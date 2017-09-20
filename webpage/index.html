@@ -1,0 +1,236 @@
+<!DOCTYPE HTML>
+<HTML>
+	<head>
+<!--		<meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1"> -->
+		<meta charset="UTF-8"> 
+		<meta name="viewport" content="width=device-width, minimum-scale=0.25"/>
+		<link rel="icon" type="image/png" href="favicon.png" />
+		<link rel="stylesheet" title="base" href="style.css" type="text/css"/>
+		<title>Karadio, the ultimate Wifi Webradio</title>
+	    <style type="text/css">
+		</style>
+	</head>
+	<body >
+	<script src="script.js"></script>
+	
+<!-- The Modal Edit window-->	
+	<div id="editStationDiv" class="modal">
+		<div class="modal-content">
+			<div id="MODALCONTENT" class="CONTENT" style ="top:10px;" >
+				<div class="tabs">
+					<h1>Edit station</h1> 
+					<div class="modal-body">							
+						<p>
+							<span class="bold">Slot number: </span><input type="text" id="add_slot" disabled="true" name="slot"><br>
+							<span class="bold">Name: </span><input type="text" style="width:350px;" id="add_name" name="name"><br>
+							<span class=bold>Full URL: </span><input type=text style="width:350px;" id=add_URL name=URL onkeyup="parseEditURL(event)" onmouseup="parseEditURL(event)">
+							<br>or<br>
+							<span class="bold">Url: </span><input type="text" id="add_url" name="url"><br>
+							<span class="bold">Port: </span><input type="text" id="add_port" name="port" value="80"><br>
+							<span class="bold">Path: </span><input type="text" id="add_path" name="path" value="/"><br>
+							<span class="bold">Volume offset: </span><input type="range" id="ovol" name="ovol" step=2  min=-126 max=126 ><br><br>
+							<input type="button"  onClick="saveStation()" value="save">&nbsp;
+							<input type="button"  onClick="eraseStation()" value="erase">&nbsp;
+							<input type="button"  onClick="abortStation()" value="abort">
+						</p>							
+					</div>
+				</div>
+			</div>
+		</div>	
+	</div>	
+
+	
+	<div id="MAIN">	
+		<div id="HEADER"  onclick="wtop()"> 
+<!--<div id="HEADER-cont">-->
+			<div class="LEFT"><img title="Click on the logo to change the theme" onClick= "theme()" src="logo.png"></div>
+			<div class="RIGHT">
+			<a href="https://github.com/karawin/Ka-Radio32" target="_blank">KaraDio32</a><br/>
+			<a href="https://github.com/karawin/Ka-Radio32" target="_blank">V0.1</a><br/>
+			<a href="http://www.karawin.fr" target="_blank" >By KaraWin</a><br/>
+<!--			<a href="https://github.com/PiotrSperka/ESP8266-WebRadio" style="font-size:8px" target="_blank">From PiotrSperka</a> -->
+			</div>
+			<div id="HEAD">
+			<span class="bold4"><span id="meta">Karadio32</span></span>
+			</div>	
+</div>	
+			
+		<div id="MAINCONTENT" class="CONTENT" >
+				<ul class="tabs">
+				<li>
+				<input type="radio" name="tabs" id="tab1" checked />
+				<label for="tab1">Radio</label>
+				<div id="tab-content1" class="tab-content">
+				<h1>Stations control &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox"  id="aplay"  onClick="autoplay()"/> AutoPlay</h1>
+					<p>
+					<select id="stationsSelect" onchange="Select()" >
+					</select></p>
+					<span id="np"><p>	
+					<!-- Rewind icon by Icons8 -->
+<img class="icon icons8" width="50" height="50"  title="Previous station" onClick="prevStation()" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAC7klEQVRoge2YzU8TQRiH98DBA0dOnvgDPHjwwLF32Z3dkhLUBMHgRxRJiIp0ZrdZaq0WhEgwAY2GqFFJ/ULamdkKsZJgICgaBEPUKBpj5EMpoRShulkPWFIqpa1JWSXz3H/J+yTzzvvOcByDwWAwGAwGg2E2NtWbu5G5rMAjUiBAPJ5xDuIKAWFfNmrKCKHmwVYB+p2iTMMCxEbaOYR3AETbBYgNSab92awxJTuhfxtAZFSStejBliEjXRHeTkSASKjY2bNU3thvrghv9x8HkET3uHvDrs4pQ+74mFLEpnpzrQ6tQ4DYONAyFPHgGaOybcQcEbGW5kuKNggg+Vl9eUxvoLNGA51NKVJY67OIsjZR5Hi4gG59MGI5U0R4iMsAIpESVzBcd/fLSjHriVjU4BZJoc0AYn1f00D4jO/rqtyGivCqL09yBAhAWK9se7lUT0KrikkmIkK83aoE3kiKtnjy+rs/MhsqwttxoSiTULGzZ97h/bRmMYkiFjWYI0B8AkCsl9b3zbk6p5Lmsi5iU725VkW7GmvMs/5vSYuJFxFrab7kCLwQEY1WXxlbN5N1ER6RglhjwpvjKYuJFwGILO46/TjsvDeRVi4rIhY1mCPJtAlArJed659PbMx0RI62jfxYq4dMEylvHPgrkapLo+aLxIg/WvF3fiZH69T9SfNFOG5lCl8TIDYOtTxf8OCZzJpdptFj7a/NF4kRu35tdd0R9c7ntK9fEWk1AGK91NMXdndNmy/CccsD0erQNICwXnVx7WZOOhAd2ltJ0RbtN96bL7IiBHEZkElkt7t3LrEH1l1RHNoFALG+v/npfOI8MntpfCai1T2Q1tKo0MkitXshfkMwTSSGgEgNQDS6t+HJnLtrOv01XgncBgjrh1uHv9eTkPkiHLf8sBIRfWVVAtEjrcMZPaxERGdLXI+WKs4Pmi/Ccb8XREQ8AGI9k6cur/ryRES1f+KpG89///kQz6b4DmIwGAwGg8FgbA5+ASg5cXSpDjcMAAAAAElFTkSuQmCC">
+					<!-- Play icon by Icons8 -->
+<img class="icon icons8" width="50" height="50" title="Play station" onClick="playStation()" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAACBElEQVRoge3XPWsUQRgH8C0sLFP6AfwAfoAUqcXszG5QCw8sIljkCkGFZGd33RwJFz3FgC9JIWgTTRGMx2VeLkQOtVhOsDgF30AlRUCOaC6bEI/T87EICxGieTFhGHx+8PT/P+zOPGNZCCGEEEII7TcaTXfozrAnCBOKMFEwvpDjy9j2OBBfLNn9pWxXVDmgO9OuOL6M+8ZqkB2vtSiTLRqo+e4Bfkx3rh1zfBlnx19BQTZguFiHM6PPVwnjbScsx9TjR3Tn27aNRdKJphYgM/I0IR5vu4GaOHqRH9Kdc0ubFUnHu/8JTuQerxAmmoSJsCuqHNSd94/+VqQgG3BFLMH5u+/ADcvfqC8XbW8mozvzprYqks7IzBfou11rEiZ+OKF6081Knbqz/2a7RdIZelSH3uvVxPY4uKFSdn/xsO4OlmXtvMjGA+FU/klCmGw5obqp/ULdbZF0BiY+wvHBuVXqy0TrhbonRXIGF4mmFiCTf7ZsM/HdDcq3jPu0hot16B2trhDG2z3hrHk/+2X+FbJj6/uYE6i3Rh6/F+69h55wdo36yswL0Z+ch5NDlYQw0SSBGDRuRck9/Aynr8bLxONt91L5gXFLY760CGdvvFhbX+NV1cA1/iWcu/ManEC1KBMfjH1YEU/8pEw2jH7qEiYUZfKa9gvtXxlfACGEEEII/T9+AR8nzQFJqsL+AAAAAElFTkSuQmCC">
+					<!-- Stop icon by Icons8 -->
+<img class="icon icons8" width="50" height="50" title="Stop station" onClick="stopStation()" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAAiklEQVRoge3YsQmAMBBAUUfISA4gwXFEUqR3kXQWEpwnG7hB7MRAIhZeivgfXHlwv72uAwAAACQN09bnZrSrKu2MdlWlvYqnp/TsY26ejhqmrS/tVTw9pWcfjQtx2Y9r3obcd4wLhHyCEEKEEEKIEEIIEUIIIUIIIUQIIYQIaeb50Mw7CAAAAP9wAgwPdP6eVGKaAAAAAElFTkSuQmCC">		
+					<!-- Fast Forward icon by Icons8 -->
+<img class="icon icons8" width="50" height="50" title="Next station" onClick="nextStation()" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAADAElEQVRoge2Yy0tUURjAZ9GyZato0bJlixYtWvQHNPc1ZoWCRZKIRUZlzrnnjpNOvm6CpGIRlUGCRaE5c+65V0WRwKHMRCyLDMGih++L48jM5Pi1yIHIbO4VxzE7PzjLD74f936PcxwOBoPBYDAYDAZjIznqfbRzM+NSBicTvxORk7bjkDbqlLWDKUhpfYiYBjlEgJfpPU4mB6zGcYiAgGmIQ4FSrujp7lTmaAkR0+CpmiBklnZFeazNOd3kiJU4DhHIqxsAEesxHtPXTrd/X6pz/SsipsGzN4ehisxCXv2rMIcISIrRnKwGOEQAt4yDr20SsiufzfNIizndgcLNynsVCRGVmqBSE3DLOLi8HWEB69+csv/QWnEJkUTchbvvlgWZxiSP0S8VaXs208HhcKwWUakJFf5pOF37PMQjEpcUve6wt2dHMhGVmnD1yVc44esJ8VgLcyiQnXaRxCl+MAaiokckjz4qILI/mYhKTajW5uDcreEYL5O45NF1p9e/K+0iKjWhvH0KctS+eV6mMRHrVxJfZy2RxPE+/gyZpV0LAtanrTaQlIokzqWm9yBgGpU8+oBQTPcmE1GpCVVkFvLrBxd5mcRdHqMppUPUqohKTShrnYCs8t4QL2sRKyK/NZBFUdG/pGyI2hFJnMI7I8t2RFRqQmVgBnJr+xd4ROKuEr3mTw0kDSJv/20RX9skZFXY/7WUhx8hw9u5NX6ty/dHQVRoVCoxLBd7tTYH+Q2DEV4mcZe3I73FXt4+BTnX+0KcrH0XMHXbab/HyrpDokJn0t5+3c1j4PJ0LIqK/sHOQDx/e2SJR9qSq8Qw0joQKwMzcObGwAKPSFwqMRqsrihlrROQVdE7vyVWFM+jT5Dh7QyLij5hZ2lcGZgxl8d4mdalsVqbg4LGocjPHclosbrG/7rCCFi/uFl5r0LENJhb+wKO+7qjgkxNOxergsYhkBQjJsj0zZa4WK1cdQN2CpNDBHhE4rysXdvw4bYets3jw7Z5DmIwGAwGg8Fg/J/8ALvQciqFBZLiAAAAAElFTkSuQmCC">
+<br/>
+<!--					
+					<input type="button" value="Previous"  onClick="prevStation()"> &nbsp;
+					<input type="button" value="Next"  onClick="nextStation()">
+					<input type="button" value="Play"  onClick="playStation()"> &nbsp;
+					<input type="button" value="Stop"  onClick="stopStation()">
+-->					
+					</p></span><p>
+					
+
+                     <span class="bold2">Volume: </span>
+					 &nbsp;&nbsp;<span id="vol1_span"></span><br/>
+					<input type="range" id="vol1_range" name="vol1"  onChange="onRangeVolChange(this.value,true)"  min=0 max=254 style="height:25px;">
+					</p>				
+				 <h1>Station No <span id="curst"></span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" checked  id="Full"  onclick="full()"/> Full</h1>				  
+					<p><span class="bold1" >Name: </span><span id="name"></span>&nbsp;&nbsp;<img id="icon" src=""  height="16px" width="16px"> </p>
+					<p><span id="ldescr"> <span class="bold1">Description: </span><span id="descr"></span></span></p>
+					<p><span id="lnot1"><span class="bold1">Notice: </span><span id="not1"></span> <span id="not2"></span></span></p>
+					<p><span id="lgenre"><span class="bold1">Genre: </span><span id="genre"></span></span></p>
+					<p><span id="lurl"><span class="bold1">URL: </span><a  target="_blank" id="url2"> <span id="url1"></span></a></span></p>
+					<p><span id="lbitr"><span class="bold1">Bitrate: </span><span id="bitr"></span></span></p>
+							
+				 <h1>Monitoring</h1>	
+				 <p>
+				 <!-- Play icon by Icons8 -->
+<img class="icon icons8" width="40" height="40" title="Play monitoring" onClick="mplay()" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAACBElEQVRoge3XPWsUQRgH8C0sLFP6AfwAfoAUqcXszG5QCw8sIljkCkGFZGd33RwJFz3FgC9JIWgTTRGMx2VeLkQOtVhOsDgF30AlRUCOaC6bEI/T87EICxGieTFhGHx+8PT/P+zOPGNZCCGEEEII7TcaTXfozrAnCBOKMFEwvpDjy9j2OBBfLNn9pWxXVDmgO9OuOL6M+8ZqkB2vtSiTLRqo+e4Bfkx3rh1zfBlnx19BQTZguFiHM6PPVwnjbScsx9TjR3Tn27aNRdKJphYgM/I0IR5vu4GaOHqRH9Kdc0ubFUnHu/8JTuQerxAmmoSJsCuqHNSd94/+VqQgG3BFLMH5u+/ADcvfqC8XbW8mozvzprYqks7IzBfou11rEiZ+OKF6081Knbqz/2a7RdIZelSH3uvVxPY4uKFSdn/xsO4OlmXtvMjGA+FU/klCmGw5obqp/ULdbZF0BiY+wvHBuVXqy0TrhbonRXIGF4mmFiCTf7ZsM/HdDcq3jPu0hot16B2trhDG2z3hrHk/+2X+FbJj6/uYE6i3Rh6/F+69h55wdo36yswL0Z+ch5NDlYQw0SSBGDRuRck9/Aynr8bLxONt91L5gXFLY760CGdvvFhbX+NV1cA1/iWcu/ManEC1KBMfjH1YEU/8pEw2jH7qEiYUZfKa9gvtXxlfACGEEEII/T9+AR8nzQFJqsL+AAAAAElFTkSuQmCC">&nbsp;
+					<!-- Stop icon by Icons8 -->
+<img class="icon icons8" width="40" height="40" title="Stop monitoring" onClick="mstop()" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAAiklEQVRoge3YsQmAMBBAUUfISA4gwXFEUqR3kXQWEpwnG7hB7MRAIhZeivgfXHlwv72uAwAAACQN09bnZrSrKu2MdlWlvYqnp/TsY26ejhqmrS/tVTw9pWcfjQtx2Y9r3obcd4wLhHyCEEKEEEKIEEIIEUIIIUIIIUQIIYQIaeb50Mw7CAAAAP9wAgwPdP6eVGKaAAAAAElFTkSuQmCC"> 		
+<!--
+					<input type="button" value="Play"  onClick="mplay()"> &nbsp;
+					<input type="button" value="Stop"  onClick="mstop()"></p>
+-->					
+				</p>
+				<p>
+					<span class="bold2">Volume</span><br/>					
+					<input type="range" id="volm_range" name="volm"  onChange="mvol(this.value/100)" min=0 max=100 style="height:25px;" >
+				</p></br>
+				<audio  volume="1"  id="audio" src=""  class="audio_sound" onerror="monerror()">
+						I'm sorry; your browser doesn't support HTML5 <code>audio</code>.
+				</audio>
+				 
+				<h1>Sleep / Wake&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="time">time</span></h1>
+				<p id="sw">
+					<span class="bold1" title="Time mode: HH:MM, or Delay mode (minutes): MM"> Sleep(i) : </span><input type="text" id="sleepdelay" onkeyup="sleepup(event)"> 
+					&nbsp;<input type="button" value="Start"  onClick="startSleep()"><input type="button" value="Stop"  onClick="stopSleep()">
+					&nbsp;&nbsp;  In: <span id="sminutes">0</span> Sec.
+				</p>
+				<p id="sw">
+					<span class="bold1" title="Time mode: HH:MM, or Delay mode (minutes): MM"> Wake(i) : </span><input type="text" id="wakedelay" onkeyup="wakeup(event)">
+					&nbsp;<input type="button" value="Start"  onClick="startWake()"><input type="button" value="Stop"  onClick="stopWake()">
+					 &nbsp;&nbsp; In: <span id="wminutes">0</span> Sec. 
+				</p>
+				<h1>Instant play</h1>
+					<p>
+					<span class=bold1>Full URL: </span>
+					<input type=text style="width:350px;" id=instant_URL name=URL onkeyup="parseURL(event)" onmouseup="parseEditURL(event)"><br/>
+					or<br/> 
+					<span class="bold1">Url: </span><input type="text" id="instant_url" name="url"><br>
+					<span class="bold1">Port: </span><input type="text" id="instant_port" name="port" value="80"><br>
+					<span class="bold1">Path: </span><input type="text" id="instant_path" name="path" value="/"><br><br>
+					
+					<!-- Play icon by Icons8 -->
+<img class="icon icons8" width="40" height="40" title="Play instant station" onClick="instantPlay()" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAACBElEQVRoge3XPWsUQRgH8C0sLFP6AfwAfoAUqcXszG5QCw8sIljkCkGFZGd33RwJFz3FgC9JIWgTTRGMx2VeLkQOtVhOsDgF30AlRUCOaC6bEI/T87EICxGieTFhGHx+8PT/P+zOPGNZCCGEEEII7TcaTXfozrAnCBOKMFEwvpDjy9j2OBBfLNn9pWxXVDmgO9OuOL6M+8ZqkB2vtSiTLRqo+e4Bfkx3rh1zfBlnx19BQTZguFiHM6PPVwnjbScsx9TjR3Tn27aNRdKJphYgM/I0IR5vu4GaOHqRH9Kdc0ubFUnHu/8JTuQerxAmmoSJsCuqHNSd94/+VqQgG3BFLMH5u+/ADcvfqC8XbW8mozvzprYqks7IzBfou11rEiZ+OKF6081Knbqz/2a7RdIZelSH3uvVxPY4uKFSdn/xsO4OlmXtvMjGA+FU/klCmGw5obqp/ULdbZF0BiY+wvHBuVXqy0TrhbonRXIGF4mmFiCTf7ZsM/HdDcq3jPu0hot16B2trhDG2z3hrHk/+2X+FbJj6/uYE6i3Rh6/F+69h55wdo36yswL0Z+ch5NDlYQw0SSBGDRuRck9/Aynr8bLxONt91L5gXFLY760CGdvvFhbX+NV1cA1/iWcu/ManEC1KBMfjH1YEU/8pEw2jH7qEiYUZfKa9gvtXxlfACGEEEII/T9+AR8nzQFJqsL+AAAAAElFTkSuQmCC">&nbsp;
+					<!-- Stop icon by Icons8 -->
+<img class="icon icons8" width="40" height="40" title="Stop instant station" onClick="stopStation()" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAAiklEQVRoge3YsQmAMBBAUUfISA4gwXFEUqR3kXQWEpwnG7hB7MRAIhZeivgfXHlwv72uAwAAACQN09bnZrSrKu2MdlWlvYqnp/TsY26ejhqmrS/tVTw9pWcfjQtx2Y9r3obcd4wLhHyCEEKEEEKIEEIIEUIIIUIIIUQIIYQIaeb50Mw7CAAAAP9wAgwPdP6eVGKaAAAAAElFTkSuQmCC">						
+<!--					
+					<input type="button" value="Play"   onClick="instantPlay()">&nbsp;
+					<input type="button" value="Stop"  onClick="stopStation()">
+-->					
+					</p>					
+				</div>
+				</li>
+				<li>
+					<input type="radio" name="tabs" id="tab2" />
+					<label for="tab2">EDIT</label>
+					<div id="tab-content2" class="tab-content">
+						<!--<h1>Manage stations</h1>--><br/>
+						<input type="button" id="refresh" title="This will reload the stations from the WebRadio" onClick="refreshList()"  value="Refresh locale list(i)">
+						<input type="button" id="stsave" disabled="true" style="margin:0px auto" title="This will save all stations to the WebRadio" onClick="stChanged()"  value="Save the list(i)">
+						<input type="button" style="margin:0px auto" id="clear" title="Warning: This will erase all stations.\n Be sure to save them before." onClick="clearList()"  value="Erase all(i)">				
+						<input type="button" style="margin:0px auto" id="clear" title="Print the list" onClick="printList()"  value="Print all(i)"><br/>				
+						<br/>
+						<span >You can Drag/Drop each line to sort the list</span><br/>
+						<table id = "stationsTable" style="table-layout: fixed; width: 100%;">
+							<thead><tr><td style="width:8%">No.</td><td style="width:30%; ">Name</td><td style="width:20%">URL</td><td style="width:20%">File</td><td style="width:8%">Port</td><td style="width:4%">Vol</td><td style="width:9%"></td></tr></thead>
+							<tbody>  							
+							</tbody>
+						</table>
+		
+					</div>
+				</li>
+				<li>
+					<input type="radio" name="tabs" id="tab3" />
+					<label for="tab3">Setting</label>
+					<div id="tab-content3" class="tab-content">
+					<h1>Sound Setting &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="Reset" onClick="resetEQ()"/></h1>
+						<p>
+						<span class="bold">Treble control: </span><input type="range" id="treble_range" name="treble"  onChange="onRangeChange('treble_range', 'treble_span', 1.5, false)" min=-8 max=7 > <span id="treble_span"></span><br>
+						<span class="bold">Treble frequency: </span><input type="range" id="treblefreq_range" name="treblefreq"  onChange="onRangeChangeFreqTreble('treblefreq_range', 'treblefreq_span', 1, false)" min=1 max=15 > <span id="treblefreq_span"></span><br>
+						<span class="bold">  Bass enhance: </span><input type="range"  id="bass_range" name="bass"  onChange="onRangeChange('bass_range', 'bass_span', 1, false)" min=0 max=15 > <span id="bass_span"></span><br>
+						<span class="bold">  Bass frequency: </span><input type="range"  id="bassfreq_range" name="bassfreq"  onChange="onRangeChangeFreqBass('bassfreq_range', 'bassfreq_span', 10, false)" min=2 max=15 > <span id="bassfreq_span"></span><br>
+						<span class="bold">  Spacialization: </span><input type="range"  id="spacial_range" name="spacial"  onChange="onRangeChangeSpatial('spacial_range', 'spacial_span')" min=0 max=3 > <span id="spacial_span"></span><br>
+						<br/>
+						<span class="bold">Volume: </span><input type="range" id="vol_range" name="vol"  onChange="onRangeVolChange(this.value,true)" value=100 min=0 max=254 > <span id="vol_span"></span><br>
+						</p>
+					<h1>Stations Save & Restore</h1>
+						<p>
+						<input type="button"  onClick="saveTextAsFile()" value="Save Stations from WebRadio"> 
+						<span style="display:inline-block;">To &nbsp;&nbsp;&nbsp;
+						<input type="text" style="width:300px;" value="WebStations.txt" id="filesave"></span>
+<!--						<a HREF="" download="WebStations.txt" id="downloadlink" style="display: none;">Download it</a>
+ -->
+						<br/><br/>
+						<input type="button"   onClick="downloadStations()" value="Restore Stations to WebRadio"> <span style="display:inline-block;">From 
+						<input type="file" style="width:300px;" id="fileload"></span><br/>
+<!--						<input type="button" id="refresh" title="This will reload the stations from the WebRadio" onClick="refreshList()"  value="Refresh locale list">
+						<input type="button" style="float:right;" id="clear" title="Warning: This will clear all stations.\n Be sure to save them before." onClick="clearList()"  value="Clear all stations"><br/>				
+						<br/>-->
+						</p>
+					<h1>Wifi & Network &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="Validate" onclick="valid()" /></h1>
+						<p>
+						<span class="bold">AP SSID:</span>
+						<input  id="ssid" type="text" /> <input  id="ssid2" type="text" />
+						<br/>
+						<span class="bold"> AP PASSWORD:</span>
+						<input id="passwd" type="password"  /> <input id="passwd2" type="password"  />
+						</p>
+						<p>
+						<span class="bold"> Mac Address:</span><span id="Mac"></span><br/>
+						<span class="bold"> Use DHCP:</span><input id="dhcp" type=checkbox onclick="clickdhcp()" /><br/>
+						<span class="bold">Ip:</span>
+						<input  id="ip" type="text" oninput="chkip(this)" />
+						<br/>
+						<span class="bold">Mask:</span>
+						<input id="mask" type="text" oninput="chkip(this)" value="255.255.255.0" /><br/>
+						<span class="bold">Gateway:</span>
+						<input id="gw" type="text" oninput="chkip(this)" />
+							</p>						
+					<h1>HTML Option &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="Validate" onclick="wifi(0)" /></h1>
+						<p>						
+						<span class="bold">User Agent:</span>
+						<input id="ua" type="text" value="" />						
+						</p>
+					<h1>Update to: <span id="newrelease"></span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type=button value="Update now" onclick="upgrade()" /><br/>	</h1>
+						<p>
+						<span class="bold4" id="Version"></span><br/>
+						<span class="bold4">To update or reload the current release:</span><br/><br/>		
+						<input type=button value="Update now" onclick="upgrade()" /><br/>	
+						<span class="bold4" id="Infos"></span><br/>
+						</p>
+					<h1>History:</h1><BR/>
+						<input type=button value="Read the history" onclick="checkhistory()" /></span><br/>
+						<span class="bold4" id="History"><br/>
+					</div>
+				</li>
+				</ul>
+			</div>
+		</div>	
+	</body>
+</HTML>

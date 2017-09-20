@@ -1,0 +1,673 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <nvs.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/event_groups.h"
+#include "esp_system.h"
+#include "esp_wifi.h"
+#include "esp_event_loop.h"
+#include "esp_log.h"
+#include "nvs_flash.h"
+//#include "http.h"
+#include "driver/i2s.h"
+#include "driver/uart.h"
+
+#include "lwip/sys.h"
+#include "lwip/netdb.h"
+#include "lwip/api.h"
+#include "lwip/tcp.h"
+#include "lwip/dns.h"
+
+//#include "ui.h"
+#include "spiram_fifo.h"
+#include "audio_renderer.h"
+//#include "web_radio.h"
+#include "playerconfig.h"
+#include "app_main.h"
+#include "mdns_task.h"
+#include "audio_player.h"
+#ifdef CONFIG_BT_SPEAKER_MODE
+#include "bt_speaker.h"
+#endif
+
+
+#include "eeprom.h"
+
+/////////////////////////////////////////////////////
+///////////////////////////
+#include "bt_config.h"
+#include "driver/gpio.h"
+#include "driver/i2c.h"
+//#include "esp_wifi.h"
+#include "xi2c.h"
+#include "fonts.h"
+#include "ssd1306.h"
+#include "nvs_flash.h"
+#include "gpio16.h"
+#include "buffer.h"
+#include "servers.h"
+#include "webclient.h"
+#include "webserver.h"
+#include "interface.h"
+#include "vs1053.h"
+
+
+
+//#define BLINK_GPIO 4
+#define I2C_EXAMPLE_MASTER_SCL_IO    14    /*!< gpio number for I2C master clock */////////////
+#define I2C_EXAMPLE_MASTER_SDA_IO    13    /*!< gpio number for I2C master data  *//////////////
+#define I2C_EXAMPLE_MASTER_NUM I2C_NUM_1   /*!< I2C port number for master dev */
+#define I2C_EXAMPLE_MASTER_TX_BUF_DISABLE   0   /*!< I2C master do not need buffer */
+#define I2C_EXAMPLE_MASTER_RX_BUF_DISABLE   0   /*!< I2C master do not need buffer */
+#define I2C_EXAMPLE_MASTER_FREQ_HZ    100000     /*!< I2C master clock frequency */
+
+
+#define WIFI_LIST_NUM   10
+#define TAG "main"
+
+//Priorities of the reader and the decoder thread. bigger number = higher prio
+#define PRIO_READER configMAX_PRIORITIES -3
+#define PRIO_MQTT configMAX_PRIORITIES - 3
+#define PRIO_CONNECT configMAX_PRIORITIES -1
+
+
+/* */
+EventGroupHandle_t wifi_event_group ;
+wifi_mode_t mode;
+xSemaphoreHandle print_mux;
+static uint8_t FlashCount = 0xFF;
+uint16_t FlashOn = 5,FlashOff = 5;
+bool ledStatus = true; // true: normal blink, false: led on when playing
+player_t *player_config;
+
+const char striWATERMARK[]  = {"watermark %s: %d  heap:%d\n"};
+
+void i2c_state(char* State)
+{
+	SSD1306_GotoXY(2, 30); 
+	SSD1306_DrawRectangle(2, 30, SSD1306_WIDTH - 1, 10, SSD1306_COLOR_BLACK);	
+    SSD1306_Puts(State, &Font_7x10, SSD1306_COLOR_WHITE);
+	SSD1306_UpdateScreen();
+}
+
+void i2c_test(char* ip)
+{
+	
+    char *url = "Stopped";// get_url(); // play_url();
+
+    SSD1306_Fill(SSD1306_COLOR_BLACK); // clear screen
+
+    SSD1306_GotoXY(20, 4);
+    SSD1306_Puts("KaraDio", &Font_11x18, SSD1306_COLOR_WHITE);
+    
+    SSD1306_GotoXY(2, 20);
+
+    SSD1306_Puts("WiFi Webradio", &Font_7x10, SSD1306_COLOR_WHITE);
+    SSD1306_GotoXY(2, 30);
+    
+    SSD1306_Puts(url, &Font_7x10, SSD1306_COLOR_WHITE);
+    if (strlen(url) > 18)  {
+      SSD1306_GotoXY(2, 39);
+      SSD1306_Puts(url + 18, &Font_7x10, SSD1306_COLOR_WHITE);
+    }
+    SSD1306_GotoXY(16, 53);
+
+
+    SSD1306_GotoXY(2, 53);
+    SSD1306_Puts("IP:", &Font_7x10, SSD1306_COLOR_WHITE);
+    SSD1306_Puts(ip, &Font_7x10, SSD1306_COLOR_WHITE);    
+
+    // Update screen, send changes to LCD 
+    SSD1306_UpdateScreen();
+   
+/* for class-D amplifier system. Dim OLED to avoid noise from panel*/
+/* PLEASE comment out next three lines for ESP32-ADB system*/  
+ //   vTaskDelay(500);
+//    SSD1306_Fill(SSD1306_COLOR_BLACK);
+//    SSD1306_UpdateScreen();  
+/* The above part is for class-D webradio system*/
+    
+}
+
+/**
+ * @brief i2c master initialization
+ */
+static void i2c_example_master_init()
+{
+    int i2c_master_port = I2C_EXAMPLE_MASTER_NUM;
+    i2c_config_t conf;
+    conf.mode = I2C_MODE_MASTER;
+    conf.sda_io_num = I2C_EXAMPLE_MASTER_SDA_IO;
+    conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
+    conf.scl_io_num = I2C_EXAMPLE_MASTER_SCL_IO;
+    conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
+    conf.master.clk_speed = I2C_EXAMPLE_MASTER_FREQ_HZ;
+    i2c_param_config(i2c_master_port, &conf);
+    i2c_driver_install(i2c_master_port, conf.mode,
+                       I2C_EXAMPLE_MASTER_RX_BUF_DISABLE,
+                       I2C_EXAMPLE_MASTER_TX_BUF_DISABLE, 0);
+}
+
+//////////////////////////////////////////////////////////////////
+
+static renderer_config_t *create_renderer_config()
+{
+    renderer_config_t *renderer_config = calloc(1, sizeof(renderer_config_t));
+
+    renderer_config->bit_depth = I2S_BITS_PER_SAMPLE_16BIT;
+    renderer_config->i2s_num = I2S_NUM_0;
+    renderer_config->sample_rate = 44100;
+    renderer_config->sample_rate_modifier = 1.0;
+    renderer_config->output_mode = AUDIO_OUTPUT_MODE;
+
+    if(renderer_config->output_mode == I2S_MERUS) {
+        renderer_config->bit_depth = I2S_BITS_PER_SAMPLE_32BIT;
+    }
+
+    if(renderer_config->output_mode == DAC_BUILT_IN) {
+        renderer_config->bit_depth = I2S_BITS_PER_SAMPLE_16BIT;
+    }
+
+    return renderer_config;
+}
+
+
+void start_network();
+
+/******************************************************************************
+ * FunctionName : checkUart
+ * Description  : Check for a valid uart baudrate
+ * Parameters   : baud
+ * Returns      : baud
+*******************************************************************************/
+uint32_t checkUart(uint32_t speed)
+{
+	uint32_t valid[] = {1200,2400,4800,9600,14400,19200,28800,38400,57600,76880,115200,230400};
+	int i ;
+	for (i=0;i<12;i++){
+		if (speed == valid[i]) return speed;
+	}
+	return 115200; // default
+}
+
+
+/******************************************************************************
+ * FunctionName : init_hardware
+ * Description  : Init all hardware, partitions etc
+ * Parameters   : 
+ * Returns      : 
+*******************************************************************************/
+static void init_hardware()
+{
+    ESP_ERROR_CHECK(nvs_flash_init());
+	partitions_init();
+	VS1053_HW_init(); // init spi
+	initBuffer();
+	
+
+    //Initialize the SPI RAM chip communications and see if it actually retains some bytes. If it
+    //doesn't, warn user.
+    if (!spiRamFifoInit()) {
+        printf("\n\nSPI RAM chip fail!\n");
+        while(1);
+    }
+
+    ESP_LOGI(TAG, "hardware initialized");
+}
+
+
+
+/* event handler for pre-defined wifi events */
+static esp_err_t event_handler(void *ctx, system_event_t *event)
+{
+    EventGroupHandle_t wifi_event = ctx;
+
+    switch (event->event_id)
+    {
+    case SYSTEM_EVENT_STA_START:
+		FlashOn = FlashOff = 50;
+        esp_wifi_connect();
+        break;
+		
+	case SYSTEM_EVENT_STA_CONNECTED:
+		xEventGroupSetBits(wifi_event, CONNECTED_AP);
+		
+		break;
+
+    case SYSTEM_EVENT_STA_GOT_IP:
+		FlashOn = 10;FlashOff = 190;
+        xEventGroupSetBits(wifi_event, CONNECTED_BIT);
+        break;
+
+    case SYSTEM_EVENT_STA_DISCONNECTED:
+        /* This is a workaround as ESP32 WiFi libs don't currently
+           auto-reassociate. */
+		FlashOn = FlashOff = 50;
+		xEventGroupClearBits(wifi_event, CONNECTED_AP);
+        esp_wifi_connect();
+        xEventGroupClearBits(wifi_event, CONNECTED_BIT);
+		
+        break;
+
+	case SYSTEM_EVENT_AP_START:
+		FlashOn = 10;FlashOff = 190;
+		xEventGroupSetBits(wifi_event, CONNECTED_AP);
+		xEventGroupSetBits(wifi_event, CONNECTED_BIT);
+		break;
+		
+	case SYSTEM_EVENT_AP_STADISCONNECTED:
+		break;
+		
+    default:
+        break;
+    }
+
+    return ESP_OK;
+}
+
+
+static void initialise_wifi_and_network()
+{
+	wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+	
+	tcpip_adapter_init();	
+	wifi_event_group = xEventGroupCreate();
+	
+    ESP_ERROR_CHECK( esp_event_loop_init(event_handler, wifi_event_group) );
+    ESP_ERROR_CHECK( esp_wifi_init(&cfg) );
+    ESP_ERROR_CHECK( esp_wifi_set_storage(WIFI_STORAGE_FLASH) );
+
+}
+
+static void start_wifi()
+{
+    ESP_LOGI(TAG, "starting wifi");
+	struct device_settings *device;	
+	char ssid[32]; 
+	char pass[64];
+	
+    /* FreeRTOS event group to signal when we are connected & ready to make a request */
+//    EventGroupHandle_t wifi_event_group = xEventGroupCreate();
+
+    /* init wifi & network*/
+    initialise_wifi_and_network();
+	
+	device = getDeviceSettings();
+
+	switch (device->current_ap)
+	{
+		case STA1: //ssid1 used
+			strcpy(ssid,device->ssid1);
+			strcpy(pass,device->pass1);
+			esp_wifi_set_mode(WIFI_MODE_STA) ;
+		break;
+		case STA2: //ssid2 used
+			strcpy(ssid,device->ssid2);
+			strcpy(pass,device->pass2);	
+			esp_wifi_set_mode(WIFI_MODE_STA) ;			
+		break;
+
+		default: // other: AP mode
+			device->current_ap = 0;
+			esp_wifi_set_mode(WIFI_MODE_AP) ;
+	}
+	
+	
+	ESP_ERROR_CHECK(esp_wifi_get_mode(&mode))	
+	if (mode == WIFI_MODE_AP)
+	{
+		wifi_config_t wifi_config = {
+			.ap = {
+				.ssid = "WifiKaradio",
+				.password = "",
+				.ssid_len = 0,
+				.authmode = WIFI_AUTH_OPEN,
+				.max_connection = 4,
+				.beacon_interval = 100,
+			},
+		};
+		ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &wifi_config));
+	}
+	else
+	{
+		wifi_config_t wifi_config = {
+			.sta = {
+				.bssid_set = 0,
+			},
+		};
+		strcpy((char*)wifi_config.sta.ssid,ssid);
+		strcpy((char*)wifi_config.sta.password,pass);
+		esp_wifi_disconnect();
+		ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
+		ESP_LOGI(TAG, "connecting");
+		esp_wifi_connect();				
+	}
+//	strcpy((char*)wifi_config.sta.ssid,device->ssid1);
+//	strcpy((char*)wifi_config.sta.password,device->pass1);	
+	
+    ESP_ERROR_CHECK( esp_wifi_start() );
+	ESP_LOGI(TAG, "Initialised wifi");
+//    set_wifi_credentials();
+ 
+    /* Wait for the callback to set the CONNECTED_BIT in the event group. */
+    if ( (xEventGroupWaitBits(wifi_event_group, CONNECTED_AP,false, true, 2000) & CONNECTED_AP) ==0) //timeout
+	{
+		device->current_ap++;
+		device->current_ap %=3;
+		saveDeviceSettings(device);
+		printf("\ndevice->current_ap: %d\n",device->current_ap);
+		vTaskDelay(100);
+		esp_restart();
+		
+	}							
+						
+	i2c_state("Connected to AP");	
+	free(device);
+}
+
+void start_network(){
+	struct device_settings *device;	
+	tcpip_adapter_ip_info_t info;
+	
+	struct ip4_addr ipAddr;
+	struct ip4_addr mask;
+	struct ip4_addr gate;
+	uint8_t dhcpEn = 0;
+	
+	device = getDeviceSettings();	
+	// Wifi ok .
+	
+	switch (device->current_ap)
+	{
+		case STA1: //ssid1 used
+			IP4_ADDR(&ipAddr, device->ipAddr1[0], device->ipAddr1[1],device->ipAddr1[2], device->ipAddr1[3]);
+			IP4_ADDR(&gate, device->gate1[0],device->gate1[1],device->gate1[2], device->gate1[3]);
+			IP4_ADDR(&mask, device->mask1[0], device->mask1[1],device->mask1[2], device->mask1[3]);
+			dhcpEn = device->dhcpEn1;
+		break;
+		case STA2: //ssid2 used
+			IP4_ADDR(&ipAddr, device->ipAddr2[0], device->ipAddr2[1],device->ipAddr2[2], device->ipAddr2[3]);
+			IP4_ADDR(&gate, device->gate2[0],device->gate2[1],device->gate2[2], device->gate2[3]);
+			IP4_ADDR(&mask, device->mask2[0], device->mask2[1],device->mask2[2], device->mask2[3]);
+			dhcpEn = device->dhcpEn2;
+		break;
+
+		default: // other: AP mode
+			IP4_ADDR(&ipAddr, 192,168,4,1);
+			IPADDR2_COPY(&gate,&ipAddr);
+			IP4_ADDR(&mask,255,255,255,0);
+	}	
+	
+	IPADDR2_COPY(&info.ip,&ipAddr);
+	IPADDR2_COPY(&info.gw,&gate);
+	IPADDR2_COPY(&info.netmask,&mask);	
+
+	if (mode == WIFI_MODE_AP)
+	{
+			xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT,false, true, 3000);
+			IPADDR2_COPY(&info.ip,&ipAddr);
+			tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_AP, &info);
+			device->dhcpEn1 = device->dhcpEn2 = 1;
+			IPADDR2_COPY(&device->mask1, &mask);
+			IPADDR2_COPY(&device->mask2, &mask);
+			saveDeviceSettings(device);			
+	}
+	else // mode STA
+	{	
+		if ((!dhcpEn) ) // check if ip is valid without dhcp
+		{
+			tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA);  // stop dhcp client	
+			tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_STA, &info);
+			dns_setserver(0,( ip_addr_t* ) &info.gw);
+			ip_addr_t ipdns = dns_getserver(0);
+			printf("DNS: %s  \n",ip4addr_ntoa(( struct ip4_addr* ) &ipdns));
+		}
+		vTaskDelay(1);
+		// wait for ip
+						
+		if ( (xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT,false, true, 3000) & CONNECTED_BIT) ==0) //timeout	
+		{ // enable dhcp and restart
+			if (device->current_ap ==1)
+				device->dhcpEn1 = 1;
+			else
+				device->dhcpEn2 = 1;
+			saveDeviceSettings(device);	
+			esp_restart();
+		}				
+		tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &info);
+		
+		if (dhcpEn) // if dhcp enabled update fields
+		{  
+			IPADDR2_COPY(&device->ipAddr1, &info.ip);
+			IPADDR2_COPY(&device->mask1, &info.netmask);
+			IPADDR2_COPY(&device->gate1, &info.gw);	
+			saveDeviceSettings(device);		
+		}
+		else
+		{
+			// if static ip	check dns
+//			dns_setserver(0,( ip_addr_t* ) &gate);
+			ip_addr_t ipdns = dns_getserver(0);
+			printf("DNS: %s  \n",ip4addr_ntoa(( struct ip4_addr* ) &ipdns));
+		}
+	}
+	
+	i2c_state("IP found");	
+  /* start mDNS */
+    // xTaskCreatePinnedToCore(&mdns_task, "mdns_task", 2048, wifi_event_group, 5, NULL, 0);
+
+	free(device);
+}
+
+
+//blinking led
+void testtask(void* p) {
+struct device_settings *device;	
+
+/*	int uxHighWaterMark;
+	uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+	printf(striWATERMARK,"testtask",uxHighWaterMark,xPortGetFreeHeapSize( ));
+*/
+	gpio4_output_conf();	
+	while(FlashCount==0xFF) {
+//		ESP_LOGI(TAG,"Led %d %d",FlashOff,	FlashOn);
+		if (ledStatus) gpio4_output_set(0);
+		vTaskDelay(FlashOff ); 
+		
+		if (ledStatus) // on led and save volume if changed
+		{		
+			gpio4_output_set(1);
+			vTaskDelay(FlashOn);
+		}	
+
+		// save volume if changed		
+		device = getDeviceSettings();
+		if (device != NULL)
+		{	
+			if (device->vol != clientIvol){ 
+				device->vol = clientIvol;
+				saveDeviceSettings(device);
+//	uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+//	printf(striWATERMARK,"testtask",uxHighWaterMark,xPortGetFreeHeapSize( ));
+			}
+			free(device);	
+		}			
+	}
+//	printf("t0 end\n");
+	vTaskDelete( NULL ); // stop the task (never reached)
+}
+
+void uartInterfaceTask(void *pvParameters) {
+	char tmp[255];
+	int d;
+	uint8_t c;
+	int t ;
+	struct device_settings *device;
+	uint32_t uspeed;
+	
+	device = getDeviceSettings();
+	uspeed = device->uartspeed;	
+	free (device);
+	
+   uart_config_t uart_config0 = {
+        .baud_rate = uspeed,
+        .data_bits = UART_DATA_8_BITS,
+        .parity = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,    //UART_HW_FLOWCTRL_CTS_RTS,
+        .rx_flow_ctrl_thresh = 0,
+    };	
+	uart_param_config(UART_NUM_0, &uart_config0);	
+	uart_driver_install(UART_NUM_0, 1024 , 0, 0, NULL, 0);
+	
+	for(t = 0; t<sizeof(tmp); t++) tmp[t] = 0;
+	t = 0;
+	
+	while(1) {
+		while(1) {
+			d= uart_read_bytes(UART_NUM_0, &c, 1, 100);
+			if (d>0)
+			{
+				if((char)c == '\r') break;
+				if((char)c == '\n') break;
+				tmp[t] = (char)c;
+				t++;
+				if(t == sizeof(tmp)-1) t = 0;
+			}
+			//else printf("uart d: %d, T= %d\n",d,t);
+			switchCommand() ;  // hardware panel of command
+		}
+		checkCommand(t, tmp);
+		
+/*	uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+	printf("watermark uartInterfaceTask: %d  heap:%d\n",uxHighWaterMark,xPortGetFreeHeapSize( ));
+*/		
+		
+		for(t = 0; t<sizeof(tmp); t++) tmp[t] = 0;
+		t = 0;
+	}	
+}
+
+/**
+ * entry point
+ */
+void app_main()
+{
+	struct device_settings *device;
+	uint32_t uspeed;
+	xTaskHandle pxCreatedTask;
+	ESP_LOGI(TAG, "starting app_main()");
+    ESP_LOGI(TAG, "RAM left: %u", esp_get_free_heap_size());
+//	esp_log_level_set("*", ESP_LOG_VERBOSE);
+	
+	xTaskCreate(testtask, "t0",1800, NULL, 1, &pxCreatedTask); // DEBUG/TEST 130
+	ESP_LOGI(TAG, "%s task: %x","t0",(unsigned int)pxCreatedTask);	
+	
+	//init hardware
+    init_hardware();
+
+    vTaskDelay(10); 
+	
+	i2c_example_master_init();
+	SSD1306_Init();
+	i2c_test("");
+	
+	// device partition initialized?
+	device = getDeviceSettings();
+	if (device->cleared != 0xAABB)
+	{		
+		ESP_LOGI(TAG,"Device not cleared. Clear it.");
+		eeErasesettings();
+		free(device);
+		device = getDeviceSettings();
+		device->cleared = 0xAABB; //marker init done
+		saveDeviceSettings(device);
+	}
+	//uart speed
+	uspeed = device->uartspeed;	
+	uspeed = checkUart(uspeed);	
+	uart_set_baudrate(UART_NUM_0, uspeed);
+	ESP_LOGI(TAG, "Set baudrate at %d",uspeed);
+	if (device->uartspeed != uspeed)
+	{
+		device->uartspeed = uspeed;
+		saveDeviceSettings(device);
+	}	
+
+	
+	ESP_LOGI(TAG, "Release %s, Revision %s",RELEASE,REVISION);
+	ESP_LOGI(TAG, "SDK %s",esp_get_idf_version());
+	ESP_LOGI(TAG, "Heap size: %d",xPortGetFreeHeapSize( ));
+
+//-----------------------------
+//	ui_queue_event(UI_CONNECTING);
+    start_wifi();
+	start_network();
+//	ui_queue_event(UI_CONNECTED);
+	free(device);
+//-----------------------------------------------------
+	//init softwares
+	clientInit();	
+//	if (AUDIO_OUTPUT_MODE == VS1053)
+		VS1053_Start();
+//	else  // other with renderer needed.
+	{
+      // init player config
+	 
+      player_config = (player_t*)calloc(1, sizeof(player_t));
+      player_config->command = CMD_NONE;
+      player_config->decoder_status = UNINITIALIZED;
+      player_config->decoder_command = CMD_NONE;
+      player_config->buffer_pref = BUF_PREF_SAFE;
+      player_config->media_stream = calloc(1, sizeof(media_stream_t));
+
+	   audio_player_init(player_config);
+	  
+      // init renderer
+      renderer_init(create_renderer_config());		
+	}
+	tcpip_adapter_ip_info_t ip_info;
+
+	if (mode == WIFI_MODE_AP)
+		tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_AP, &ip_info);
+	else	
+		tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info);
+ 
+	ESP_LOGI(TAG, "IP: %s",ip4addr_ntoa(&ip_info.ip));
+    i2c_test(ip4addr_ntoa(&ip_info.ip));
+	i2c_state("Started");
+	
+    ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
+
+	//start tasks
+	xTaskCreate(uartInterfaceTask, "t1", 2500, NULL, 2, &pxCreatedTask); // 350
+	ESP_LOGI(TAG, "%s task: %x","t1",(unsigned int)pxCreatedTask)
+//	xTaskCreate(vsTask, "t2", 2000, NULL,/*configMAX_PRIORITIES*/5, &pxCreatedTask); //380 230
+//	ESP_LOGI(TAG, "%s task: %x","t2",(unsigned int)pxCreatedTask)
+	xTaskCreate(clientTask, "t3", 2500, NULL, 5, &pxCreatedTask); // 340
+	ESP_LOGI(TAG, "%s task: %x","t3",(unsigned int)pxCreatedTask);	
+    xTaskCreate(serversTask, "t4", 2500, NULL, 4, &pxCreatedTask); //380
+	ESP_LOGI(TAG, "%s task: %x","t4",(unsigned int)pxCreatedTask);	
+	
+	//autostart	
+	device = getDeviceSettings();
+	kprintf(PSTR("autostart: playing:%d, currentstation:%d\n"),device->autostart,device->currentstation);
+	currentStation = device->currentstation;
+	VS1053_I2SRate(device->i2sspeed);
+	clientIvol = device->vol;
+
+	if (device->autostart ==1)
+	{	
+		vTaskDelay(100); 
+		playStationInt(device->currentstation);
+	}
+	
+//
+//	ledStatus = ((device->options & T_LED)== 0);
+//
+	free(device);
+}
