@@ -36,7 +36,6 @@ extern bool ledStatus;
 xSemaphoreHandle sConnect, sConnected, sDisconnect, sHeader;
 
 uint8_t once = 0;
-uint8_t volume = 0;
 uint8_t playing = 0;
 
 static const char* icyHeaders[] = { "icy-name:", "icy-notice1:", "icy-notice2:",  "icy-url:", "icy-genre:", "icy-br:","icy-description:","ice-audio-info:", "icy-metaint:" };
@@ -700,13 +699,13 @@ void clientSilentConnect()
 void clientSilentDisconnect()
 {
 	xSemaphoreGive(sDisconnect);
+	
 }
 
 void clientDisconnect(const char* from)
 {
 	kprintf(CLISTOP,from);
 	xSemaphoreGive(sDisconnect);
-	
 
 	if (!ledStatus) gpio4_output_set(1);
 	vTaskDelay(10);
@@ -1042,11 +1041,11 @@ if (l > 80) dump(inpdata,len);
 //printf("test memory: %d  on size %d\n",	(BUFFER_SIZE == BIGMEMORY)?(7*BIGMEMORY/10):(BUFFER_SIZE/2),BUFFER_SIZE);		
 //			if ( (getBufferFree() < ((BUFFER_SIZE == BIGMEMORY)?(7*BIGMEMORY/10):(BUFFER_SIZE/2))) ||(once ==1)) 
 			{
-				volume = VS1053_GetVolume();
 				VS1053_SetVolume(0);
 				playing=1;
 				if (once == 0)vTaskDelay(20);
-				VS1053_SetVolume(volume);
+				VS1053_SetVolume(getVolume());
+				renderer_volume(getVolume()+2); // max 256
 				kprintf(CLIPLAY,0x0d,0x0a);
 				if (!ledStatus) gpio4_output_set(0);
 			}	
@@ -1055,11 +1054,11 @@ if (l > 80) dump(inpdata,len);
 }
 
 #define VSTASKBUF	1024
-uint8_t b[VSTASKBUF];
+//uint8_t b[VSTASKBUF];
 
 IRAM_ATTR void vsTask(void *pvParams) { 
 //	portBASE_TYPE uxHighWaterMark;
-	struct device_settings *device;
+/*	struct device_settings *device;
 	uint16_t size ,s;
 //	VS1053_Start();
 	device = getDeviceSettings();
@@ -1092,6 +1091,7 @@ IRAM_ATTR void vsTask(void *pvParams) {
 //			printf("watermark vstask: %x  %d\n",uxHighWaterMark,uxHighWaterMark);			
 		}	
 	}
+	*/
 }
 
 //uint8_t bufrec[RECEIVE+10];
@@ -1222,7 +1222,7 @@ void clientTask(void *pvParams) {
 						if ((!playing )&& (getBufferFree() < (BUFFER_SIZE))) {						
 							playing=1;
 							vTaskDelay(1);
-							if (VS1053_GetVolume()==0) VS1053_SetVolume(volume);
+							if (VS1053_GetVolume()==0) VS1053_SetVolume(getVolume());
 							kprintf(CLIPLAY,0x0d,0x0a);
 							while (!getBufferEmpty()) vTaskDelay(100);							
 							vTaskDelay(150);
@@ -1252,14 +1252,14 @@ void clientTask(void *pvParams) {
 			if (playing)  // stop clean
 			{		
 				audio_player_stop();
-				volume = VS1053_GetVolume();
+				player_config->media_stream->eof = true;
 				bufferReset();
 				VS1053_SetVolume(0);
 				VS1053_flush_cancel(2);
 				playing = 0;
 				vTaskDelay(40);	// stop without click
 				//VS1053_LowPower();
-				VS1053_SetVolume(volume);
+				VS1053_SetVolume(getVolume());
 			}	
 
 			bufferReset();

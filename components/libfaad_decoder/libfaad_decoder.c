@@ -51,7 +51,7 @@ size_t skipID3(uint8_t *sd_buf)
 
 void print_buffer(buffer_t *buf)
 {
-    size_t data_left = buf->fill_pos - buf->read_pos;
+    size_t data_left = buf->write_pos - buf->read_pos;
     size_t space_left = buf->len - data_left;
     ESP_LOGI(TAG, "fill %d capacity %d", data_left, space_left);
 }
@@ -122,7 +122,7 @@ void libfaac_decoder_task(void *pvParameters)
     };
     buf.base = calloc(FAAD_BYTE_BUFFER_SIZE, sizeof(uint8_t));
     buf.read_pos = buf.base;
-    buf.fill_pos = buf.base;
+    buf.write_pos = buf.base;
 
     /* Clean and initialize decoder structures */
     memset(&demux_res, 0, sizeof(demux_res));
@@ -153,14 +153,12 @@ void libfaac_decoder_task(void *pvParameters)
         ESP_LOGE(TAG, "unsupported content-type: %d", content_type);
         return;
     }
-
     /* initialise the sound converter */
     decoder = NeAACDecOpen();
     if (!decoder) {
         ESP_LOGE(TAG, "FAAD: Decode open error");
         return ;
     }
-
     NeAACDecConfigurationPtr conf = NeAACDecGetCurrentConfiguration(decoder);
     renderer_config_t *renderer = renderer_get();
     switch(renderer->bit_depth) {
@@ -178,7 +176,6 @@ void libfaac_decoder_task(void *pvParameters)
     conf->defObjectType = LC;
     conf->defSampleRate = 44100;
     NeAACDecSetConfiguration(decoder, conf);
-
 
     if(content_type == AUDIO_MP4) {
         err = NeAACDecInit2(decoder, demux_res.codecdata, demux_res.codecdata_len, &samp_rate, &chan);
@@ -216,11 +213,12 @@ void libfaac_decoder_task(void *pvParameters)
 
         /* Request the required number of bytes from the input buffer */
         fill_read_buffer(&buf);
-
+ESP_LOGI(TAG, "read buf ");
+ESP_LOGI(TAG, "NeAACDecDecode buf %x  len: %d",(unsigned int)buf.read_pos,buf.write_pos - buf.read_pos);
         /* Decode one block - returned samples will be host-endian */
         ret = NeAACDecDecode(decoder, &frame_info, buf.read_pos,
-                buf.fill_pos - buf.read_pos);
-
+                buf.write_pos - buf.read_pos);
+ESP_LOGI(TAG, "read buf %s ",(char*)ret);
         /* NeAACDecDecode may sometimes return NULL without setting error. */
         if (ret == NULL || frame_info.error > 0) {
             printf("FAAD: decode error '%s'\n",
@@ -235,10 +233,10 @@ void libfaac_decoder_task(void *pvParameters)
         frame_samples = frame_info.samples >> 1;
         framelength = frame_samples - lead_trim;
 
-        int16_t *pcm_buf = ret;
+        char *pcm_buf = ret;
         render_samples(pcm_buf, frame_info.samples * 2, &pcm_fmt);
 
-        // ESP_LOGI(TAG, "stack: %d\n", uxTaskGetStackHighWaterMark(NULL));
+         ESP_LOGI(TAG, "stack: %d\n", uxTaskGetStackHighWaterMark(NULL));
     }
 
     NeAACDecClose(decoder);

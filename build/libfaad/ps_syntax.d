@@ -29,10 +29,7 @@ ps_syntax.o: \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdint.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/string.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/string.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/math.h \
- C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad/bits.h \
- C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad/analysis.h \
- C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad/ps_dec.h
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/math.h
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad/common.h:
 
@@ -93,10 +90,4 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/string.h:
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/string.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/math.h:
-
-C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad/bits.h:
-
-C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad/analysis.h:
-
-C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad/ps_dec.h:
 /home/jp/esp/Ka-Radio32/components/libfaad/./ps_syntax.c:

@@ -15,6 +15,7 @@
 #include "driver/timer.h"
 #include "driver/uart.h"
 #include "audio_renderer.h"
+#include "app_main.h"
 
 
 xSemaphoreHandle semfile = NULL ;
@@ -244,7 +245,7 @@ void setVolume(char* vol) {
 		if (uvol > 254) uvol = 254;
 		if (uvol <0) uvol = 1;
 		if(vol) {
-kprintf("setVol: \"%s + %d, uvol: %d, clientIvol:%d\"\n",vol,clientOvol,uvol,clientIvol);
+//kprintf("setVol: \"%s + %d, uvol: %d, clientIvol:%d\"\n",vol,clientOvol,uvol,clientIvol);
 			VS1053_SetVolume(uvol);
 			renderer_volume(uvol+2); // max 256
 			kprintf(PSTR("##CLI.VOL#: %d\n"),clientIvol);		
@@ -281,39 +282,66 @@ void theme() {
 		}
 }
 
-void IRAM_ATTR sleepCallback(void *pArg) {
-		clientSilentDisconnect(); // stop the player		
+extern xQueueHandle timer_queue;
+void   sleepCallback(void *pArg) {
+	int timer_idx = (int) pArg;
+	timer_event_t evt;	
+	TIMERG0.int_clr_timers.t0 = 1; //isr ack
+//	TIMERG0.hw_timer[timer_idx].config.alarm_en = 1;  //enable isr again
+//	clientSilentDisconnect(); // stop the player
+		evt.type = TIMER_SLEEP;
+        evt.group = 0;
+        evt.idx = timer_idx;
+	xQueueSendFromISR(timer_queue, &evt, NULL);	
 }
-void IRAM_ATTR wakeCallback(void *pArg) {
-		clientSilentDisconnect();
-		clientSilentConnect(); // start the player			
+void   wakeCallback(void *pArg) {
+
+	int timer_idx = (int) pArg;
+	timer_event_t evt;	
+	TIMERG0.int_clr_timers.t1 = 1;
+//	TIMERG0.hw_timer[timer_idx].config.alarm_en = 1;
+//	clientSilentDisconnect();
+//	clientSilentConnect(); // start the player	
+		evt.type = TIMER_SLEEP;
+        evt.group = 0;
+        evt.idx = timer_idx;
+	xQueueSendFromISR(timer_queue, &evt, NULL);	
+		evt.type = TIMER_WAKE;
+	xQueueSendFromISR(timer_queue, &evt, NULL);
 }
+
 
 void startSleep(uint32_t delay)
 {
-//	printf("Delay:%d\n",delay);
+printf("Delay:%d\n",delay);
 	if (delay == 0) return;
-	timer_set_counter_value(TIMERGROUP, sleepTimer, 0x00000000ULL);
-	timer_set_alarm_value(TIMERGROUP, sleepTimer,TIMERVALUE(delay*60));
-	timer_set_alarm(TIMERGROUP, sleepTimer,TIMER_ALARM_EN);
-	timer_start(TIMERGROUP, sleepTimer);
+	ESP_ERROR_CHECK(timer_set_counter_value(TIMERGROUP, sleepTimer, 0x00000000ULL));
+	ESP_ERROR_CHECK(timer_set_alarm_value(TIMERGROUP, sleepTimer,TIMERVALUE(delay*60)));
+	ESP_ERROR_CHECK(timer_enable_intr(TIMERGROUP, sleepTimer));
+	//ESP_ERROR_CHECK(timer_isr_register(TIMERGROUP, sleepTimer, sleepCallback, (void*) sleepTimer, 0, NULL));
+	ESP_ERROR_CHECK(timer_set_alarm(TIMERGROUP, sleepTimer,TIMER_ALARM_EN));
+	ESP_ERROR_CHECK(timer_start(TIMERGROUP, sleepTimer));
 }
 void stopSleep(){
-//	printf("stopDelayDelay\n");
-	timer_set_alarm(TIMERGROUP, sleepTimer,TIMER_ALARM_DIS);
+printf("stopDelayDelay\n");
+//	ESP_ERROR_CHECK(timer_set_alarm(TIMERGROUP, sleepTimer,TIMER_ALARM_DIS));
+	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, sleepTimer));
 }
 void startWake(uint32_t delay)
 {
 //	printf("Wake Delay:%d\n",delay);
 	if (delay == 0) return;
-	timer_set_counter_value(TIMERGROUP, wakeTimer, 0x00000000ULL);
-	timer_set_alarm_value(TIMERGROUP, wakeTimer,TIMERVALUE(delay*60));
-	timer_set_alarm(TIMERGROUP, wakeTimer,TIMER_ALARM_EN);
-	timer_start(TIMERGROUP, wakeTimer);	
+	ESP_ERROR_CHECK(timer_set_counter_value(TIMERGROUP, wakeTimer, 0x00000000ULL));
+	ESP_ERROR_CHECK(timer_set_alarm_value(TIMERGROUP, wakeTimer,TIMERVALUE(delay*60)));
+	ESP_ERROR_CHECK(timer_enable_intr(TIMERGROUP, wakeTimer));
+	//ESP_ERROR_CHECK(timer_isr_register(TIMERGROUP, wakeTimer, wakeCallback, (void*) wakeTimer, 0, NULL));	
+	ESP_ERROR_CHECK(timer_set_alarm(TIMERGROUP, wakeTimer,TIMER_ALARM_EN));
+	ESP_ERROR_CHECK(timer_start(TIMERGROUP, wakeTimer));	
 }
 void stopWake(){
 //	printf("stopDelayWake\n");
-	timer_set_alarm(TIMERGROUP, wakeTimer,TIMER_ALARM_DIS);
+//	ESP_ERROR_CHECK(timer_set_alarm(TIMERGROUP, wakeTimer,TIMER_ALARM_DIS));
+	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, wakeTimer));
 }
 
 // treat the received message of the websocket
@@ -369,7 +397,7 @@ void playStationInt(int sid) {
 			int i;
 			vTaskDelay(4);
 //			clientSilentDisconnect();
-			clientDisconnect(PSTR("playStationInt"));
+			clientDisconnect("playStationInt");
 printf ("playstationInt: %d, new station: %s\n",sid,si->name);
 			for (i = 0;i<100;i++)
 			{
@@ -1039,6 +1067,7 @@ void serverclientTask(void *pvParams) {
 	uint16_t reclen = 	RECLEN;	
     char *buf = (char *)inmalloc(reclen);
 	bool result = true;
+	
 
 	
 	if (buf == NULL)

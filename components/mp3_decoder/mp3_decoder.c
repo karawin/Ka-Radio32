@@ -25,7 +25,7 @@
 #include "mp3_decoder.h"
 #include "common_buffer.h"
 
-#define TAG "decoder"
+#define TAG "mad_decoder"
 
 // The theoretical maximum frame size is 2881 bytes,
 // MPEG 2.5 Layer II, 8000 Hz @ 160 kbps, with a padding slot plus 8 byte MAD_BUFFER_GUARD.
@@ -60,7 +60,7 @@ static enum mad_flow input(struct mad_stream *stream, buffer_t *buf, player_t *p
         }
 
         // Calculate amount of bytes we need to fill buffer.
-        bytes_to_read = min(buf_free_capacity(buf), spiRamFifoFill());
+        bytes_to_read = min(buf_free_capacity_after_purge(buf), spiRamFifoFill());
 
         // Can't take anything?
         if (bytes_to_read == 0) {
@@ -72,11 +72,14 @@ static enum mad_flow input(struct mad_stream *stream, buffer_t *buf, player_t *p
 
             //Wait until there is enough data in the buffer. This only happens when the data feed
             //rate is too low, and shouldn't normally be needed!
-            ESP_LOGE(TAG, "Buffer underflow, need %d bytes.", buf_free_capacity(buf));
+            ESP_LOGE(TAG, "Buffer underflow, need %d bytes.", buf_free_capacity_after_purge(buf));
             buf_underrun_cnt++;
             //We both silence the output as well as wait a while by pushing silent samples into the i2s system.
             //This waits for about 200mS
             renderer_zero_dma_buffer();
+//KaraDio32 added			
+			vTaskDelay(20);
+//			
         } else {
             //Read some bytes from the FIFO to re-fill the buffer.
             fill_read_buffer(buf);
@@ -95,7 +98,7 @@ static enum mad_flow input(struct mad_stream *stream, buffer_t *buf, player_t *p
 
 //Routine to print out an error
 static enum mad_flow error(void *data, struct mad_stream *stream, struct mad_frame *frame) {
-    printf("dec err 0x%04x (%s)\n", stream->error, mad_stream_errorstr(stream));
+    ESP_LOGE(TAG, "dec err 0x%04x (%s)", stream->error, mad_stream_errorstr(stream));
     return MAD_FLOW_CONTINUE;
 }
 
@@ -118,14 +121,14 @@ void mp3_decoder_task(void *pvParameters)
     synth = malloc(sizeof(struct mad_synth));
     buffer_t *buf = buf_create(MAX_FRAME_SIZE);
 
-    if (stream==NULL) { printf("MAD: malloc(stream) failed\n"); return; }
-    if (synth==NULL) { printf("MAD: malloc(synth) failed\n"); return; }
-    if (frame==NULL) { printf("MAD: malloc(frame) failed\n"); return; }
-    if (buf==NULL) { printf("MAD: buf_create() failed\n"); return; }
+    if (stream==NULL) { ESP_LOGE(TAG, "malloc(stream) failed\n"); return; }
+    if (synth==NULL) { ESP_LOGE(TAG, "malloc(synth) failed\n"); return; }
+    if (frame==NULL) { ESP_LOGE(TAG, "malloc(frame) failed\n"); return; }
+    if (buf==NULL) { ESP_LOGE(TAG, "buf_create() failed\n"); return; }
 
     buf_underrun_cnt = 0;
 
-    printf("MAD: Decoder start.\n");
+    ESP_LOGI(TAG, "decoder start");
 
     //Initialize mp3 parts
     mad_stream_init(stream);
@@ -176,26 +179,22 @@ void mp3_decoder_task(void *pvParameters)
 
     player->decoder_status = STOPPED;
     player->decoder_command = CMD_NONE;
-    printf("MAD: Decoder stopped.\n");
+    ESP_LOGI(TAG, "decoder stopped");
 
     ESP_LOGI(TAG, "MAD decoder stack: %d\n", uxTaskGetStackHighWaterMark(NULL));
     vTaskDelete(NULL);
 }
 
 /* Called by the NXP modifications of libmad. Sets the needed output sample rate. */
-static int prevRate;
 void set_dac_sample_rate(int rate)
 {
-    if(rate == prevRate)
-        return;
-    prevRate = rate;
-
     mad_buffer_fmt.sample_rate = rate;
 }
 
 /* render callback for the libmad synth */
 void render_sample_block(short *sample_buff_ch0, short *sample_buff_ch1, int num_samples, unsigned int num_channels)
 {
+    mad_buffer_fmt.num_channels = num_channels;
     uint32_t len = num_samples * sizeof(short) * num_channels;
     render_samples((char*) sample_buff_ch0, len, &mad_buffer_fmt);
     return;

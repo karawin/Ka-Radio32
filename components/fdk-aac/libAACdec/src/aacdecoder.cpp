@@ -728,6 +728,7 @@ LINKSPEC_CPP HANDLE_AACDECODER CAacDecoder_Open(TRANSPORT_TYPE bsFormat)    /*!<
 
   self = GetAacDecoder();
   if (self == NULL) {
+	  FDKprintf("CAacDecoder_Open 1\n");	
     goto bail;
   }
 
@@ -749,6 +750,7 @@ LINKSPEC_CPP HANDLE_AACDECODER CAacDecoder_Open(TRANSPORT_TYPE bsFormat)    /*!<
 
   self->hDrcInfo = GetDrcInfo();
   if (self->hDrcInfo == NULL) {
+	  FDKprintf("CAacDecoder_Open 2\n");	
     goto bail;
   }
   /* Init common DRC structure */
@@ -765,7 +767,10 @@ LINKSPEC_CPP HANDLE_AACDECODER CAacDecoder_Open(TRANSPORT_TYPE bsFormat)    /*!<
   self->aacCommonData.workBufferCore2 = GetWorkBufferCore2();
   if (self->aacCommonData.workBufferCore1 == NULL
     ||self->aacCommonData.workBufferCore2 == NULL )
-    goto bail;
+	{
+		FDKprintf("CAacDecoder_Open 3, %x    %x\n", self->aacCommonData.workBufferCore1, self->aacCommonData.workBufferCore2);	
+		goto bail;
+	}
 
   return self;
 

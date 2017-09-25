@@ -21,6 +21,7 @@
 #include "m4a.h"
 #include "spiram_fifo.h"
 
+
 #define TAG "fdkaac_decoder"
 
 
@@ -87,6 +88,7 @@ void fdkaac_decoder_task(void *pvParameters)
         handle = aacDecoder_Open(TT_MP4_ADTS, /* num layers */1);
         if (handle == NULL) {
             ESP_LOGE(TAG, "malloc failed %d", __LINE__);
+			ESP_LOGI(TAG, "%u free heap %u", __LINE__, esp_get_free_heap_size());
             goto cleanup;
         }
     }
@@ -164,10 +166,9 @@ void fdkaac_decoder_task(void *pvParameters)
     aacDecoder_Close(handle);
 	
 	spiRamFifoReset();
-
     player->decoder_status = STOPPED;
     player->decoder_command = CMD_NONE;
-    printf("MAD: Decoder stopped.\n");
+    printf("Decoder stopped.\n");
 
     ESP_LOGI(TAG, "aac decoder finished");
 

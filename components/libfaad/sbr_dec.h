@@ -108,7 +108,7 @@ typedef struct
     uint8_t t_Q[2][3];
     uint8_t f[2][MAX_L_E+1];
     uint8_t f_prev[2];
-
+	
     real_t *G_temp_prev[2][5];
     real_t *Q_temp_prev[2][5];
     int8_t GQ_ringbuf_index[2];

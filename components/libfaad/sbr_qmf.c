@@ -40,6 +40,7 @@
 #include "sbr_qmf.h"
 #include "sbr_qmf_c.h"
 #include "sbr_syntax.h"
+#include "esp_system.h"
 
 qmfa_info *qmfa_init(uint8_t channels)
 {
@@ -229,6 +230,8 @@ qmfs_info *qmfs_init(uint8_t channels)
 
 	/* v is a double ringbuffer */
     qmfs->v = (real_t*)faad_malloc(2 * channels * 20 * sizeof(real_t));
+printf("qmfs->v: %d\n",2 * channels * 20 * sizeof(real_t));
+printf("RAM left %d\n", esp_get_free_heap_size());	
     memset(qmfs->v, 0, 2 * channels * 20 * sizeof(real_t));
 
     qmfs->v_index = 0;

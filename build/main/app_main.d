@@ -146,11 +146,11 @@ app_main.o: C:/msys32/home/jp/esp/Ka-Radio32/main/app_main.c \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/icmp.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/icmp6.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/dns.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/fifo/include/spiram_fifo.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/audio_renderer/include/audio_renderer.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/common/include/common_component.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/playerconfig.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/mdns_task/include/mdns_task.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/audio_player/include/audio_player.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/eeprom.h \
@@ -472,6 +472,8 @@ C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/icmp6.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/dns.h:
 
+C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h:
+
 C:/msys32/home/jp/esp/Ka-Radio32/components/fifo/include/spiram_fifo.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/audio_renderer/include/audio_renderer.h:
@@ -479,8 +481,6 @@ C:/msys32/home/jp/esp/Ka-Radio32/components/audio_renderer/include/audio_rendere
 C:/msys32/home/jp/esp/Ka-Radio32/components/common/include/common_component.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/playerconfig.h:
-
-C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/mdns_task/include/mdns_task.h:
 

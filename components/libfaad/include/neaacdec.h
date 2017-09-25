@@ -25,7 +25,7 @@
 ** Commercial non-GPL licensing of this software is possible.
 ** For more info contact Nero AG through Mpeg4AAClicense@nero.com.
 **
-** $Id: neaacdec.h,v 1.13 2009/01/26 23:51:15 menno Exp $
+** $Id: neaacdec.h,v 1.14 2012/03/02 15:29:47 knik Exp $
 **/
 
 #ifndef __NEAACDEC_H__
@@ -63,13 +63,17 @@ extern "C" {
   #ifndef NEAACDECAPI
     #define NEAACDECAPI __cdecl
   #endif
+#elif defined(__GNUC__) && __GNUC__ >= 4
+  #ifndef NEAACDECAPI
+    #define NEAACDECAPI __attribute__((visibility("default")))
+  #endif
 #else
   #ifndef NEAACDECAPI
     #define NEAACDECAPI
   #endif
 #endif
 
-#define FAAD2_VERSION "2.7"
+#define FAAD2_VERSION "unknown"
 
 /* object types for AAC */
 #define MAIN       1
@@ -198,7 +202,7 @@ typedef struct NeAACDecFrameInfo
     unsigned char ps;
 } NeAACDecFrameInfo;
 
-char* NEAACDECAPI NeAACDecGetErrorMessage(unsigned char errcode);
+char NEAACDECAPI *NeAACDecGetErrorMessage(unsigned char errcode);
 
 unsigned long NEAACDECAPI NeAACDecGetCapabilities(void);
 
@@ -231,12 +235,12 @@ void NEAACDECAPI NeAACDecPostSeekReset(NeAACDecHandle hDecoder, long frame);
 
 void NEAACDECAPI NeAACDecClose(NeAACDecHandle hDecoder);
 
-void* NEAACDECAPI NeAACDecDecode(NeAACDecHandle hDecoder,
+void NEAACDECAPI *NeAACDecDecode(NeAACDecHandle hDecoder,
                                  NeAACDecFrameInfo *hInfo,
                                  unsigned char *buffer,
                                  unsigned long buffer_size);
 
-void* NEAACDECAPI NeAACDecDecode2(NeAACDecHandle hDecoder,
+void NEAACDECAPI *NeAACDecDecode2(NeAACDecHandle hDecoder,
                                   NeAACDecFrameInfo *hInfo,
                                   unsigned char *buffer,
                                   unsigned long buffer_size,
@@ -246,6 +250,10 @@ void* NEAACDECAPI NeAACDecDecode2(NeAACDecHandle hDecoder,
 char NEAACDECAPI NeAACDecAudioSpecificConfig(unsigned char *pBuffer,
                                              unsigned long buffer_size,
                                              mp4AudioSpecificConfig *mp4ASC);
+
+/* Get version and copyright strings */
+int NEAACDECAPI NeAACDecGetVersion(char **faad_id_string,
+                                   char **faad_copyright_string);
 
 #ifdef _WIN32
   #pragma pack(pop)

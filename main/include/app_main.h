@@ -10,11 +10,16 @@
 #ifndef MAIN_INCLUDE_APP_MAIN_H_
 #define MAIN_INCLUDE_APP_MAIN_H_
 
+// isr event for timers
+#define TIMER_SLEEP   0   
+#define TIMER_WAKE    1 
 
-/* The event group allows multiple bits for each event*/
-//   are we connected  to the AP with an IP? */
-const int CONNECTED_BIT = 0x00000001;
-//
-const int CONNECTED_AP  = 0x00000010;
+typedef struct {
+    int type;                  /*!< event type */
+    int group;                 /*!< timer group */
+    int idx;                   /*!< timer number */
+} timer_event_t;
+
+
 
 #endif /* MAIN_INCLUDE_APP_MAIN_H_ */

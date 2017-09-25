@@ -150,7 +150,8 @@ webserver.o: C:/msys32/home/jp/esp/Ka-Radio32/main/webserver.c \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/uart.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/uart_reg.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/uart_struct.h \
- C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/ringbuf.h
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/ringbuf.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h:
 
@@ -455,4 +456,6 @@ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/uart_reg.h:
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/uart_struct.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/ringbuf.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h:
 /home/jp/esp/Ka-Radio32/main/./webserver.c:

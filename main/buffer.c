@@ -19,8 +19,8 @@ uint8_t bempty = 1;
 void initBuffer()
 {
 //		 BUFFER_SIZE = 12960;
-		 BUFFER_SIZE = 14080;
-//		 BUFFER_SIZE = 16000;
+//		 BUFFER_SIZE = 14080;
+		 BUFFER_SIZE = 1;
 		 buffer = malloc(BUFFER_SIZE);	 	 
 }
 uint32_t getBufferFree() {

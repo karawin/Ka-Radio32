@@ -35,7 +35,6 @@ typedef struct {
 
 typedef struct {
     player_command_t command;
-
     player_command_t decoder_command;
     component_status_t decoder_status;
     buffer_pref_t buffer_pref;

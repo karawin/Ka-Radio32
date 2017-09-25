@@ -22,12 +22,13 @@
 #include "lwip/tcp.h"
 #include "lwip/dns.h"
 
+#include "app_main.h"
+
 //#include "ui.h"
 #include "spiram_fifo.h"
 #include "audio_renderer.h"
 //#include "web_radio.h"
 #include "playerconfig.h"
-#include "app_main.h"
 #include "mdns_task.h"
 #include "audio_player.h"
 #ifdef CONFIG_BT_SPEAKER_MODE
@@ -55,7 +56,11 @@
 #include "interface.h"
 #include "vs1053.h"
 
-
+/* The event group allows multiple bits for each event*/
+//   are we connected  to the AP with an IP? */
+const int CONNECTED_BIT = 0x00000001;
+//
+const int CONNECTED_AP  = 0x00000010;
 
 //#define BLINK_GPIO 4
 #define I2C_EXAMPLE_MASTER_SCL_IO    14    /*!< gpio number for I2C master clock */////////////
@@ -77,9 +82,9 @@
 
 /* */
 EventGroupHandle_t wifi_event_group ;
+xQueueHandle timer_queue;
 wifi_mode_t mode;
 xSemaphoreHandle print_mux;
-static uint8_t FlashCount = 0xFF;
 uint16_t FlashOn = 5,FlashOff = 5;
 bool ledStatus = true; // true: normal blink, false: led on when playing
 player_t *player_config;
@@ -464,17 +469,28 @@ void start_network(){
 }
 
 
-//blinking led
-void testtask(void* p) {
+//blinking led and timer isr
+void ledTask(void* p) {
 struct device_settings *device;	
 
 /*	int uxHighWaterMark;
 	uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-	printf(striWATERMARK,"testtask",uxHighWaterMark,xPortGetFreeHeapSize( ));
+	printf(striWATERMARK,"ledTask",uxHighWaterMark,xPortGetFreeHeapSize( ));
 */
 	gpio4_output_conf();	
-	while(FlashCount==0xFF) {
-//		ESP_LOGI(TAG,"Led %d %d",FlashOff,	FlashOn);
+	while(1) {
+		timer_event_t evt;
+		if (xQueueReceive(timer_queue, &evt, 0))
+		{
+			if(evt.type == TIMER_SLEEP) {
+				printf("timer Sleep\n");
+				clientDisconnect("Timer"); // stop the player
+			}
+			if(evt.type == TIMER_WAKE) {
+				printf("timer Wake\n");
+				clientConnect(); // start the player	
+			}
+		}
 		if (ledStatus) gpio4_output_set(0);
 		vTaskDelay(FlashOff ); 
 		
@@ -492,7 +508,7 @@ struct device_settings *device;
 				device->vol = clientIvol;
 				saveDeviceSettings(device);
 //	uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-//	printf(striWATERMARK,"testtask",uxHighWaterMark,xPortGetFreeHeapSize( ));
+//	printf(striWATERMARK,"ledTask",uxHighWaterMark,xPortGetFreeHeapSize( ));
 			}
 			free(device);	
 		}			
@@ -563,21 +579,11 @@ void app_main()
 	ESP_LOGI(TAG, "starting app_main()");
     ESP_LOGI(TAG, "RAM left: %u", esp_get_free_heap_size());
 //	esp_log_level_set("*", ESP_LOG_VERBOSE);
-	
-	xTaskCreate(testtask, "t0",1800, NULL, 1, &pxCreatedTask); // DEBUG/TEST 130
-	ESP_LOGI(TAG, "%s task: %x","t0",(unsigned int)pxCreatedTask);	
-	
-	//init hardware
-    init_hardware();
 
-    vTaskDelay(10); 
-	
-	i2c_example_master_init();
-	SSD1306_Init();
-	i2c_test("");
-	
-	// device partition initialized?
+	//init hardware
+    init_hardware(); 
 	device = getDeviceSettings();
+	// device partition initialized?
 	if (device->cleared != 0xAABB)
 	{		
 		ESP_LOGI(TAG,"Device not cleared. Clear it.");
@@ -586,7 +592,8 @@ void app_main()
 		device = getDeviceSettings();
 		device->cleared = 0xAABB; //marker init done
 		saveDeviceSettings(device);
-	}
+	}	
+
 	//uart speed
 	uspeed = device->uartspeed;	
 	uspeed = checkUart(uspeed);	
@@ -598,26 +605,41 @@ void app_main()
 		saveDeviceSettings(device);
 	}	
 
+	// volume
+	clientIvol = device->vol;
 	
+	timer_queue = xQueueCreate(10, sizeof(timer_event_t));
+
+	// led blinks
+	xTaskCreate(ledTask, "t0",2000, NULL, 1, &pxCreatedTask); // DEBUG/TEST 130
+	ESP_LOGI(TAG, "%s task: %x","t0",(unsigned int)pxCreatedTask);	
+	
+	//Display if any	
+	i2c_example_master_init();
+	SSD1306_Init();
+	i2c_test("");
+	
+	// Version infos
 	ESP_LOGI(TAG, "Release %s, Revision %s",RELEASE,REVISION);
 	ESP_LOGI(TAG, "SDK %s",esp_get_idf_version());
 	ESP_LOGI(TAG, "Heap size: %d",xPortGetFreeHeapSize( ));
 
 //-----------------------------
-//	ui_queue_event(UI_CONNECTING);
     start_wifi();
 	start_network();
-//	ui_queue_event(UI_CONNECTED);
-	free(device);
+	
 //-----------------------------------------------------
 	//init softwares
+//-----------------------------------------------------
 	clientInit();	
 //	if (AUDIO_OUTPUT_MODE == VS1053)
+	{
 		VS1053_Start();
+		VS1053_I2SRate(device->i2sspeed);
+	}
 //	else  // other with renderer needed.
 	{
       // init player config
-	 
       player_config = (player_t*)calloc(1, sizeof(player_t));
       player_config->command = CMD_NONE;
       player_config->decoder_status = UNINITIALIZED;
@@ -625,8 +647,7 @@ void app_main()
       player_config->buffer_pref = BUF_PREF_SAFE;
       player_config->media_stream = calloc(1, sizeof(media_stream_t));
 
-	   audio_player_init(player_config);
-	  
+	  audio_player_init(player_config);	  
       // init renderer
       renderer_init(create_renderer_config());		
 	}
@@ -638,28 +659,28 @@ void app_main()
 		tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info);
  
 	ESP_LOGI(TAG, "IP: %s",ip4addr_ntoa(&ip_info.ip));
+	
+	// Display infos
     i2c_test(ip4addr_ntoa(&ip_info.ip));
 	i2c_state("Started");
 	
-    ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
+//    ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
 
 	//start tasks
 	xTaskCreate(uartInterfaceTask, "t1", 2500, NULL, 2, &pxCreatedTask); // 350
-	ESP_LOGI(TAG, "%s task: %x","t1",(unsigned int)pxCreatedTask)
+	ESP_LOGI(TAG, "%s task: %x","t1",(unsigned int)pxCreatedTask);
 //	xTaskCreate(vsTask, "t2", 2000, NULL,/*configMAX_PRIORITIES*/5, &pxCreatedTask); //380 230
 //	ESP_LOGI(TAG, "%s task: %x","t2",(unsigned int)pxCreatedTask)
-	xTaskCreate(clientTask, "t3", 2500, NULL, 5, &pxCreatedTask); // 340
+	xTaskCreate(clientTask, "t3", 2500, NULL, configMAX_PRIORITIES -2, &pxCreatedTask); // 340
 	ESP_LOGI(TAG, "%s task: %x","t3",(unsigned int)pxCreatedTask);	
-    xTaskCreate(serversTask, "t4", 2500, NULL, 4, &pxCreatedTask); //380
+    xTaskCreatePinnedToCore(serversTask, "t4", 2500, NULL, 4, &pxCreatedTask,0); //380
 	ESP_LOGI(TAG, "%s task: %x","t4",(unsigned int)pxCreatedTask);	
 	
 	//autostart	
-	device = getDeviceSettings();
-	kprintf(PSTR("autostart: playing:%d, currentstation:%d\n"),device->autostart,device->currentstation);
+	kprintf("autostart: playing:%d, currentstation:%d\n",device->autostart,device->currentstation);
 	currentStation = device->currentstation;
-	VS1053_I2SRate(device->i2sspeed);
 	clientIvol = device->vol;
-
+	
 	if (device->autostart ==1)
 	{	
 		vTaskDelay(100); 

@@ -21,7 +21,6 @@
 
 #define BT_AV_TAG               "BT_AV"
 
-
 /**
  * @brief     callback function for A2DP sink
  */

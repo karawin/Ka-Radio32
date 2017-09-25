@@ -38,6 +38,7 @@ void serversTask(void* pvParams) {
 	struct sockaddr_in server_addr, client_addr;
 	int  client_sock;
 	socklen_t sin_size;
+	
 	timer_config_t config;
 	config.alarm_en = 1;
     config.auto_reload = 0;
@@ -46,20 +47,19 @@ void serversTask(void* pvParams) {
     config.intr_type = TIMER_INTR_LEVEL;
     config.counter_en = TIMER_PAUSE;
 	
-    /*Configure timer*/
-    timer_init(TIMERGROUP, sleepTimer, &config);
-    /*Stop timer counter*/
-	timer_pause(TIMERGROUP, sleepTimer);
-	timer_enable_intr(TIMERGROUP, sleepTimer);
-	timer_isr_register(TIMERGROUP, sleepTimer, sleepCallback, (void*) sleepTimer, ESP_INTR_FLAG_IRAM, NULL);
+	    /*Configure timer*/
+    ESP_ERROR_CHECK(timer_init(TIMERGROUP, sleepTimer, &config));
+	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, sleepTimer));
+	//ESP_ERROR_CHECK(timer_enable_intr(TIMERGROUP, sleepTimer));
+	//ESP_ERROR_CHECK(timer_isr_register(TIMERGROUP, sleepTimer, sleepCallback, (void*) sleepTimer, ESP_INTR_FLAG_IRAM, NULL));
+	ESP_ERROR_CHECK(timer_isr_register(TIMERGROUP, sleepTimer, sleepCallback, (void*) sleepTimer, 0, NULL));
 	
-    /*Configure timer*/
-    timer_init(TIMERGROUP, wakeTimer, &config);
-    /*Stop timer counter*/
-	timer_pause(TIMERGROUP, wakeTimer);
-	timer_enable_intr(TIMERGROUP, wakeTimer);
-	timer_isr_register(TIMERGROUP, wakeTimer, wakeCallback, (void*) wakeTimer, ESP_INTR_FLAG_IRAM, NULL);	
-	
+    ESP_ERROR_CHECK(timer_init(TIMERGROUP, wakeTimer, &config));
+	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, wakeTimer));
+	//ESP_ERROR_CHECK(timer_enable_intr(TIMERGROUP, wakeTimer));
+	//ESP_ERROR_CHECK(timer_isr_register(TIMERGROUP, wakeTimer, wakeCallback, (void*) wakeTimer, ESP_INTR_FLAG_IRAM, NULL));	
+	ESP_ERROR_CHECK(timer_isr_register(TIMERGROUP, wakeTimer, wakeCallback, (void*) wakeTimer, 0, NULL));	
+
 	semclient = xSemaphoreCreateCounting(5,5); 
 	semfile = xSemaphoreCreateCounting(5,5); 
 	
@@ -217,12 +217,12 @@ void serversTask(void* pvParams) {
 						if (xSemaphoreTake(semclient,portMAX_DELAY))
 						{
 //printf ("Take client_sock: %d\n",client_sock);							
-							while (xTaskCreate( serverclientTask,
+							while (xTaskCreatePinnedToCore( serverclientTask,
 								"t10",
 								stack,
 								(void *) client_sock,
 								4, 
-								NULL ) != pdPASS) 
+								NULL, 0 ) != pdPASS) 
 							{								
 								vTaskDelay(200);
 //printf(PSTR("Server low mem. Retrying...%c"),0x0d);
