@@ -58,6 +58,8 @@ vs1053b-patches.o: \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core-matmap.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/flash.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h \
+ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/opt.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/lwipopts.h \
@@ -77,7 +79,6 @@ vs1053b-patches.o: \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_config.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/projdefs.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portable.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/deprecated_definitions.h \
@@ -236,6 +237,10 @@ C:/msys32/home/jp/esp/Ka-Radio32/main/include/flash.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h:
+
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/opt.h:
@@ -273,8 +278,6 @@ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h:
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_config.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/projdefs.h:
 

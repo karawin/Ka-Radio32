@@ -40,8 +40,8 @@ extern "C" {
 #include "sbr_dec.h"
 #endif
 
-#define MAX_CHANNELS        2
-#define MAX_SYNTAX_ELEMENTS 2
+#define MAX_CHANNELS        64
+#define MAX_SYNTAX_ELEMENTS 48
 #define MAX_WINDOW_GROUPS    8
 #define MAX_SFB             51
 #define MAX_LTP_SFB         40

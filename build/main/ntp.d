@@ -106,6 +106,7 @@ ntp.o: C:/msys32/home/jp/esp/Ka-Radio32/main/ntp.c \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netdb.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/ntp.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h \
+ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_wifi.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/queue.h \
@@ -333,6 +334,8 @@ C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netdb.h:
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/ntp.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h:
 

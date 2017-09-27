@@ -25,7 +25,7 @@
 ** Commercial non-GPL licensing of this software is possible.
 ** For more info contact Nero AG through Mpeg4AAClicense@nero.com.
 **
-** $Id: mp4.c,v 1.41 2016/11/11 11:25:58 knik Exp $
+** $Id: mp4.c,v 1.40 2009/02/06 03:39:58 menno Exp $
 **/
 
 #include "common.h"
@@ -276,7 +276,7 @@ int8_t AudioSpecificConfigFromBitfile(bitfile *ld,
 
     /* no SBR signalled, this could mean either implicit signalling or no SBR in this file */
     /* MPEG specification states: assume SBR on files with samplerate <= 24000 Hz */
-    if (mp4ASC->sbr_present_flag == (char)-1) /* cannot be -1 on systems with unsigned char */
+    if (mp4ASC->sbr_present_flag == -1)
     {
         if (mp4ASC->samplingFrequency <= 24000)
         {

@@ -1,7 +1,7 @@
 
 #ifndef INTERFACE_H
 #define INTERFACE_H
-
+#include "esp_log.h"
 #include "telnet.h"
 
 //#define PROGMEM   ICACHE_RODATA_ATTR
@@ -16,6 +16,8 @@ uint32_t checkUart(uint32_t speed);
 extern unsigned short adcdiv;	
 void switchCommand(void );
 void checkCommand(int size, char* s);
+esp_log_level_t getLogLevel();
+void setLogLevel(esp_log_level_t level);
 void wifiConnectMem();
 char* webInfo();
 char* webList(int id);

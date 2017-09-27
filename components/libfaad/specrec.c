@@ -1,19 +1,19 @@
 /*
 ** FAAD2 - Freeware Advanced Audio (AAC) Decoder including SBR decoding
 ** Copyright (C) 2003-2005 M. Bakker, Nero AG, http://www.nero.com
-**  
+**
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
 ** the Free Software Foundation; either version 2 of the License, or
 ** (at your option) any later version.
-** 
+**
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
-** 
+**
 ** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software 
+** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 **
 ** Any non-GPL usage of this software or parts of this software is strictly
@@ -25,7 +25,7 @@
 ** Commercial non-GPL licensing of this software is possible.
 ** For more info contact Nero AG through Mpeg4AAClicense@nero.com.
 **
-** $Id: specrec.c,v 1.63 2010/06/04 20:47:56 menno Exp $
+** $Id: specrec.c,v 1.62 2009/01/26 23:51:15 menno Exp $
 **/
 
 /*
@@ -622,10 +622,10 @@ static uint8_t quant_to_spec(NeAACDecStruct *hDecoder,
                     wb = wa + bin;
 
                     spec_data[wb+0] = iquant(quant_data[k+0], tab, &error) * scf;
-                    spec_data[wb+1] = iquant(quant_data[k+1], tab, &error) * scf;                        
-                    spec_data[wb+2] = iquant(quant_data[k+2], tab, &error) * scf;                        
+                    spec_data[wb+1] = iquant(quant_data[k+1], tab, &error) * scf;
+                    spec_data[wb+2] = iquant(quant_data[k+2], tab, &error) * scf;
                     spec_data[wb+3] = iquant(quant_data[k+3], tab, &error) * scf;
-                        
+
 #else
                     real_t iq0 = iquant(quant_data[k+0], tab, &error);
                     real_t iq1 = iquant(quant_data[k+1], tab, &error);
@@ -1131,13 +1131,16 @@ uint8_t reconstruct_channel_pair(NeAACDecStruct *hDecoder, ic_stream *ics1, ic_s
     hDecoder->requant_cycles += count;
 #endif
 
+
     /* pns decoding */
     if (ics1->ms_mask_present)
     {
         pns_decode(ics1, ics2, spec_coef1, spec_coef2, hDecoder->frameLength, 1, hDecoder->object_type,
             &(hDecoder->__r1), &(hDecoder->__r2));
     } else {
-        pns_decode(ics1, ics2, spec_coef1, spec_coef2, hDecoder->frameLength, 0, hDecoder->object_type,
+        pns_decode(ics1, NULL, spec_coef1, NULL, hDecoder->frameLength, 0, hDecoder->object_type,
+            &(hDecoder->__r1), &(hDecoder->__r2));
+        pns_decode(ics2, NULL, spec_coef2, NULL, hDecoder->frameLength, 0, hDecoder->object_type,
             &(hDecoder->__r1), &(hDecoder->__r2));
     }
 

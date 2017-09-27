@@ -6,7 +6,7 @@
  *  Created on: 26.04.2017
  *      Author: michaelboeckling
  */
-
+#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 #include <stdbool.h>
 #include <inttypes.h>
 #include <string.h>
@@ -51,7 +51,7 @@ size_t skipID3(uint8_t *sd_buf)
 
 void print_buffer(buffer_t *buf)
 {
-    size_t data_left = buf->write_pos - buf->read_pos;
+    size_t data_left = buf->fill_pos - buf->read_pos;
     size_t space_left = buf->len - data_left;
     ESP_LOGI(TAG, "fill %d capacity %d", data_left, space_left);
 }
@@ -93,28 +93,28 @@ void libfaac_decoder_task(void *pvParameters)
      * contains a number of "sound samples" (the kind you refer to with
      * the sampling frequency).
      */
-    size_t n;
+    //size_t n;
     demux_res_t demux_res;
     stream_t input_stream;
-    uint32_t sound_samples_done;
-    uint32_t elapsed_time;
-    int file_offset;
+    //uint32_t sound_samples_done;
+    //uint32_t elapsed_time;
+    //int file_offset;
     int framelength;
     int lead_trim = 0;
     unsigned int frame_samples;
-    unsigned int i;
-    unsigned char* buffer;
+    //unsigned int i;
+    //unsigned char* buffer;
     NeAACDecFrameInfo frame_info;
     NeAACDecHandle decoder;
     int err;
-    uint32_t seek_idx = 0;
+    //uint32_t seek_idx = 0;
     unsigned long samp_rate = 0;
-    uint32_t sbr_fac = 1;
+    //uint32_t sbr_fac = 1;
     unsigned char chan = 0;
     void *ret;
     // enum codec_command_action action;
-    intptr_t param;
-    bool empty_first_frame = false;
+    //intptr_t param;
+    //bool empty_first_frame = false;
 
 
     buffer_t buf = {
@@ -122,7 +122,7 @@ void libfaac_decoder_task(void *pvParameters)
     };
     buf.base = calloc(FAAD_BYTE_BUFFER_SIZE, sizeof(uint8_t));
     buf.read_pos = buf.base;
-    buf.write_pos = buf.base;
+    buf.fill_pos = buf.base;
 
     /* Clean and initialize decoder structures */
     memset(&demux_res, 0, sizeof(demux_res));
@@ -142,7 +142,7 @@ void libfaac_decoder_task(void *pvParameters)
          if (!qtmovie_read(&input_stream, &demux_res)) {
              ESP_LOGE(TAG, "FAAD: File init error\n");
              // return CODEC_ERROR;
-             return;
+             goto cleanup;
          } else {
              ESP_LOGI(TAG, "qtmovie_read success");
          }
@@ -151,14 +151,16 @@ void libfaac_decoder_task(void *pvParameters)
         demux_res.codecdata_len = 64;
     } else {
         ESP_LOGE(TAG, "unsupported content-type: %d", content_type);
-        return;
+        goto cleanup;
     }
+
     /* initialise the sound converter */
     decoder = NeAACDecOpen();
     if (!decoder) {
         ESP_LOGE(TAG, "FAAD: Decode open error");
-        return ;
+        goto cleanup;
     }
+
     NeAACDecConfigurationPtr conf = NeAACDecGetCurrentConfiguration(decoder);
     renderer_config_t *renderer = renderer_get();
     switch(renderer->bit_depth) {
@@ -177,6 +179,7 @@ void libfaac_decoder_task(void *pvParameters)
     conf->defSampleRate = 44100;
     NeAACDecSetConfiguration(decoder, conf);
 
+
     if(content_type == AUDIO_MP4) {
         err = NeAACDecInit2(decoder, demux_res.codecdata, demux_res.codecdata_len, &samp_rate, &chan);
     } else {
@@ -186,7 +189,7 @@ void libfaac_decoder_task(void *pvParameters)
     if (err) {
         //LOGF("FAAD: DecInit: %d, %d\n", err, decoder->object_type);
         ESP_LOGE(TAG, "FAAD: DecInit: %d", err);
-        return ;
+        goto cleanup;
     }
 
 #ifdef SBR_DEC
@@ -213,17 +216,16 @@ void libfaac_decoder_task(void *pvParameters)
 
         /* Request the required number of bytes from the input buffer */
         fill_read_buffer(&buf);
-ESP_LOGI(TAG, "read buf ");
-ESP_LOGI(TAG, "NeAACDecDecode buf %x  len: %d",(unsigned int)buf.read_pos,buf.write_pos - buf.read_pos);
+
         /* Decode one block - returned samples will be host-endian */
         ret = NeAACDecDecode(decoder, &frame_info, buf.read_pos,
-                buf.write_pos - buf.read_pos);
-ESP_LOGI(TAG, "read buf %s ",(char*)ret);
+                buf.fill_pos - buf.read_pos);
+
         /* NeAACDecDecode may sometimes return NULL without setting error. */
         if (ret == NULL || frame_info.error > 0) {
             printf("FAAD: decode error '%s'\n",
                     NeAACDecGetErrorMessage(frame_info.error));
-            return;
+            goto cleanup;
         }
 
         /* Advance codec buffer (no need to call set_offset because of this) */
@@ -233,12 +235,20 @@ ESP_LOGI(TAG, "read buf %s ",(char*)ret);
         frame_samples = frame_info.samples >> 1;
         framelength = frame_samples - lead_trim;
 
-        char *pcm_buf = ret;
+        int16_t *pcm_buf = ret;
         render_samples(pcm_buf, frame_info.samples * 2, &pcm_fmt);
 
-         ESP_LOGI(TAG, "stack: %d\n", uxTaskGetStackHighWaterMark(NULL));
+        // ESP_LOGI(TAG, "stack: %d\n", uxTaskGetStackHighWaterMark(NULL));
     }
 
     NeAACDecClose(decoder);
+	 
+	cleanup:
+	
+    buf_destroy(buf.base);
+	spiRamFifoReset();
+    player->decoder_status = STOPPED;
+	player->decoder_command = CMD_NONE;
+	vTaskDelete(NULL);
 }
 

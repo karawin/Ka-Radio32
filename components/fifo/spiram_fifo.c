@@ -41,8 +41,8 @@ static long fifoOvfCnt, fifoUdrCnt;
 #undef SPIRAMSIZE
 //allocate enough for about one mp3 frame
 //#define SPIRAMSIZE 1850
-//#define SPIRAMSIZE 32000
-#define SPIRAMSIZE 16000
+#define SPIRAMSIZE 65536
+//#define SPIRAMSIZE 16000
 static char fakespiram[SPIRAMSIZE];
 #define spiRamInit() while(0)
 #define spiRamTest() 1
@@ -125,7 +125,8 @@ void spiRamFifoWrite(const char *buff, int buffLen) {
 			fifoOvfCnt++;
 			xSemaphoreGive(mux);
 			xSemaphoreTake(semCanWrite, portMAX_DELAY);
-			taskYIELD();
+			//taskYIELD();
+			vTaskDelay(1);
 		} else {
 			// Write the data.
 			spiRamWrite(fifoWpos, buff, n);

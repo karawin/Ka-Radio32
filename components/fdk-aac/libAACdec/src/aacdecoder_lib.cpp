@@ -653,8 +653,7 @@ LINKSPEC_CPP HANDLE_AACDECODER aacDecoder_Open(TRANSPORT_TYPE transportFmt, UINT
   /* Allocate AAC decoder core struct. */
   aacDec = CAacDecoder_Open(transportFmt);
 
-  if (aacDec == NULL) {
-FDKprintf("AAC 2\n");	  
+  if (aacDec == NULL) {	  
     transportDec_Close(&pIn);
     goto bail;
   }
@@ -670,7 +669,7 @@ FDKprintf("AAC 2\n");
   /* open SBR decoder */
   if ( SBRDEC_OK != sbrDecoder_Open ( &aacDec->hSbrDecoder )) {
     err = -1;
-FDKprintf("AAC 3\n");
+	
     goto bail;
   }
   aacDec->qmfModeUser = NOT_DEFINED;
@@ -680,7 +679,6 @@ FDKprintf("AAC 3\n");
   pcmDmx_Open( &aacDec->hPcmUtils );
   if (aacDec->hPcmUtils == NULL) {
     err = -1;
-FDKprintf("AAC 4\n");
 	
     goto bail;
   }
@@ -697,7 +695,6 @@ FDKprintf("AAC 4\n");
   /* Assure that all modules have same delay */
   if ( setConcealMethod(aacDec, CConcealment_GetMethod(&aacDec->concealCommonData)) ) {
     err = -1;
-FDKprintf("AAC 5\n");
 	
     goto bail;
   }

@@ -22,7 +22,7 @@ typedef struct
 {
     uint8_t *base;
     uint8_t *read_pos;
-    uint8_t *write_pos;
+    uint8_t *fill_pos;
     uint16_t len;
     uint32_t bytes_consumed;
 } buffer_t;
@@ -30,14 +30,8 @@ typedef struct
 /* create a buffer on the heap */
 buffer_t *buf_create(size_t len);
 
-/* wraps an existing buffer */
-buffer_t *buf_wrap(void *existing, size_t len);
-
 /* free the backing storage, and the struct itself */
 int buf_destroy(buffer_t *buf);
-
-/* resize the buffer via realloc() */
-int buf_resize(buffer_t *buf, size_t new_size);
 
 /**
  * Seek from the current position of the pointer.
@@ -47,7 +41,7 @@ int buf_seek_rel(buffer_t *buf, uint32_t pos);
 int buf_seek_abs(buffer_t *buf, uint32_t pos);
 
 /* available unused capacity */
-size_t buf_free_capacity_after_purge(buffer_t *buf);
+size_t buf_free_capacity(buffer_t *buf);
 
 /* total amount of data in the buffer */
 size_t buf_data_total(buffer_t *buf);
@@ -78,10 +72,6 @@ uint32_t fread32(buffer_t *buf, size_t position);
 unsigned int REV16( unsigned int value);
 unsigned int REV32( unsigned int value);
 
-/* write bytes into the buffer */
-size_t buf_write(buffer_t *buf, const void* from, size_t len);
-
-/* todo: move elsewhere */
 size_t fill_read_buffer(buffer_t *buf);
 
 #endif /* _INCLUDE_COMMON_BUFFER_H_ */

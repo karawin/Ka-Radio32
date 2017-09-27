@@ -25,7 +25,7 @@
 ** Commercial non-GPL licensing of this software is possible.
 ** For more info contact Nero AG through Mpeg4AAClicense@nero.com.
 **
-** $Id: drc.c,v 1.29 2015/02/22 10:09:29 knik Exp $
+** $Id: drc.c,v 1.28 2007/11/01 12:33:30 menno Exp $
 **/
 
 #include "common.h"
@@ -130,9 +130,9 @@ void drc_decode(drc_info *drc, real_t *spec)
 #ifndef FIXED_POINT
         /* Decode DRC gain factor */
         if (drc->dyn_rng_sgn[bd])  /* compress */
-            exp = ((-drc->ctrl1 * drc->dyn_rng_ctl[bd]) - (DRC_REF_LEVEL - drc->prog_ref_level))/REAL_CONST(24.0);
+            exp = -drc->ctrl1 * (drc->dyn_rng_ctl[bd] - (DRC_REF_LEVEL - drc->prog_ref_level))/REAL_CONST(24.0);
         else /* boost */
-            exp = ((drc->ctrl2 * drc->dyn_rng_ctl[bd]) - (DRC_REF_LEVEL - drc->prog_ref_level))/REAL_CONST(24.0);
+            exp = drc->ctrl2 * (drc->dyn_rng_ctl[bd] - (DRC_REF_LEVEL - drc->prog_ref_level))/REAL_CONST(24.0);
         factor = (real_t)pow(2.0, exp);
 
         /* Apply gain factor */

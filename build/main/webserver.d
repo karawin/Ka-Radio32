@@ -23,6 +23,15 @@ webserver.o: C:/msys32/home/jp/esp/Ka-Radio32/main/webserver.c \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/string.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/string.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h \
+ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdint.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_intsup.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/build/include/sdkconfig.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_assert.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/platform_include/assert.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/opt.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/lwipopts.h \
@@ -33,19 +42,13 @@ webserver.o: C:/msys32/home/jp/esp/Ka-Radio32/main/webserver.c \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_default_fcntl.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stat.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_task.h \
- C:/msys32/home/jp/esp/Ka-Radio32/build/include/sdkconfig.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_system.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdint.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_intsup.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/platform_include/assert.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_sleep.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/gpio.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_types.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/gpio_reg.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_assert.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/gpio_struct.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc_io_reg.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/io_mux_reg.h \
@@ -56,7 +59,6 @@ webserver.o: C:/msys32/home/jp/esp/Ka-Radio32/main/webserver.c \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/touch_pad.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_intr.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h \
- C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_api.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/hal.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_context.h \
@@ -76,7 +78,6 @@ webserver.o: C:/msys32/home/jp/esp/Ka-Radio32/main/webserver.c \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_config.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/projdefs.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portable.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/deprecated_definitions.h \
@@ -120,7 +121,6 @@ webserver.o: C:/msys32/home/jp/esp/Ka-Radio32/main/webserver.c \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/webserver.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/webclient.h \
- C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/flash.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/eeprom.h \
@@ -201,6 +201,24 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/string.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdint.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_intsup.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/build/include/sdkconfig.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_assert.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/platform_include/assert.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h:
+
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/opt.h:
@@ -221,19 +239,9 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stat.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_task.h:
 
-C:/msys32/home/jp/esp/Ka-Radio32/build/include/sdkconfig.h:
-
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_system.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdint.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_intsup.h:
-
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/platform_include/assert.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_sleep.h:
 
@@ -244,8 +252,6 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_types.h:
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/gpio_reg.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_assert.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/gpio_struct.h:
 
@@ -266,8 +272,6 @@ C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/touch_pad.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_intr.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_api.h:
 
@@ -306,8 +310,6 @@ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h:
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_config.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/projdefs.h:
 
@@ -394,8 +396,6 @@ C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h:
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/webserver.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/webclient.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h:
 

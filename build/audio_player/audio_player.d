@@ -90,7 +90,7 @@ audio_player.o: \
  C:/msys32/home/jp/esp/Ka-Radio32/components/faad_decoder/include/fdk_aac_decoder.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad_decoder/include/libfaad_decoder.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/mp3_decoder/include/mp3_decoder.h \
- C:/msys32/home/jp/esp/Ka-Radio32/components/controls/include/controls.h
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/webclient.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdlib.h:
 
@@ -272,5 +272,5 @@ C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad_decoder/include/libfaad_deco
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/mp3_decoder/include/mp3_decoder.h:
 
-C:/msys32/home/jp/esp/Ka-Radio32/components/controls/include/controls.h:
+C:/msys32/home/jp/esp/Ka-Radio32/main/include/webclient.h:
 /home/jp/esp/Ka-Radio32/components/audio_player/./audio_player.c:

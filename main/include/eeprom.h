@@ -46,6 +46,7 @@ struct device_settings {
 	uint32_t wakeValue;	
 // esp32
 	output_mode_t audio_output_mode; // 
+	uint8_t trace_level;
 	char filler[32]; 
 
 };

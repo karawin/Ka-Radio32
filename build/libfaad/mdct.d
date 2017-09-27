@@ -32,6 +32,9 @@ mdct.o: C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad/mdct.c \
  C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad/structs.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad/cfft.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad/sbr_dec.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad/ps_dec.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad/bits.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad/analysis.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/platform_include/assert.h \
  C:/msys32/home/jp/esp/Ka-Radio32/build/include/sdkconfig.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h \
@@ -103,6 +106,12 @@ C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad/structs.h:
 C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad/cfft.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad/sbr_dec.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad/ps_dec.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad/bits.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad/analysis.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/platform_include/assert.h:
 

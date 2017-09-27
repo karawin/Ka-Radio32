@@ -3,7 +3,7 @@
 */
 
 #define BOUCHON
-
+#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -398,7 +398,7 @@ void playStationInt(int sid) {
 			vTaskDelay(4);
 //			clientSilentDisconnect();
 			clientDisconnect("playStationInt");
-printf ("playstationInt: %d, new station: %s\n",sid,si->name);
+//printf ("playstationInt: %d, new station: %s\n",sid,si->name);
 			for (i = 0;i<100;i++)
 			{
 				if(!clientIsConnected())break;

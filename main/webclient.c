@@ -2,7 +2,7 @@
  * Copyright 2016 karawin (http://www.karawin.fr)
 */
 #define TAG "webclient"
-
+#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 
 #include "webclient.h"
 #include "webserver.h"
@@ -581,6 +581,26 @@ bool clientParseHeader(char* s)
 	{
 		clearHeaders();
 	}	
+
+		t = strstr(s,"Content-Type:");
+		if (t == NULL) t = strstr(s,"content-type:");
+		if (t != NULL)
+		{
+			contentType = KMIME_UNKNOWN;
+			if (strstr(t, "application/octet-stream")) contentType = KOCTET_STREAM;
+			if (strstr(t, "audio/aac")) contentType = KAUDIO_AAC;
+			if (strstr(t, "audio/mp4")) contentType = KAUDIO_MP4;
+			if (strstr(t, "audio/x-m4a")) contentType = KAUDIO_MP4;
+			if (strstr(t, "audio/mpeg")) contentType = KAUDIO_MPEG;
+
+			if(contentType == KMIME_UNKNOWN) {
+				ESP_LOGD(TAG, "unknown contentType: %s", t);
+			}	
+			ESP_LOGD(TAG, "contentType: %d", contentType);
+			player_config->media_stream->content_type = contentType;
+		}
+
+
 	
 	for(header_num=0; header_num<ICY_HEADERS_COUNT; header_num++)
 	{
@@ -614,22 +634,6 @@ bool clientParseHeader(char* s)
 	}
 	if (ret == true) 
 	{
-		t = strstr(s,"Content-Type:");
-		if (t != NULL)
-		{
-			contentType = KMIME_UNKNOWN;
-			if (strstr(t, "application/octet-stream")) contentType = KOCTET_STREAM;
-			if (strstr(t, "audio/aac")) contentType = KAUDIO_AAC;
-			if (strstr(t, "audio/mp4")) contentType = KAUDIO_MP4;
-			if (strstr(t, "audio/x-m4a")) contentType = KAUDIO_MP4;
-			if (strstr(t, "audio/mpeg")) contentType = KAUDIO_MPEG;
-
-			if(contentType == KMIME_UNKNOWN) {
-				ESP_LOGE(TAG, "unknown contentType: %s", t);
-			}	
-			ESP_LOGI(TAG, "contentType: %d", contentType);
-			player_config->media_stream->content_type = contentType;
-		}
 		wsHeaders();
 		wsMonitor();
 	}
@@ -699,6 +703,7 @@ void clientSilentConnect()
 void clientSilentDisconnect()
 {
 	xSemaphoreGive(sDisconnect);
+	audio_player_stop();
 	
 }
 
@@ -706,7 +711,7 @@ void clientDisconnect(const char* from)
 {
 	kprintf(CLISTOP,from);
 	xSemaphoreGive(sDisconnect);
-
+	audio_player_stop();
 	if (!ledStatus) gpio4_output_set(1);
 	vTaskDelay(10);
 //	clearHeaders();
@@ -1138,7 +1143,7 @@ void clientTask(void *pvParams) {
 			//VS1053_HighPower();
 			xSemaphoreTake(sDisconnect, 0);	
 			sockfd = socket(AF_INET, SOCK_STREAM, 0);
-			if(sockfd >= 0) {printf("WebClient Socket created\n"); }
+			if(sockfd >= 0) ;//{printf("WebClient Socket created\n"); }
 			else printf(strcWEBSOCKET,"create",errno);
 			bzero(&dest, sizeof(dest));
 			dest.sin_family = AF_INET;
@@ -1241,7 +1246,7 @@ void clientTask(void *pvParams) {
 					else{  //playing & once=1 and no more received stream
 						while (!getBufferEmpty()) vTaskDelay(100);
 						vTaskDelay(200);
-						clientDisconnect(PSTR("once")); 						
+						clientDisconnect("once"); 						
 					}					
 			}//jpc
 						
@@ -1251,7 +1256,7 @@ void clientTask(void *pvParams) {
 */
 			if (playing)  // stop clean
 			{		
-				audio_player_stop();
+				audio_player_stop(); 
 				player_config->media_stream->eof = true;
 				bufferReset();
 				VS1053_SetVolume(0);

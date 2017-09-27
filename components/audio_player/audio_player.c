@@ -11,14 +11,15 @@
 #include "audio_player.h"
 #include "spiram_fifo.h"
 #include "freertos/task.h"
-
+#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 #include "esp_system.h"
 #include "esp_log.h"
 
 #include "fdk_aac_decoder.h"
 #include "libfaad_decoder.h"
 #include "mp3_decoder.h"
-#include "controls.h"
+//#include "controls.h"
+#include "webclient.h"
 
 #define TAG "audio_player"
 #define PRIO_MAD configMAX_PRIORITIES - 4
@@ -32,7 +33,7 @@ static int start_decoder_task(player_t *player)
     char * task_name;
     uint16_t stack_depth;
 
-    ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
+    ESP_LOGD(TAG, "RAM left %d", esp_get_free_heap_size());
 
     switch (player->media_stream->content_type)
     {
@@ -47,7 +48,7 @@ static int start_decoder_task(player_t *player)
         case AUDIO_MP4:
             task_func = libfaac_decoder_task;
             task_name = "libfaac_decoder_task";
-            stack_depth = 55000; //55000
+            stack_depth = 54000; //55000
             break;
 
         case AUDIO_AAC:
@@ -58,19 +59,21 @@ static int start_decoder_task(player_t *player)
             break;
 
         default:
-            ESP_LOGE(TAG, "unknown mime type: %d", player->media_stream->content_type);
+            ESP_LOGW(TAG, "unknown mime type: %d", player->media_stream->content_type);
+			spiRamFifoReset();
             return -1;
     }
 
     if (xTaskCreatePinnedToCore(task_func, task_name, stack_depth, player,
     PRIO_MAD, NULL, 1) != pdPASS) {
         ESP_LOGE(TAG, "ERROR creating decoder task! Out of memory?");
+		spiRamFifoReset();
         return -1;
     } else {
         player->decoder_status = RUNNING;
     }
-
-    ESP_LOGI(TAG, "created decoder task: %s", task_name);
+	
+    ESP_LOGD(TAG, "created decoder task: %s", task_name);
 
     return 0;
 }
@@ -82,12 +85,12 @@ int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read,
         void *user_data)
 {
     player_t *player = user_data;
-
     // don't bother consuming bytes if stopped
     if(player->command == CMD_STOP) {
-		audio_player_stop();
+		//audio_player_stop();
+		clientDisconnect("Player stop"); 
+		
         //player->decoder_command = CMD_STOP;
-        player->command = CMD_NONE;
         return -1;
     }
 
@@ -106,14 +109,15 @@ int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read,
         // buffer is filled, start decoder
         if (start_decoder_task(player) != 0) {
             ESP_LOGE(TAG, "failed to start decoder task");
-			audio_player_stop();
+//			audio_player_stop();
+			clientDisconnect("unsupported mime type"); 
             return -1;
         }
     }
 
     t = (t + 1) & 255;
     if (t == 0) {
-        ESP_LOGV(TAG, "Buffer fill %u%%, %d bytes", fill_level, bytes_in_buf);
+        ESP_LOGD(TAG, "Buffer fill %u%%, %d bytes", fill_level, bytes_in_buf);
     }
 
     return 0;
@@ -136,6 +140,7 @@ void audio_player_start()
     renderer_start();
 	player_instance->media_stream->eof = false;
 	player_instance->command = CMD_START;
+	player_instance->decoder_command = CMD_NONE;
 	
     player_status = RUNNING;
 }
@@ -146,8 +151,9 @@ void audio_player_stop()
 	player_instance->command = CMD_STOP;
 	player_instance->media_stream->eof = true;
     renderer_stop();
-
+	player_instance->command = CMD_NONE;
     player_status = STOPPED;
+	
 }
 
 component_status_t get_player_status()

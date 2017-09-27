@@ -13,9 +13,10 @@
 #include "webclient.h"
 #include "webserver.h"
 #include "gpio16.h"
-
+#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 #include <driver/adc.h>
-
+#include "esp_system.h"
+#include "esp_log.h"
 
 char parslashquote[] = {"(\""};
 char parquoteslash[] = {"\")"};
@@ -100,14 +101,14 @@ help: this command\n\
 \n\
 A command error display:\n\
 ##CMD_ERROR#\n\r%c"}; 
-uint16_t currentStation = 0;
 
-//extern uint16_t currentStation;
+uint16_t currentStation = 0;
+static esp_log_level_t s_log_default_level = CONFIG_LOG_BOOTLOADER_LEVEL;
 extern void wsVol(char* vol);
 extern void playStation(char* id);
 extern void setVolume(char* vol);
 extern void setRelVolume(int8_t vol);
-extern uint16_t getVolume(void);
+
 
 
 void clientVol(char *s);
@@ -131,8 +132,7 @@ void setVolumew(char* vol)
 
 unsigned short adcdiv;	
 
-
-
+/*
 void readAdc()
 {
 	int adc;
@@ -141,8 +141,9 @@ void readAdc()
 	adc = adc1_get_raw(ADC1_CHANNEL_0);
 	kprintf(PSTR("##ADC: %d * %d = %d\n"),adc,adcdiv,adc*adcdiv);
 }
+*/
 // Read the command panel
-void switchCommand() {
+/*void switchCommand() {
 	int adc;
 //remove	int i = 0;
 	char Vol[22];
@@ -199,7 +200,7 @@ void switchCommand() {
 	}
 }
 
-
+*/
 
 uint8_t startsWith(const char *pre, const char *str)
 {
@@ -737,6 +738,54 @@ void heapSize()
 	kprintf(PSTR("%sHEAP: %d #\n"),msgsys,hps);
 }
 
+
+void displayLogLevel()
+{
+	switch (s_log_default_level){
+		case ESP_LOG_NONE:
+		  kprintf("Log level is now ESP_LOG_NONE\n");
+		  break;
+		case ESP_LOG_ERROR:
+		  kprintf("Log level is now ESP_LOG_ERROR\n");
+		  break;
+		case ESP_LOG_WARN:
+		  kprintf("Log level is now ESP_LOG_WARN\n");
+		  break;
+		case ESP_LOG_INFO:
+		  kprintf("Log level is now ESP_LOG_INFO\n");
+		  break;
+		case ESP_LOG_DEBUG:
+		  kprintf("Log level is now ESP_LOG_DEBUG\n");
+		  break;
+		case ESP_LOG_VERBOSE:
+		  kprintf("Log level is now ESP_LOG_VERBOSE\n");
+		  break;
+		default:
+		  kprintf("Log level is now Unknonwn\n");	
+	}
+}
+
+esp_log_level_t getLogLevel()
+{
+	 return s_log_default_level;
+}
+
+
+void setLogLevel(esp_log_level_t level)
+{
+	struct device_settings *device;
+	device = getDeviceSettings();
+	esp_log_level_set("*", level);
+	s_log_default_level=level; 
+	if (device != NULL)
+	{
+		device->trace_level = level;
+		saveDeviceSettings(device);
+		free(device);
+	}	
+	displayLogLevel();
+} 
+
 void checkCommand(int size, char* s)
 {
 	char *tmp = (char*)malloc((size+1)*sizeof(char));
@@ -775,7 +824,7 @@ void checkCommand(int size, char* s)
 	if(startsWith ("sys.", tmp))
 	{
 			 if(startsWith (  "i2s",tmp+4)) 	sysI2S(tmp);
-		else if(strcmp(tmp+4, "adc") == 0) 		readAdc();
+//		else if(strcmp(tmp+4, "adc") == 0) 		readAdc();
 		else if(startsWith (  "uart",tmp+4)) 	sysUart(tmp);
 		else if(strcmp(tmp+4, "erase") == 0) 	eeEraseAll();
 		else if(strcmp(tmp+4, "heap") == 0) 	heapSize();
@@ -787,6 +836,13 @@ void checkCommand(int size, char* s)
 		else if(strcmp(tmp+4, "date") == 0) 	ntp_print_time();
 		else if(strncmp(tmp+4, "version",4) == 0) 	kprintf(PSTR("Release: %s, Revision: %s\n"),RELEASE,REVISION);
 		else if(startsWith(   "tzo",tmp+4)) 	tzoffset(tmp);
+		else if(strcmp(tmp+4, "logn") == 0) 	setLogLevel(ESP_LOG_NONE);
+		else if(strcmp(tmp+4, "loge") == 0) 	setLogLevel(ESP_LOG_ERROR); 
+		else if(strcmp(tmp+4, "logw") == 0) 	setLogLevel(ESP_LOG_WARN); 
+		else if(strcmp(tmp+4, "logi") == 0) 	setLogLevel(ESP_LOG_INFO); 
+		else if(strcmp(tmp+4, "logd") == 0) 	setLogLevel(ESP_LOG_DEBUG); 
+		else if(strcmp(tmp+4, "logv") == 0) 	setLogLevel(ESP_LOG_VERBOSE); 
+		else if(strcmp(tmp+4, "dlog") == 0) 	displayLogLevel();
 		else if(startsWith(   "log",tmp+4)) 	; // do nothing
 		else printInfo(tmp);
 	}

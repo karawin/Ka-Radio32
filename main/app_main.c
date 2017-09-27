@@ -1,3 +1,4 @@
+#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -70,8 +71,6 @@ const int CONNECTED_AP  = 0x00000010;
 #define I2C_EXAMPLE_MASTER_RX_BUF_DISABLE   0   /*!< I2C master do not need buffer */
 #define I2C_EXAMPLE_MASTER_FREQ_HZ    100000     /*!< I2C master clock frequency */
 
-
-#define WIFI_LIST_NUM   10
 #define TAG "main"
 
 //Priorities of the reader and the decoder thread. bigger number = higher prio
@@ -555,7 +554,7 @@ void uartInterfaceTask(void *pvParameters) {
 				if(t == sizeof(tmp)-1) t = 0;
 			}
 			//else printf("uart d: %d, T= %d\n",d,t);
-			switchCommand() ;  // hardware panel of command
+			//switchCommand() ;  // hardware panel of command
 		}
 		checkCommand(t, tmp);
 		
@@ -594,6 +593,9 @@ void app_main()
 		saveDeviceSettings(device);
 	}	
 
+	// log level
+	setLogLevel(device->trace_level);
+	
 	//uart speed
 	uspeed = device->uartspeed;	
 	uspeed = checkUart(uspeed);	
@@ -671,9 +673,9 @@ void app_main()
 	ESP_LOGI(TAG, "%s task: %x","t1",(unsigned int)pxCreatedTask);
 //	xTaskCreate(vsTask, "t2", 2000, NULL,/*configMAX_PRIORITIES*/5, &pxCreatedTask); //380 230
 //	ESP_LOGI(TAG, "%s task: %x","t2",(unsigned int)pxCreatedTask)
-	xTaskCreate(clientTask, "t3", 2500, NULL, configMAX_PRIORITIES -2, &pxCreatedTask); // 340
+	xTaskCreate(clientTask, "t3", 2500, NULL, configMAX_PRIORITIES -5, &pxCreatedTask); // 340
 	ESP_LOGI(TAG, "%s task: %x","t3",(unsigned int)pxCreatedTask);	
-    xTaskCreatePinnedToCore(serversTask, "t4", 2500, NULL, 4, &pxCreatedTask,0); //380
+    xTaskCreate(serversTask, "t4", 2500, NULL, 4, &pxCreatedTask); //380
 	ESP_LOGI(TAG, "%s task: %x","t4",(unsigned int)pxCreatedTask);	
 	
 	//autostart	

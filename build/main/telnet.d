@@ -118,6 +118,7 @@ telnet.o: C:/msys32/home/jp/esp/Ka-Radio32/main/telnet.c \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netdb.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h \
+ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h:
@@ -357,6 +358,8 @@ C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netdb.h:
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h:
 /home/jp/esp/Ka-Radio32/main/./telnet.c:

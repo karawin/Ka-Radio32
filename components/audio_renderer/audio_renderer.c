@@ -11,7 +11,7 @@
 #include <stdbool.h>
 
 #include "freertos/FreeRTOS.h"
-
+#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 #include "esp_log.h"
 #include "driver/gpio.h"
 #include "driver/i2s.h"
@@ -100,14 +100,14 @@ void renderer_volume(uint32_t vol)
  */
 void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 {
-    //ESP_LOGI(TAG, "buf_desc: bit_depth %d format %d num_chan %d sample_rate %d", buf_desc->bit_depth, buf_desc->buffer_format, buf_desc->num_channels, buf_desc->sample_rate);
-    //ESP_LOGI(TAG, "renderer_instance: bit_depth %d, output_mode %d", renderer_instance->bit_depth, renderer_instance->output_mode);
+    ESP_LOGV(TAG, "buf_desc: bit_depth %d format %d num_chan %d sample_rate %d", buf_desc->bit_depth, buf_desc->buffer_format, buf_desc->num_channels, buf_desc->sample_rate);
+    ESP_LOGV(TAG, "renderer_instance: bit_depth %d, output_mode %d", renderer_instance->bit_depth, renderer_instance->output_mode);
 
 
     // handle changed sample rate
     if(renderer_instance->sample_rate != buf_desc->sample_rate)
     {
-        ESP_LOGI(TAG, "changing sample rate from %d to %d", renderer_instance->sample_rate, buf_desc->sample_rate);
+        ESP_LOGD(TAG, "changing sample rate from %d to %d", renderer_instance->sample_rate, buf_desc->sample_rate);
         uint32_t rate = buf_desc->sample_rate * renderer_instance->sample_rate_modifier;
         i2s_set_sample_rates(renderer_instance->i2s_num, rate);
         renderer_instance->sample_rate = buf_desc->sample_rate;
@@ -153,7 +153,7 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 
     // support only 16 bit buffers for now
     if(buf_desc->bit_depth != I2S_BITS_PER_SAMPLE_16BIT) {
-        ESP_LOGE(TAG, "unsupported decoder bit depth: %d", buf_desc->bit_depth);
+        ESP_LOGD(TAG, "unsupported decoder bit depth: %d", buf_desc->bit_depth);
         return;
     }
 
@@ -259,7 +259,7 @@ void renderer_init(renderer_config_t *config)
     renderer_instance = config;
     renderer_status = INITIALIZED;
 
-    ESP_LOGI(TAG, "init I2S mode %d, port %d, %d bit, %d Hz", config->output_mode, config->i2s_num, config->bit_depth, config->sample_rate);
+    ESP_LOGD(TAG, "init I2S mode %d, port %d, %d bit, %d Hz", config->output_mode, config->i2s_num, config->bit_depth, config->sample_rate);
     init_i2s(config);
 
     if(config->output_mode == I2S_MERUS) {

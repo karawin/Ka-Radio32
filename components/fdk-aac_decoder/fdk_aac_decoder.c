@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include <inttypes.h>
 #include <string.h>
-
+#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_system.h"
@@ -20,7 +20,6 @@
 #include "audio_player.h"
 #include "m4a.h"
 #include "spiram_fifo.h"
-
 
 #define TAG "fdkaac_decoder"
 
@@ -62,7 +61,7 @@ void fdkaac_decoder_task(void *pvParameters)
 
         if (!qtmovie_read(&input_stream, &demux_res)) {
             ESP_LOGE(TAG, "qtmovie_read failed");
-            goto cleanup;
+            goto abort;
         } else {
             ESP_LOGI(TAG, "qtmovie_read success");
         }
@@ -71,7 +70,7 @@ void fdkaac_decoder_task(void *pvParameters)
         handle = aacDecoder_Open(TT_MP4_RAW, /* num layers */1);
         if (handle == NULL) {
             ESP_LOGE(TAG, "malloc failed %d", __LINE__);
-            goto cleanup;
+            goto abort;
         }
 
         // If out-of-band config data (AudioSpecificConfig(ASC) or StreamMuxConfig(SMC)) is available
@@ -80,7 +79,7 @@ void fdkaac_decoder_task(void *pvParameters)
         err = aacDecoder_ConfigRaw(handle, &demux_res.codecdata, &demux_res.codecdata_len);
         if (err != AAC_DEC_OK) {
             ESP_LOGE(TAG, "aacDecoder_ConfigRaw error %d", err);
-            goto cleanup;
+            goto abort;
         }
 
     } else {
@@ -88,8 +87,7 @@ void fdkaac_decoder_task(void *pvParameters)
         handle = aacDecoder_Open(TT_MP4_ADTS, /* num layers */1);
         if (handle == NULL) {
             ESP_LOGE(TAG, "malloc failed %d", __LINE__);
-			ESP_LOGI(TAG, "%u free heap %u", __LINE__, esp_get_free_heap_size());
-            goto cleanup;
+            goto abort;
         }
     }
 
@@ -103,7 +101,7 @@ void fdkaac_decoder_task(void *pvParameters)
     uint32_t pcm_size = 0;
     bool first_frame = true;
 
-    ESP_LOGI(TAG, "(line %u) free heap: %u", __LINE__, esp_get_free_heap_size());
+    ESP_LOGD(TAG, "(line %u) free heap: %u", __LINE__, esp_get_free_heap_size());
 
     while (!player->media_stream->eof) {
 
@@ -129,7 +127,7 @@ void fdkaac_decoder_task(void *pvParameters)
         }
 
         if (err != AAC_DEC_OK) {
-            ESP_LOGE(TAG, "decode error 0x%08x", err);
+            ESP_LOGD(TAG, "decode error 0x%08x", err);
             continue;
         }
 
@@ -157,20 +155,24 @@ void fdkaac_decoder_task(void *pvParameters)
 
         // about 32K free heap at this point
     }
+	goto cleanup;
 
-    cleanup:
+	// exit on internal error
+    abort:
+	
+	player->command = CMD_STOP;
+	
+	// exit on external event
+	cleanup:
 
     buf_destroy(in_buf);
     buf_destroy(pcm_buf);
 
     aacDecoder_Close(handle);
-	
 	spiRamFifoReset();
     player->decoder_status = STOPPED;
-    player->decoder_command = CMD_NONE;
-    printf("Decoder stopped.\n");
-
-    ESP_LOGI(TAG, "aac decoder finished");
+	player->decoder_command = CMD_NONE;
+    ESP_LOGD(TAG, "decoder finished");
 
     vTaskDelete(NULL);
 }
