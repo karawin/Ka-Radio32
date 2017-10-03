@@ -121,7 +121,6 @@ void i2c_test(char* ip)
     }
     SSD1306_GotoXY(16, 53);
 
-
     SSD1306_GotoXY(2, 53);
     SSD1306_Puts("IP:", &Font_7x10, SSD1306_COLOR_WHITE);
     SSD1306_Puts(ip, &Font_7x10, SSD1306_COLOR_WHITE);    
@@ -134,8 +133,7 @@ void i2c_test(char* ip)
  //   vTaskDelay(500);
 //    SSD1306_Fill(SSD1306_COLOR_BLACK);
 //    SSD1306_UpdateScreen();  
-/* The above part is for class-D webradio system*/
-    
+/* The above part is for class-D webradio system*/  
 }
 
 
@@ -220,11 +218,9 @@ uint32_t checkUart(uint32_t speed)
 *******************************************************************************/
 static void init_hardware()
 {
-    //ESP_ERROR_CHECK(nvs_flash_init());
 	VS1053_HW_init(); // init spi
 	VS1053_Start();
 	
-
     //Initialize the SPI RAM chip communications and see if it actually retains some bytes. If it
     //doesn't, warn user.
     if (!spiRamFifoInit()) {
@@ -296,7 +292,6 @@ static void initialise_wifi_and_network()
     ESP_ERROR_CHECK( esp_event_loop_init(event_handler, wifi_event_group) );
     ESP_ERROR_CHECK( esp_wifi_init(&cfg) );
     ESP_ERROR_CHECK( esp_wifi_set_storage(WIFI_STORAGE_FLASH) );
-
 }
 
 static void start_wifi()
@@ -313,74 +308,73 @@ static void start_wifi()
     initialise_wifi_and_network();
 	
 	device = getDeviceSettings();
+	while (1)
+	{
+		switch (device->current_ap)
+		{
+			case STA1: //ssid1 used
+				strcpy(ssid,device->ssid1);
+				strcpy(pass,device->pass1);
+				esp_wifi_set_mode(WIFI_MODE_STA) ;
+			break;
+			case STA2: //ssid2 used
+				strcpy(ssid,device->ssid2);
+				strcpy(pass,device->pass2);	
+				esp_wifi_set_mode(WIFI_MODE_STA) ;			
+			break;
 
-	switch (device->current_ap)
-	{
-		case STA1: //ssid1 used
-			strcpy(ssid,device->ssid1);
-			strcpy(pass,device->pass1);
-			esp_wifi_set_mode(WIFI_MODE_STA) ;
-		break;
-		case STA2: //ssid2 used
-			strcpy(ssid,device->ssid2);
-			strcpy(pass,device->pass2);	
-			esp_wifi_set_mode(WIFI_MODE_STA) ;			
-		break;
+			default: // other: AP mode
+				device->current_ap = 0;
+				esp_wifi_set_mode(WIFI_MODE_AP) ;
+		}
+	
+	
+		ESP_ERROR_CHECK(esp_wifi_get_mode(&mode))	
+		if (mode == WIFI_MODE_AP)
+		{
+			wifi_config_t wifi_config = {
+				.ap = {
+					.ssid = "WifiKaradio",
+					.password = "",
+					.ssid_len = 0,
+					.authmode = WIFI_AUTH_OPEN,
+					.max_connection = 4,
+					.beacon_interval = 100,
+				},
+			};
+			ESP_LOGE(TAG, "The default AP is  WifiKaRadio. Connect your wifi to it.\nThen connect a webbrowser to 192.168.4.1 and go to Setting\nMay be long to load the first time.Be patient.");
+			ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &wifi_config));
+		}
+		else
+		{
+			wifi_config_t wifi_config = {
+				.sta = {
+					.bssid_set = 0,
+				},
+			};
+			strcpy((char*)wifi_config.sta.ssid,ssid);
+			strcpy((char*)wifi_config.sta.password,pass);
+			esp_wifi_disconnect();
+			ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
+			ESP_LOGI(TAG, "connecting");
+			esp_wifi_connect();				
+		}
 
-		default: // other: AP mode
-			device->current_ap = 0;
-			esp_wifi_set_mode(WIFI_MODE_AP) ;
-	}
-	
-	
-	ESP_ERROR_CHECK(esp_wifi_get_mode(&mode))	
-	if (mode == WIFI_MODE_AP)
-	{
-		wifi_config_t wifi_config = {
-			.ap = {
-				.ssid = "WifiKaradio",
-				.password = "",
-				.ssid_len = 0,
-				.authmode = WIFI_AUTH_OPEN,
-				.max_connection = 4,
-				.beacon_interval = 100,
-			},
-		};
-		ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &wifi_config));
-	}
-	else
-	{
-		wifi_config_t wifi_config = {
-			.sta = {
-				.bssid_set = 0,
-			},
-		};
-		strcpy((char*)wifi_config.sta.ssid,ssid);
-		strcpy((char*)wifi_config.sta.password,pass);
-		esp_wifi_disconnect();
-		ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
-		ESP_LOGI(TAG, "connecting");
-		esp_wifi_connect();				
-	}
-//	strcpy((char*)wifi_config.sta.ssid,device->ssid1);
-//	strcpy((char*)wifi_config.sta.password,device->pass1);	
-	
-    ESP_ERROR_CHECK( esp_wifi_start() );
-	ESP_LOGI(TAG, "Initialised wifi");
-//    set_wifi_credentials();
+		ESP_ERROR_CHECK( esp_wifi_start() );
+		ESP_LOGI(TAG, "Initialised wifi");
+// 	   set_wifi_credentials();
  
-    /* Wait for the callback to set the CONNECTED_BIT in the event group. */
-    if ( (xEventGroupWaitBits(wifi_event_group, CONNECTED_AP,false, true, 2000) & CONNECTED_AP) ==0) //timeout
-	{
-		device->current_ap++;
-		device->current_ap %=3;
-		saveDeviceSettings(device);
-		printf("\ndevice->current_ap: %d\n",device->current_ap);
-		vTaskDelay(100);
-		esp_restart();
-		
-	}							
-						
+		/* Wait for the callback to set the CONNECTED_BIT in the event group. */
+		if ( (xEventGroupWaitBits(wifi_event_group, CONNECTED_AP,false, true, 2000) & CONNECTED_AP) ==0) //timeout
+		{
+			device->current_ap++;
+			device->current_ap %=3;
+			saveDeviceSettings(device);
+			printf("\ndevice->current_ap: %d\n",device->current_ap);
+			//vTaskDelay(100);
+			//esp_restart();		
+		}	else break;						
+	}					
 	i2c_state("Connected to AP");	
 	free(device);
 }
@@ -591,6 +585,10 @@ void app_main()
     ESP_LOGI(TAG, "RAM left: %u", esp_get_free_heap_size());
 	
 	partitions_init();
+	//init hardware
+    init_hardware(); 
+	
+
 	device = getDeviceSettings();
 	// device partition initialized?
 	if (device->cleared != 0xAABB)
@@ -600,13 +598,11 @@ void app_main()
 		free(device);
 		device = getDeviceSettings();
 		device->cleared = 0xAABB; //marker init done
+		device->uartspeed = 115200; // default
 		device->audio_output_mode = VS1053; // default
 		device->trace_level = ESP_LOG_ERROR; //default
 		saveDeviceSettings(device);
 	}	
-	
-	//init hardware
-    init_hardware(); 
 	
 	// output mode
 	//I2S, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053
@@ -693,15 +689,22 @@ void app_main()
 	ESP_LOGI(TAG, "%s task: %x","clientTask",(unsigned int)pxCreatedTask);	
     xTaskCreate(serversTask, "serversTask", 2500, NULL, 4, &pxCreatedTask); //380
 	ESP_LOGI(TAG, "%s task: %x","serversTask",(unsigned int)pxCreatedTask);	
-	
+	printf("Init ");
+	vTaskDelay(1);
+	for (int i=0;i<30;i++)
+	{
+		vTaskDelay(10);// wait tasks init
+		printf(".");
+	}
+	printf(" Done\n");
 	//autostart	
 	kprintf("autostart: playing:%d, currentstation:%d\n",device->autostart,device->currentstation);
-	setCurrentStation( device->currentstation);
 	setIvol( device->vol);
+	setCurrentStation( device->currentstation);
 	
 	if (device->autostart ==1)
 	{	
-		vTaskDelay(100); 
+		vTaskDelay(50); 
 		playStationInt(device->currentstation);
 	}
 	
