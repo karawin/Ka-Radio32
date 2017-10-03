@@ -45,8 +45,11 @@ audio_player.o: \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/specreg.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-state.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h \
- C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h \
+ C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h \
+ C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_attr.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/mpu_wrappers.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_system.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h \
@@ -70,6 +73,7 @@ audio_player.o: \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_intr.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_api.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/audio_player/include/audio_player.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/common/include/common_component.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/audio_renderer/include/audio_renderer.h \
@@ -87,10 +91,13 @@ audio_player.o: \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/limits.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
+ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/faad_decoder/include/fdk_aac_decoder.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad_decoder/include/libfaad_decoder.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/mp3_decoder/include/mp3_decoder.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/webclient.h
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/webclient.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdlib.h:
 
@@ -182,9 +189,15 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-sta
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h:
+C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_attr.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/mpu_wrappers.h:
 
@@ -232,6 +245,8 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_api.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h:
+
 C:/msys32/home/jp/esp/Ka-Radio32/components/audio_player/include/audio_player.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/common/include/common_component.h:
@@ -266,6 +281,8 @@ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
+
 C:/msys32/home/jp/esp/Ka-Radio32/components/faad_decoder/include/fdk_aac_decoder.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad_decoder/include/libfaad_decoder.h:
@@ -273,4 +290,8 @@ C:/msys32/home/jp/esp/Ka-Radio32/components/libfaad_decoder/include/libfaad_deco
 C:/msys32/home/jp/esp/Ka-Radio32/components/mp3_decoder/include/mp3_decoder.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/webclient.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h:
 /home/jp/esp/Ka-Radio32/components/audio_player/./audio_player.c:

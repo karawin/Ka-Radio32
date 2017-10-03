@@ -6,6 +6,7 @@ bootloader_start.o: \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_assert.h \
+ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/cache.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_access.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_dport_access.h \
@@ -56,6 +57,8 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h:
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_assert.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/cache.h:
 

@@ -17,7 +17,6 @@
 #include "lwip/sockets.h"
 #include "lwip/dns.h"
 #include "lwip/netdb.h"
-#include "flash.h"
 #include "eeprom.h"
 #include "interface.h"
 #include "websocket.h"
@@ -38,8 +37,7 @@ extern xSemaphoreHandle semclient;
 extern xSemaphoreHandle semfile;
 
 //void serverTask(void *pvParams);
-extern int8_t clientOvol ;
-extern uint8_t clientIvol ;
+
 void sleepCallback(void *pArg);
 void wakeCallback(void *pArg);
 void startSleep(uint32_t delay);

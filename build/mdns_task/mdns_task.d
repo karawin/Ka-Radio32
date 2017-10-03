@@ -47,8 +47,11 @@ mdns_task.o: \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/specreg.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-state.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h \
- C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h \
+ C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h \
+ C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_attr.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/mpu_wrappers.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_system.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h \
@@ -72,6 +75,7 @@ mdns_task.o: \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_intr.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_api.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/task.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/limits.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h \
@@ -112,6 +116,7 @@ mdns_task.o: \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/apps/dhcpserver.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_event_loop.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
+ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
  C:/msys32/home/jp/esp/esp-idf/components/nvs_flash/include/nvs_flash.h \
  C:/msys32/home/jp/esp/esp-idf/components/nvs_flash/include/nvs.h \
  C:/msys32/home/jp/esp/esp-idf/components/mdns/include/mdns.h
@@ -210,9 +215,15 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-sta
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h:
+C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_attr.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/mpu_wrappers.h:
 
@@ -259,6 +270,8 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_intr.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_api.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/task.h:
 
@@ -339,6 +352,8 @@ C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/apps/dhcpserver.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_event_loop.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/nvs_flash/include/nvs_flash.h:
 

@@ -40,7 +40,8 @@ esp_adc_cal_lookup_tables.o: \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/gpio_sig_map.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/gpio.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_attr.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_intr_alloc.h
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_intr_alloc.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/adc_channel.h
 
 C:/msys32/home/jp/esp/esp-idf/components/esp_adc_cal/include/esp_adc_cal.h:
 
@@ -123,4 +124,6 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/gpio.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_attr.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_intr_alloc.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/adc_channel.h:
 /home/jp/esp/esp-idf/components/esp_adc_cal/./esp_adc_cal_lookup_tables.c:

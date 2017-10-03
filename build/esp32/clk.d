@@ -29,6 +29,7 @@ clk.o: C:/msys32/home/jp/esp/esp-idf/components/esp32/clk.c \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/stdlib.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/alloca.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h \
+ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_clk.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/uart.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_types.h \
@@ -41,7 +42,13 @@ clk.o: C:/msys32/home/jp/esp/esp-idf/components/esp32/clk.c \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_reg.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_access.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_dport_access.h \
- C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/i2s_reg.h
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/i2s_reg.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/core-macros.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/hal.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtensa-versions.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core-matmap.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/tie.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdint.h:
 
@@ -103,6 +110,8 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/alloca.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_clk.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/uart.h:
@@ -128,4 +137,16 @@ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_access.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_dport_access.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/i2s_reg.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/core-macros.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/hal.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtensa-versions.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core-matmap.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/tie.h:
 /home/jp/esp/esp-idf/components/esp32/./clk.c:

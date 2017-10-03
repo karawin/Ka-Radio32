@@ -24,8 +24,10 @@
 #include "gpio16.h"
 #include "audio_player.h"
 #include "spiram_fifo.h"
+#include "app_main.h"
 
 extern player_t* player_config;
+#define min(a, b) (((a) < (b)) ? (a) : (b))
 
 enum clientStatus cstatus;
 //static uint32_t metacount = 0;
@@ -74,14 +76,14 @@ void *incmalloc(size_t n)
 	ret = malloc(n);
 	if (ret == NULL) printf(strcMALLOC,n);
 //	if (n <4) printf("Client: incmalloc size:%d\n",n);	
-//	printf ("Client malloc after of %d bytes ret:%x  Heap size: %d\n",n,ret,xPortGetFreeHeapSize( ));
+	ESP_LOGV(TAG,"Client malloc after of %d bytes ret:%x  Heap size: %d",n,(int)ret,xPortGetFreeHeapSize( ));
 	return ret;
 }	
 void incfree(void *p,char* from)
 {
 	if (p != NULL) free(p);
 //	else printf ("Client incfree from %s NULL\n",from);
-//	printf ("Client incfree of %x, from %s           Heap size: %d\n",p,from,xPortGetFreeHeapSize( ));
+	ESP_LOGV(TAG,"Client incfree of %x, from %s           Heap size: %d",(int)p,from,xPortGetFreeHeapSize( ));
 }	
 
 
@@ -154,7 +156,7 @@ bool clientParsePlaylist(char* s)
   {
 	ns = str;
     while ((strlen(ns) > 1) && (ns[0]!=0x0A)) ns++;
-//	printf("EXTM3U: %s\n",ns);
+	ESP_LOGV(TAG,"EXTM3U: %s\n",ns);
 	s= ns;
   }
   str = strstr(s,"<location>http://");  //for xspf
@@ -175,13 +177,12 @@ bool clientParsePlaylist(char* s)
   if (str != NULL) 
   
   {
-	str += remove; //skip http://
-	
-//	printf("parse str %s\n",str);
+	str += remove; //skip http://	
+	ESP_LOGV(TAG,"parse str %s",str);
 	
 	while ((str[i] != '/')&&(str[i] != ':')&&(str[i] != 0x0a)&&(str[i] != 0x0d)&&(j<78)) {url[j] = str[i]; i++ ;j++;}
 	url[j] = 0;
-//	kprintf("parse str url %s\n",url);
+	ESP_LOGV(TAG,"parse str url %s",url);
 	j = 0;
 	if (str[i] == ':')  //port
 	{
@@ -217,7 +218,7 @@ char* stringify(char* str,int len)
 		int nlen = len+10;
 		if (new != NULL)
 		{
-//			printf("stringify: enter: len:%d  \"%s\"\n",len,str);
+			ESP_LOGV(TAG,"stringify: enter: len:%d  \"%s\"",len,str);
 			int i=0 ,j =0;
 			for (i = 0;i< len+10;i++) new[i] = 0;
 			for (i=0;i< len;i++)
@@ -251,7 +252,7 @@ char* stringify(char* str,int len)
 			incfree(str,"str");
 
 			new = realloc(new,j+1); // adjust
-//printf("stringify: exit: len:%d  \"%s\"\n",j,new);
+			ESP_LOGV(TAG,"stringify: exit: len:%d  \"%s\"",j,new);
 			return new;		
 		} else 
 		{
@@ -308,7 +309,7 @@ void clientSaveMetadata(char* s,int len)
 		}
 		t = s;
 		len = strlen(t);
-//printf("clientSaveMetadata:  len:%d   char:%s\n",len,s);
+		ESP_LOGV(TAG,"clientSaveMetadata:  len:%d   char:%s",len,s);
 		t_end = strstr(t,"song_spot=");
 		if (t_end != NULL)
 		{ 
@@ -355,7 +356,7 @@ void clientSaveMetadata(char* s,int len)
 			if (len >=2) len-=2; 
 		}
 
-//printf("clientSaveMetadata0:  len:%d   char:%s\n",strlen(t),t);
+		ESP_LOGV(TAG,"clientSaveMetadata0:  len:%d   char:%s",strlen(t),t);
 
 // see if it is !=
 		tt = NULL;
@@ -403,7 +404,6 @@ void clientSaveMetadata(char* s,int len)
 			char* title = incmalloc(strlen(t_end)+15);
 			if (title != NULL)
 			{
-//printf("sprint%d\n",1);
 				sprintf(title,"{\"meta\":\"%s\"}",t_end); 
 				websocketbroadcast(title, strlen(title));
 				incfree(title,"title");
@@ -417,15 +417,14 @@ void wsStationNext()
 {
 	struct shoutcast_info* si =NULL;
 	do {
-		++currentStation;
-		if (currentStation >= 255)
-			currentStation = 0;
-		if (si != NULL) incfree(si,"wsstation");
-		si = getStation(currentStation);	
+		setCurrentStation(getCurrentStation()+1);
+		if (getCurrentStation() >= 255)
+			setCurrentStation(0);
+		si = getStation(getCurrentStation());	
 	}
 	while (si == NULL || ((si != NULL)&&(strcmp(si->domain,"")==0)) || ((si != NULL)&&(strcmp( si->file,"")== 0)));
 
-	playStationInt	(currentStation);
+	playStationInt(getCurrentStation());
 	incfree(si,"wsstation");
 }
 // websocket: previous station
@@ -433,16 +432,16 @@ void wsStationPrev()
 {
 	struct shoutcast_info* si = NULL;
 	do {
-		if (currentStation >0)
-		{	
-			if (si != NULL) incfree(si,"wsstation");
-			si = getStation(--currentStation);
+		if (getCurrentStation() >0)
+		{				
+			setCurrentStation(getCurrentStation()-1);
+			si = getStation(getCurrentStation());
 		}	
 		else return;
 	}
 	while (si == NULL || ((si != NULL)&&(strcmp(si->domain,"")==0)) || ((si != NULL)&&(strcmp( si->file,"")== 0)));
 
-	playStationInt	(currentStation);
+	playStationInt	(getCurrentStation());
 	incfree(si,"wsstation");
 }
 
@@ -452,7 +451,6 @@ void wsVol(char* vol)
 	char answer[21];
 	if (vol != NULL)
 	{	
-//printf("sprint%d\n",2);
 		sprintf(answer,"{\"wsvol\":\"%s\"}",vol);
 		websocketbroadcast(answer, strlen(answer));
 	} 
@@ -464,7 +462,6 @@ void wsMonitor()
 		memset(answer,0,300);
 		if ((clientPath[0]!= 0))
 		{
-//printf("sprint%d\n",3);
 			sprintf(answer,"{\"monitor\":\"http://%s:%d%s\"}",clientURL,clientPort,clientPath);
 			websocketbroadcast(answer, strlen(answer));
 		}
@@ -474,7 +471,7 @@ void wsHeaders()
 {
 //remove	uint8_t header_num;
 	char currentSt[6]; 	
-	sprintf(currentSt,"%d",currentStation);
+	sprintf(currentSt,"%d",getCurrentStation());
 	char* not2;
 	not2 = header.members.single.notice2;
 	if (not2 ==NULL) not2=header.members.single.audioinfo;
@@ -493,7 +490,6 @@ void wsHeaders()
 		;
 	char* wsh = incmalloc(json_length+1);
 	if (wsh == NULL) {printf(strcMALLOC1,"wsHeader");return;}
-//printf("sprint%d\n",5);
 	sprintf(wsh,"{\"wsicy\":{\"curst\":\"%s\",\"descr\":\"%s\",\"meta\":\"%s\",\"name\":\"%s\",\"bitr\":\"%s\",\"url1\":\"%s\",\"not1\":\"%s\",\"not2\":\"%s\",\"genre\":\"%s\"}}",
 			currentSt,
 			(header.members.single.description ==NULL)?"":header.members.single.description,
@@ -504,7 +500,7 @@ void wsHeaders()
 			(header.members.single.notice1 ==NULL)?"":header.members.single.notice1,
 			(not2 ==NULL)?"":not2 ,
 			(header.members.single.genre ==NULL)?"":header.members.single.genre); 
-//printf("WSH: len:%d  \"%s\"\n",strlen(wsh),wsh);
+	ESP_LOGV(TAG,"WSH: len:%d  \"%s\"",strlen(wsh),wsh);
 	websocketbroadcast(wsh, strlen(wsh));	
 	incfree (wsh,"wsh");
 }	
@@ -564,7 +560,7 @@ bool clientSaveOneHeader(char* t, uint16_t len, uint8_t header_num)
 	header.members.mArr[header_num] = stringify(tt,len); //tt is freed here
 	vTaskDelay(10);
 	clientPrintOneHeader(header_num);
-//	printf("header after num:%d addr:0x%x  cont:\"%s\"\n",header_num,header.members.mArr[header_num],header.members.mArr[header_num]);
+	ESP_LOGV(TAG,"header after num:%d addr:0x%x  cont:\"%s\"",header_num,(int)header.members.mArr[header_num],header.members.mArr[header_num]);
 	return true;
 }
 
@@ -575,7 +571,7 @@ bool clientParseHeader(char* s)
 	uint8_t header_num;
 	char *t;
 	bool ret = false;
-//	printf("ParseHeader: %s\n",s);
+	ESP_LOGV(TAG,"ParseHeader: %s",s);
 	xSemaphoreTake(sHeader,portMAX_DELAY);
 	if ((cstatus != C_HEADER1)&& (cstatus != C_PLAYLIST))// not ended. dont clear
 	{
@@ -604,8 +600,7 @@ bool clientParseHeader(char* s)
 	
 	for(header_num=0; header_num<ICY_HEADERS_COUNT; header_num++)
 	{
-//				printf("icy deb: %d\n",header_num);		
-		
+		ESP_LOGV(TAG,"icy deb: %d",header_num);				
 		t = strstr(s, icyHeaders[header_num]);
 		if( t != NULL )
 		{
@@ -613,7 +608,7 @@ bool clientParseHeader(char* s)
 			char *t_end = strstr(t, "\r\n");
 			if(t_end != NULL)
 			{
-//				printf("icy in: %d\n",header_num);		
+				ESP_LOGV(TAG,"icy in: %d",header_num);		
 				uint16_t len = t_end - t;
 				if(header_num != METAINT) // Text header field
 				{
@@ -625,9 +620,9 @@ bool clientParseHeader(char* s)
 						for(i = 0; i<len+1; i++) metaint[i] = 0;
 						strncpy(metaint, t, len);
 						header.members.single.metaint = atoi(metaint);
-//						printf("len = %d,MetaInt= %s, Metaint= %d\n",len, metaint,header.members.single.metaint);
+						ESP_LOGV(TAG,"len = %d,MetaInt= %s, Metaint= %d",len, metaint,header.members.single.metaint);
 						ret = true;
-//						printf("icy: %s, %d\n",icyHeaders[header_num],header.members.single.metaint);					
+						ESP_LOGV(TAG,"icy: %s, %d",icyHeaders[header_num],header.members.single.metaint);					
 				}
 			}
 		}
@@ -714,7 +709,6 @@ void clientDisconnect(const char* from)
 	audio_player_stop();
 	if (!ledStatus) gpio4_output_set(1);
 	vTaskDelay(10);
-//	clearHeaders();
 }
 
 IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
@@ -770,7 +764,7 @@ IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
 		if (t1 != NULL) { // moved to a new address
 			if( strcmp(t1,"Found")||strcmp(t1,"Temporarily")||strcmp(t1,"Moved"))
 			{
-//printf("Len=%d,\n %s\n",len,pdata);
+				ESP_LOGV(TAG,"Header Len=%d,\n %s\n",len,pdata);
 				kprintf(PSTR("Header: Moved%c"),0x0d);
 				clientDisconnect(PSTR("C_HDER"));
 				clientParsePlaylist(pdata);
@@ -784,7 +778,7 @@ IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
 			cstatus = C_HEADER1;
 			do {
 				t1 = strstr(pdata, "\r\n\r\n"); // END OF HEADER
-//	printf("Header len: %d,  Header: %s\n",len,pdata);
+				ESP_LOGV(TAG,"Header1 len: %d,  Header: %s\n",len,pdata);
 				if ((t1 != NULL) && (t1 <= pdata+len-4)) 
 				{
 						t2 = strstr(pdata, "Internal Server Error"); 
@@ -795,7 +789,7 @@ IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
 							cstatus = C_HEADER;
 							
 						}
-						icyfound = clientParseHeader(pdata);
+						icyfound = 	clientParseHeader(pdata);
 						wsMonitor();											
 /*						if(header.members.single.bitrate != NULL) 
 							if (strcmp(header.members.single.bitrate,"320")==0)
@@ -803,7 +797,7 @@ IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
 							else system_update_cpu_freq(SYS_CPU_80MHZ);*/
 						if(header.members.single.metaint > 0) 
 							metad = header.members.single.metaint;
-//	printf("t1: 0x%x, cstatus: %d, icyfound: %d  metad:%d Metaint:%d\n", t1,cstatus, icyfound,metad, header.members.single.metaint); 
+						ESP_LOGD(TAG,"t1: 0x%x, cstatus: %d, icyfound: %d  metad:%d Metaint:%d\n", (int) t1,cstatus, icyfound,metad,  (header.members.single.metaint)); 
 						cstatus = C_DATA;	// a stream found
 						
 /////////////////////////////////////////////////////////////////////////////////////////////////						
@@ -825,13 +819,13 @@ IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
 							if (strchr((t1),0x0A) != NULL)
 								*strchr(t1,0x0A) = 0;
 							
-//	printf("chunked: %d,  strlen: %d  \"%s\"\n",chunked,strlen(t1)+1,t1);
+							ESP_LOGV(TAG,"chunked: %d,  strlen: %d  \"%s\"",chunked,strlen(t1)+1,t1);
 							t1 +=strlen(t1)+1; //+1 for char 0, 
 						}
 						
 						int newlen = len - (t1-pdata) ;
 						cchunk = chunked;
-//	printf("newlen: %d   len: %d   chunked:%d  pdata:%x \n",newlen,len,chunked,pdata);
+						ESP_LOGV(TAG,"newlen: %d   len: %d   chunked:%d  pdata:%x",newlen,len,chunked,(int)pdata);
 						if(newlen > 0) clientReceiveCallback(sockfd,t1, newlen);
 				} else
 				{
@@ -1043,61 +1037,18 @@ if (l > 80) dump(inpdata,len);
 // ---------------			
 		if (!playing )
 		{
-//printf("test memory: %d  on size %d\n",	(BUFFER_SIZE == BIGMEMORY)?(7*BIGMEMORY/10):(BUFFER_SIZE/2),BUFFER_SIZE);		
-//			if ( (getBufferFree() < ((BUFFER_SIZE == BIGMEMORY)?(7*BIGMEMORY/10):(BUFFER_SIZE/2))) ||(once ==1)) 
-			{
-				VS1053_SetVolume(0);
-				playing=1;
-				if (once == 0)vTaskDelay(20);
-				VS1053_SetVolume(getVolume());
-				renderer_volume(getVolume()+2); // max 256
-				kprintf(CLIPLAY,0x0d,0x0a);
-				if (!ledStatus) gpio4_output_set(0);
-			}	
+			if (get_audio_output_mode() == VS1053) VS1053_SetVolume(0);
+			playing=1;
+			if (once == 0)vTaskDelay(20);
+			if (get_audio_output_mode() == VS1053) VS1053_SetVolume(getVolume());
+			renderer_volume(getVolume()+2); // max 256
+			kprintf(CLIPLAY,0x0d,0x0a);
+			if (!ledStatus) gpio4_output_set(0);	
 		}
 	}
 }
 
-#define VSTASKBUF	1024
-//uint8_t b[VSTASKBUF];
 
-IRAM_ATTR void vsTask(void *pvParams) { 
-//	portBASE_TYPE uxHighWaterMark;
-/*	struct device_settings *device;
-	uint16_t size ,s;
-//	VS1053_Start();
-	device = getDeviceSettings();
-	VS1053_SetVolume( device->vol);	
-	VS1053_SetTreble(device->treble);
-	VS1053_SetBass(device->bass);
-	VS1053_SetTrebleFreq(device->freqtreble);
-	VS1053_SetBassFreq(device->freqbass);
-	VS1053_SetSpatial(device->spacial);
-	incfree(device,"device");
-	
-	while(1) {
-		if(playing) {			
-			size = bufferRead(b, VSTASKBUF);
-//			printf("Size %d\n",size);
-			s = 0; 			
-			while(s < size) 
-			{
-//				s += VS1053_SendMusicBytes(b+s, size-s);
-//test
-				audio_stream_consumer((char*)b, size, (void*)player_config);				
-				s =size;	
-//printf(".");
-			}
-			vTaskDelay(2);	
-		} else 
-		{
-			vTaskDelay(30);				
-//			uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-//			printf("watermark vstask: %x  %d\n",uxHighWaterMark,uxHighWaterMark);			
-		}	
-	}
-	*/
-}
 
 //uint8_t bufrec[RECEIVE+10];
 
@@ -1227,7 +1178,8 @@ void clientTask(void *pvParams) {
 						if ((!playing )&& (getBufferFree() < (BUFFER_SIZE))) {						
 							playing=1;
 							vTaskDelay(1);
-							if (VS1053_GetVolume()==0) VS1053_SetVolume(getVolume());
+							if (get_audio_output_mode() == VS1053)
+								if (VS1053_GetVolume()==0) VS1053_SetVolume(getVolume());
 							kprintf(CLIPLAY,0x0d,0x0a);
 							while (!getBufferEmpty()) vTaskDelay(100);							
 							vTaskDelay(150);
@@ -1257,14 +1209,15 @@ void clientTask(void *pvParams) {
 			if (playing)  // stop clean
 			{		
 				audio_player_stop(); 
+				//if (get_audio_output_mode() == VS1053) spiRamFifoReset();
 				player_config->media_stream->eof = true;
 				bufferReset();
-				VS1053_SetVolume(0);
-				VS1053_flush_cancel(2);
+				if (get_audio_output_mode() == VS1053) VS1053_SetVolume(0);
+				if (get_audio_output_mode() == VS1053)VS1053_flush_cancel(2);
 				playing = 0;
 				vTaskDelay(40);	// stop without click
 				//VS1053_LowPower();
-				VS1053_SetVolume(getVolume());
+				if (get_audio_output_mode() == VS1053)VS1053_SetVolume(getVolume());
 			}	
 
 			bufferReset();

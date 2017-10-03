@@ -40,7 +40,8 @@ trax.o: \
  C:/msys32/home/jp/esp/esp-idf/components/xtensa-debug-module/include/xtensa-debug-module.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h \
- C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h \
+ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h:
 
@@ -123,4 +124,6 @@ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
 /home/jp/esp/esp-idf/components/xtensa-debug-module/./trax.c:

@@ -2,6 +2,8 @@
  * Copyright 2015 Piotr Sperka (http://www.piotrsperka.info)
  * Copyright 2016 karawin (http://www.karawin.fr)
 */
+#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
+
 #include "interface.h"
 //#include "user_interface.h"
 //#include "osapi.h"
@@ -13,7 +15,7 @@
 #include "webclient.h"
 #include "webserver.h"
 #include "gpio16.h"
-#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
+
 #include <driver/adc.h>
 #include "esp_system.h"
 #include "esp_log.h"
@@ -82,25 +84,27 @@ sys.led(\"x\"): Change the led indication:\n\
 0 = Led is in Play mode (lighted when a station is playing), 1 or up = Led is in Blink mode (default)\n\
 sys.led: Display the led indication status\n\
 sys.version: Display the Release and Revision numbers\n\
-sys.tzo(\"xx\"): Set the timezone offset of your country.%c"\
+sys.tzo(\"xx\"): Set the timezone offset of your country.\n"
 };
 
 const char stritHELP3[]  = {" \
 sys.tzo: Display the timezone offset\n\
 sys.date: Send a ntp request and Display the current locale time\n\
-: Format ISO-8601 local time   https://www.w3.org/TR/NOTE-datetime\n\
-: YYYY-MM-DDThh:mm:ssTZD (eg 2017-07-16T19:20:30+01:00)\n\
-sys.adc: Display the adc value\n\
+:   Format ISO-8601 local time   https://www.w3.org/TR/NOTE-datetime\n\
+:   YYYY-MM-DDThh:mm:ssTZD (eg 2017-07-16T19:20:30+01:00)\n\
 sys.version: Display the release and Revision of KaraDio\n\
-///////\n\
+sys.dlog: Display the current log level\n\
+sys.logx: Set log level to x with x=n for none, v for verbose, d for debug, i for info, w for warning, e for error\n\
+sys.log: do nothing apart a trace on uart (debug use)\n\
+///////////\n\
   Other\n\
-///////\n\
+///////////\n\
 help: this command\n\
 <enter> will display\n\
 #INFO:\"\"#\n\
 \n\
 A command error display:\n\
-##CMD_ERROR#\n\r%c"}; 
+##CMD_ERROR#\n\r"}; 
 
 uint16_t currentStation = 0;
 static esp_log_level_t s_log_default_level = CONFIG_LOG_BOOTLOADER_LEVEL;
@@ -108,9 +112,6 @@ extern void wsVol(char* vol);
 extern void playStation(char* id);
 extern void setVolume(char* vol);
 extern void setRelVolume(int8_t vol);
-
-
-
 void clientVol(char *s);
 
 #define MAX_WIFI_STATIONS 50
@@ -129,6 +130,15 @@ void setVolumew(char* vol)
 	setVolume(vol);	
 	wsVol(vol);
 }	
+
+uint16_t getCurrentStation()
+{
+	return currentStation;
+}
+void setCurrentStation( uint16_t cst)
+{
+	currentStation = cst;
+}
 
 unsigned short adcdiv;	
 

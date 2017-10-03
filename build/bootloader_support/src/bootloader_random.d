@@ -38,6 +38,7 @@ src/bootloader_random.o: \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h \
+ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_system.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h \
@@ -66,7 +67,8 @@ src/bootloader_random.o: \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-frames.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtensa-versions.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core-matmap.h
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core-matmap.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h
 
 C:/msys32/home/jp/esp/esp-idf/components/bootloader_support/include_priv/bootloader_random.h:
 
@@ -144,6 +146,8 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_system.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h:
@@ -201,4 +205,6 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtensa-versions.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core-matmap.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h:
 /home/jp/esp/esp-idf/components/bootloader_support/src/bootloader_random.c:

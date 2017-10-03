@@ -15,7 +15,7 @@
 #define ICY_HEADER_COUNT 10
 //2000 1440 1460
 #define RECEIVE 1440
-extern uint16_t currentStation;
+
 
 typedef enum
 {
@@ -66,7 +66,6 @@ void clientConnectOnce();
 void clientDisconnect(const char* from);
 void clientSilentDisconnect();
 void clientTask(void *pvParams);
-void vsTask(void *pvParams) ;
 void wsVol(char* vol);
 void wsMonitor();
 void wsStationNext();

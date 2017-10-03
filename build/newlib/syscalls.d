@@ -54,6 +54,9 @@ syscalls.o: C:/msys32/home/jp/esp/esp-idf/components/newlib/syscalls.c \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/specreg.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-state.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h \
+ C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h \
+ C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/mpu_wrappers.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_system.h \
@@ -75,8 +78,7 @@ syscalls.o: C:/msys32/home/jp/esp/esp-idf/components/newlib/syscalls.c \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_intr.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_api.h \
- C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h \
- C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/string.h:
 
@@ -188,6 +190,12 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-sta
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/mpu_wrappers.h:
@@ -230,7 +238,5 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_api.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h:
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h:
 /home/jp/esp/esp-idf/components/newlib/./syscalls.c:

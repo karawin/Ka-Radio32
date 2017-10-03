@@ -27,6 +27,7 @@ rtc_module.o: \
  C:/msys32/home/jp/esp/Ka-Radio32/build/include/sdkconfig.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
+ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc_io_reg.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc_io_struct.h \
@@ -49,6 +50,7 @@ rtc_module.o: \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/gpio.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_attr.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_intr_alloc.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc_gpio_channel.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/touch_pad.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_intr.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h \
@@ -62,8 +64,11 @@ rtc_module.o: \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtensa-versions.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core-matmap.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/adc.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/adc_channel.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/dac.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dac_channel.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_config.h \
@@ -76,6 +81,9 @@ rtc_module.o: \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/specreg.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-state.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h \
+ C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h \
+ C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/mpu_wrappers.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_system.h \
@@ -144,6 +152,8 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc_io_reg.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h:
@@ -188,6 +198,8 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_attr.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_intr_alloc.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc_gpio_channel.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/touch_pad.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_intr.h:
@@ -214,9 +226,15 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtensa-versions.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core-matmap.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/adc.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/adc_channel.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/dac.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dac_channel.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h:
 
@@ -241,6 +259,12 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/specreg.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-state.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h:
 

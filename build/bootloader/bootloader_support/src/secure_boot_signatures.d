@@ -9,6 +9,7 @@ src/secure_boot_signatures.o: \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_assert.h \
+ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
  C:/msys32/home/jp/esp/esp-idf/components/bootloader_support/include/esp_image_format.h \
  C:/msys32/home/jp/esp/esp-idf/components/bootloader_support/include/esp_flash_partitions.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_flash_data_types.h \
@@ -35,6 +36,8 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h:
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_assert.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/bootloader_support/include/esp_image_format.h:
 

@@ -1,0 +1,55 @@
+/*
+* The MIT License (MIT)
+* 
+* Copyright (c) 2015 David Ogilvy (MetalPhreak)
+* 
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+* 
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+* 
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+* SOFTWARE.
+*/
+
+#ifndef SPI_APP_H
+#define SPI_APP_H
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
+#include "driver/spi_master.h"
+
+// spi pins
+#define PIN_NUM_MISO 22
+#define PIN_NUM_MOSI 23
+#define PIN_NUM_CLK  5
+
+uint8_t spi_take_semaphore();
+void spi_give_semaphore();
+
+void spi_init(uint8_t spi_no);
+uint32_t spi_transaction(spi_device_handle_t spi_no, uint32_t dout_bits, uint32_t dout_data, uint32_t din_bits, uint32_t dummy_bits);
+
+//Expansion Macros
+
+//#define spi_txd(spi_no, bits, data) spi_transaction(spi_no,  bits, (uint32_t) data, 0, 0)
+#define spi_tx8(spi_no, data)       spi_transaction(spi_no,  8,    (uint32_t) data, 0, 0)
+//#define spi_tx16(spi_no, data)      spi_transaction(spi_no,  16,   (uint32_t) data, 0, 0)
+//#define spi_tx32(spi_no, data)      spi_transaction(spi_no,  32,   (uint32_t) data, 0, 0)
+
+//#define spi_rxd(spi_no, bits) spi_transaction(spi_no,  0, 0, bits, 0)
+#define spi_rx8(spi_no)       spi_transaction(spi_no,  0, 0, 8,    0)
+//#define spi_rx16(spi_no)      spi_transaction(spi_no,  0, 0, 16,   0)
+//#define spi_rx32(spi_no)      spi_transaction(spi_no,  0, 0, 32,   0)
+
+#endif
+

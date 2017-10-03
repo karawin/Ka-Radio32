@@ -17,6 +17,7 @@
 #include "audio_renderer.h"
 #include "app_main.h"
 
+#define TAG "webserver"
 
 xSemaphoreHandle semfile = NULL ;
 
@@ -33,16 +34,13 @@ const char strsICY[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nCo
 const char strsWIFI[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:%d\r\n\r\n{\"ssid\":\"%s\",\"pasw\":\"%s\",\"ssid2\":\"%s\",\"pasw2\":\"%s\",\"ip\":\"%s\",\"msk\":\"%s\",\"gw\":\"%s\",\"ua\":\"%s\",\"dhcp\":\"%s\",\"mac\":\"%s\"}"};
 const char strsGSTAT[]  = {"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %d\r\n\r\n{\"Name\":\"%s\",\"URL\":\"%s\",\"File\":\"%s\",\"Port\":\"%d\",\"ovol\":\"%d\"}"};
 
-
-
-
 int8_t clientOvol = 0;
-uint8_t clientIvol = 0;
+
 
 void *inmalloc(size_t n)
 {
-	void* ret;
-//printf ("server Malloc of %d %d,  Heap size: %d\n",n,((n / 32) + 1) * 32,xPortGetFreeHeapSize( ));
+	void* ret;	
+	ESP_LOGV(TAG, "server Malloc of %d %d,  Heap size: %d",n,((n / 32) + 1) * 32,xPortGetFreeHeapSize( ));
 	ret = malloc(n);
 /*	if (ret == NULL)//
 	{
@@ -52,15 +50,16 @@ void *inmalloc(size_t n)
 		ret = malloc(n);
 	}	
 */		
-//	printf ("server Malloc of %x : %d bytes Heap size: %d\n",ret,n,xPortGetFreeHeapSize( ));
+	ESP_LOGV(TAG,"server Malloc of %x : %d bytes Heap size: %d",(int)ret,n,xPortGetFreeHeapSize( ));
 //	if (n <4) printf("Server: incmalloc size:%d\n",n);	
 	return ret;
 }	
 void infree(void *p)
 {
-//	printf ("server free of   %x,            Heap size: %d\n",p,xPortGetFreeHeapSize( ));
+	ESP_LOGV(TAG,"server free of   %x,            Heap size: %d",(int)p,xPortGetFreeHeapSize( ));
 	if (p != NULL)free(p);
 }	
+
 
 
 struct servFile* findFile(char* name)
@@ -83,12 +82,11 @@ void respOk(int conn,char* message)
 	if (fresp!=NULL)
 	{
 		sprintf(fresp,strsROK,"text/plain",strlen(message),message);
-//printf("respOk %s\n",fresp);
+	ESP_LOGV(TAG,"respOk %s",fresp);
 		write(conn, fresp, strlen(fresp));
 		infree(fresp);
 	}		
-
-//printf("respOk exit\n");
+	ESP_LOGV(TAG,"respOk exit");
 }
 
 void respKo(int conn)
@@ -117,8 +115,8 @@ void serveFile(char* name, int conn)
 		}
 	}
 	struct servFile* f = findFile(name);
-//printf("find %s at %x\n",name,(int)f);
-//	printf ("Heap size: %d\n",xPortGetFreeHeapSize( ));
+	ESP_LOGV(TAG,"find %s at %x",name,(int)f);
+	ESP_LOGV(TAG,"Heap size: %d",xPortGetFreeHeapSize( ));
 	gpart = PART;
 	if(f != NULL)
 	{
@@ -129,30 +127,12 @@ void serveFile(char* name, int conn)
 	else length = 0;
 	if(length > 0)
 	{
-//		char *con = NULL;
-		
 		if (xSemaphoreTake(semfile,portMAX_DELAY ))
 		{				
-/*			do {
-				gpart /=2;
-				con = (char*)inmalloc((gpart)*sizeof(char));
-				vTaskDelay(5);
-			} while ((con == NULL)&&(gpart >=LIMIT));
 		
-			if ((con == NULL)||(gpart <LIMIT))
-			{
-				//sprintf(buf, "HTTP/1.1 500 Internal Server Error\r\nContent-Type: %s\r\nContent-Length: %d\r\n\r\n", (f!=NULL ? f->type : "text/plain"), 0);
-				//write(conn, lowmemory, strlen(lowmemory));
-				respKo(conn);
-				printf(PSTR("serveFile malloc fails%c"),0x0d);
-				infree(con);
-				xSemaphoreGive(semfile);
-				return ;
-			}	
-*/		
-//printf("serveFile socket:%d,  %s. Length: %d  sliced in %d\n",conn,name,length,gpart);		
+			ESP_LOGV(TAG,"serveFile socket:%d,  %s. Length: %d  sliced in %d",conn,name,length,gpart);		
 			sprintf(buf, "HTTP/1.1 200 OK\r\nContent-Type: %s\r\nContent-Encoding: gzip\r\nContent-Length: %d\r\nConnection: keep-alive\r\n\r\n", (f!=NULL ? f->type : "text/plain"), length);
-//printf("serveFile send %d bytes\n%s\n",strlen(buf),buf);	
+			ESP_LOGV(TAG,"serveFile send %d bytes\n%s",strlen(buf),buf);	
 			vTaskDelay(1); // why i need it? Don't know. 
 			write(conn, buf, strlen(buf));
 			progress = length;
@@ -160,9 +140,8 @@ void serveFile(char* name, int conn)
 			if (progress <= part) part = progress;
 			while (progress > 0) 
 			{
-//				flashRead(con, (uint32_t)content, part);
 				write(conn, content, part);
-//printf("serveFile socket:%d,  read at %x len: %d\n",conn,(int)content,(int)part);					
+				ESP_LOGV(TAG,"serveFile socket:%d,  read at %x len: %d",conn,(int)content,(int)part);					
 				content += part;
 				progress -= part;
 				if (progress <= part) part = progress;
@@ -170,14 +149,12 @@ void serveFile(char* name, int conn)
 			} 
 			xSemaphoreGive(semfile);	
 		} else {respKo(conn); printf(PSTR("semfile fails%c"),0x0D);}
-//		infree(con);
-		//vTaskDelay(1);
 	}
 	else
 	{
 		respKo(conn);
 	}
-//	printf("serveFile socket:%d, end\n",conn);
+	ESP_LOGV(TAG,"serveFile socket:%d, end",conn);
 }
 
 
@@ -194,11 +171,11 @@ char* getParameter(char* sep,char* param, char* data, uint16_t data_length) {
 			if (p_end==p) return NULL;
 			char* t = inmalloc(p_end-p + 1);
 			if (t == NULL) { printf(PSTR("getParameterF fails%c"),0x0d); return NULL;}
-//printf("getParameter malloc of %d  for %s\n",p_end-p + 1,param);
+			ESP_LOGV(TAG,"getParameter malloc of %d  for %s",p_end-p + 1,param);
 			int i;
 			for(i=0; i<(p_end-p + 1); i++) t[i] = 0;
 			strncpy(t, p, p_end-p);
-//printf("getParam: in: \"%s\"   \"%s\"\n",data,t);
+			ESP_LOGV(TAG,"getParam: in: \"%s\"   \"%s\"",data,t);
 			return t;
 		} else return NULL;
 	} else return NULL;
@@ -210,8 +187,7 @@ char* getParameterFromComment(char* param, char* data, uint16_t data_length) {
 	return getParameter("\"",param,data, data_length) ;
 }
 
-
-
+// volume offset
 void clientSetOvol(int8_t ovol)
 {
 	clientOvol = ovol;
@@ -221,48 +197,44 @@ void clientSetOvol(int8_t ovol)
 
 // set the current volume with its offset
 void setOffsetVolume(void) {
-		struct device_settings *device;
-		device = getDeviceSettings();
-		int16_t uvol = 0;
-		if (device != NULL) 
-		{
-			kprintf(PSTR("##CLI.VOL#: %d\n"),device->vol);
-			uvol = device->vol+clientOvol;
-			infree(device);			
-		}
-		if (uvol > 254) uvol = 254;
-		if (uvol <=0) uvol = 1;
-//printf("setOffsetVol: %d\n",clientOvol);
-		VS1053_SetVolume(uvol);
+	struct device_settings *device;
+	device = getDeviceSettings();
+	int16_t uvol = 0;
+	if (device != NULL) 
+	{
+		kprintf(PSTR("##CLI.VOL#: %d\n"),device->vol);
+		uvol = device->vol+clientOvol;
+		infree(device);			
+	}
+	if (uvol > 254) uvol = 254;
+	if (uvol <=0) uvol = 1;
+	ESP_LOGV(TAG,"setOffsetVol: %d",clientOvol);
+	if (get_audio_output_mode() == VS1053) VS1053_SetVolume(uvol);
 }
 
 // set the volume with vol,  add offset
 void setVolume(char* vol) {
-//		uint16_t ivol = atoi(vol);
-		clientIvol = atoi(vol);
-		int16_t uvol = atoi(vol);
-		uvol += clientOvol;
-		if (uvol > 254) uvol = 254;
-		if (uvol <0) uvol = 1;
-		if(vol) {
-//kprintf("setVol: \"%s + %d, uvol: %d, clientIvol:%d\"\n",vol,clientOvol,uvol,clientIvol);
-			VS1053_SetVolume(uvol);
-			renderer_volume(uvol+2); // max 256
-			kprintf(PSTR("##CLI.VOL#: %d\n"),clientIvol);		
-		}
+	setIvol(atoi(vol));
+	int16_t uvol = atoi(vol);
+	uvol += clientOvol;
+	if (uvol > 254) uvol = 254;
+	if (uvol <0) uvol = 1;
+	if(vol) {
+		if (get_audio_output_mode() == VS1053) VS1053_SetVolume(uvol);
+		renderer_volume(uvol+2); // max 256
+		kprintf(PSTR("##CLI.VOL#: %d\n"),getIvol());		
+	}
 }
 
 uint16_t getVolume() {
-//	return (VS1053_GetVolume()-clientOvol);
-	return (clientIvol);
+	return (getIvol());
 }
 
 // Set the volume with increment vol
 void setRelVolume(int8_t vol) {
-//	struct device_settings *device;
 	char Vol[5];
 	int16_t rvol;
-	rvol = clientIvol+vol;
+	rvol = getIvol()+vol;
 	if (rvol <0) rvol = 0;
 	if (rvol > 254) rvol = 254;
 	sprintf(Vol,"%d",rvol);	
@@ -277,7 +249,7 @@ void theme() {
 		if (device != NULL)	 {
 			if ((device->options&T_THEME)!=0) device->options&=NT_THEME; else device->options |= T_THEME;
 			saveDeviceSettings(device);
-//			printf("theme:%d\n",device->options&T_THEME);
+			ESP_LOGV(TAG,"theme:%d",device->options&T_THEME);
 			infree(device);	
 		}
 }
@@ -287,8 +259,6 @@ void   sleepCallback(void *pArg) {
 	int timer_idx = (int) pArg;
 	timer_event_t evt;	
 	TIMERG0.int_clr_timers.t0 = 1; //isr ack
-//	TIMERG0.hw_timer[timer_idx].config.alarm_en = 1;  //enable isr again
-//	clientSilentDisconnect(); // stop the player
 		evt.type = TIMER_SLEEP;
         evt.group = 0;
         evt.idx = timer_idx;
@@ -299,9 +269,6 @@ void   wakeCallback(void *pArg) {
 	int timer_idx = (int) pArg;
 	timer_event_t evt;	
 	TIMERG0.int_clr_timers.t1 = 1;
-//	TIMERG0.hw_timer[timer_idx].config.alarm_en = 1;
-//	clientSilentDisconnect();
-//	clientSilentConnect(); // start the player	
 		evt.type = TIMER_SLEEP;
         evt.group = 0;
         evt.idx = timer_idx;
@@ -313,34 +280,30 @@ void   wakeCallback(void *pArg) {
 
 void startSleep(uint32_t delay)
 {
-printf("Delay:%d\n",delay);
+	ESP_LOGD(TAG,"Delay:%d\n",delay);
 	if (delay == 0) return;
 	ESP_ERROR_CHECK(timer_set_counter_value(TIMERGROUP, sleepTimer, 0x00000000ULL));
 	ESP_ERROR_CHECK(timer_set_alarm_value(TIMERGROUP, sleepTimer,TIMERVALUE(delay*60)));
 	ESP_ERROR_CHECK(timer_enable_intr(TIMERGROUP, sleepTimer));
-	//ESP_ERROR_CHECK(timer_isr_register(TIMERGROUP, sleepTimer, sleepCallback, (void*) sleepTimer, 0, NULL));
 	ESP_ERROR_CHECK(timer_set_alarm(TIMERGROUP, sleepTimer,TIMER_ALARM_EN));
 	ESP_ERROR_CHECK(timer_start(TIMERGROUP, sleepTimer));
 }
 void stopSleep(){
-printf("stopDelayDelay\n");
-//	ESP_ERROR_CHECK(timer_set_alarm(TIMERGROUP, sleepTimer,TIMER_ALARM_DIS));
+	ESP_LOGD(TAG,"stopDelayDelay\n");
 	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, sleepTimer));
 }
 void startWake(uint32_t delay)
 {
-//	printf("Wake Delay:%d\n",delay);
+	ESP_LOGD(TAG,"Wake Delay:%d\n",delay);
 	if (delay == 0) return;
 	ESP_ERROR_CHECK(timer_set_counter_value(TIMERGROUP, wakeTimer, 0x00000000ULL));
 	ESP_ERROR_CHECK(timer_set_alarm_value(TIMERGROUP, wakeTimer,TIMERVALUE(delay*60)));
 	ESP_ERROR_CHECK(timer_enable_intr(TIMERGROUP, wakeTimer));
-	//ESP_ERROR_CHECK(timer_isr_register(TIMERGROUP, wakeTimer, wakeCallback, (void*) wakeTimer, 0, NULL));	
 	ESP_ERROR_CHECK(timer_set_alarm(TIMERGROUP, wakeTimer,TIMER_ALARM_EN));
 	ESP_ERROR_CHECK(timer_start(TIMERGROUP, wakeTimer));	
 }
 void stopWake(){
-//	printf("stopDelayWake\n");
-//	ESP_ERROR_CHECK(timer_set_alarm(TIMERGROUP, wakeTimer,TIMER_ALARM_DIS));
+	ESP_LOGD(TAG,"stopDelayWake\n");
 	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, wakeTimer));
 }
 
@@ -349,7 +312,7 @@ void websockethandle(int socket, wsopcode_t opcode, uint8_t * payload, size_t le
 {
 //	struct device_settings *device;
 	//wsvol
-//	printf("websocketHandle: %s\n",payload);
+	ESP_LOGV(TAG,"websocketHandle: %s",payload);
 	if (strstr((char*)payload,"wsvol=")!= NULL)
 	{
 		char answer[17];
@@ -396,9 +359,9 @@ void playStationInt(int sid) {
 	if(si != NULL &&si->domain && si->file) {
 			int i;
 			vTaskDelay(4);
-//			clientSilentDisconnect();
-			clientDisconnect("playStationInt");
-//printf ("playstationInt: %d, new station: %s\n",sid,si->name);
+			clientSilentDisconnect();
+//			clientDisconnect("playStationInt");
+			ESP_LOGV(TAG,"playstationInt: %d, new station: %s",sid,si->name);
 			for (i = 0;i<100;i++)
 			{
 				if(!clientIsConnected())break;
@@ -423,7 +386,7 @@ void playStationInt(int sid) {
 	device = getDeviceSettings();
 	if (device != NULL)
 	{
-//	printf ("playstationInt: %d, device: %d\n",sid,device->currentstation);
+		ESP_LOGV(TAG,"playstationInt: %d, device: %d",sid,device->currentstation);
 		if (device->currentstation != sid)
 		{
 			device->currentstation = sid;
@@ -438,10 +401,10 @@ void playStation(char* id) {
 
 	int uid;
 	uid = atoi(id) ;
-//	printf ("playstation: %d\n",uid);
+	ESP_LOGV(TAG,"playstation: %d",uid);
 	if (uid < 255)
-		currentStation = atoi(id) ;
-	playStationInt(currentStation);	
+		setCurrentStation (atoi(id)) ;
+	playStationInt(getCurrentStation());	
 }
 
 // replace special  json char
@@ -466,8 +429,7 @@ void pathParse(char* str)
 }
 
 void handlePOST(char* name, char* data, int data_size, int conn) {
-//printf("HandlePost %s\n",name);
-//	char* head = NULL;
+	ESP_LOGV(TAG,"HandlePost %s\n",name);
 	int i;
 	bool changed = false;
 	struct device_settings *device;
@@ -477,7 +439,6 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 			char* path = getParameterFromResponse("path=", data, data_size);
 			pathParse(path);
 			char* port = getParameterFromResponse("port=", data, data_size);
-//			int i;
 			if(url != NULL && path != NULL && port != NULL) {
 				clientDisconnect(PSTR("Post instant_play"));
 				for (i = 0;i<100;i++)
@@ -504,10 +465,9 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 		}
 	} else if(strcmp(name, "/soundvol") == 0) {
 		if(data_size > 0) {
-//			char* vol = getParameterFromResponse("vol=", data, data_size);
 			char * vol = data+4;
 			data[data_size-1] = 0;
-//			printf("/sounvol vol: %s num:%d \n",vol, atoi(vol));
+			ESP_LOGV(TAG,"/sounvol vol: %s num:%d",vol, atoi(vol));
 			setVolume(vol); 
 		}
 	} else if(strcmp(name, "/sound") == 0) {
@@ -522,31 +482,33 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 			{
 				changed = false;
 				if(bass) {
-					VS1053_SetBass(atoi(bass));
-					if (device->bass != atoi(bass)){ device->bass = atoi(bass); changed = true;}
+					
+					if (device->bass != atoi(bass))
+					{ 
+						if (get_audio_output_mode() == VS1053) VS1053_SetBass(atoi(bass));
+						device->bass = atoi(bass); 
+						changed = true;
+					}
 					infree(bass);
 				}
-				if(treble) {
-					VS1053_SetTreble(atoi(treble));
-					if (device->treble != atoi(treble)){ device->treble = atoi(treble); changed = true;}
+				if(treble) {				
+					if (device->treble != atoi(treble)){ if (get_audio_output_mode() == VS1053) VS1053_SetTreble(atoi(treble));device->treble = atoi(treble); changed = true;}
 					infree(treble);
 				}
-				if(bassfreq) {
-					VS1053_SetBassFreq(atoi(bassfreq));
-					if (device->freqbass != atoi(bassfreq)){ device->freqbass = atoi(bassfreq); changed = true;}
+				if(bassfreq) {					
+					if (device->freqbass != atoi(bassfreq)){ if (get_audio_output_mode() == VS1053) VS1053_SetBassFreq(atoi(bassfreq));device->freqbass = atoi(bassfreq); changed = true;}
 					infree(bassfreq);
 				}
-				if(treblefreq) {
-					VS1053_SetTrebleFreq(atoi(treblefreq));
-					if (device->freqtreble != atoi(treblefreq)){ device->freqtreble = atoi(treblefreq); changed = true;}
+				if(treblefreq) {					
+					if (device->freqtreble != atoi(treblefreq)){if (get_audio_output_mode() == VS1053) VS1053_SetTrebleFreq(atoi(treblefreq)); device->freqtreble = atoi(treblefreq); changed = true;}
 					infree(treblefreq);
 				}
-				if(spacial) {
-					VS1053_SetSpatial(atoi(spacial));
-					if (device->spacial != atoi(spacial)){ device->spacial = atoi(spacial); changed = true;}
+				if(spacial) {					
+					if (device->spacial != atoi(spacial)){if (get_audio_output_mode() == VS1053) VS1053_SetSpatial(atoi(spacial)); device->spacial = atoi(spacial); changed = true;}
 					infree(spacial);
 				}
-				if (changed) saveDeviceSettings(device);
+				if (changed) 
+					saveDeviceSettings(device);
 				infree(device);
 			}
 		}
@@ -559,7 +521,6 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 				{
 					char ibuf [6];	
 					char *buf;
-//					int i;
 					for(i = 0; i<sizeof(ibuf); i++) ibuf[i] = 0;
 					struct shoutcast_info* si;
 					si = getStation(atoi(id));
@@ -572,8 +533,7 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 					
 					if (buf == NULL)
 					{	
-						printf(strsMALLOC1,"getStation");
-						//printf("getStation\n");
+						ESP_LOGE(TAG," %s malloc fails","getStation");
 						respKo(conn);
 					}
 					else {				
@@ -581,7 +541,7 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 						for(i = 0; i<sizeof(buf); i++) buf[i] = 0;
 						sprintf(buf, strsGSTAT,					
 						json_length, si->name, si->domain, si->file,si->port,si->ovol);
-//				printf("getStation Buf len:%d : %s\n",strlen(buf),buf);						
+						ESP_LOGV(TAG,"getStation Buf len:%d : %s",strlen(buf),buf);						
 						write(conn, buf, strlen(buf));
 						infree(buf);
 					}
@@ -598,17 +558,17 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 //printf("data:%s\n",data);
 			char* nb = getParameterFromResponse("nb=", data, data_size);
 			uint16_t unb,uid = 0;
-//printf("nb init:%s\n",nb);
+			ESP_LOGV(TAG,"Setstation: nb init:%s",nb);
 			bool pState = getState();  // remember if we are playing
 			if (nb) {unb = atoi(nb); infree(nb);}
 			else unb = 1;
-//printf("unb init:%d\n",unb);
+			ESP_LOGV(TAG,"unb init:%d",unb);
 			char* id; char* url; char* file; char* name; char* port; char* ovol;
 			struct shoutcast_info *si =  inmalloc(sizeof(struct shoutcast_info)*unb);
 			struct shoutcast_info *nsi ;
 			
 			if (si == NULL) {
-				printf(strsMALLOC1,"setStation");
+				ESP_LOGE(TAG," %s malloc fails","setStation");
 				respKo(conn);
 				return;
 			}
@@ -626,7 +586,7 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 				name = getParameterFromResponse("name=", data, data_size);
 				port = getParameterFromResponse("port=", data, data_size);
 				ovol = getParameterFromResponse("ovol=", data, data_size);
-//printf("nb:%d,si:%x,nsi:%x,id:%s,url:%s,file:%s\n",i,si,nsi,id,url,file);
+				ESP_LOGV(TAG,"nb:%d,si:%x,nsi:%x,id:%s,url:%s,file:%s",i,(int)si,(int)nsi,id,url,file);
 				if(id ) {
 					if (i == 0) uid = atoi(id);
 					if ((atoi(id) >=0) && (atoi(id) < 255))
@@ -651,11 +611,11 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 				infree(id);
 				
 				data = strstr(data,"&&")+2;
-//				printf("si:%x, nsi:%x, addr:%x\n",si,nsi,data);
+				ESP_LOGV(TAG,"si:%x, nsi:%x, addr:%x",(int)si,(int)nsi,(int)data);
 			}
-//printf("save station: %d, unb:%d, addr:%x\n",uid,unb,si);
+			ESP_LOGV(TAG,"save station: %d, unb:%d, addr:%x",uid,unb,(int)si);
 			saveMultiStation(si, uid,unb);
-//printf("save station return: %d, unb:%d, addr:%x\n",uid,unb,si);
+			ESP_LOGV(TAG,"save station return: %d, unb:%d, addr:%x",uid,unb,(int)si);
 			infree (si);	
 			if (pState != getState()) 
 				if (pState) {clientConnect();vTaskDelay(200);}	 //we was playing so start again the play		
@@ -676,14 +636,14 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 				if ((strcmp(id,"true"))&&(device->autostart==1))
 				{
 					device->autostart = 0;
-//printf("autostart: %s, num:%d\n",id,device->autostart);
+					ESP_LOGV(TAG,"autostart: %s, num:%d",id,device->autostart);
 					saveDeviceSettings(device);
 				}
 				else
 				if ((strcmp(id,"false"))&&(device->autostart==0))
 				{
 					device->autostart = 1;
-//printf("autostart: %s, num:%d\n",id,device->autostart);
+					ESP_LOGV(TAG,"autostart: %s, num:%d",id,device->autostart);
 					saveDeviceSettings(device);
 				}
 				infree(device);	
@@ -693,15 +653,13 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 		char *buf = inmalloc( strlen(strsRAUTO)+16);
 		if (buf == NULL)
 		{	
-			printf(strsMALLOC1,"post rauto");
+			ESP_LOGE(TAG," %s malloc fails","post rauto");
 			respOk(conn,"nok");
 		}
 		else {			
 			device = getDeviceSettings();
 			if (device != NULL)
 			{
-				//flashRead(buf,(int)strsRAUTO,strlen(strsRAUTO));
-				//buf[strlen(strsRAUTO)] = 0;
 				sprintf(buf, strsRAUTO,(device->autostart)?'1':'0' );
 				write(conn, buf, strlen(buf));
 				infree(buf);
@@ -711,7 +669,6 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 		
 		return;		
 	} else if(strcmp(name, "/stop") == 0) {
-//	    int i;
 		if (clientIsConnected())
 		{	
 			clientDisconnect(PSTR("Post Stop"));
@@ -723,18 +680,17 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 		}
 	} else if(strcmp(name, "/icy") == 0)	
 	{	
-//printf("icy vol \n");
-
-		char currentSt[5]; sprintf(currentSt,"%d",currentStation);
+		ESP_LOGV(TAG,"icy vol");
+		char currentSt[5]; sprintf(currentSt,"%d",getCurrentStation());
 		char vol[5]; sprintf(vol,"%d",(getVolume() ));
-		char treble[5]; sprintf(treble,"%d",VS1053_GetTreble());
-		char bass[5]; sprintf(bass,"%d",VS1053_GetBass());
-		char tfreq[5]; sprintf(tfreq,"%d",VS1053_GetTrebleFreq());
-		char bfreq[5]; sprintf(bfreq,"%d",VS1053_GetBassFreq());
-		char spac[5]; sprintf(spac,"%d",VS1053_GetSpatial());
+		char treble[5]; sprintf(treble,"%d",(get_audio_output_mode() == VS1053)?VS1053_GetTreble():0);
+		char bass[5]; sprintf(bass,"%d",(get_audio_output_mode() == VS1053)?VS1053_GetBass():0);
+		char tfreq[5]; sprintf(tfreq,"%d",(get_audio_output_mode() == VS1053)?VS1053_GetTrebleFreq():0);
+		char bfreq[5]; sprintf(bfreq,"%d",(get_audio_output_mode() == VS1053)?VS1053_GetBassFreq():0);
+		char spac[5]; sprintf(spac,"%d",(get_audio_output_mode() == VS1053)?VS1053_GetSpatial():0);
 				
 		struct icyHeader *header = clientGetHeader();
-//printf("icy start header %x\n",(int)header);
+		ESP_LOGV(TAG,"icy start header %x",(int)header);
 		char* not2;
 		not2 = header->members.single.notice2;
 		if (not2 ==NULL) not2=header->members.single.audioinfo;
@@ -751,13 +707,12 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 		((header->members.single.metadata ==NULL)?0:strlen(header->members.single.metadata))
 		+ strlen(currentSt)+	strlen(vol) +strlen(treble)+strlen(bass)+strlen(tfreq)+strlen(bfreq)+strlen(spac)
 		;
-//printf("icy start header %x  len:%d vollen:%d vol:%s\n",(int)header,json_length,strlen(vol),vol);
+		ESP_LOGV(TAG,"icy start header %x  len:%d vollen:%d vol:%s",(int)header,json_length,strlen(vol),vol);
 		
 		char *buf = inmalloc( json_length + 75);
 		if (buf == NULL) 
 		{	
-			//printf("post icy\n");
-			printf(strsMALLOC1,"post icy");
+			ESP_LOGE(TAG," %s malloc fails","post icy");
 			infree(buf);
 			respKo(conn);
 		}
@@ -771,8 +726,6 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 				infree(device);	
 			}
 			sprintf(buf, strsICY,
-				
-//			sprintf(buf, "HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:%d\r\n\r\n{\"curst\":\"%s\",\"descr\":\"%s\",\"name\":\"%s\",\"bitr\":\"%s\",\"url1\":\"%s\",\"not1\":\"%s\",\"not2\":\"%s\",\"genre\":\"%s\",\"meta\":\"%s\",\"vol\":\"%s\",\"treb\":\"%s\",\"bass\":\"%s\",\"tfreq\":\"%s\",\"bfreq\":\"%s\",\"spac\":\"%s\",\"auto\":\"%c\"}",
 			json_length,
 			currentSt,
 			(header->members.single.description ==NULL)?"":header->members.single.description,
@@ -785,7 +738,7 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 			(header->members.single.metadata ==NULL)?"":header->members.single.metadata,			
 			vol,treble,bass,tfreq,bfreq,spac,
 			vauto );
-//printf("test: len fmt:%d %d\n%s\nfmt: %s",strlen(strsICY),strlen(strsICY),buf,strsICY);
+			ESP_LOGV(TAG,"test: len fmt:%d %d\n%s\nfmt: %s",strlen(strsICY),strlen(strsICY),buf,strsICY);
 			write(conn, buf, strlen(buf));
 			infree(buf);
 			wsMonitor();
@@ -798,8 +751,6 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 		bool val = false;
 		char tmpip[16],tmpmsk[16],tmpgw[16];
 		struct device_settings *device;
-		
-//		uint8_t a,b,c,d;
 		changed = false;		
 		if(data_size > 0) {
 			device = getDeviceSettings();
@@ -825,8 +776,7 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 			char* aua = getParameterFromResponse("ua=", data, data_size);
 			pathParse(aua);
 			char* adhcp = getParameterFromResponse("dhcp=", data, data_size);
-// printf("rec:%s\n",data);
- //printf("wifi received  valid:%s,val:%d, ssid:%s, pasw:%s, aip:%s, amsk:%s, agw:%s, adhcp:%s, aua:%s \n",valid,val,ssid,pasw,aip,amsk,agw,adhcp,aua);
+			ESP_LOGV(TAG,"wifi received  valid:%s,val:%d, ssid:%s, pasw:%s, aip:%s, amsk:%s, agw:%s, adhcp:%s, aua:%s",valid,val,ssid,pasw,aip,amsk,agw,adhcp,aua);
 			if (val) {
 				changed = true;
 				ip_addr_t valu;
@@ -885,15 +835,14 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 			char *buf = inmalloc( json_length + 95);
 			if (buf == NULL) 
 			{	
-				//printf("post wifi\n");
-				printf(strsMALLOC1,"post wifi");
+				ESP_LOGE(TAG," %s malloc fails","post wifi");
 				respKo(conn);
 			}
 			else {			
 				sprintf(buf, strsWIFI,
 				json_length,
 				device->ssid1,device->pass1,device->ssid2,device->pass2,tmpip,tmpmsk,tmpgw,device->ua,adhcp,macstr);
-//printf("wifi Buf len:%d\n%s\n",strlen(buf),buf);
+				ESP_LOGV(TAG,"wifi Buf len:%d\n%s",strlen(buf),buf);
 				write(conn, buf, strlen(buf));
 				infree(buf);
 			}
@@ -903,7 +852,7 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 			infree(macstr);
 			if (val){
 				// set current_ap to the first filled ssid
-printf("currentAP: %d\n",device->current_ap);
+				ESP_LOGD(TAG,"currentAP: %d",device->current_ap);
 				if (device->current_ap == APMODE)
 				{
 					if (strlen(device->ssid1)!= 0) device->current_ap = STA1;
@@ -911,7 +860,7 @@ printf("currentAP: %d\n",device->current_ap);
 					if (strlen(device->ssid2)!= 0) device->current_ap = STA2;
 					saveDeviceSettings(device);
 				}
-printf("currentAP: %d\n",device->current_ap);				
+				ESP_LOGD(TAG,"currentAP: %d",device->current_ap);				
 				vTaskDelay(50);	
 				esp_restart();			
 			}	
@@ -928,16 +877,15 @@ printf("currentAP: %d\n",device->current_ap);
 bool httpServerHandleConnection(int conn, char* buf, uint16_t buflen) {
 	char* c;
 	char* d;
-//	xTaskHandle pxCreatedTask;
-//	printf ("Heap size: %d\n",xPortGetFreeHeapSize( ));
+	ESP_LOGD(TAG,"Heap size: %d",xPortGetFreeHeapSize( ));
 //printf("httpServerHandleConnection  %20c \n",&buf);
 	if( (c = strstr(buf, "GET ")) != NULL)
 	{
-//printf("GET socket:%d str:\n%s\n",conn,buf);
+		ESP_LOGV(TAG,"GET socket:%d str:\n%s",conn,buf);
 		if( ((d = strstr(buf,"Connection:")) !=NULL)&& ((d = strstr(d," Upgrade")) != NULL))
 		{  // a websocket request
 			websocketAccept(conn,buf,buflen);	
-//printf ("websocketAccept socket: %d\n",conn);
+			ESP_LOGD(TAG,"websocketAccept socket: %d",conn);
 			return false;
 		} else
 		{
@@ -972,7 +920,7 @@ bool httpServerHandleConnection(int conn, char* buf, uint16_t buflen) {
 				if (param != NULL) {playStation(param);infree(param);}
 // start command				
 				param = strstr(c,"start") ;
-				if (param != NULL) {playStationInt(currentStation);}
+				if (param != NULL) {playStationInt(getCurrentStation());}
 // stop command				
 				param = strstr(c,"stop") ;
 				if (param != NULL) {clientDisconnect(PSTR("Web stop"));}
@@ -1023,14 +971,14 @@ bool httpServerHandleConnection(int conn, char* buf, uint16_t buflen) {
 				if(strlen(c) > 32) {
 					respKo(conn); 
 					return true;}
-//printf("GET file  socket:%d file:%s\n",conn,c);
+				ESP_LOGV(TAG,"GET file  socket:%d file:%s",conn,c);
 				serveFile(c, conn);
-//printf("GET end socket:%d file:%s\n",conn,c);
+				ESP_LOGV(TAG,"GET end socket:%d file:%s",conn,c);
 			}
 		}
 	} else if( (c = strstr(buf, "POST ")) != NULL) {
 // a post request		
-//	printf("POST socket: %d  buflen: %d\n",conn,buflen);
+		ESP_LOGV(TAG,"POST socket: %d  buflen: %d",conn,buflen);
 		char fname[32];
 		uint8_t i;
 		for(i=0; i<32; i++) fname[i] = 0;
@@ -1040,10 +988,10 @@ bool httpServerHandleConnection(int conn, char* buf, uint16_t buflen) {
 		uint8_t len = c_end-c;
 		if(len > 32) return true;
 		strncpy(fname, c, len);
-//		printf("Name: %s\n", fname);
+		ESP_LOGV(TAG,"POST Name: %s", fname);
 		// DATA
 		char* d_start = strstr(buf, "\r\n\r\n");
-//	printf("dstart:%s\n",d_start);
+		ESP_LOGV(TAG,"dstart:%s",d_start);
 		if(d_start != NULL) {
 			d_start += 4;
 			uint16_t len = buflen - (d_start-buf);
@@ -1054,21 +1002,18 @@ bool httpServerHandleConnection(int conn, char* buf, uint16_t buflen) {
 }
 
 
-
-// Server child to handle a request from a browser.
+// Server child task to handle a request from a browser.
 void serverclientTask(void *pvParams) {
 #define RECLEN	768
 	struct timeval timeout; 
     timeout.tv_sec = 2000; // bug *1000 for seconds
     timeout.tv_usec = 0;
 	int recbytes ,recb;
-//	portBASE_TYPE uxHighWaterMark;
+	portBASE_TYPE uxHighWaterMark;
 	int  client_sock =  (int)pvParams;
 	uint16_t reclen = 	RECLEN;	
     char *buf = (char *)inmalloc(reclen);
 	bool result = true;
-	
-
 	
 	if (buf == NULL)
 	{
@@ -1148,14 +1093,7 @@ void serverclientTask(void *pvParams) {
 //					printf ("Server: received more for end now: %d bytes\n", recbytes+recb);
 					if (recb < 0) {
 						respKo(client_sock);
-						break;
-/*						if (errno != EAGAIN )
-						{
-							printf(strsSOCKET,"read",errno);
-							vTaskDelay(10);	
-							break;
-						} else printf(strsSOCKET,tryagain,errno);	
-*/	
+						break;	
 					}
 					recbytes += recb;
 				} //until "\r\n\r\n"
@@ -1190,12 +1128,12 @@ void serverclientTask(void *pvParams) {
 		}
 	}
 	xSemaphoreGive(semclient);	
-//printf ("Give client_sock: %d\n",client_sock);		
-/*	uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-	printf("watermark serverClientTask: %x  %d\n",uxHighWaterMark,uxHighWaterMark);	
-*/
+	ESP_LOGV(TAG,"Give client_sock: %d",client_sock);		
+	uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+	ESP_LOGI(TAG,"watermark serverClientTask: %x  %d",uxHighWaterMark,uxHighWaterMark);	
 
-//	printf("Client exit socket:%d result %d \n",client_sock,result);
+
+	ESP_LOGV(TAG,"Client exit socket:%d result %d \n",client_sock,result);
 	vTaskDelete( NULL );	
 }	
 

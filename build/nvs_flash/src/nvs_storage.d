@@ -5,9 +5,6 @@ src/nvs_storage.o: \
  C:/msys32/home/jp/esp/esp-idf/components/nvs_flash/include/nvs.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/types.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/types.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/sched.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stdio.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/platform_include/assert.h \
  C:/msys32/home/jp/esp/Ka-Radio32/build/include/sdkconfig.h \
@@ -32,12 +29,6 @@ C:/msys32/home/jp/esp/esp-idf/components/nvs_flash/include/nvs.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/types.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/types.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/sched.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stdio.h:
 

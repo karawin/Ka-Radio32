@@ -24,7 +24,14 @@ esp32/rtc_clk.o: \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/i2c_apll.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/i2c_bbpll.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/soc_log.h \
- C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h
+ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
+ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/core-macros.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/hal.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtensa-versions.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core-matmap.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/tie.h
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h:
 
@@ -75,4 +82,18 @@ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/i2c_bbpll.h:
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/soc_log.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/core-macros.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/hal.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtensa-versions.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core-matmap.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/tie.h:
 /home/jp/esp/esp-idf/components/soc/esp32/rtc_clk.c:

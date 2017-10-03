@@ -35,6 +35,7 @@ library/ssl_stack.o: \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/stdlib.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/alloca.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h \
+ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/string.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/string.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/malloc.h \
@@ -110,6 +111,8 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/stdlib.h:
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/alloca.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/string.h:
 

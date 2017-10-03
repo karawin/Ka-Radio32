@@ -2,7 +2,6 @@
 
 
 #include "vs1053.h"
-#include "flash.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "interface.h"
@@ -477,7 +476,10 @@ void  LoadUserCode( const unsigned short* plugin,uint16_t size) {
 	   return ;
   }
   kprintf(PSTR("plugin size %d %d \n"),size,ssize);
-  flashRead( iplugin,(uint32_t) plugin, size );
+  
+  //flashRead( iplugin,(uint32_t) plugin, size );
+  iplugin = plugin;
+  
   kprintf(PSTR("plugin start: %x %x %x %x\n"),*iplugin,*(iplugin+1),*(iplugin+2),*(iplugin+3));
   while (i<ssize) {
     unsigned short addr, n, val;
@@ -496,7 +498,6 @@ void  LoadUserCode( const unsigned short* plugin,uint16_t size) {
       }
     }
   }
-  free(iplugin);
 }
 void  LoadUserCodes(void)
 {

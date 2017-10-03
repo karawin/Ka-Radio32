@@ -22,11 +22,21 @@ bt.o: C:/msys32/home/jp/esp/esp-idf/components/bt/bt.c \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stdio.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/string.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/string.h \
- C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h \
+ C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps_init.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdint.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_intsup.h \
- C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/platform_include/assert.h \
  C:/msys32/home/jp/esp/Ka-Radio32/build/include/sdkconfig.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h \
+ C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h \
+ C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_assert.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_attr.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_config.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/hal.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core.h \
@@ -38,10 +48,6 @@ bt.o: C:/msys32/home/jp/esp/esp-idf/components/bt/bt.c \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/corebits.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-frames.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h \
- C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_assert.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/platform_include/assert.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/projdefs.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portable.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/deprecated_definitions.h \
@@ -52,10 +58,8 @@ bt.o: C:/msys32/home/jp/esp/esp-idf/components/bt/bt.c \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-state.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_attr.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/mpu_wrappers.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_system.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_sleep.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/gpio.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_types.h \
@@ -71,6 +75,7 @@ bt.o: C:/msys32/home/jp/esp/esp-idf/components/bt/bt.c \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_intr.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_api.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/task.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/limits.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h \
@@ -80,7 +85,9 @@ bt.o: C:/msys32/home/jp/esp/esp-idf/components/bt/bt.c \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portmacro.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_task.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_phy_init.h \
- C:/msys32/home/jp/esp/esp-idf/components/bt/include/bt.h
+ C:/msys32/home/jp/esp/esp-idf/components/bt/include/bt.h \
+ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
+ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdlib.h:
 
@@ -128,15 +135,35 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/string.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/string.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h:
+C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps_init.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdint.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_intsup.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h:
+C:/msys32/home/jp/esp/esp-idf/components/newlib/platform_include/assert.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/build/include/sdkconfig.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_assert.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_attr.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_config.h:
 
@@ -160,14 +187,6 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-frames.h
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_assert.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/platform_include/assert.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h:
-
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/projdefs.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portable.h:
@@ -188,13 +207,9 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_attr.h:
-
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/mpu_wrappers.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_system.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_sleep.h:
 
@@ -226,6 +241,8 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_api.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/task.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/limits.h:
@@ -245,4 +262,8 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_task.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_phy_init.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/bt/include/bt.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
 /home/jp/esp/esp-idf/components/bt/./bt.c:

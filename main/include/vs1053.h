@@ -16,23 +16,24 @@
 
 
 
-#define SET 1
-#define RESET 0
+#define SET 0
+#define RESET 1
 
 #ifndef VS1053_H_
 #define VS1053_H_
 
 // spi pins
-#define PIN_NUM_CS   22
-#define PIN_NUM_DC   21
-#define PIN_NUM_RST  18
-#define PIN_NUM_XDCS 5
+#define PIN_NUM_XCS  18
+//#define PIN_NUM_DC   21
+#define PIN_NUM_RST  21
+#define PIN_NUM_XDCS 16
 #define PIN_NUM_DREQ 17
 
-//#define RST_PIN 0
-//#define CS_PIN 15
-#define XDCS_PIN 5 //GPIO5 (!)
-#define DREQ_PIN 4 //GPIO4 (!)
+
+// from spi.harderr#define PIN_NUM_MISO 7
+#define PIN_NUM_MISO 19
+#define PIN_NUM_MOSI 23
+#define PIN_NUM_CLK  5
 
 #define RXNE    0x01
 #define TXE     0x02
@@ -75,7 +76,8 @@
 #define SM_LINE1            0x4000
 #define para_endFillByte    0x1E06
 //public functions
-extern int vsVersion;
+//extern int vsVersion;
+int getVsVersion();
 void 	VS1053_HW_init();
 void 	VS1053_SineTest();
 void 	VS1053_I2SRATE(uint8_t speed);
@@ -143,5 +145,7 @@ void VS1053_sine(char pitch);
 void VS1053_SPI_SpeedUp();
 void VS1053_SPI_SpeedDown();
 //void VS1053_PluginLoad();
+
+void vsTask(void *pvParams) ;
 
 #endif /* VS1053_H_ */

@@ -7,8 +7,8 @@ static uint8_t SSD1306_Buffer[SSD1306_WIDTH * SSD1306_HEIGHT / 8];
 
 /* Private SSD1306 structure */
 typedef struct {
-	uint16_t CurrentX;
-	uint16_t CurrentY;
+	int16_t CurrentX;
+	int16_t CurrentY;
 	uint8_t Inverted;
 	uint8_t Initialized;
 } SSD1306_t;
@@ -98,11 +98,8 @@ void SSD1306_Fill(SSD1306_COLOR_t color) {
 	memset(SSD1306_Buffer, (color == SSD1306_COLOR_BLACK) ? 0x00 : 0xFF, sizeof(SSD1306_Buffer));
 }
 
-void SSD1306_DrawPixel(uint16_t x, uint16_t y, SSD1306_COLOR_t color) {
-	if (
-		x >= SSD1306_WIDTH ||
-		y >= SSD1306_HEIGHT
-	) {
+void SSD1306_DrawPixel(int16_t x, int16_t y, SSD1306_COLOR_t color) {
+	if (x >= SSD1306_WIDTH || y >= SSD1306_HEIGHT || x < 0 || y < 0) {
 		/* Error */
 		return;
 	}
@@ -120,7 +117,7 @@ void SSD1306_DrawPixel(uint16_t x, uint16_t y, SSD1306_COLOR_t color) {
 	}
 }
 
-void SSD1306_GotoXY(uint16_t x, uint16_t y) {
+void SSD1306_GotoXY(int16_t x, int16_t y) {
 	/* Set write pointers */
 	SSD1306.CurrentX = x;
 	SSD1306.CurrentY = y;
@@ -130,10 +127,7 @@ char SSD1306_Putc(char ch, FontDef_t* Font, SSD1306_COLOR_t color) {
 	uint32_t i, b, j;
 
 	/* Check available space in LCD */
-	if (
-		SSD1306_WIDTH <= (SSD1306.CurrentX + Font->FontWidth) ||
-		SSD1306_HEIGHT <= (SSD1306.CurrentY + Font->FontHeight)
-	) {
+	if (SSD1306_WIDTH <= SSD1306.CurrentX || SSD1306_HEIGHT <= SSD1306.CurrentY) {
 		/* Error */
 		return 0;
 	}

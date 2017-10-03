@@ -41,6 +41,7 @@ partition.o: \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h \
+ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/queue.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdlib.h:
@@ -124,6 +125,8 @@ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/queue.h:
 /home/jp/esp/esp-idf/components/spi_flash/./partition.c:

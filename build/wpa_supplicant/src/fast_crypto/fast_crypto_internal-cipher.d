@@ -70,6 +70,7 @@ src/fast_crypto/fast_crypto_internal-cipher.o: \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtensa-versions.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core-matmap.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/debug.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/arch.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/arch/cc.h \
@@ -88,6 +89,9 @@ src/fast_crypto/fast_crypto_internal-cipher.o: \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/specreg.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-state.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h \
+ C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h \
+ C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/mpu_wrappers.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/task.h \
@@ -246,6 +250,8 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtensa-versions.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core-matmap.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/debug.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/arch.h:
@@ -281,6 +287,12 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/specreg.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-state.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h:
 

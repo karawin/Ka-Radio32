@@ -6,8 +6,6 @@
 #include "driver/uart.h"
 
 #include "eeprom.h"
-#include "flash.h"
-//#include "spi.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include <assert.h>
@@ -196,8 +194,11 @@ struct shoutcast_info* getStation(uint8_t position) {
 
 void saveDeviceSettings(struct device_settings *settings) {
 	if (settings == NULL) { ESP_LOGE(TAG,"saveDeviceSetting fails");return;}
+	vTaskDelay(1);
 	ESP_ERROR_CHECK(esp_partition_erase_range(DEVICE,0,DEVICE->size));
+	vTaskDelay(1);
 	ESP_ERROR_CHECK(esp_partition_write(DEVICE,0,settings,DEVICE->size));	
+	vTaskDelay(1);
 }
 
 

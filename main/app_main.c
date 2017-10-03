@@ -13,7 +13,6 @@
 #include "esp_event_loop.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
-//#include "http.h"
 #include "driver/i2s.h"
 #include "driver/uart.h"
 
@@ -25,13 +24,11 @@
 
 #include "app_main.h"
 
-//#include "ui.h"
 #include "spiram_fifo.h"
 #include "audio_renderer.h"
-//#include "web_radio.h"
-#include "playerconfig.h"
 #include "mdns_task.h"
 #include "audio_player.h"
+
 #ifdef CONFIG_BT_SPEAKER_MODE
 #include "bt_speaker.h"
 #endif
@@ -83,12 +80,16 @@ const int CONNECTED_AP  = 0x00000010;
 EventGroupHandle_t wifi_event_group ;
 xQueueHandle timer_queue;
 wifi_mode_t mode;
-xSemaphoreHandle print_mux;
+//xSemaphoreHandle print_mux;
 uint16_t FlashOn = 5,FlashOff = 5;
 bool ledStatus = true; // true: normal blink, false: led on when playing
 player_t *player_config;
-
+output_mode_t audio_output_mode; 
+uint8_t clientIvol = 0;
 const char striWATERMARK[]  = {"watermark %s: %d  heap:%d\n"};
+
+output_mode_t get_audio_output_mode() 
+{ return audio_output_mode;}
 
 void i2c_state(char* State)
 {
@@ -137,6 +138,7 @@ void i2c_test(char* ip)
     
 }
 
+
 /**
  * @brief i2c master initialization
  */
@@ -158,6 +160,17 @@ static void i2c_example_master_init()
 
 //////////////////////////////////////////////////////////////////
 
+uint8_t getIvol()
+{
+	return clientIvol;
+}
+
+void setIvol( uint8_t vol)
+{
+	clientIvol = vol;
+}
+
+
 static renderer_config_t *create_renderer_config()
 {
     renderer_config_t *renderer_config = calloc(1, sizeof(renderer_config_t));
@@ -166,7 +179,7 @@ static renderer_config_t *create_renderer_config()
     renderer_config->i2s_num = I2S_NUM_0;
     renderer_config->sample_rate = 44100;
     renderer_config->sample_rate_modifier = 1.0;
-    renderer_config->output_mode = AUDIO_OUTPUT_MODE;
+    renderer_config->output_mode = audio_output_mode;
 
     if(renderer_config->output_mode == I2S_MERUS) {
         renderer_config->bit_depth = I2S_BITS_PER_SAMPLE_32BIT;
@@ -207,17 +220,16 @@ uint32_t checkUart(uint32_t speed)
 *******************************************************************************/
 static void init_hardware()
 {
-    ESP_ERROR_CHECK(nvs_flash_init());
-	partitions_init();
+    //ESP_ERROR_CHECK(nvs_flash_init());
 	VS1053_HW_init(); // init spi
-	initBuffer();
+	VS1053_Start();
 	
 
     //Initialize the SPI RAM chip communications and see if it actually retains some bytes. If it
     //doesn't, warn user.
     if (!spiRamFifoInit()) {
-        printf("\n\nSPI RAM chip fail!\n");
-        while(1);
+        ESP_LOGE(TAG, "\nSPI RAM chip fail!");
+        esp_restart();
     }
 
     ESP_LOGI(TAG, "hardware initialized");
@@ -427,8 +439,8 @@ void start_network(){
 			tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA);  // stop dhcp client	
 			tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_STA, &info);
 			dns_setserver(0,( ip_addr_t* ) &info.gw);
-			ip_addr_t ipdns = dns_getserver(0);
-			printf("DNS: %s  \n",ip4addr_ntoa(( struct ip4_addr* ) &ipdns));
+			//ip_addr_t ipdns = dns_getserver(0);
+			//printf("DNS: %s  \n",ip4addr_ntoa(( struct ip4_addr* ) &ipdns));
 		}
 		vTaskDelay(1);
 		// wait for ip
@@ -456,7 +468,7 @@ void start_network(){
 			// if static ip	check dns
 //			dns_setserver(0,( ip_addr_t* ) &gate);
 			ip_addr_t ipdns = dns_getserver(0);
-			printf("DNS: %s  \n",ip4addr_ntoa(( struct ip4_addr* ) &ipdns));
+			printf("\nDNS: %s\n",ip4addr_ntoa(( struct ip4_addr* ) &ipdns));
 		}
 	}
 	
@@ -503,8 +515,8 @@ struct device_settings *device;
 		device = getDeviceSettings();
 		if (device != NULL)
 		{	
-			if (device->vol != clientIvol){ 
-				device->vol = clientIvol;
+			if (device->vol != getIvol()){ 			
+				device->vol = getIvol();
 				saveDeviceSettings(device);
 //	uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
 //	printf(striWATERMARK,"ledTask",uxHighWaterMark,xPortGetFreeHeapSize( ));
@@ -577,10 +589,8 @@ void app_main()
 	xTaskHandle pxCreatedTask;
 	ESP_LOGI(TAG, "starting app_main()");
     ESP_LOGI(TAG, "RAM left: %u", esp_get_free_heap_size());
-//	esp_log_level_set("*", ESP_LOG_VERBOSE);
-
-	//init hardware
-    init_hardware(); 
+	
+	partitions_init();
 	device = getDeviceSettings();
 	// device partition initialized?
 	if (device->cleared != 0xAABB)
@@ -590,9 +600,24 @@ void app_main()
 		free(device);
 		device = getDeviceSettings();
 		device->cleared = 0xAABB; //marker init done
+		device->audio_output_mode = VS1053; // default
+		device->trace_level = ESP_LOG_ERROR; //default
 		saveDeviceSettings(device);
 	}	
+	
+	//init hardware
+    init_hardware(); 
+	
+	// output mode
+	//I2S, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053
+	//audio_output_mode = device->audio_output_mode;
+	audio_output_mode = VS1053; // to be removed when ...
+	if ((audio_output_mode == VS1053) && (getVsVersion() < 3))
+		audio_output_mode = I2S	;
+	else
+		audio_output_mode = VS1053;
 
+	ESP_LOGI(TAG, "audio_output_mode %d\nOne of I2S=0, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053",audio_output_mode);
 	// log level
 	setLogLevel(device->trace_level);
 	
@@ -608,8 +633,7 @@ void app_main()
 	}	
 
 	// volume
-	clientIvol = device->vol;
-	
+	setIvol( device->vol);
 	timer_queue = xQueueCreate(10, sizeof(timer_event_t));
 
 	// led blinks
@@ -634,25 +658,19 @@ void app_main()
 	//init softwares
 //-----------------------------------------------------
 	clientInit();	
-//	if (AUDIO_OUTPUT_MODE == VS1053)
-	{
-		VS1053_Start();
-		VS1053_I2SRate(device->i2sspeed);
-	}
-//	else  // other with renderer needed.
-	{
-      // init player config
-      player_config = (player_t*)calloc(1, sizeof(player_t));
-      player_config->command = CMD_NONE;
-      player_config->decoder_status = UNINITIALIZED;
-      player_config->decoder_command = CMD_NONE;
-      player_config->buffer_pref = BUF_PREF_SAFE;
-      player_config->media_stream = calloc(1, sizeof(media_stream_t));
 
-	  audio_player_init(player_config);	  
-      // init renderer
-      renderer_init(create_renderer_config());		
-	}
+    // init player config
+    player_config = (player_t*)calloc(1, sizeof(player_t));
+    player_config->command = CMD_NONE;
+    player_config->decoder_status = UNINITIALIZED;
+    player_config->decoder_command = CMD_NONE;
+    player_config->buffer_pref = BUF_PREF_SAFE;
+    player_config->media_stream = calloc(1, sizeof(media_stream_t));
+
+	audio_player_init(player_config);	  
+    // init renderer (i2s)
+    renderer_init(create_renderer_config());	
+	  
 	tcpip_adapter_ip_info_t ip_info;
 
 	if (mode == WIFI_MODE_AP)
@@ -660,28 +678,26 @@ void app_main()
 	else	
 		tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info);
  
-	ESP_LOGI(TAG, "IP: %s",ip4addr_ntoa(&ip_info.ip));
+	printf("\nIP: %s\n\n",ip4addr_ntoa(&ip_info.ip));
 	
-	// Display infos
+	// LCD Display infos
     i2c_test(ip4addr_ntoa(&ip_info.ip));
 	i2c_state("Started");
 	
-//    ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
+    ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
 
 	//start tasks
-	xTaskCreate(uartInterfaceTask, "t1", 2500, NULL, 2, &pxCreatedTask); // 350
-	ESP_LOGI(TAG, "%s task: %x","t1",(unsigned int)pxCreatedTask);
-//	xTaskCreate(vsTask, "t2", 2000, NULL,/*configMAX_PRIORITIES*/5, &pxCreatedTask); //380 230
-//	ESP_LOGI(TAG, "%s task: %x","t2",(unsigned int)pxCreatedTask)
-	xTaskCreate(clientTask, "t3", 2500, NULL, configMAX_PRIORITIES -5, &pxCreatedTask); // 340
-	ESP_LOGI(TAG, "%s task: %x","t3",(unsigned int)pxCreatedTask);	
-    xTaskCreate(serversTask, "t4", 2500, NULL, 4, &pxCreatedTask); //380
-	ESP_LOGI(TAG, "%s task: %x","t4",(unsigned int)pxCreatedTask);	
+	xTaskCreate(uartInterfaceTask, "uartInterfaceTask", 2500, NULL, 2, &pxCreatedTask); // 350
+	ESP_LOGI(TAG, "%s task: %x","uartInterfaceTask",(unsigned int)pxCreatedTask);
+	xTaskCreate(clientTask, "clientTask", 2500, NULL, configMAX_PRIORITIES -5, &pxCreatedTask); // 340
+	ESP_LOGI(TAG, "%s task: %x","clientTask",(unsigned int)pxCreatedTask);	
+    xTaskCreate(serversTask, "serversTask", 2500, NULL, 4, &pxCreatedTask); //380
+	ESP_LOGI(TAG, "%s task: %x","serversTask",(unsigned int)pxCreatedTask);	
 	
 	//autostart	
 	kprintf("autostart: playing:%d, currentstation:%d\n",device->autostart,device->currentstation);
-	currentStation = device->currentstation;
-	clientIvol = device->vol;
+	setCurrentStation( device->currentstation);
+	setIvol( device->vol);
 	
 	if (device->autostart ==1)
 	{	

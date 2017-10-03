@@ -64,7 +64,9 @@ phy_init.o: C:/msys32/home/jp/esp/esp-idf/components/esp32/phy_init.c \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtensa-versions.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core-matmap.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
+ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
  C:/msys32/home/jp/esp/esp-idf/components/nvs_flash/include/nvs.h \
  C:/msys32/home/jp/esp/esp-idf/components/nvs_flash/include/nvs_flash.h \
  C:/msys32/home/jp/esp/esp-idf/components/nvs_flash/include/nvs.h \
@@ -202,7 +204,11 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtensa-versions.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core-matmap.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/nvs_flash/include/nvs.h:
 

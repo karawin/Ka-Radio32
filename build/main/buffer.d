@@ -53,7 +53,8 @@ buffer.o: C:/msys32/home/jp/esp/Ka-Radio32/main/buffer.c \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-frames.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtensa-versions.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core-matmap.h
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core-matmap.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_system.h:
 
@@ -164,4 +165,6 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtensa-versions.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core-matmap.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h:
 /home/jp/esp/Ka-Radio32/main/./buffer.c:

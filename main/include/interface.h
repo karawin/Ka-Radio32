@@ -21,6 +21,8 @@ void setLogLevel(esp_log_level_t level);
 void wifiConnectMem();
 char* webInfo();
 char* webList(int id);
+uint16_t getCurrentStation();
+void setCurrentStation( uint16_t vol);
 
 
 #define kprintf(fmt, ...) do {    \
