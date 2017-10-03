@@ -1,5 +1,25 @@
+KaraDio32 in dev state: use at your own risk
+
+Work with i2s or a vs1053
+
+To flash all build output, run 'make flash' or:
+python /home/jp/esp/esp-idf/components/esptool_py/esptool/esptool.py --chip esp32 --port com5 --baud 460800 --before default_reset --after hard_reset write_flash -u --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 /home/jp/esp/Ka-Radio32/build/bootloader/bootloader.bin 0x10000 /home/jp/esp/Ka-Radio32/build/KaRadio32.bin 0x8000 /home/jp/esp/Ka-Radio32/build/partitions.bin
 
 
+For the VS1053 version:
+// spi pins
+#define PIN_NUM_XCS  18
+#define PIN_NUM_RST  21
+#define PIN_NUM_XDCS 16
+#define PIN_NUM_DREQ 17
+
+#define PIN_NUM_MISO 19
+#define PIN_NUM_MOSI 23
+#define PIN_NUM_CLK  5
+
+
+
+Old readme:
 Modified for OLED display support by kodera2t
 
 Please use latest esp-idf environment (environment just before will make lots error)
