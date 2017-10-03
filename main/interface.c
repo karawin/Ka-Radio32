@@ -50,7 +50,7 @@ cli.instant: play the instant station\n\
 cli.start: start to play the current station\n\
 cli.play(\"xxx\"): play the xxx recorded station in the list (0 = stop)\n\
 cli.prev (or cli.previous): select the previous station in the list and play it\n\
-cli.next: select the next station in the list and play it%c"};
+cli.next: select the next station in the list and play it"};
 
 const char stritHELP1[]  = {" \
 cli.stop: stop the playing station or instant\n\
@@ -67,7 +67,7 @@ cli.info: Respond with nameset, all icy, meta, volume and stae playing or stoppe
 //////////////////\n\
 sys.uart(\"x\"): Change the baudrate of the uart on the next reset.\n\
  Valid x are: 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 76880, 115200, 230400\n\
-sys.i2s: Display the current I2S speed%c"};
+sys.i2s: Display the current I2S speed"};
 
 const char stritHELP2[]  = {" \
 sys.i2s(\"x\"): Change and record the I2S clock speed of the vs1053 GPIO5 MCLK for the i2s interface to external dac.\n\
@@ -84,8 +84,8 @@ sys.led(\"x\"): Change the led indication:\n\
 0 = Led is in Play mode (lighted when a station is playing), 1 or up = Led is in Blink mode (default)\n\
 sys.led: Display the led indication status\n\
 sys.version: Display the Release and Revision numbers\n\
-sys.tzo(\"xx\"): Set the timezone offset of your country.\n"
-};
+sys.tzo(\"xx\"): Set the timezone offset of your country.\n\
+"};
 
 const char stritHELP3[]  = {" \
 sys.tzo: Display the timezone offset\n\
@@ -860,13 +860,13 @@ void checkCommand(int size, char* s)
 	{
 		if(strcmp(tmp, "help") == 0)
 		{
-			kprintfl(stritHELP0,0x0d);
+			kprintfl(stritHELP0);
 			vTaskDelay(1);
-			kprintfl(stritHELP1,0x0d);
+			kprintfl(stritHELP1);
 			vTaskDelay(1);
-			kprintfl(stritHELP2,0x0d);
+			kprintfl(stritHELP2);
 			vTaskDelay(1);
-			kprintfl(stritHELP3,0x0d);
+			kprintfl(stritHELP3);
 		}
 		else printInfo(tmp);
 	}	
