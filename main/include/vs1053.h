@@ -24,13 +24,10 @@
 
 // spi pins
 #define PIN_NUM_XCS  18
-//#define PIN_NUM_DC   21
 #define PIN_NUM_RST  21
 #define PIN_NUM_XDCS 16
 #define PIN_NUM_DREQ 17
 
-
-// from spi.harderr#define PIN_NUM_MISO 7
 #define PIN_NUM_MISO 19
 #define PIN_NUM_MOSI 23
 #define PIN_NUM_CLK  5

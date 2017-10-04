@@ -47,5 +47,7 @@ void serverclientTask(void *pvParams);
 void playStationInt(int sid);
 void websockethandle(int socket, wsopcode_t opcode, uint8_t * payload, size_t length);
 uint16_t getVolume(void);
+void setVolume(char* vol);
+void setVolumei(int16_t vol);
 
 #endif

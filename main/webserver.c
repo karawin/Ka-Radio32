@@ -192,27 +192,17 @@ void clientSetOvol(int8_t ovol)
 {
 	clientOvol = ovol;
 	kprintf(PSTR("##CLI.OVOLSET#: %d\n"),ovol);
-	vTaskDelay(20);
-}
-
-// set the current volume with its offset
-void setOffsetVolume(void) {
-	struct device_settings *device;
-	device = getDeviceSettings();
-	int16_t uvol = 0;
-	if (device != NULL) 
-	{
-		kprintf(PSTR("##CLI.VOL#: %d\n"),device->vol);
-		uvol = device->vol+clientOvol;
-		infree(device);			
-	}
-	if (uvol > 254) uvol = 254;
-	if (uvol <=0) uvol = 1;
-	ESP_LOGV(TAG,"setOffsetVol: %d",clientOvol);
-	if (get_audio_output_mode() == VS1053) VS1053_SetVolume(uvol);
+	vTaskDelay(10);
 }
 
 // set the volume with vol,  add offset
+void setVolumei(int16_t vol) {
+	if (vol > 254) vol = 254;
+	if (vol <0) vol = 1;
+	if (get_audio_output_mode() == VS1053) VS1053_SetVolume(vol);
+	if (vol <3) vol--;
+	renderer_volume(vol+2); // max 256
+}
 void setVolume(char* vol) {
 	setIvol(atoi(vol));
 	int16_t uvol = atoi(vol);
@@ -221,10 +211,22 @@ void setVolume(char* vol) {
 	if (uvol <0) uvol = 1;
 	if(vol) {
 		if (get_audio_output_mode() == VS1053) VS1053_SetVolume(uvol);
+		if (uvol <3) uvol--;
 		renderer_volume(uvol+2); // max 256
 		kprintf(PSTR("##CLI.VOL#: %d\n"),getIvol());		
 	}
 }
+// set the current volume with its offset
+void setOffsetVolume(void) {
+	int16_t uvol = getIvol();
+	uvol += clientOvol;
+	if (uvol > 254) uvol = 254;
+	if (uvol <=0) uvol = 1;
+	ESP_LOGV(TAG,"setOffsetVol: %d",clientOvol);
+	setVolumei(uvol);
+}
+
+
 
 uint16_t getVolume() {
 	return (getIvol());
@@ -485,26 +487,61 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 					
 					if (device->bass != atoi(bass))
 					{ 
-						if (get_audio_output_mode() == VS1053) VS1053_SetBass(atoi(bass));
-						device->bass = atoi(bass); 
-						changed = true;
+						if (get_audio_output_mode() == VS1053)
+						{
+							VS1053_SetBass(atoi(bass));
+							changed = true;
+							device->bass = atoi(bass); 
+						}
 					}
 					infree(bass);
 				}
 				if(treble) {				
-					if (device->treble != atoi(treble)){ if (get_audio_output_mode() == VS1053) VS1053_SetTreble(atoi(treble));device->treble = atoi(treble); changed = true;}
+					if (device->treble != atoi(treble))
+					{ 
+						if (get_audio_output_mode() == VS1053)
+						{
+							VS1053_SetTreble(atoi(treble));
+							changed = true;
+							device->treble = atoi(treble); 
+						}
+					}
 					infree(treble);
 				}
 				if(bassfreq) {					
-					if (device->freqbass != atoi(bassfreq)){ if (get_audio_output_mode() == VS1053) VS1053_SetBassFreq(atoi(bassfreq));device->freqbass = atoi(bassfreq); changed = true;}
+					if (device->freqbass != atoi(bassfreq))
+					{ 
+						if (get_audio_output_mode() == VS1053) 
+						{
+							VS1053_SetBassFreq(atoi(bassfreq));
+							changed = true;
+							device->freqbass = atoi(bassfreq); 
+						}
+					}
 					infree(bassfreq);
 				}
 				if(treblefreq) {					
-					if (device->freqtreble != atoi(treblefreq)){if (get_audio_output_mode() == VS1053) VS1053_SetTrebleFreq(atoi(treblefreq)); device->freqtreble = atoi(treblefreq); changed = true;}
+					if (device->freqtreble != atoi(treblefreq))
+					{
+						if (get_audio_output_mode() == VS1053)
+						{
+							VS1053_SetTrebleFreq(atoi(treblefreq)); 
+							changed = true;
+							device->freqtreble = atoi(treblefreq); 
+						}
+					}
 					infree(treblefreq);
 				}
 				if(spacial) {					
-					if (device->spacial != atoi(spacial)){if (get_audio_output_mode() == VS1053) VS1053_SetSpatial(atoi(spacial)); device->spacial = atoi(spacial); changed = true;}
+					if (device->spacial != atoi(spacial))
+					{
+							if (get_audio_output_mode() == VS1053) 
+							{	
+								VS1053_SetSpatial(atoi(spacial)); 
+								changed = true;
+								device->spacial = atoi(spacial); 
+							}
+					}
 					infree(spacial);
 				}
 				if (changed) 

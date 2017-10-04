@@ -783,7 +783,7 @@ function checkhistory()
 	 xhr.onload = function() {
 		document.getElementById('History').innerHTML = xhr.responseText;	
     }
-	xhr.open("GET","http://KaraDio.karawin.fr/history1.php", false);
+	xhr.open("GET","http://KaraDio.karawin.fr/history132.php", false);
 	try{
 		xhr.send(null );
 	}catch(e){;}
@@ -816,7 +816,7 @@ function checkversion()
 		document.getElementById('Version').innerHTML = xhr.responseText;	
 		document.getElementById('newrelease').innerHTML = document.getElementById('firmware_last').innerHTML;
     }
-	xhr.open("GET","http://KaraDio.karawin.fr/version.php", false);
+	xhr.open("GET","http://KaraDio.karawin.fr/version32.php", false);
 	try{
 		xhr.send(null );
 	}catch(e){;}

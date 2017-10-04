@@ -1037,11 +1037,11 @@ if (l > 80) dump(inpdata,len);
 // ---------------			
 		if (!playing )
 		{
-			if (get_audio_output_mode() == VS1053) VS1053_SetVolume(0);
+			setVolumei(0);
 			playing=1;
 			if (once == 0)vTaskDelay(20);
-			if (get_audio_output_mode() == VS1053) VS1053_SetVolume(getVolume());
-			renderer_volume(getVolume()+2); // max 256
+			setVolumei(getVolume());
+			//renderer_volume(getVolume()+2); // max 256
 			kprintf(CLIPLAY,0x0d,0x0a);
 			if (!ledStatus) gpio4_output_set(0);	
 		}
@@ -1140,8 +1140,8 @@ void clientTask(void *pvParams) {
 				do
 				{
 					bytes_read = recvfrom(sockfd, bufrec,RECEIVE, 0, NULL, NULL);	
-//if ( bytes_read < 0 )						
-//printf("Client socket: %d  read: %d  errno:%d ",sockfd, bytes_read,errno);	
+					if ( bytes_read < 0 )						
+					ESP_LOGE(TAG,"Client socket: %d  read: %d  errno:%d ",sockfd, bytes_read,errno);	
 //if (bytes_read < 1000 )  
 //printf("Rec:%d\n%s\n",bytes_read,bufrec);
 					
@@ -1178,8 +1178,7 @@ void clientTask(void *pvParams) {
 						if ((!playing )&& (getBufferFree() < (BUFFER_SIZE))) {						
 							playing=1;
 							vTaskDelay(1);
-							if (get_audio_output_mode() == VS1053)
-								if (VS1053_GetVolume()==0) VS1053_SetVolume(getVolume());
+							setVolumei(getVolume());
 							kprintf(CLIPLAY,0x0d,0x0a);
 							while (!getBufferEmpty()) vTaskDelay(100);							
 							vTaskDelay(150);
@@ -1212,12 +1211,12 @@ void clientTask(void *pvParams) {
 				//if (get_audio_output_mode() == VS1053) spiRamFifoReset();
 				player_config->media_stream->eof = true;
 				bufferReset();
-				if (get_audio_output_mode() == VS1053) VS1053_SetVolume(0);
+				setVolumei(0);
 				if (get_audio_output_mode() == VS1053)VS1053_flush_cancel(2);
 				playing = 0;
 				vTaskDelay(40);	// stop without click
 				//VS1053_LowPower();
-				if (get_audio_output_mode() == VS1053)VS1053_SetVolume(getVolume());
+				setVolumei(getVolume());
 			}	
 
 			bufferReset();
