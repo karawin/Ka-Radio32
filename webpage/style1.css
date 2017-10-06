@@ -368,6 +368,26 @@ border:1px solid #444;
 .tabs label:hover {
 	background:#96906B
 }
+
+.tabs span.coutput label {
+	display:run-in;
+	padding:1px 1px;
+	top:1px;
+	border-radius:0px;
+	background:#666145;
+}
+
+.tabs [id^="output"]:checked+label {
+	top:0;
+	padding:2px 2px;
+	color:#EEE;
+	background:#918B69;
+	border-radius:4px
+}
+
+
+
+
 .tabs .tab-content {
 	z-index:2;
 	display:none;

@@ -400,8 +400,8 @@ char *buf = NULL;
 	}
 	if (buf != NULL)
 	{
-		if (setsockopt (wsocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0)
-				printf(strwSOCKET,"setsockopt",errno);
+/*		if (setsockopt (wsocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0)
+				printf(strwSOCKET,"setsockopt",errno);*/
 		if ((!iswebsocket(wsocket ))&&(websocketnewclient(wsocket))) 
 		{
 			recbytes = decodeHttpMessage (bufin, buf);

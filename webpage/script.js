@@ -144,7 +144,10 @@ function valid() {
     alert("System reboot. Please change your browser address to the new one.");
 }
 
-
+function validOutput() {
+	hardware(1);
+    alert("System reboot.");
+}
 
 function scrollTo(to, duration) {
     if (duration < 0) return;
@@ -514,7 +517,33 @@ function wifi(valid) {
 	}
 	xhr.open("POST","wifi",false);
 	xhr.setRequestHeader(content,ctype);
-	xhr.send("valid=" + valid +"&ssid=" + encodeURIComponent(document.getElementById('ssid').value )+ "&pasw=" + encodeURIComponent(document.getElementById('passwd').value) +"&ssid2=" + encodeURIComponent(document.getElementById('ssid2').value) + "&pasw2=" + encodeURIComponent(document.getElementById('passwd2').value) + "&ip=" + document.getElementById('ip').value+"&msk=" + document.getElementById('mask').value+"&gw=" + document.getElementById('gw').value+"&ua=" + encodeURIComponent(document.getElementById('ua').value) +"&dhcp=" + document.getElementById('dhcp').checked+"&");
+	xhr.send("valid=" + valid 
+	+"&ssid=" + encodeURIComponent(document.getElementById('ssid').value )
+	+"&pasw=" + encodeURIComponent(document.getElementById('passwd').value) 
+	+"&ssid2=" + encodeURIComponent(document.getElementById('ssid2').value) 
+	+"&pasw2=" + encodeURIComponent(document.getElementById('passwd2').value) 
+	+"&ip=" + document.getElementById('ip').value
+	+"&msk=" + document.getElementById('mask').value
+	+"&gw=" + document.getElementById('gw').value
+	+"&ua=" + encodeURIComponent(document.getElementById('ua').value) 
+	+"&dhcp=" + document.getElementById('dhcp').checked+"&");
+}
+function hardware(valid) {
+	var i,coutput;
+	xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState == 4 && xhr.status == 200) {	
+			var arr = JSON.parse(xhr.responseText);
+			document.getElementById("output"+arr['coutput']).checked = true;
+		}
+	}
+	xhr.open("POST","hardware",false);
+	xhr.setRequestHeader(content,ctype);
+	for (i=0 ;i<5;i++) if (document.getElementById('output'+i).checked) break;
+	if (i==5) coutput = 0;
+	xhr.send("valid=" + valid 
+	+"&coutput=" + i
+	+"&");
 }
 function instantPlay() {
 	var curl;
@@ -1188,6 +1217,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			if (stchanged) stChanged();
 			curtab = "tab-content3";
 			wifi(0) ;
+			hardware(0);
 			checkversion();
 			setMainHeight(curtab);	
 		});
@@ -1199,6 +1229,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	checkwebsocket();
 	refresh();
 	wifi(0) ;
+	hardware(0);
 	autostart();
 	checkversion();
 	setMainHeight(curtab);

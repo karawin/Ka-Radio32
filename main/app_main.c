@@ -606,12 +606,13 @@ void app_main()
 	
 	// output mode
 	//I2S, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053
-	//audio_output_mode = device->audio_output_mode;
-	audio_output_mode = VS1053; // to be removed when ...
+	audio_output_mode = device->audio_output_mode;
+	//audio_output_mode = VS1053; // to be removed when ...
 	if ((audio_output_mode == VS1053) && (getVsVersion() < 3))
+	{
 		audio_output_mode = I2S	;
-	else
-		audio_output_mode = VS1053;
+		saveDeviceSettings(device);
+	}
 
 	ESP_LOGI(TAG, "audio_output_mode %d\nOne of I2S=0, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053",audio_output_mode);
 	// log level

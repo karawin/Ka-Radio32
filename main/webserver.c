@@ -431,7 +431,7 @@ void pathParse(char* str)
 }
 
 void handlePOST(char* name, char* data, int data_size, int conn) {
-	ESP_LOGV(TAG,"HandlePost %s\n",name);
+	ESP_LOGD(TAG,"HandlePost %s\n",name);
 	int i;
 	bool changed = false;
 	struct device_settings *device;
@@ -469,7 +469,7 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 		if(data_size > 0) {
 			char * vol = data+4;
 			data[data_size-1] = 0;
-			ESP_LOGV(TAG,"/sounvol vol: %s num:%d",vol, atoi(vol));
+			ESP_LOGD(TAG,"/sounvol vol: %s num:%d",vol, atoi(vol));
 			setVolume(vol); 
 		}
 	} else if(strcmp(name, "/sound") == 0) {
@@ -744,7 +744,7 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 		((header->members.single.metadata ==NULL)?0:strlen(header->members.single.metadata))
 		+ strlen(currentSt)+	strlen(vol) +strlen(treble)+strlen(bass)+strlen(tfreq)+strlen(bfreq)+strlen(spac)
 		;
-		ESP_LOGV(TAG,"icy start header %x  len:%d vollen:%d vol:%s",(int)header,json_length,strlen(vol),vol);
+		ESP_LOGD(TAG,"icy start header %x  len:%d vollen:%d vol:%s",(int)header,json_length,strlen(vol),vol);
 		
 		char *buf = inmalloc( json_length + 75);
 		if (buf == NULL) 
@@ -782,7 +782,56 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 			
 		}		
 		return;
-		
+	} else if(strcmp(name, "/hardware") == 0)
+	{		
+		bool val = false;
+		uint8_t cout;
+		struct device_settings *device;
+		changed = false;
+		if(data_size > 0) {
+			device = getDeviceSettings();
+			if (device ==NULL)
+			{
+				infree(device);
+				respKo(conn);
+				return;
+			}
+			char* valid = getParameterFromResponse("valid=", data, data_size);
+			if(valid != NULL) if (strcmp(valid,"1")==0) val = true;	
+			char* coutput = getParameterFromResponse("coutput=", data, data_size);
+			cout = atoi(coutput);
+			if (val)
+			{
+				device->audio_output_mode = cout;
+				changed = true;
+				saveDeviceSettings(device);	
+			}
+			int json_length ;
+			json_length =15;
+				
+			char *buf = inmalloc( json_length + 95);
+			if (buf == NULL) 
+			{	
+				ESP_LOGE(TAG," %s malloc fails","post wifi");
+				respKo(conn);
+			}
+			else {	
+				sprintf(buf, "HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:%d\r\n\r\n{\"coutput\":\"%d\"}",
+				json_length,
+				device->audio_output_mode);
+				ESP_LOGV(TAG,"hardware Buf len:%d\n%s",strlen(buf),buf);
+				write(conn, buf, strlen(buf));
+				infree(buf);
+			}
+			infree(valid); infree(coutput);
+			if (val){
+				// set current_ap to the first filled ssid
+				ESP_LOGD(TAG,"audio_output_mode: %d",device->audio_output_mode);
+				vTaskDelay(50);	
+				esp_restart();			
+			}	
+			infree(device);			
+		}		
 	} else if(strcmp(name, "/wifi") == 0)	
 	{
 		bool val = false;
@@ -813,8 +862,8 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 			char* aua = getParameterFromResponse("ua=", data, data_size);
 			pathParse(aua);
 			char* adhcp = getParameterFromResponse("dhcp=", data, data_size);
-			ESP_LOGV(TAG,"wifi received  valid:%s,val:%d, ssid:%s, pasw:%s, aip:%s, amsk:%s, agw:%s, adhcp:%s, aua:%s",valid,val,ssid,pasw,aip,amsk,agw,adhcp,aua);
 			if (val) {
+				ESP_LOGV(TAG,"wifi received  valid:%s,val:%d, ssid:%s, pasw:%s, aip:%s, amsk:%s, agw:%s, adhcp:%s, aua:%s",valid,val,ssid,pasw,aip,amsk,agw,adhcp,aua);
 				changed = true;
 				ip_addr_t valu;
 				ipaddr_aton(aip, &valu);

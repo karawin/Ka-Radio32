@@ -1053,7 +1053,7 @@ if (l > 80) dump(inpdata,len);
 //uint8_t bufrec[RECEIVE+10];
 
 void clientTask(void *pvParams) { 
-//	portBASE_TYPE uxHighWaterMark;
+	portBASE_TYPE uxHighWaterMark;
 	struct timeval timeout; 
     timeout.tv_usec = 0;
 	int sockfd;
@@ -1136,6 +1136,7 @@ void clientTask(void *pvParams) {
 
 				if (setsockopt (sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0)
 					printf(strcSOCKET,"setsockopt",errno);
+				
 //////				
 				do
 				{
@@ -1201,10 +1202,6 @@ void clientTask(void *pvParams) {
 					}					
 			}//jpc
 						
-			// marker for heap size (debug)
-/*			uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-			printf(PSTR("watermark webclient :%d  heap:%d\n"),uxHighWaterMark,xPortGetFreeHeapSize( ));
-*/
 			if (playing)  // stop clean
 			{		
 				audio_player_stop(); 
@@ -1228,6 +1225,8 @@ void clientTask(void *pvParams) {
 			{
 			  clientConnect();
 			}
+			uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+			ESP_LOGI(TAG,"watermark : %x  %d",uxHighWaterMark,uxHighWaterMark);	
 		}
 	}
 }

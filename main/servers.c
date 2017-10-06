@@ -15,7 +15,7 @@
 #include "driver/timer.h"
 
 #define stack  2500//320
-
+#define TAG	"servers"
 
 const char strsTELNET[]  = {"Servers Telnet Socket fails %s errno: %d\n"};
 const char strsWEB[]  = {"Servers Web Socket fails %s errno: %d\n"};
@@ -50,31 +50,21 @@ void serversTask(void* pvParams) {
 	    /*Configure timer*/
     ESP_ERROR_CHECK(timer_init(TIMERGROUP, sleepTimer, &config));
 	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, sleepTimer));
-	//ESP_ERROR_CHECK(timer_enable_intr(TIMERGROUP, sleepTimer));
-	//ESP_ERROR_CHECK(timer_isr_register(TIMERGROUP, sleepTimer, sleepCallback, (void*) sleepTimer, ESP_INTR_FLAG_IRAM, NULL));
 	ESP_ERROR_CHECK(timer_isr_register(TIMERGROUP, sleepTimer, sleepCallback, (void*) sleepTimer, 0, NULL));
 	
     ESP_ERROR_CHECK(timer_init(TIMERGROUP, wakeTimer, &config));
 	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, wakeTimer));
-	//ESP_ERROR_CHECK(timer_enable_intr(TIMERGROUP, wakeTimer));
-	//ESP_ERROR_CHECK(timer_isr_register(TIMERGROUP, wakeTimer, wakeCallback, (void*) wakeTimer, ESP_INTR_FLAG_IRAM, NULL));	
 	ESP_ERROR_CHECK(timer_isr_register(TIMERGROUP, wakeTimer, wakeCallback, (void*) wakeTimer, 0, NULL));	
 
 	semclient = xSemaphoreCreateCounting(5,5); 
 	semfile = xSemaphoreCreateCounting(5,5); 
 	
-//	portBASE_TYPE uxHighWaterMark;
+	portBASE_TYPE uxHighWaterMark;
 	
 	
 	int max_sd;
 	int activity;
 	int	ret, sd;	
-	
-/*	
-	uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-	printf(PSTR("watermark serverstask %d\n"),uxHighWaterMark);
-*/	
-
 
 	int i;
 	telnetinit();
@@ -300,10 +290,8 @@ void serversTask(void* pvParams) {
 //					if (--activity ==0) break;
 				}
 			}    				
-			
-/*			uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-			printf(PSTR("watermark middle ssTask: %d\n"),uxHighWaterMark);
-*/			
+			uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+			ESP_LOGI(TAG,"watermark: %x  %d",uxHighWaterMark,uxHighWaterMark);						
 		}			
 					
 	} 

@@ -1258,13 +1258,16 @@ def make_logger(name=str(os.getpid())):
 def make_post_execution_message(app=__doc__.splitlines()[0].strip()):
     """Simple Post-Execution Message with information about RAM and Time."""
     ram_use, ram_all = 0, 0
+    use = 0
+    al = 0
+    msg = "end"
     if sys.platform.startswith("linux"):
         use = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss *
                     resource.getpagesize() / 1024 / 1024 if resource else 0)
         al = int(os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
                       / 1024 / 1024 if hasattr(os, "sysconf") else 0)
-    msg = "Total Maximum RAM Memory used: ~{0} of {1}MegaBytes".format(use, al)
-    log.info(msg)
+        msg = "Total Maximum RAM Memory used: ~{0} of {1}MegaBytes".format(use, al)
+        log.info(msg)
     if start_time and datetime:
         log.info("Total Working Time: {0}".format(datetime.now() - start_time))
     if randint(0, 100) < 25:  # ~25% chance to see the message,dont get on logs
