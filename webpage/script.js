@@ -535,6 +535,8 @@ function hardware(valid) {
 		if (xhr.readyState == 4 && xhr.status == 200) {	
 			var arr = JSON.parse(xhr.responseText);
 			document.getElementById("output"+arr['coutput']).checked = true;
+			if (arr['coutput'] != "4") document.getElementById("vs1052Only").style.display = "none";
+			else document.getElementById("vs1052Only").style.display = "run-in";
 		}
 	}
 	xhr.open("POST","hardware",false);

@@ -177,14 +177,15 @@
 						<input type="radio" name="output" id="output3"   /><label for="output3">PDM</label>
 						<input type="radio" name="output" id="output4" 	 /><label for="output4">VS1053</label>
 						<input type="button" value="Validate" onclick="validOutput()" />
-						</span>
 						</span><br>
+						<span id="vs1052Only">
 						<span class="bold">Treble control: </span><input type="range" id="treble_range" name="treble"  onChange="onRangeChange('treble_range', 'treble_span', 1.5, false)" min=-8 max=7 > <span id="treble_span"></span><br>
 						<span class="bold">Treble frequency: </span><input type="range" id="treblefreq_range" name="treblefreq"  onChange="onRangeChangeFreqTreble('treblefreq_range', 'treblefreq_span', 1, false)" min=1 max=15 > <span id="treblefreq_span"></span><br>
 						<span class="bold">  Bass enhance: </span><input type="range"  id="bass_range" name="bass"  onChange="onRangeChange('bass_range', 'bass_span', 1, false)" min=0 max=15 > <span id="bass_span"></span><br>
 						<span class="bold">  Bass frequency: </span><input type="range"  id="bassfreq_range" name="bassfreq"  onChange="onRangeChangeFreqBass('bassfreq_range', 'bassfreq_span', 10, false)" min=2 max=15 > <span id="bassfreq_span"></span><br>
 						<span class="bold">  Spacialization: </span><input type="range"  id="spacial_range" name="spacial"  onChange="onRangeChangeSpatial('spacial_range', 'spacial_span')" min=0 max=3 > <span id="spacial_span"></span><br>
 						<br/>
+						</span>
 						<span class="bold">Volume: </span><input type="range" id="vol_range" name="vol"  onChange="onRangeVolChange(this.value,true)" value=100 min=0 max=254 > <span id="vol_span"></span><br>
 						</p>
 					<h1>Stations Save & Restore</h1>
