@@ -2,9 +2,9 @@
 KaraDio32 in dev state: use at your own risk<br/>
 
 Based on KaraDio for esp8266 and https://github.com/kodera2t/ESP32_OLED_webradio<br/>
-
+<br/>
 Work with i2s or a vs1053<br/>
-Output mode in Setting panel:<br/>
+Output mode in Setting panel on web page of KaraDio32:<br/>
 I2S for connection to a dac<br/>
 I2SMERU to connect a meru amplifier<br/>
 DAC to use the built in DAC of the esp32<br/>
@@ -14,8 +14,8 @@ VS1053 to connect to a vs1053 board.<br/>
 
 
 ```
-To flash all build output, run 'make flash' or:<br/>
-python /home/jp/esp/esp-idf/components/esptool_py/esptool/esptool.py --chip esp32 --port com5 --baud 460800 --before default_reset --after hard_reset write_flash -u --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 /home/jp/esp/Ka-Radio32/build/bootloader/bootloader.bin 0x10000 /home/jp/esp/Ka-Radio32/build/KaRadio32.bin 0x8000 /home/jp/esp/Ka-Radio32/build/partitions.bin<br/>
+To flash all build output, run 'make flash' or:
+python /home/jp/esp/esp-idf/components/esptool_py/esptool/esptool.py --chip esp32 --port com5 --baud 460800 --before default_reset --after hard_reset write_flash -u --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 /home/jp/esp/Ka-Radio32/build/bootloader/bootloader.bin 0x10000 /home/jp/esp/Ka-Radio32/build/KaRadio32.bin 0x8000 /home/jp/esp/Ka-Radio32/build/partitions.bin
 ```
 
 For the VS1053 version:<br/>
