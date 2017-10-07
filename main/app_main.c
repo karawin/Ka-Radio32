@@ -74,6 +74,7 @@ const int CONNECTED_AP  = 0x00000010;
 #define PRIO_READER configMAX_PRIORITIES -3
 #define PRIO_MQTT configMAX_PRIORITIES - 3
 #define PRIO_CONNECT configMAX_PRIORITIES -1
+#define striWATERMARK  "watermark: %d  heap: %d"
 
 
 /* */
@@ -86,7 +87,6 @@ bool ledStatus = true; // true: normal blink, false: led on when playing
 player_t *player_config;
 output_mode_t audio_output_mode; 
 uint8_t clientIvol = 0;
-const char striWATERMARK[]  = {"watermark %s: %d  heap:%d\n"};
 
 output_mode_t get_audio_output_mode() 
 { return audio_output_mode;}
@@ -478,10 +478,8 @@ void start_network(){
 void ledTask(void* p) {
 struct device_settings *device;	
 
-/*	int uxHighWaterMark;
-	uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-	printf(striWATERMARK,"ledTask",uxHighWaterMark,xPortGetFreeHeapSize( ));
-*/
+	int uxHighWaterMark;
+
 	gpio4_output_conf();	
 	while(1) {
 		timer_event_t evt;
@@ -512,8 +510,8 @@ struct device_settings *device;
 			if (device->vol != getIvol()){ 			
 				device->vol = getIvol();
 				saveDeviceSettings(device);
-//	uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-//	printf(striWATERMARK,"ledTask",uxHighWaterMark,xPortGetFreeHeapSize( ));
+				uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+				ESP_LOGI("ledTask",striWATERMARK,uxHighWaterMark,xPortGetFreeHeapSize( ));
 			}
 			free(device);	
 		}			
@@ -529,6 +527,7 @@ void uartInterfaceTask(void *pvParameters) {
 	int t ;
 	struct device_settings *device;
 	uint32_t uspeed;
+	int uxHighWaterMark;
 	
 	device = getDeviceSettings();
 	uspeed = device->uartspeed;	
@@ -564,10 +563,9 @@ void uartInterfaceTask(void *pvParameters) {
 		}
 		checkCommand(t, tmp);
 		
-/*	uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-	printf("watermark uartInterfaceTask: %d  heap:%d\n",uxHighWaterMark,xPortGetFreeHeapSize( ));
-*/		
-		
+		uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+		ESP_LOGI("uartInterfaceTask",striWATERMARK,uxHighWaterMark,xPortGetFreeHeapSize( ));
+				
 		for(t = 0; t<sizeof(tmp); t++) tmp[t] = 0;
 		t = 0;
 	}	
@@ -634,7 +632,7 @@ void app_main()
 	timer_queue = xQueueCreate(10, sizeof(timer_event_t));
 
 	// led blinks
-	xTaskCreate(ledTask, "t0",2000, NULL, 1, &pxCreatedTask); // DEBUG/TEST 130
+	xTaskCreate(ledTask, "t0",1700, NULL, 1, &pxCreatedTask); // DEBUG/TEST 130
 	ESP_LOGI(TAG, "%s task: %x","t0",(unsigned int)pxCreatedTask);	
 	
 	//Display if any	
@@ -684,11 +682,11 @@ void app_main()
     ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
 
 	//start tasks
-	xTaskCreate(uartInterfaceTask, "uartInterfaceTask", 2500, NULL, 2, &pxCreatedTask); // 350
+	xTaskCreate(uartInterfaceTask, "uartInterfaceTask", 2000, NULL, 2, &pxCreatedTask); // 350
 	ESP_LOGI(TAG, "%s task: %x","uartInterfaceTask",(unsigned int)pxCreatedTask);
-	xTaskCreate(clientTask, "clientTask", 2500, NULL, configMAX_PRIORITIES -5, &pxCreatedTask); // 340
+	xTaskCreate(clientTask, "clientTask", 2300, NULL, configMAX_PRIORITIES -5, &pxCreatedTask); // 340
 	ESP_LOGI(TAG, "%s task: %x","clientTask",(unsigned int)pxCreatedTask);	
-    xTaskCreate(serversTask, "serversTask", 2500, NULL, 4, &pxCreatedTask); //380
+    xTaskCreate(serversTask, "serversTask", 2000, NULL, 4, &pxCreatedTask); //380
 	ESP_LOGI(TAG, "%s task: %x","serversTask",(unsigned int)pxCreatedTask);	
 	printf("Init ");
 	vTaskDelay(1);
@@ -713,4 +711,5 @@ void app_main()
 //	ledStatus = ((device->options & T_LED)== 0);
 //
 	free(device);
+	vTaskDelete( NULL ); 
 }
