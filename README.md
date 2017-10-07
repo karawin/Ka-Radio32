@@ -1,7 +1,18 @@
 #### State
 KaraDio32 in dev state: use at your own risk<br/>
 
+Based on KaraDio for esp8266 and https://github.com/kodera2t/ESP32_OLED_webradio<br/>
+
 Work with i2s or a vs1053<br/>
+Output mode in Setting panel:<br/>
+I2S for connection to a dac<br/>
+I2SMERU to connect a meru amplifier<br/>
+DAC to use the built in DAC of the esp32<br/>
+PDM to output a PDM (Pulse Density Modulation) stream<br/>
+VS1053 to connect to a vs1053 board.<br/>
+<br/>
+
+
 ```
 To flash all build output, run 'make flash' or:<br/>
 python /home/jp/esp/esp-idf/components/esptool_py/esptool/esptool.py --chip esp32 --port com5 --baud 460800 --before default_reset --after hard_reset write_flash -u --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 /home/jp/esp/Ka-Radio32/build/bootloader/bootloader.bin 0x10000 /home/jp/esp/Ka-Radio32/build/KaRadio32.bin 0x8000 /home/jp/esp/Ka-Radio32/build/partitions.bin<br/>
@@ -26,8 +37,8 @@ For the VS1053 version:<br/>
 - In the gateway field, enter the ip address of your router.
 - Validate. The equipment restart to the new configuration. Connect your wifi to your AP and browse to the ip given in configuration.
 - Congratulation, you can edit your own station list. Dont forget to save your stations list in case of problem or for new equipments.
-- if the AP is already know by the esp8266, the default ip is given by dhcp.
-- a sample of stations list is on https://github.com/karawin/ESP8266-WebRadio/blob/master/ESP8266-Firmware/WebStations.txt . Can be uploaded via the web page.        
+- if the AP is already know by the esp32, the default ip is given by dhcp.
+- a sample of stations list is on http://karadio.karawin.fr/WebStations.txt . Can be uploaded via the web page.        
 
 
 <br/>
