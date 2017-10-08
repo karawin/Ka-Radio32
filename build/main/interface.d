@@ -122,6 +122,7 @@ interface.o: C:/msys32/home/jp/esp/Ka-Radio32/main/interface.c \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/dns.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netdb.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/string.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/string.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/eeprom.h \
@@ -394,6 +395,8 @@ C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/dns.h:
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netdb.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/string.h:
 

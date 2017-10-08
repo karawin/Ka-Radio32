@@ -124,6 +124,7 @@ webserver.o: C:/msys32/home/jp/esp/Ka-Radio32/main/webserver.c \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/dns.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netdb.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/webserver.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/webclient.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h \
@@ -156,7 +157,8 @@ webserver.o: C:/msys32/home/jp/esp/Ka-Radio32/main/webserver.c \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/uart_struct.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/ringbuf.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/uart_channel.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h:
 
@@ -408,6 +410,8 @@ C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netdb.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h:
 
+C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h:
+
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/webserver.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/webclient.h:
@@ -473,4 +477,6 @@ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/ringbuf.h:
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/uart_channel.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h:
 /home/jp/esp/Ka-Radio32/main/./webserver.c:

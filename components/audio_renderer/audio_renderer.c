@@ -100,8 +100,8 @@ void renderer_volume(uint32_t vol)
  */
 void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 {
-    ESP_LOGV(TAG, "buf_desc: bit_depth %d format %d num_chan %d sample_rate %d", buf_desc->bit_depth, buf_desc->buffer_format, buf_desc->num_channels, buf_desc->sample_rate);
-    ESP_LOGV(TAG, "renderer_instance: bit_depth %d, output_mode %d", renderer_instance->bit_depth, renderer_instance->output_mode);
+//    ESP_LOGV(TAG, "buf_desc: bit_depth %d format %d num_chan %d sample_rate %d", buf_desc->bit_depth, buf_desc->buffer_format, buf_desc->num_channels, buf_desc->sample_rate);
+//    ESP_LOGV(TAG, "renderer_instance: bit_depth %d, output_mode %d", renderer_instance->bit_depth, renderer_instance->output_mode);
 
 
     // handle changed sample rate
@@ -118,7 +118,7 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 	
 //KaraDio32 Volume control
 	register uint32_t mult = renderer_instance->volume;
-	if (mult!= 0x10000) // need voluem?
+	if (mult!= 0x10000) // need volume?
 	{	
 		int16_t *psample;
 		psample = (int16_t*)buf;

@@ -4,7 +4,7 @@
 
 	Main task for the web websocket and telnet servers.
 */
-
+#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 #include "telnet.h"
 #include "websocket.h"
 #include "webserver.h"
@@ -14,12 +14,11 @@
 #include <strings.h>
 #include "driver/timer.h"
 
-#define stack  2500//320
+#define stack  2500
 #define TAG	"servers"
 
-const char strsTELNET[]  = {"Servers Telnet Socket fails %s errno: %d\n"};
-const char strsWEB[]  = {"Servers Web Socket fails %s errno: %d\n"};
-const char strsWSOCK[]  = {"WebServer Socket fails %s errno: %d\n"};
+#define  strsTELNET  "Servers Telnet Socket fails %s errno: %d"
+#define  strsWSOCK  "WebServer Socket fails %s errno: %d"
 
 fd_set readfds;
 xSemaphoreHandle semclient = NULL ;
@@ -29,7 +28,7 @@ const char strbind[] = {"Bind"};
 const char strlisten[] = {"Listen"};
 
 void serversTask(void* pvParams) {
-	//telnet
+	//telnet, client and websocket
 	struct sockaddr_in tenetserver_addr, tenetclient_addr;
 	int telnetServer_sock, telnetClient_sock;
 	int server_sock;
@@ -80,18 +79,18 @@ void serversTask(void* pvParams) {
         tenetserver_addr.sin_port = htons(23);
 		
         if (-1 == (telnetServer_sock = socket(AF_INET, SOCK_STREAM, 0))) {
-			printf (strsTELNET,strsocket, errno);
+			ESP_LOGE(TAG,strsTELNET,strsocket, errno);
 			vTaskDelay(5);	
             break;
         }
         if (-1 == bind(telnetServer_sock, (struct sockaddr *)(&tenetserver_addr), sizeof(struct sockaddr))) {
-			printf (strsTELNET,strbind, errno);
+			ESP_LOGE(TAG,strsTELNET,strbind, errno);
 			close(telnetServer_sock);
 			vTaskDelay(10);	
             break;
         }
         if (-1 == listen(telnetServer_sock, 5)) {
-			printf (strsTELNET,strlisten,errno);
+			ESP_LOGE(TAG,strsTELNET,strlisten,errno);
 			close(telnetServer_sock);
 			vTaskDelay(10);	
             break;
@@ -111,18 +110,18 @@ void serversTask(void* pvParams) {
 		server_addr.sin_port = htons(80);
 
 		if (-1 == (server_sock = socket(AF_INET, SOCK_STREAM, 0))) {
-			printf (strsWSOCK, strsocket, errno);
+			ESP_LOGE(TAG,strsWSOCK, strsocket, errno);
 			vTaskDelay(5);	
 			break;
 		}
 		if (-1 == bind(server_sock, (struct sockaddr *)(&server_addr), sizeof(struct sockaddr))) {
-			printf (strsWSOCK, strbind,errno);
+			ESP_LOGE(TAG,strsWSOCK, strbind,errno);
 			close(server_sock);
 			vTaskDelay(10);	
             break;
 		}
 		if (-1 == listen(server_sock, 5)) {
-			printf (strsWSOCK,strlisten,errno);
+			ESP_LOGE(TAG,strsWSOCK,strlisten,errno);
 			close(server_sock);
 			vTaskDelay(10);	
 			break;
@@ -142,11 +141,9 @@ void serversTask(void* pvParams) {
 			FD_SET(server_sock, &readfds);
 			max_sd = server_sock ;  
 				
-
 			//add telnetServer_sock to set (telnet)
 			FD_SET(telnetServer_sock, &readfds);
 			max_sd = telnetServer_sock > max_sd ? telnetServer_sock : max_sd;  
-
 
 			//add child sockets to set (wssocket)
 			for (i = 0;i<NBCLIENT;i++) 
@@ -184,7 +181,7 @@ void serversTask(void* pvParams) {
    
 			if ((activity < 0) && (errno!=EINTR) && (errno!=0)) 
 			{
-				printf(strsTELNET,"select",errno);
+				ESP_LOGE(TAG,strsTELNET,"select",errno);
 				vTaskDelay(100);
 				continue;
 			}	
@@ -196,7 +193,7 @@ void serversTask(void* pvParams) {
 				FD_CLR(server_sock , &readfds); 
 //printf(PSTR("Server web accept.%c"),0x0d);				
 				if ((client_sock = accept(server_sock, (struct sockaddr *) &client_addr, &sin_size)) < 0) {
-						printf (strsWSOCK,"accept",errno);
+						ESP_LOGE(TAG,strsWSOCK,"accept",errno);
 						vTaskDelay(10);					
 				} else
 				{
@@ -237,14 +234,14 @@ void serversTask(void* pvParams) {
 				FD_CLR(telnetServer_sock , &readfds);  				
 				if ((telnetClient_sock = accept(telnetServer_sock, (struct sockaddr *) &tenetclient_addr, &telnetSin_size)) < 0) 
 				{
-					printf (strsTELNET,"accept",errno);
+					ESP_LOGE(TAG,strsTELNET,"accept",errno);
 					close(telnetClient_sock);
 					vTaskDelay(50);					
 				} else
 				{
 					if (!telnetAccept(telnetClient_sock))
 					{
-						printf (strsTELNET,"Accept1n",errno);
+						ESP_LOGE(TAG,strsTELNET,"Accept1n",errno);
 						close(telnetClient_sock);
 						vTaskDelay(50);	
 					}
@@ -264,7 +261,7 @@ void serversTask(void* pvParams) {
 					if (ret == 0) 
 					{
 						telnetremoveclient(sd);						
-//						printf(strsTELNET,"Clear",errno); 
+//						ESP_LOGE(TAG,strsTELNET,"Clear",errno); 
 					}
 //					if (--activity ==0) break;
 				}
@@ -291,7 +288,7 @@ void serversTask(void* pvParams) {
 				}
 			}    				
 			uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-			ESP_LOGI(TAG,"watermark: %x  %d",uxHighWaterMark,uxHighWaterMark);						
+			ESP_LOGI(TAG,"watermark: 0x%x  %d",uxHighWaterMark,uxHighWaterMark);						
 		}			
 					
 	} 

@@ -141,6 +141,7 @@ vs1053.o: C:/msys32/home/jp/esp/Ka-Radio32/main/vs1053.c \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/dns.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netdb.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/audio_player/include/audio_player.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/fifo/include/spiram_fifo.h \
@@ -430,6 +431,8 @@ C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/dns.h:
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netdb.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h:
 

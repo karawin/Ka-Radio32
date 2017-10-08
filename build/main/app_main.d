@@ -117,6 +117,10 @@ app_main.o: C:/msys32/home/jp/esp/Ka-Radio32/main/app_main.c \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_event_loop.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
+ C:/msys32/home/jp/esp/esp-idf/components/app_update/include/esp_ota_ops.h \
+ C:/msys32/home/jp/esp/esp-idf/components/spi_flash/include/esp_partition.h \
+ C:/msys32/home/jp/esp/esp-idf/components/spi_flash/include/esp_spi_flash.h \
+ C:/msys32/home/jp/esp/esp-idf/components/spi_flash/include/esp_spi_flash.h \
  C:/msys32/home/jp/esp/esp-idf/components/nvs_flash/include/nvs_flash.h \
  C:/msys32/home/jp/esp/esp-idf/components/nvs_flash/include/nvs.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/i2s.h \
@@ -166,7 +170,6 @@ app_main.o: C:/msys32/home/jp/esp/Ka-Radio32/main/app_main.c \
  C:/msys32/home/jp/esp/Ka-Radio32/components/ssd/include/ssd1306.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/ssd/include/fonts.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio16.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/buffer.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/servers.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/webclient.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/webserver.h \
@@ -175,6 +178,7 @@ app_main.o: C:/msys32/home/jp/esp/Ka-Radio32/main/app_main.c \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/websocket.h \
  C:/msys32/home/jp/esp/esp-idf/components/wpa_supplicant/include/crypto\sha1_i.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/timer.h \
@@ -418,6 +422,14 @@ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/app_update/include/esp_ota_ops.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/spi_flash/include/esp_partition.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/spi_flash/include/esp_spi_flash.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/spi_flash/include/esp_spi_flash.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/nvs_flash/include/nvs_flash.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/nvs_flash/include/nvs.h:
@@ -516,8 +528,6 @@ C:/msys32/home/jp/esp/Ka-Radio32/components/ssd/include/fonts.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio16.h:
 
-C:/msys32/home/jp/esp/Ka-Radio32/main/include/buffer.h:
-
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/servers.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/webclient.h:
@@ -533,6 +543,8 @@ C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h:
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/websocket.h:
 

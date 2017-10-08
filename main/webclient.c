@@ -19,7 +19,6 @@
 
 #include "vs1053.h"
 #include "eeprom.h"
-#include "buffer.h"
 #include "interface.h"
 #include "gpio16.h"
 #include "audio_player.h"
@@ -995,7 +994,7 @@ if (l > 80) dump(inpdata,len);
 //if (getBufferFree() < metad) printf("metaout wait metad: %d, bufferfree: %d\n",metad,getBufferFree());			
 //					while(getBufferFree() < metad)	 // wait some room
 					while(spiRamFifoFree()==0)	 // wait some room
-						vTaskDelay(20);
+						vTaskDelay(30);
 //					bufferWrite((void *)inpdata, metad); 
 					audio_stream_consumer((char*)inpdata, metad, (void*)player_config);
 				}
@@ -1013,7 +1012,7 @@ if (l > 80) dump(inpdata,len);
 //if (getBufferFree() < rest) printf("metaout wait rest: %d, bufferfree: %d\n",rest,getBufferFree());
 //					while(getBufferFree() < rest)
 					while(spiRamFifoFree()==0)	 // wait some room						
-						vTaskDelay(20);// 
+						vTaskDelay(30);// 
 					audio_stream_consumer((char*)inpdata, rest, (void*)player_config);					
 //					bufferWrite((uint8_t*)inpdata, rest); 
 				}
@@ -1029,7 +1028,7 @@ if (l > 80) dump(inpdata,len);
 //printf("metaout wait len: %d\n",len);					
 //				while(getBufferFree() < len) 
 				while(spiRamFifoFree()==0)	 // wait some room	
-						vTaskDelay(20); 
+						vTaskDelay(30); 
 				audio_stream_consumer((char*)pdata+rest, len, (void*)player_config);
 //				bufferWrite((uint8_t*)pdata+rest, len);
 			}			
@@ -1041,7 +1040,6 @@ if (l > 80) dump(inpdata,len);
 			playing=1;
 			if (once == 0)vTaskDelay(20);
 			setVolumei(getVolume());
-			//renderer_volume(getVolume()+2); // max 256
 			kprintf(CLIPLAY,0x0d,0x0a);
 			if (!ledStatus) gpio4_output_set(0);	
 		}
@@ -1059,7 +1057,7 @@ void clientTask(void *pvParams) {
 	int sockfd;
 	int bytes_read;
 	char *useragent;
-	struct device_settings*device;
+	struct device_settings* device;
 	struct sockaddr_in dest;
 	uint8_t *bufrec;
 	
@@ -1176,12 +1174,12 @@ void clientTask(void *pvParams) {
 					}	
 					else if ((!playing)&&(once == 1)){ // nothing played. Force the read of the buffer
 						// some data not played						
-						if ((!playing )&& (getBufferFree() < (BUFFER_SIZE))) {						
+						if ((!playing )&& (spiRamFifoFill())) {						
 							playing=1;
 							vTaskDelay(1);
 							setVolumei(getVolume());
 							kprintf(CLIPLAY,0x0d,0x0a);
-							while (!getBufferEmpty()) vTaskDelay(100);							
+							while (spiRamFifoFill()) vTaskDelay(100);							
 							vTaskDelay(150);
 							playing=0;
 							clientDisconnect(PSTR("data not played")); 
@@ -1196,7 +1194,7 @@ void clientTask(void *pvParams) {
 							
 					}	
 					else{  //playing & once=1 and no more received stream
-						while (!getBufferEmpty()) vTaskDelay(100);
+						while (spiRamFifoFill()) vTaskDelay(100);
 						vTaskDelay(200);
 						clientDisconnect("once"); 						
 					}					
@@ -1207,7 +1205,7 @@ void clientTask(void *pvParams) {
 				audio_player_stop(); 
 				//if (get_audio_output_mode() == VS1053) spiRamFifoReset();
 				player_config->media_stream->eof = true;
-				bufferReset();
+//				bufferReset();
 				setVolumei(0);
 				if (get_audio_output_mode() == VS1053)VS1053_flush_cancel(2);
 				playing = 0;
@@ -1216,7 +1214,7 @@ void clientTask(void *pvParams) {
 				setVolumei(getVolume());
 			}	
 
-			bufferReset();
+//			bufferReset();
 			shutdown(sockfd,SHUT_RDWR); // stop the socket
 			vTaskDelay(1);	
 			close(sockfd);

@@ -3,6 +3,7 @@
 #define INTERFACE_H
 #include "esp_log.h"
 #include "telnet.h"
+#include "ota.h"
 
 //#define PROGMEM   ICACHE_RODATA_ATTR
 #define PSTR(s) (s)

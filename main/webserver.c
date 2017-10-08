@@ -2,7 +2,6 @@
  * Copyright 2016 karawin (http://www.karawin.fr)
 */
 
-#define BOUCHON
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,6 +15,7 @@
 #include "driver/uart.h"
 #include "audio_renderer.h"
 #include "app_main.h"
+#include "ota.h"
 
 #define TAG "webserver"
 
@@ -343,11 +343,7 @@ void websockethandle(int socket, wsopcode_t opcode, uint8_t * payload, size_t le
 	else if (strstr((char*)payload,"stopWake")!= NULL){stopWake();}
 	//monitor
 	else if (strstr((char*)payload,"monitor")!= NULL){wsMonitor();}
-	else if (strstr((char*)payload,"upgrade")!= NULL){
-#ifndef BOUCHON		
-		update_firmware("new");
-#endif		
-		}
+	else if (strstr((char*)payload,"upgrade")!= NULL){update_firmware("KaRadio32");	}
 	else if (strstr((char*)payload,"theme")!= NULL){theme();}
 }
 

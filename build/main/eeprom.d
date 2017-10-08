@@ -140,7 +140,8 @@ eeprom.o: C:/msys32/home/jp/esp/Ka-Radio32/main/eeprom.c \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/inet.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/dns.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netdb.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h
 
 C:/msys32/home/jp/esp/esp-idf/components/spi_flash/include/esp_spi_flash.h:
 
@@ -425,4 +426,6 @@ C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/dns.h:
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netdb.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h:
 /home/jp/esp/Ka-Radio32/main/./eeprom.c:

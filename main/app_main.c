@@ -12,6 +12,7 @@
 #include "esp_wifi.h"
 #include "esp_event_loop.h"
 #include "esp_log.h"
+#include "esp_ota_ops.h"
 #include "nvs_flash.h"
 #include "driver/i2s.h"
 #include "driver/uart.h"
@@ -47,7 +48,6 @@
 #include "ssd1306.h"
 #include "nvs_flash.h"
 #include "gpio16.h"
-#include "buffer.h"
 #include "servers.h"
 #include "webclient.h"
 #include "webserver.h"
@@ -581,12 +581,24 @@ void app_main()
 	xTaskHandle pxCreatedTask;
 	ESP_LOGI(TAG, "starting app_main()");
     ESP_LOGI(TAG, "RAM left: %u", esp_get_free_heap_size());
-	
+	const esp_partition_t *running = esp_ota_get_running_partition();
+	ESP_LOGI(TAG, "Running partition type %d subtype %d (offset 0x%08x)",
+             running->type, running->subtype, running->address);
+    // Initialize NVS.
+    esp_err_t err = nvs_flash_init();
+    if (err == ESP_ERR_NVS_NO_FREE_PAGES) {
+        // OTA app partition table has a smaller NVS partition size than the non-OTA
+        // partition table. This size mismatch may cause NVS initialization to fail.
+        // If this happens, we erase NVS partition and initialize NVS again.
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        err = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK( err );
+
+	//init hardware	
 	partitions_init();
-	//init hardware
     init_hardware(); 
 	
-
 	device = getDeviceSettings();
 	// device partition initialized?
 	if (device->cleared != 0xAABB)
@@ -599,20 +611,22 @@ void app_main()
 		device->uartspeed = 115200; // default
 		device->audio_output_mode = VS1053; // default
 		device->trace_level = ESP_LOG_ERROR; //default
+		device->vol = 100; //default
 		saveDeviceSettings(device);
 	}	
 	
 	// output mode
 	//I2S, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053
 	audio_output_mode = device->audio_output_mode;
-	//audio_output_mode = VS1053; // to be removed when ...
 	if ((audio_output_mode == VS1053) && (getVsVersion() < 3))
 	{
 		audio_output_mode = I2S	;
+		device->audio_output_mode = audio_output_mode;
+		ESP_LOGE(TAG," No vs1053 detected. Fall back to I2S mode");
 		saveDeviceSettings(device);
 	}
-
 	ESP_LOGI(TAG, "audio_output_mode %d\nOne of I2S=0, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053",audio_output_mode);
+	
 	// log level
 	setLogLevel(device->trace_level);
 	
@@ -629,10 +643,10 @@ void app_main()
 
 	// volume
 	setIvol( device->vol);
+	// queur for events of the sleep / wake timers
 	timer_queue = xQueueCreate(10, sizeof(timer_event_t));
-
 	// led blinks
-	xTaskCreate(ledTask, "t0",1700, NULL, 1, &pxCreatedTask); // DEBUG/TEST 130
+	xTaskCreate(ledTask, "ledTask",1800, NULL, 1, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","t0",(unsigned int)pxCreatedTask);	
 	
 	//Display if any	
@@ -646,11 +660,13 @@ void app_main()
 	ESP_LOGI(TAG, "Heap size: %d",xPortGetFreeHeapSize( ));
 
 //-----------------------------
+// start the network
+//-----------------------------
     start_wifi();
 	start_network();
 	
 //-----------------------------------------------------
-	//init softwares
+//init softwares
 //-----------------------------------------------------
 	clientInit();	
 
@@ -663,11 +679,10 @@ void app_main()
     player_config->media_stream = calloc(1, sizeof(media_stream_t));
 
 	audio_player_init(player_config);	  
-    // init renderer (i2s)
     renderer_init(create_renderer_config());	
-	  
-	tcpip_adapter_ip_info_t ip_info;
 
+	// retrieve the current ip	
+	tcpip_adapter_ip_info_t ip_info;
 	if (mode == WIFI_MODE_AP)
 		tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_AP, &ip_info);
 	else	
@@ -681,7 +696,7 @@ void app_main()
 	
     ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
 
-	//start tasks
+	//start tasks of KaRadio32
 	xTaskCreate(uartInterfaceTask, "uartInterfaceTask", 2000, NULL, 2, &pxCreatedTask); // 350
 	ESP_LOGI(TAG, "%s task: %x","uartInterfaceTask",(unsigned int)pxCreatedTask);
 	xTaskCreate(clientTask, "clientTask", 2300, NULL, configMAX_PRIORITIES -5, &pxCreatedTask); // 340
@@ -696,6 +711,7 @@ void app_main()
 		printf(".");
 	}
 	printf(" Done\n");
+	
 	//autostart	
 	kprintf("autostart: playing:%d, currentstation:%d\n",device->autostart,device->currentstation);
 	setIvol( device->vol);
@@ -703,12 +719,10 @@ void app_main()
 	
 	if (device->autostart ==1)
 	{	
-		vTaskDelay(50); 
+		vTaskDelay(50); // wait a bit
 		playStationInt(device->currentstation);
 	}
 	
-//
-//	ledStatus = ((device->options & T_LED)== 0);
 //
 	free(device);
 	vTaskDelete( NULL ); 

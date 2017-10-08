@@ -124,7 +124,8 @@ ntp.o: C:/msys32/home/jp/esp/Ka-Radio32/main/ntp.c \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_wifi_types.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/apps/dhcpserver.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/dns.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h:
 
@@ -377,4 +378,6 @@ C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/apps/dhcpserver.h:
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/dns.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h:
 /home/jp/esp/Ka-Radio32/main/./ntp.c:

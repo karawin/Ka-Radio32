@@ -839,7 +839,7 @@ void checkCommand(int size, char* s)
 		else if(strcmp(tmp+4, "erase") == 0) 	eeEraseAll();
 		else if(strcmp(tmp+4, "heap") == 0) 	heapSize();
 		else if(strcmp(tmp+4, "boot") == 0) 	esp_restart();
-//bouchon		else if(strcmp(tmp+4, "update") == 0) 	update_firmware("new");
+		else if(strcmp(tmp+4, "update") == 0) 	update_firmware("KaRadio32");
 //bouchon		else if(strcmp(tmp+4, "prerelease") == 0) 	update_firmware("prv");
 		else if(startsWith (  "patch",tmp+4)) 	syspatch(tmp);
 		else if(startsWith (  "led",tmp+4)) 	sysled(tmp);

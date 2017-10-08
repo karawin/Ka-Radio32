@@ -16,7 +16,7 @@
 #include "esp_log.h"
 
 #include "fdk_aac_decoder.h"
-#include "libfaad_decoder.h"
+//#include "libfaad_decoder.h"
 #include "mp3_decoder.h"
 //#include "controls.h"
 #include "webclient.h"
@@ -50,14 +50,13 @@ static int start_decoder_task(player_t *player)
             stack_depth = 8448;
             break;
 
-//        case AUDIO_AAC:
-//        case OCTET_STREAM: // probably .aac
-        case AUDIO_MP4:
+ /*       case AUDIO_MP4:
             task_func = libfaac_decoder_task;
             task_name = "libfaac_decoder_task";
             stack_depth = 54000; //55000
-            break;
+            break;*/
 
+		case AUDIO_MP4:
         case AUDIO_AAC:
         case OCTET_STREAM: // probably .aac
             task_func = fdkaac_decoder_task;
