@@ -51,6 +51,9 @@ static char text[BUFFSIZE + 1] = { 0 };
 static int binary_file_length = 0;
 // the get request
 static char http_request[80] = {0};
+/*the header*/
+static char header[BUFFSIZE + 1] = { 0 };
+static int  reclen = 0;
 	
 /*read buffer by byte still delim ,return read bytes counts*/
 static int read_until(char *buffer, char delim, int len)
@@ -189,8 +192,18 @@ static void ota_task(void *pvParameter)
 			kprintf("Error: receive data error! errno=%d\n", errno);
             goto exit;
         } else if (buff_len > 0 && !resp_body_start) { /*deal with response header*/
-            memcpy(ota_write_data, text, buff_len);
+			strncat(header,text,buff_len);
             resp_body_start = read_past_http_header(text, buff_len, update_handle);
+			if (resp_body_start)
+			{
+				char* str = NULL;
+				str=strstr(header,"Content-Length:");
+				if (str!=NULL) reclen = atoi(str+15);
+				ESP_LOGI(TAG, "must receive:%d bytes",reclen);
+				kprintf("must receive:%d bytes\n",reclen);
+			}
+			
+			
         } else if (buff_len > 0 && resp_body_start) { /*deal with response body*/
             memcpy(ota_write_data, text, buff_len);
             err = esp_ota_write( update_handle, (const void *)ota_write_data, buff_len);
@@ -201,11 +214,17 @@ static void ota_task(void *pvParameter)
             }
             binary_file_length += buff_len;
             ESP_LOGD(TAG, "Have written image length %d", binary_file_length);
-			kprintf(".");
+			if (binary_file_length == reclen)
+			{
+				flag = false; // all received, exit
+				ESP_LOGI(TAG, "Connection closed, all packets received");
+				kprintf("\nConnection closed, all packets received\n");
+				close(sockfd);
+			}
         } else if (buff_len == 0) {  /*packet over*/
             flag = false;
-            ESP_LOGI(TAG, "Connection closed, all packets received");
-			kprintf("\nConnection closed, all packets received\n");
+            ESP_LOGI(TAG, "Connection closed, all packets not received");
+			kprintf("\nConnection closed, all packets not received\n");
             close(sockfd);
         } else {
             ESP_LOGE(TAG, "Unexpected recv result");

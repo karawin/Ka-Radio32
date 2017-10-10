@@ -43,7 +43,7 @@ static long fifoOvfCnt, fifoUdrCnt;
 //allocate enough for about one mp3 frame
 #define SPIRAMSIZE (32*1024)
 
-static char fakespiram[SPIRAMSIZE];
+static   char fakespiram[SPIRAMSIZE];
 #define spiRamInit() while(0)
 #define spiRamTest() 1
 #define spiRamWrite(pos, buf, n) memcpy(&fakespiram[pos], buf, n)

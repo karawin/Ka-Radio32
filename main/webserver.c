@@ -34,7 +34,7 @@ const char strsICY[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nCo
 const char strsWIFI[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:%d\r\n\r\n{\"ssid\":\"%s\",\"pasw\":\"%s\",\"ssid2\":\"%s\",\"pasw2\":\"%s\",\"ip\":\"%s\",\"msk\":\"%s\",\"gw\":\"%s\",\"ua\":\"%s\",\"dhcp\":\"%s\",\"mac\":\"%s\"}"};
 const char strsGSTAT[]  = {"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %d\r\n\r\n{\"Name\":\"%s\",\"URL\":\"%s\",\"File\":\"%s\",\"Port\":\"%d\",\"ovol\":\"%d\"}"};
 
-int8_t clientOvol = 0;
+static int8_t clientOvol = 0;
 
 
 void *inmalloc(size_t n)
@@ -62,7 +62,7 @@ void infree(void *p)
 
 
 
-struct servFile* findFile(char* name)
+static struct servFile* findFile(char* name)
 {
 	struct servFile* f = (struct servFile*)&indexFile;
 	while(1)
@@ -74,7 +74,7 @@ struct servFile* findFile(char* name)
 }
 
 
-void respOk(int conn,char* message)
+static void respOk(int conn,char* message)
 {
 	char rempty[] = {""};
 	if (message == NULL) message = rempty;
@@ -89,13 +89,13 @@ void respOk(int conn,char* message)
 	ESP_LOGV(TAG,"respOk exit");
 }
 
-void respKo(int conn)
+static void respKo(int conn)
 {
 //printf("ko\n");
 	write(conn, lowmemory, strlen(lowmemory));
 }
 
-void serveFile(char* name, int conn)
+static void serveFile(char* name, int conn)
 {
 #define PART 1024
 #define LIMIT 128
@@ -160,7 +160,7 @@ void serveFile(char* name, int conn)
 
 
 
-char* getParameter(char* sep,char* param, char* data, uint16_t data_length) {
+static char* getParameter(char* sep,char* param, char* data, uint16_t data_length) {
 	if ((data == NULL) || (param == NULL))return NULL;
 	char* p = strstr(data, param);
 	if(p != NULL) {
@@ -180,15 +180,15 @@ char* getParameter(char* sep,char* param, char* data, uint16_t data_length) {
 		} else return NULL;
 	} else return NULL;
 }
-char* getParameterFromResponse(char* param, char* data, uint16_t data_length) {
+static char* getParameterFromResponse(char* param, char* data, uint16_t data_length) {
 	return getParameter("&",param,data, data_length) ;
 }
-char* getParameterFromComment(char* param, char* data, uint16_t data_length) {
+static char* getParameterFromComment(char* param, char* data, uint16_t data_length) {
 	return getParameter("\"",param,data, data_length) ;
 }
 
 // volume offset
-void clientSetOvol(int8_t ovol)
+static void clientSetOvol(int8_t ovol)
 {
 	clientOvol = ovol;
 	kprintf(PSTR("##CLI.OVOLSET#: %d\n"),ovol);
@@ -217,7 +217,7 @@ void setVolume(char* vol) {
 	}
 }
 // set the current volume with its offset
-void setOffsetVolume(void) {
+static void setOffsetVolume(void) {
 	int16_t uvol = getIvol();
 	uvol += clientOvol;
 	if (uvol > 254) uvol = 254;
@@ -245,7 +245,7 @@ void setRelVolume(int8_t vol) {
 }
 
 // flip flop the theme indicator
-void theme() {
+static void theme() {
 		struct device_settings *device;
 		device = getDeviceSettings();
 		if (device != NULL)	 {
@@ -257,7 +257,7 @@ void theme() {
 }
 
 extern xQueueHandle timer_queue;
-void   sleepCallback(void *pArg) {
+IRAM_ATTR void   sleepCallback(void *pArg) {
 	int timer_idx = (int) pArg;
 	timer_event_t evt;	
 	TIMERG0.int_clr_timers.t0 = 1; //isr ack
@@ -266,7 +266,7 @@ void   sleepCallback(void *pArg) {
         evt.idx = timer_idx;
 	xQueueSendFromISR(timer_queue, &evt, NULL);	
 }
-void   wakeCallback(void *pArg) {
+IRAM_ATTR void   wakeCallback(void *pArg) {
 
 	int timer_idx = (int) pArg;
 	timer_event_t evt;	
@@ -280,7 +280,7 @@ void   wakeCallback(void *pArg) {
 }
 
 
-void startSleep(uint32_t delay)
+static void startSleep(uint32_t delay)
 {
 	ESP_LOGD(TAG,"Delay:%d\n",delay);
 	if (delay == 0) return;
@@ -290,11 +290,11 @@ void startSleep(uint32_t delay)
 	ESP_ERROR_CHECK(timer_set_alarm(TIMERGROUP, sleepTimer,TIMER_ALARM_EN));
 	ESP_ERROR_CHECK(timer_start(TIMERGROUP, sleepTimer));
 }
-void stopSleep(){
+static void stopSleep(){
 	ESP_LOGD(TAG,"stopDelayDelay\n");
 	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, sleepTimer));
 }
-void startWake(uint32_t delay)
+static void startWake(uint32_t delay)
 {
 	ESP_LOGD(TAG,"Wake Delay:%d\n",delay);
 	if (delay == 0) return;
@@ -304,7 +304,7 @@ void startWake(uint32_t delay)
 	ESP_ERROR_CHECK(timer_set_alarm(TIMERGROUP, wakeTimer,TIMER_ALARM_EN));
 	ESP_ERROR_CHECK(timer_start(TIMERGROUP, wakeTimer));	
 }
-void stopWake(){
+static void stopWake(){
 	ESP_LOGD(TAG,"stopDelayWake\n");
 	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, wakeTimer));
 }
@@ -406,7 +406,7 @@ void playStation(char* id) {
 }
 
 // replace special  json char
-void pathParse(char* str)
+static void pathParse(char* str)
 {
 	int i ;
 	char *pend;
@@ -426,7 +426,7 @@ void pathParse(char* str)
 	}
 }
 
-void handlePOST(char* name, char* data, int data_size, int conn) {
+static void handlePOST(char* name, char* data, int data_size, int conn) {
 	ESP_LOGD(TAG,"HandlePost %s\n",name);
 	int i;
 	bool changed = false;
@@ -956,7 +956,7 @@ void handlePOST(char* name, char* data, int data_size, int conn) {
 	respOk(conn,NULL);
 }
 
-bool httpServerHandleConnection(int conn, char* buf, uint16_t buflen) {
+static bool httpServerHandleConnection(int conn, char* buf, uint16_t buflen) {
 	char* c;
 	char* d;
 	ESP_LOGD(TAG,"Heap size: %d",xPortGetFreeHeapSize( ));
@@ -1084,33 +1084,28 @@ bool httpServerHandleConnection(int conn, char* buf, uint16_t buflen) {
 }
 
 
+#define RECLEN	768
+#define DRECLEN (RECLEN*2)
+static char buf[2*RECLEN]; 
 // Server child task to handle a request from a browser.
 void serverclientTask(void *pvParams) {
-#define RECLEN	768
 	struct timeval timeout; 
     timeout.tv_sec = 2000; // bug *1000 for seconds
     timeout.tv_usec = 0;
 	int recbytes ,recb;
 	portBASE_TYPE uxHighWaterMark;
 	int  client_sock =  (int)pvParams;
-	uint16_t reclen = 	RECLEN;	
-    char *buf = (char *)inmalloc(reclen);
+ //   char *buf = (char *)inmalloc(reclen);
 	bool result = true;
 	
-	if (buf == NULL)
-	{
-		vTaskDelay(100);
-		buf = (char *)inmalloc(reclen); // second chance
-	}
-//printf("Client entry  socket:%x  reclen:%d\n",client_sock,reclen);
 	if (buf != NULL)
 	{
-		memset(buf,0,reclen);
+		memset(buf,0,DRECLEN);
 		if (setsockopt (client_sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0)
 			printf(strsSOCKET,"setsockopt",errno);
 
-		while (((recbytes = read(client_sock , buf, reclen)) != 0)) 
-		{ // For now we assume max. reclen bytes for request with 2*reclen extention if needed
+		while (((recbytes = read(client_sock , buf, DRECLEN)) != 0)) 
+		{ // For now we assume max. DRECLEN bytes for request 
 			if (recbytes < 0) {
 				break;
 				if (errno != EAGAIN )
@@ -1126,23 +1121,13 @@ void serverclientTask(void *pvParams) {
 				if (bend != NULL) 
 				{	
 					bend += 4;
-//printf("Server: header len : %d,recbytes = %d,reclen: %d\n%s\nend\n",bend - buf,recbytes,reclen,buf);	
 					if (strstr(buf,"POST") ) //rest of post?
 					{
 						uint16_t cl = atoi(strstr(buf, "Content-Length: ")+16);
-//printf("cl: %d, rec:%s\n",cl,buf);
-						if ((reclen == RECLEN) && ((bend - buf +cl)> reclen))
-						{
-//printf("cl: %d, rec:%d\n",cl,recbytes);
-							buf = realloc(buf,(2*RECLEN) );
-							if (buf == NULL) { printf(strsSOCKET,"realloc",errno);   break;}
-							reclen = 2*RECLEN;
-							bend = strstr(buf, "\r\n\r\n")+4;
-						}
 						vTaskDelay(1);
 						if ((bend - buf +cl)> recbytes)
 						{	
-//printf ("Server: try receive more:%d bytes. reclen = %d, must be %d\n", recbytes,reclen,bend - buf +cl);
+//printf ("Server: try receive more:%d bytes. , must be %d\n", recbytes,bend - buf +cl);
 							while(((recb = read(client_sock , buf+recbytes, cl))==0)){vTaskDelay(1);printf(".");}
 							buf[recbytes+recb] = 0;
 //printf ("Server: received more now: %d bytes, rec:\n%s\nEnd\n", recbytes+recb,buf);
@@ -1164,14 +1149,7 @@ void serverclientTask(void *pvParams) {
 				else { 
 					
 //					printf ("Server: try receive more for end:%d bytes\n", recbytes);					
-					if (reclen == RECLEN) 
-					{
-//						printf ("Server: try receive more for end:%d bytes\n", recbytes);
-						buf = realloc(buf,(2*RECLEN) +1);
-						if (buf == NULL) {printf(strsSOCKET,"Realloc",errno);break;}
-						reclen = 2*RECLEN;
-					}	
-					while(((recb= read(client_sock , buf+recbytes, reclen-recbytes))==0)) vTaskDelay(1);
+					while(((recb= read(client_sock , buf+recbytes, DRECLEN-recbytes))==0)) vTaskDelay(1);
 //					printf ("Server: received more for end now: %d bytes\n", recbytes+recb);
 					if (recb < 0) {
 						respKo(client_sock);
@@ -1181,21 +1159,15 @@ void serverclientTask(void *pvParams) {
 				} //until "\r\n\r\n"
 			} while (bend == NULL);
 			result = httpServerHandleConnection(client_sock, buf, recbytes);
-			if (reclen == 2*RECLEN)
-			{
-				reclen = RECLEN;
-				buf = realloc(buf,reclen);
-				vTaskDelay(10);	
-			}
 			//if (buf == NULL) printf("WARNING\n");
-			memset(buf,0,reclen);
+			memset(buf,0,DRECLEN);
 			if (!result) 
 			{
 				break; // only a websocket created. exit without closing the socket
 			}	
 			vTaskDelay(1);
 		}
-		infree(buf);
+//		infree(buf);
 	} else  printf(strsMALLOC1,"buf");
 	if (result)
 	{

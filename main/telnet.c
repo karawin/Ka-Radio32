@@ -21,14 +21,13 @@ const char strtWELCOME[]  ={"Karadio telnet\n> "};
 
 int telnetclients[NBCLIENTT];
 //set of socket descriptors
-fd_set readfdst;
 // reception buffer
-char brec[256];
-char iac[3];
-bool inIac = false; // if in negociation
-char *obrec;
-uint16_t irec;
-uint8_t iiac;
+static char brec[256];
+static char iac[3];
+static bool inIac = false; // if in negociation
+static char *obrec;
+static uint16_t irec;
+static uint8_t iiac;
 
 ///////////////////////
 // init some data

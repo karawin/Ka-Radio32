@@ -76,22 +76,23 @@ const int CONNECTED_AP  = 0x00000010;
 #define PRIO_CONNECT configMAX_PRIORITIES -1
 #define striWATERMARK  "watermark: %d  heap: %d"
 
-
+void start_network();
 /* */
-EventGroupHandle_t wifi_event_group ;
+static EventGroupHandle_t wifi_event_group ;
 xQueueHandle timer_queue;
-wifi_mode_t mode;
+static wifi_mode_t mode;
 //xSemaphoreHandle print_mux;
-uint16_t FlashOn = 5,FlashOff = 5;
+static uint16_t FlashOn = 5,FlashOff = 5;
 bool ledStatus = true; // true: normal blink, false: led on when playing
 player_t *player_config;
-output_mode_t audio_output_mode; 
-uint8_t clientIvol = 0;
+static output_mode_t audio_output_mode; 
+static uint8_t clientIvol = 0;
 
+//-----------------------------------
 output_mode_t get_audio_output_mode() 
 { return audio_output_mode;}
 
-void i2c_state(char* State)
+static void i2c_state(char* State)
 {
 	SSD1306_GotoXY(2, 30); 
 	SSD1306_DrawRectangle(2, 30, SSD1306_WIDTH - 1, 10, SSD1306_COLOR_BLACK);	
@@ -99,7 +100,7 @@ void i2c_state(char* State)
 	SSD1306_UpdateScreen();
 }
 
-void i2c_test(char* ip)
+static void i2c_test(char* ip)
 {
 	
     char *url = "Stopped";// get_url(); // play_url();
@@ -190,8 +191,6 @@ static renderer_config_t *create_renderer_config()
     return renderer_config;
 }
 
-
-void start_network();
 
 /******************************************************************************
  * FunctionName : checkUart
@@ -697,11 +696,11 @@ void app_main()
     ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
 
 	//start tasks of KaRadio32
-	xTaskCreate(uartInterfaceTask, "uartInterfaceTask", 2000, NULL, 2, &pxCreatedTask); // 350
+	xTaskCreate(uartInterfaceTask, "uartInterfaceTask", 2000, NULL, 2, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","uartInterfaceTask",(unsigned int)pxCreatedTask);
-	xTaskCreate(clientTask, "clientTask", 2300, NULL, configMAX_PRIORITIES -5, &pxCreatedTask); // 340
+	xTaskCreate(clientTask, "clientTask", 2300, NULL, 4, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","clientTask",(unsigned int)pxCreatedTask);	
-    xTaskCreate(serversTask, "serversTask", 2000, NULL, 4, &pxCreatedTask); //380
+    xTaskCreate(serversTask, "serversTask", 2000, NULL, 3, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","serversTask",(unsigned int)pxCreatedTask);	
 	printf("Init ");
 	vTaskDelay(1);

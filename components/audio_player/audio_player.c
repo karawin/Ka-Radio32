@@ -70,16 +70,16 @@ static int start_decoder_task(player_t *player)
             return -1;
     }
 
-    if (xTaskCreatePinnedToCore(task_func, task_name, stack_depth, player,
-    PRIO_MAD, NULL, 1) != pdPASS) {
-        ESP_LOGE(TAG, "ERROR creating decoder task! Out of memory?");
+	if (((task_func != NULL)) && (xTaskCreatePinnedToCore(task_func, task_name, stack_depth, player,
+			PRIO_MAD, NULL, 1) != pdPASS)) {
+		ESP_LOGE(TAG, "ERROR creating decoder task! Out of memory?");
 		spiRamFifoReset();
-        return -1;
-    } else {
-        player->decoder_status = RUNNING;
-    }
+		return -1;
+	} else {
+		player->decoder_status = RUNNING;
+	}
 	
-    ESP_LOGD(TAG, "created decoder task: %s", task_name);
+		ESP_LOGD(TAG, "created decoder task: %s", task_name);
 
     return 0;
 }
@@ -117,7 +117,7 @@ int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read,
 			// buffer is filled, start decoder
 			if (start_decoder_task(player) != 0) {
 				ESP_LOGE(TAG, "failed to start decoder task");
-//				audio_player_stop();
+				audio_player_stop();
 				clientDisconnect("unsupported mime type"); 
 				return -1;
 			}

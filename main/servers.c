@@ -20,7 +20,7 @@
 #define  strsTELNET  "Servers Telnet Socket fails %s errno: %d"
 #define  strsWSOCK  "WebServer Socket fails %s errno: %d"
 
-fd_set readfds;
+static fd_set readfds;
 xSemaphoreHandle semclient = NULL ;
 
 const char strsocket[] = {"Socket"};
@@ -68,6 +68,8 @@ void serversTask(void* pvParams) {
 	int i;
 	telnetinit();
 	websocketinit();
+	uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+	ESP_LOGI(TAG,"watermark: 0x%x  %d",uxHighWaterMark,uxHighWaterMark);
 	while(1)
 	{
 /////////////////////		
@@ -287,8 +289,7 @@ void serversTask(void* pvParams) {
 //					if (--activity ==0) break;
 				}
 			}    				
-			uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-			ESP_LOGI(TAG,"watermark: 0x%x  %d",uxHighWaterMark,uxHighWaterMark);						
+						
 		}			
 					
 	} 

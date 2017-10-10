@@ -110,8 +110,6 @@ uint16_t currentStation = 0;
 static esp_log_level_t s_log_default_level = CONFIG_LOG_BOOTLOADER_LEVEL;
 extern void wsVol(char* vol);
 extern void playStation(char* id);
-extern void setVolume(char* vol);
-extern void setRelVolume(int8_t vol);
 void clientVol(char *s);
 
 #define MAX_WIFI_STATIONS 50

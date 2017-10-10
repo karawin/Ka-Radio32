@@ -36,14 +36,14 @@ extern bool ledStatus;
 
 xSemaphoreHandle sConnect, sConnected, sDisconnect, sHeader;
 
-uint8_t once = 0;
-uint8_t playing = 0;
+static uint8_t once = 0;
+static uint8_t playing = 0;
 
 static const char* icyHeaders[] = { "icy-name:", "icy-notice1:", "icy-notice2:",  "icy-url:", "icy-genre:", "icy-br:","icy-description:","ice-audio-info:", "icy-metaint:" };
 contentType_t contentType;
 
-char notfound[]={"Not Found"};
-char parEmty[] = {" "};
+static char notfound[]={"Not Found"};
+static char parEmpty[] = {" "};
 const char CLIPLAY[]  = {"##CLI.PLAYING#%c%c"};
 const char CLISTOP[]  = {"##CLI.STOPPED# from %s\n"};
 
@@ -57,15 +57,15 @@ const char strcSOCKET[]  = {"WebClient Socket fails %s errno: %d\n"};
 	- IP SETTINGS
 	- VS1053 - DELAY USING vTaskDelay
 */
-struct icyHeader header = {{{NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL}}};
+static struct icyHeader header = {{{NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL}}};
 
-char metaint[10];
-char clientURL[256]= {0,0};
-char clientPath[256] = {0,0};
-uint16_t clientPort = 80;
+static char metaint[10];
+static char clientURL[256]= {0,0};
+static char clientPath[256] = {0,0};
+static uint16_t clientPort = 80;
 
 
-struct hostent *server = NULL;
+static struct hostent *server = NULL;
 
 
 void *incmalloc(size_t n)
@@ -209,7 +209,8 @@ bool clientParsePlaylist(char* s)
    return false;
   }
 }
-char* stringify(char* str,int len)
+//---------------------------------------
+static char* stringify(char* str,int len)
 {
 //		if ((strchr(str,'"') == NULL)&&(strchr(str,'/') == NULL)) return str;
         if (len == 0) return str;
@@ -271,10 +272,10 @@ bool clientPrintMeta()
 
 char* getMeta()
 {
-	return (header.members.mArr[METADATA] == NULL)?parEmty:header.members.mArr[METADATA];
+	return (header.members.mArr[METADATA] == NULL)?parEmpty:header.members.mArr[METADATA];
 }
 
-void removePartOfString(char* origine, char* remove)
+static void removePartOfString(char* origine, char* remove)
 {
 	if (strlen(origine) == 0) return;
 	char* copy = incmalloc(strlen(origine));
@@ -293,7 +294,7 @@ void removePartOfString(char* origine, char* remove)
 }
 
 // A metadata found. Extract the Stream title
-void clientSaveMetadata(char* s,int len)
+static void clientSaveMetadata(char* s,int len)
 {
 		char* t_end = NULL;
 		char* t ,*tt;
@@ -466,7 +467,7 @@ void wsMonitor()
 		}
 }						
 //websocket: broadcast all icy and meta info to web client.
-void wsHeaders()
+static void wsHeaders()
 {
 //remove	uint8_t header_num;
 	char currentSt[6]; 	
@@ -505,7 +506,8 @@ void wsHeaders()
 }	
 
 //Clear all ICY and META infos
-void clearHeaders()
+
+static void clearHeaders()
 {
 	uint8_t header_num;
 	for(header_num=0; header_num<ICY_HEADER_COUNT; header_num++) {
@@ -540,7 +542,7 @@ bool clientPrintHeaders()
 	return true;
 }	
 
-bool clientSaveOneHeader(char* t, uint16_t len, uint8_t header_num)
+static bool clientSaveOneHeader(char* t, uint16_t len, uint8_t header_num)
 {
 	char* tt;
 	if(header.members.mArr[header_num] != NULL) 
@@ -818,13 +820,13 @@ IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
 							if (strchr((t1),0x0A) != NULL)
 								*strchr(t1,0x0A) = 0;
 							
-							ESP_LOGV(TAG,"chunked: %d,  strlen: %d  \"%s\"",chunked,strlen(t1)+1,t1);
+							ESP_LOGD(TAG,"chunked: %d,  strlen: %d  \"%s\"",chunked,strlen(t1)+1,t1);
 							t1 +=strlen(t1)+1; //+1 for char 0, 
 						}
 						
 						int newlen = len - (t1-pdata) ;
 						cchunk = chunked;
-						ESP_LOGV(TAG,"newlen: %d   len: %d   chunked:%d  pdata:%x",newlen,len,chunked,(int)pdata);
+						ESP_LOGD(TAG,"newlen: %d   len: %d   chunked:%d  pdata:%x",newlen,len,chunked,(int)pdata);
 						if(newlen > 0) clientReceiveCallback(sockfd,t1, newlen);
 				} else
 				{
@@ -864,10 +866,9 @@ IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
 					{					
 						while (lc < cchunk+9) 
 						{
-							
 							clen = recvfrom(sockfd, pdata+len, 9, 0,NULL,NULL); 
 							lc+=clen;len+=clen;
-//	printf("more:%d, lc:%d\n",clen,lc);
+							ESP_LOGD(TAG,"more:%d, lc:%d\n",clen,lc);
 						} //security to be sure to receive the new length
 						
 //	printf("leni0:%d, inpdata:%x, chunked:%d  cchunk:%d, lc:%d, \n",len,inpdata,chunked,cchunk, lc );
@@ -877,7 +878,7 @@ IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
 						else {
 /*							printf("0D not found\n");
 							printf("len:%d, inpdata:%x, pdata:%x,chunked:%d  cchunk:%d, lc:%d, str:%s\n",len,inpdata,pdata,chunked,cchunk, lc,inpdata+cchunk );*/
-							clientDisconnect(PSTR("chunk")); clientConnect();
+							clientDisconnect("chunk"); clientConnect();
 							lc = 0; 
 							break;
 						}
@@ -927,7 +928,7 @@ IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
 // meta data computing
 		if (rest <0) 
 		{
-//printf("Negative enter len= %d, metad= %d  rest= %d   pdata= %x :\"%s\"\n",len,metad,rest,pdata,pdata);
+			ESP_LOGD(TAG,"Negative enter len= %d, metad= %d  rest= %d   pdata= %x :\"%s\"\n",len,metad,rest,(int)pdata,pdata);
 			if (len>-rest)
 //				*(pdata+len-rest) = 0; //truncated
 				*(pdata-rest) = 0; //truncated
@@ -991,11 +992,9 @@ if (l > 80) dump(inpdata,len);
 				}	
 				if (metad >0)
 				{		
-//if (getBufferFree() < metad) printf("metaout wait metad: %d, bufferfree: %d\n",metad,getBufferFree());			
-//					while(getBufferFree() < metad)	 // wait some room
-					while(spiRamFifoFree()==0)	 // wait some room
+					if (spiRamFifoFree() < metad) ESP_LOGV(TAG,"metaout wait metad: %d, bufferfree: %d\n",metad,spiRamFifoFree());			
+					while(spiRamFifoFree()<metad)	 // wait some room
 						vTaskDelay(30);
-//					bufferWrite((void *)inpdata, metad); 
 					audio_stream_consumer((char*)inpdata, metad, (void*)player_config);
 				}
 				metad  = header.members.single.metaint;
@@ -1009,12 +1008,10 @@ if (l > 80) dump(inpdata,len);
 				metad = header.members.single.metaint - rest ; //until next
 				if (rest >0)
 				{
-//if (getBufferFree() < rest) printf("metaout wait rest: %d, bufferfree: %d\n",rest,getBufferFree());
-//					while(getBufferFree() < rest)
-					while(spiRamFifoFree()==0)	 // wait some room						
+					if (spiRamFifoFree() < rest) ESP_LOGV(TAG,"metaout wait rest: %d, bufferfree: %d",rest,spiRamFifoFree());			
+					while(spiRamFifoFree()<rest)	 // wait some room						
 						vTaskDelay(30);// 
 					audio_stream_consumer((char*)inpdata, rest, (void*)player_config);					
-//					bufferWrite((uint8_t*)inpdata, rest); 
 				}
 				rest = 0;
 			}	
@@ -1025,12 +1022,10 @@ if (l > 80) dump(inpdata,len);
 //printf("out len = %d, metad = %d  metaint= %d, rest:%d\n",len,metad,header.members.single.metaint,rest);
 			if (len >0) 
 			{
-//printf("metaout wait len: %d\n",len);					
-//				while(getBufferFree() < len) 
-				while(spiRamFifoFree()==0)	 // wait some room	
+				if (spiRamFifoFree() < len) ESP_LOGV(TAG,"metaout wait len: %d, bufferfree: %d\n",len,spiRamFifoFree());							
+				while(spiRamFifoFree()<len)	 // wait some room	
 						vTaskDelay(30); 
 				audio_stream_consumer((char*)pdata+rest, len, (void*)player_config);
-//				bufferWrite((uint8_t*)pdata+rest, len);
 			}			
 		}
 // ---------------			
@@ -1048,7 +1043,8 @@ if (l > 80) dump(inpdata,len);
 
 
 
-//uint8_t bufrec[RECEIVE+10];
+static uint8_t bufrec[RECEIVE+10];
+static char useragent[50];
 
 void clientTask(void *pvParams) { 
 	portBASE_TYPE uxHighWaterMark;
@@ -1056,15 +1052,15 @@ void clientTask(void *pvParams) {
     timeout.tv_usec = 0;
 	int sockfd;
 	int bytes_read;
-	char *useragent;
+//	char *useragent;
 	struct device_settings* device;
 	struct sockaddr_in dest;
-	uint8_t *bufrec;
+//	uint8_t *bufrec;
 	
 	vTaskDelay(300);	
 
-	bufrec = incmalloc(RECEIVE+10);
-	useragent = incmalloc(50);
+//	bufrec = incmalloc(RECEIVE+10);
+//	useragent = incmalloc(50);
 	
 	device = getDeviceSettings();
 	if (device != NULL)
