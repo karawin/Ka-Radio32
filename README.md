@@ -17,7 +17,7 @@ You must install the idf https://github.com/espressif/esp-idf and the toolchain.
 To flash all build output, run 'make flash' or:
 python /home/jp/esp/esp-idf/components/esptool_py/esptool/esptool.py --chip esp32 --port com5 --baud 460800 --before default_reset --after hard_reset write_flash -u --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 /home/jp/esp/Ka-Radio32/build/bootloader/bootloader.bin 0x10000 /home/jp/esp/Ka-Radio32/build/KaRadio32.bin 0x8000 /home/jp/esp/Ka-Radio32/build/partitions.bin
 ```
-
+```
 //-------------------------------//
 // Define GPIO used in KaRadio32 //
 //-------------------------------//
@@ -56,7 +56,7 @@ python /home/jp/esp/esp-idf/components/esptool_py/esptool/esptool.py --chip esp3
 #define PIN_I2S_LRCK GPIO_NUM_25
 #define PIN_I2S_BCLK GPIO_NUM_26
 #define PIN_I2S_DATA GPIO_NUM_22
-
+```
 
 #### First use
 - If the acces point of your router is not known, the webradio inits itself as an AP. Connect the wifi of your computer to the ssid "WifiKaRadio",  
