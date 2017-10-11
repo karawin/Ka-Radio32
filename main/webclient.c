@@ -155,7 +155,7 @@ bool clientParsePlaylist(char* s)
   {
 	ns = str;
     while ((strlen(ns) > 1) && (ns[0]!=0x0A)) ns++;
-	ESP_LOGV(TAG,"EXTM3U: %s\n",ns);
+	ESP_LOGV(TAG,"EXTM3U: %s",ns);
 	s= ns;
   }
   str = strstr(s,"<location>http://");  //for xspf
@@ -765,7 +765,7 @@ IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
 		if (t1 != NULL) { // moved to a new address
 			if( strcmp(t1,"Found")||strcmp(t1,"Temporarily")||strcmp(t1,"Moved"))
 			{
-				ESP_LOGV(TAG,"Header Len=%d,\n %s\n",len,pdata);
+				ESP_LOGV(TAG,"Header Len=%d,\n %s",len,pdata);
 				kprintf(PSTR("Header: Moved%c"),0x0d);
 				clientDisconnect(PSTR("C_HDER"));
 				clientParsePlaylist(pdata);
@@ -779,7 +779,7 @@ IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
 			cstatus = C_HEADER1;
 			do {
 				t1 = strstr(pdata, "\r\n\r\n"); // END OF HEADER
-				ESP_LOGV(TAG,"Header1 len: %d,  Header: %s\n",len,pdata);
+				ESP_LOGV(TAG,"Header1 len: %d,  Header: %s",len,pdata);
 				if ((t1 != NULL) && (t1 <= pdata+len-4)) 
 				{
 						t2 = strstr(pdata, "Internal Server Error"); 
@@ -992,7 +992,7 @@ if (l > 80) dump(inpdata,len);
 				}	
 				if (metad >0)
 				{		
-					if (spiRamFifoFree() < metad) ESP_LOGV(TAG,"metaout wait metad: %d, bufferfree: %d\n",metad,spiRamFifoFree());			
+					if (spiRamFifoFree() < metad) ESP_LOGV(TAG,"metaout wait metad: %d, bufferfree: %d",metad,spiRamFifoFree());			
 					while(spiRamFifoFree()<metad)	 // wait some room
 						vTaskDelay(30);
 					audio_stream_consumer((char*)inpdata, metad, (void*)player_config);
@@ -1022,7 +1022,7 @@ if (l > 80) dump(inpdata,len);
 //printf("out len = %d, metad = %d  metaint= %d, rest:%d\n",len,metad,header.members.single.metaint,rest);
 			if (len >0) 
 			{
-				if (spiRamFifoFree() < len) ESP_LOGV(TAG,"metaout wait len: %d, bufferfree: %d\n",len,spiRamFifoFree());							
+				if (spiRamFifoFree() < len) ESP_LOGV(TAG,"metaout wait len: %d, bufferfree: %d",len,spiRamFifoFree());							
 				while(spiRamFifoFree()<len)	 // wait some room	
 						vTaskDelay(30); 
 				audio_stream_consumer((char*)pdata+rest, len, (void*)player_config);

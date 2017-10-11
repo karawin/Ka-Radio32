@@ -6,7 +6,7 @@ Based on KaraDio for esp8266 and https://github.com/kodera2t/ESP32_OLED_webradio
 Work with i2s or a vs1053<br/>
 Output mode in Setting panel on web page of KaraDio32:<br/>
 I2S for connection to a dac<br/>
-I2SMERU to connect a meru amplifier<br/>
+I2SMERU to connect a merus amplifier<br/>
 DAC to use the built in DAC of the esp32<br/>
 PDM to output a PDM (Pulse Density Modulation) stream<br/>
 VS1053 to connect to a vs1053 board.<br/>
