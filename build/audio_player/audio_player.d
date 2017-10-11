@@ -96,7 +96,10 @@ audio_player.o: \
  C:/msys32/home/jp/esp/Ka-Radio32/components/mp3_decoder/include/mp3_decoder.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/webclient.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h \
+ C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/timer.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_reg.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_struct.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdlib.h:
 
@@ -291,4 +294,10 @@ C:/msys32/home/jp/esp/Ka-Radio32/main/include/webclient.h:
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/timer.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_reg.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_struct.h:
 /home/jp/esp/Ka-Radio32/components/audio_player/./audio_player.c:

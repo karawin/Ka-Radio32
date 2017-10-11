@@ -38,25 +38,10 @@ void serversTask(void* pvParams) {
 	int  client_sock;
 	socklen_t sin_size;
 	
-	timer_config_t config;
-	config.alarm_en = 1;
-    config.auto_reload = 0;
-    config.counter_dir = TIMER_COUNT_UP;
-    config.divider = TIMER_DIVIDER;
-    config.intr_type = TIMER_INTR_LEVEL;
-    config.counter_en = TIMER_PAUSE;
 	
-	    /*Configure timer*/
-    ESP_ERROR_CHECK(timer_init(TIMERGROUP, sleepTimer, &config));
-	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, sleepTimer));
-	ESP_ERROR_CHECK(timer_isr_register(TIMERGROUP, sleepTimer, sleepCallback, (void*) sleepTimer, 0, NULL));
-	
-    ESP_ERROR_CHECK(timer_init(TIMERGROUP, wakeTimer, &config));
-	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, wakeTimer));
-	ESP_ERROR_CHECK(timer_isr_register(TIMERGROUP, wakeTimer, wakeCallback, (void*) wakeTimer, 0, NULL));	
 
-	semclient = xSemaphoreCreateCounting(5,5); 
-	semfile = xSemaphoreCreateCounting(5,5); 
+	semclient = xSemaphoreCreateCounting(3,3); 
+	semfile = xSemaphoreCreateCounting(3,3); 
 	
 	portBASE_TYPE uxHighWaterMark;
 	

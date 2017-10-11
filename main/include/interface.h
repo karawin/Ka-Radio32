@@ -5,12 +5,14 @@
 #include "telnet.h"
 #include "ota.h"
 
-//#define PROGMEM   ICACHE_RODATA_ATTR
+// need this for ported soft to esp32
+#define ESP32_IDF
+
 #define PSTR(s) (s)
 #define MAXDATAT	 256
 
 
-#define RELEASE "0.2"
+#define RELEASE "0.3"
 #define REVISION "0"
 
 uint32_t checkUart(uint32_t speed);

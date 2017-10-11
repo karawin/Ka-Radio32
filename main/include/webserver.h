@@ -20,29 +20,13 @@
 #include "eeprom.h"
 #include "interface.h"
 #include "websocket.h"
-#include "driver/timer.h"
 
-
-#define TIMER_DIVIDER 16 
-#define TIMERGROUP TIMER_GROUP_0 
-#define TIMERVALUE(x) (x*5000000 -7)
-#define sleepTimer  TIMER_0
-#define wakeTimer TIMER_1
-
-//extern os_timer_t sleepTimer;
-extern uint32_t sleepDelay;
-//extern os_timer_t wakeTimer;
-extern uint32_t wakeDelay;
 extern xSemaphoreHandle semclient;
 extern xSemaphoreHandle semfile;
 
 //void serverTask(void *pvParams);
 
-void sleepCallback(void *pArg);
-void wakeCallback(void *pArg);
-//void startSleep(uint32_t delay);
-//void stopSleep();
-//void stopWake();
+
 void serverclientTask(void *pvParams);
 void playStationInt(int sid);
 void websockethandle(int socket, wsopcode_t opcode, uint8_t * payload, size_t length);

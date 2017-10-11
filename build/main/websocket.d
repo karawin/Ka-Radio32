@@ -142,9 +142,6 @@ websocket.o: C:/msys32/home/jp/esp/Ka-Radio32/main/websocket.c \
  C:/msys32/home/jp/esp/Ka-Radio32/components/common/include/common_component.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/websocket.h \
- C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/timer.h \
- C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_reg.h \
- C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_struct.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h:
@@ -432,12 +429,6 @@ C:/msys32/home/jp/esp/Ka-Radio32/components/common/include/common_component.h:
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/websocket.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/timer.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_reg.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_struct.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h:
 /home/jp/esp/Ka-Radio32/main/./websocket.c:

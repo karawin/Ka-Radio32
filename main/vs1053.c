@@ -4,8 +4,8 @@
   * @author  Piotr Sperka
   * @date    07.08.2015
   * @brief   This file provides VS1053 usage and control functions. Based on VS1003 library by Przemyslaw Stasiak.
- * Copyright 2016 karawin (http://www.karawin.fr)
- * added control treble, bass and spacialisation
+  * Copyright 2017 karawin (http://www.karawin.fr) for KaRadio32
+  * added control treble, bass and spacialisation
   ***********************************************************************************************************************
 */
 
@@ -15,6 +15,7 @@
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 
 #include "vs1053.h"
+#include "gpio.h"
 #include "eeprom.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -260,12 +261,11 @@ void VS1053_Start(){
 	struct device_settings *device;
 	int i = 0;
 	
+	VS1053_ResetChip();
 	while(VS1053_checkDREQ() == 0) 
 	{
-		if (i++ >= 400) {vsVersion = 0; ESP_LOGI(TAG,"NO VS1053 detected");return;}
-	}
-	
-	VS1053_ResetChip();
+		if (i++ >= 800) {vsVersion = 0; ESP_LOGI(TAG,"NO VS1053 detected");return;}
+	}	
 // these 4 lines makes board to run on mp3 mode, no soldering required anymore
 	VS1053_WriteRegister16(SPI_WRAMADDR, 0xc017); //address of GPIO_DDR is 0xC017
 	VS1053_WriteRegister16(SPI_WRAM, 0x0003); //GPIO_DDR=3

@@ -12,24 +12,51 @@ PDM to output a PDM (Pulse Density Modulation) stream<br/>
 VS1053 to connect to a vs1053 board.<br/>
 <br/>
 
-
+You must install the idf https://github.com/espressif/esp-idf and the toolchain.
 ```
 To flash all build output, run 'make flash' or:
 python /home/jp/esp/esp-idf/components/esptool_py/esptool/esptool.py --chip esp32 --port com5 --baud 460800 --before default_reset --after hard_reset write_flash -u --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 /home/jp/esp/Ka-Radio32/build/bootloader/bootloader.bin 0x10000 /home/jp/esp/Ka-Radio32/build/KaRadio32.bin 0x8000 /home/jp/esp/Ka-Radio32/build/partitions.bin
 ```
 
-For the VS1053 version:<br/>
-```
-// spi pins<br/>
-#define PIN_NUM_XCS  18<br/>
-#define PIN_NUM_RST  21<br/>
-#define PIN_NUM_XDCS 16<br/>
-#define PIN_NUM_DREQ 17<br/>
+//-------------------------------//
+// Define GPIO used in KaRadio32 //
+//-------------------------------//
+// Compatible ESP32 ADB
+// https://www.tindie.com/products/microwavemont/esp32-audio-developing-board-esp32-adb/
 
-#define PIN_NUM_MISO 19<br/>
-#define PIN_NUM_MOSI 23<br/>
-#define PIN_NUM_CLK  5<br/>
-```
+
+// status led if any.
+//------------------- 
+#define GPIO_LED	GPIO_NUM_4
+
+// gpio of the vs1053
+//-------------------
+#define PIN_NUM_XCS  GPIO_NUM_32
+#define PIN_NUM_RST  GPIO_NUM_21
+#define PIN_NUM_XDCS GPIO_NUM_33
+#define PIN_NUM_DREQ GPIO_NUM_34
+// spi
+#define PIN_NUM_MISO GPIO_NUM_19
+#define PIN_NUM_MOSI GPIO_NUM_23
+#define PIN_NUM_CLK  GPIO_NUM_18
+
+// Encoder knob
+//-------------
+#define PIN_ENC_A   GPIO_NUM_16
+#define PIN_ENC_B   GPIO_NUM_17
+#define PIN_ENC_BTN GPIO_NUM_5
+
+// I2C Oled
+//----------
+#define PIN_I2C_SCL GPIO_NUM_14
+#define PIN_I2C_SDA GPIO_NUM_13
+
+// I2S DAC or PDM
+//----------------
+#define PIN_I2S_LRCK GPIO_NUM_25
+#define PIN_I2S_BCLK GPIO_NUM_26
+#define PIN_I2S_DATA GPIO_NUM_22
+
 
 #### First use
 - If the acces point of your router is not known, the webradio inits itself as an AP. Connect the wifi of your computer to the ssid "WifiKaRadio",  
@@ -42,7 +69,8 @@ For the VS1053 version:<br/>
 
 
 <br/>
-Old readme:<br/>
+<br/>
+original readme:<br/>
 Modified for OLED display support by kodera2t<br/>
 
 Please use latest esp-idf environment (environment just before will make lots error)<br/>

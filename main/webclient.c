@@ -20,7 +20,7 @@
 #include "vs1053.h"
 #include "eeprom.h"
 #include "interface.h"
-#include "gpio16.h"
+#include "gpio.h"
 #include "audio_player.h"
 #include "spiram_fifo.h"
 #include "app_main.h"
@@ -708,7 +708,7 @@ void clientDisconnect(const char* from)
 	kprintf(CLISTOP,from);
 	xSemaphoreGive(sDisconnect);
 	audio_player_stop();
-	if (!ledStatus) gpio4_output_set(1);
+	if (!ledStatus) gpio_set_level(GPIO_LED,0);
 	vTaskDelay(10);
 }
 
@@ -1036,7 +1036,7 @@ if (l > 80) dump(inpdata,len);
 			if (once == 0)vTaskDelay(20);
 			setVolumei(getVolume());
 			kprintf(CLIPLAY,0x0d,0x0a);
-			if (!ledStatus) gpio4_output_set(0);	
+			if (!ledStatus) gpio_set_level(GPIO_LED,1);
 		}
 	}
 }

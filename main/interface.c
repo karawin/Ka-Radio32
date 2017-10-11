@@ -14,7 +14,7 @@
 #include "ntp.h"
 #include "webclient.h"
 #include "webserver.h"
-#include "gpio16.h"
+#include "gpio.h"
 
 #include <driver/adc.h>
 #include "esp_system.h"
@@ -704,7 +704,7 @@ void sysled(char* s)
     }	
 	uint8_t value = atoi(t+2);
 	if (value ==0) 
-	{device->options |= T_LED; ledStatus = false; if (getState()) gpio4_output_set(0);}
+	{device->options |= T_LED; ledStatus = false; if (getState()) gpio_set_level(GPIO_LED,0);}
 	else 
 	{device->options &= NT_LED; ledStatus =true;} // options:0 = ledStatus true = Blink mode
 	

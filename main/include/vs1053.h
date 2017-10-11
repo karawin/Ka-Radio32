@@ -3,34 +3,21 @@
  *
  *  Created on: 25-04-2011
  *      Author: Przemyslaw Stasiak
+ *
+ * Mofified for KaRadio32
+ *		Author: KaraWin
  */
-//#include "stm32f10x.h"
 #pragma once
+#ifndef VS1053_H_
+#define VS1053_H_
+
 #include "esp_system.h"
-//#include "freertos/FreeRTOS.h"
-//#include "stdio.h"
-//#include "stdlib.h"
-//#include "espconn.h"
-//#include "osapi.h"
-//#include "user/spi_ram_buffer.h"
-
-
 
 #define SET 0
 #define RESET 1
 
-#ifndef VS1053_H_
-#define VS1053_H_
+// gpio are defined in gpio.h
 
-// spi pins
-#define PIN_NUM_XCS  18
-#define PIN_NUM_RST  21
-#define PIN_NUM_XDCS 16
-#define PIN_NUM_DREQ 17
-
-#define PIN_NUM_MISO 19
-#define PIN_NUM_MOSI 23
-#define PIN_NUM_CLK  5
 
 #define RXNE    0x01
 #define TXE     0x02

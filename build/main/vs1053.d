@@ -56,6 +56,7 @@ vs1053.o: C:/msys32/home/jp/esp/Ka-Radio32/main/vs1053.c \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtensa-versions.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core-matmap.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/eeprom.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/audio_renderer/include/audio_renderer.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h \
@@ -143,6 +144,9 @@ vs1053.o: C:/msys32/home/jp/esp/Ka-Radio32/main/vs1053.c \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h \
+ C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/timer.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_reg.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_struct.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/audio_player/include/audio_player.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/fifo/include/spiram_fifo.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/common/include/common_buffer.h \
@@ -261,6 +265,8 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtensa-versions.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core-matmap.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/eeprom.h:
 
@@ -435,6 +441,12 @@ C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h:
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/timer.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_reg.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_struct.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/audio_player/include/audio_player.h:
 

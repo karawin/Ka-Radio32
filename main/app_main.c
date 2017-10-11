@@ -47,7 +47,7 @@
 #include "fonts.h"
 #include "ssd1306.h"
 #include "nvs_flash.h"
-#include "gpio16.h"
+#include "gpio.h"
 #include "servers.h"
 #include "webclient.h"
 #include "webserver.h"
@@ -79,7 +79,7 @@ const int CONNECTED_AP  = 0x00000010;
 void start_network();
 /* */
 static EventGroupHandle_t wifi_event_group ;
-xQueueHandle timer_queue;
+xQueueHandle event_queue;
 static wifi_mode_t mode;
 //xSemaphoreHandle print_mux;
 static uint16_t FlashOn = 5,FlashOff = 5;
@@ -88,7 +88,116 @@ player_t *player_config;
 static output_mode_t audio_output_mode; 
 static uint8_t clientIvol = 0;
 
+// disable 1MS timer interrupt
+void noInterrupt1Ms()
+{
+	timer_disable_intr(TIMERGROUP1MS, msTimer);
+}
+// enable 1MS timer interrupt
+void interrupt1Ms()
+{
+	timer_enable_intr(TIMERGROUP1MS, msTimer);
+}
 //-----------------------------------
+IRAM_ATTR void   msCallback(void *pArg) {
+	int timer_idx = (int) pArg;
+	queue_event_t evt;	
+	TIMERG1.hw_timer[timer_idx].update = 1;
+	TIMERG1.int_clr_timers.t0 = 1; //isr ack
+		evt.type = TIMER_1MS;
+        evt.i1 = TIMERGROUP1MS;
+        evt.i2 = timer_idx;
+	xQueueSendFromISR(event_queue, &evt, NULL);	
+	TIMERG1.hw_timer[timer_idx].config.alarm_en = 1;
+}
+
+IRAM_ATTR void   sleepCallback(void *pArg) {
+	int timer_idx = (int) pArg;
+	queue_event_t evt;	
+	TIMERG0.int_clr_timers.t0 = 1; //isr ack
+		evt.type = TIMER_SLEEP;
+        evt.i1 = TIMERGROUP;
+        evt.i2 = timer_idx;
+	xQueueSendFromISR(event_queue, &evt, NULL);	
+	TIMERG0.hw_timer[timer_idx].config.alarm_en = 0;
+}
+IRAM_ATTR void   wakeCallback(void *pArg) {
+
+	int timer_idx = (int) pArg;
+	queue_event_t evt;	
+	TIMERG0.int_clr_timers.t1 = 1;
+        evt.i1 = TIMERGROUP;
+        evt.i2 = timer_idx;
+		evt.type = TIMER_WAKE;
+	xQueueSendFromISR(event_queue, &evt, NULL);
+	TIMERG0.hw_timer[timer_idx].config.alarm_en = 0;
+}
+
+
+void startSleep(uint32_t delay)
+{
+	ESP_LOGD(TAG,"Delay:%d\n",delay);
+	if (delay == 0) return;
+	ESP_ERROR_CHECK(timer_set_counter_value(TIMERGROUP, sleepTimer, 0x00000000ULL));
+	ESP_ERROR_CHECK(timer_set_alarm_value(TIMERGROUP, sleepTimer,TIMERVALUE(delay*60)));
+	ESP_ERROR_CHECK(timer_enable_intr(TIMERGROUP, sleepTimer));
+	ESP_ERROR_CHECK(timer_set_alarm(TIMERGROUP, sleepTimer,TIMER_ALARM_EN));
+	ESP_ERROR_CHECK(timer_start(TIMERGROUP, sleepTimer));
+}
+void stopSleep(){
+	ESP_LOGD(TAG,"stopDelayDelay\n");
+	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, sleepTimer));
+}
+void startWake(uint32_t delay)
+{
+	ESP_LOGD(TAG,"Wake Delay:%d\n",delay);
+	if (delay == 0) return;
+	ESP_ERROR_CHECK(timer_set_counter_value(TIMERGROUP, wakeTimer, 0x00000000ULL));
+	//TIMER_INTERVAL0_SEC * TIMER_SCALE - TIMER_FINE_ADJ
+	ESP_ERROR_CHECK(timer_set_alarm_value(TIMERGROUP, wakeTimer,TIMERVALUE(delay*60)));
+	ESP_ERROR_CHECK(timer_enable_intr(TIMERGROUP, wakeTimer));
+	ESP_ERROR_CHECK(timer_set_alarm(TIMERGROUP, wakeTimer,TIMER_ALARM_EN));
+	ESP_ERROR_CHECK(timer_start(TIMERGROUP, wakeTimer));	
+}
+void stopWake(){
+	ESP_LOGD(TAG,"stopDelayWake\n");
+	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, wakeTimer));
+}
+
+
+void initTimers()
+{
+timer_config_t config;
+	config.alarm_en = 1;
+    config.auto_reload = TIMER_AUTORELOAD_DIS;
+    config.counter_dir = TIMER_COUNT_UP;
+    config.divider = TIMER_DIVIDER;
+    config.intr_type = TIMER_INTR_LEVEL;
+    config.counter_en = TIMER_PAUSE;
+	
+	/*Configure timer sleep*/
+    ESP_ERROR_CHECK(timer_init(TIMERGROUP, sleepTimer, &config));
+	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, sleepTimer));
+	ESP_ERROR_CHECK(timer_isr_register(TIMERGROUP, sleepTimer, sleepCallback, (void*) sleepTimer, 0, NULL));
+	/*Configure timer wake*/
+    ESP_ERROR_CHECK(timer_init(TIMERGROUP, wakeTimer, &config));
+	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, wakeTimer));
+	ESP_ERROR_CHECK(timer_isr_register(TIMERGROUP, wakeTimer, wakeCallback, (void*) wakeTimer, 0, NULL));	
+	/*Configure timer 1MS*/
+	config.auto_reload = TIMER_AUTORELOAD_EN;
+	config.divider = TIMER_DIVIDER1MS;
+	ESP_ERROR_CHECK(timer_init(TIMERGROUP1MS, msTimer, &config));
+	ESP_ERROR_CHECK(timer_pause(TIMERGROUP1MS, msTimer));
+	ESP_ERROR_CHECK(timer_isr_register(TIMERGROUP1MS, msTimer, msCallback, (void*) msTimer, 0, NULL));
+	/* start 1MS timer*/
+	ESP_ERROR_CHECK(timer_set_counter_value(TIMERGROUP1MS, msTimer, 0x00000000ULL));
+	ESP_ERROR_CHECK(timer_set_alarm_value(TIMERGROUP1MS, msTimer,TIMERVALUE1MS(1)));
+	ESP_ERROR_CHECK(timer_enable_intr(TIMERGROUP1MS, msTimer));
+	ESP_ERROR_CHECK(timer_set_alarm(TIMERGROUP1MS, msTimer,TIMER_ALARM_EN));
+	ESP_ERROR_CHECK(timer_start(TIMERGROUP1MS, msTimer));
+}
+
+
 output_mode_t get_audio_output_mode() 
 { return audio_output_mode;}
 
@@ -240,7 +349,7 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
     switch (event->event_id)
     {
     case SYSTEM_EVENT_STA_START:
-		FlashOn = FlashOff = 50;
+		FlashOn = FlashOff = 100;
         esp_wifi_connect();
         break;
 		
@@ -250,14 +359,14 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
 		break;
 
     case SYSTEM_EVENT_STA_GOT_IP:
-		FlashOn = 10;FlashOff = 190;
+		FlashOn = 5;FlashOff = 395;
         xEventGroupSetBits(wifi_event, CONNECTED_BIT);
         break;
 
     case SYSTEM_EVENT_STA_DISCONNECTED:
         /* This is a workaround as ESP32 WiFi libs don't currently
            auto-reassociate. */
-		FlashOn = FlashOff = 50;
+		FlashOn = FlashOff = 100;
 		xEventGroupClearBits(wifi_event, CONNECTED_AP);
         esp_wifi_connect();
         xEventGroupClearBits(wifi_event, CONNECTED_BIT);
@@ -265,7 +374,7 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
         break;
 
 	case SYSTEM_EVENT_AP_START:
-		FlashOn = 10;FlashOff = 190;
+		FlashOn = 5;FlashOff = 395;
 		xEventGroupSetBits(wifi_event, CONNECTED_AP);
 		xEventGroupSetBits(wifi_event, CONNECTED_BIT);
 		break;
@@ -474,46 +583,70 @@ void start_network(){
 
 
 //blinking led and timer isr
-void ledTask(void* p) {
-struct device_settings *device;	
-
-	int uxHighWaterMark;
-
-	gpio4_output_conf();	
+void timerTask(void* p) {
+	struct device_settings *device;	
+	uint32_t ctime = 0;
+	uint32_t cCur;
+	bool stateLed = false;
+//	int uxHighWaterMark;
+	
+	initTimers();
+	
+	gpio_output_conf(GPIO_LED);
+	gpio_set_level(GPIO_LED,0);	
+	cCur = FlashOff*10;
+	
 	while(1) {
-		timer_event_t evt;
-		if (xQueueReceive(timer_queue, &evt, 0))
+		// read and treat the timer queue events
+		queue_event_t evt;
+		while (xQueueReceive(event_queue, &evt, 0))
 		{
-			if(evt.type == TIMER_SLEEP) {
-				printf("timer Sleep\n");
-				clientDisconnect("Timer"); // stop the player
-			}
-			if(evt.type == TIMER_WAKE) {
-				printf("timer Wake\n");
-				clientConnect(); // start the player	
+			switch (evt.type){
+					case TIMER_SLEEP:
+						clientDisconnect("Timer"); // stop the player
+					break;
+					case TIMER_WAKE:
+					clientConnect(); // start the player	
+					break;
+					case TIMER_1MS:
+					  ctime++;					 
+					break;
+					default:
+					break;
 			}
 		}
-		if (ledStatus) gpio4_output_set(0);
-		vTaskDelay(FlashOff ); 
-		
-		if (ledStatus) // on led and save volume if changed
-		{		
-			gpio4_output_set(1);
-			vTaskDelay(FlashOn);
-		}	
-
-		// save volume if changed		
-		device = getDeviceSettings();
-		if (device != NULL)
-		{	
-			if (device->vol != getIvol()){ 			
-				device->vol = getIvol();
-				saveDeviceSettings(device);
-				uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-				ESP_LOGI("ledTask",striWATERMARK,uxHighWaterMark,xPortGetFreeHeapSize( ));
-			}
-			free(device);	
-		}			
+		taskYIELD();
+		if (ledStatus)
+		{
+			
+			if (ctime >= cCur)
+			{
+				taskYIELD();
+				if (stateLed)
+				{
+					gpio_set_level(GPIO_LED,0);	
+					stateLed = false;
+					cCur = FlashOff*10;
+				} else
+				{
+					gpio_set_level(GPIO_LED,1);	
+					stateLed = true;
+					cCur = FlashOn*10;
+					device = getDeviceSettings();
+					if (device != NULL)
+					{	
+						if (device->vol != getIvol()){ 			
+							device->vol = getIvol();
+							taskYIELD();
+							saveDeviceSettings(device);
+//							ESP_LOGD("timerTask",striWATERMARK,uxTaskGetStackHighWaterMark( NULL ),xPortGetFreeHeapSize( ));
+						}
+						free(device);	
+					}											
+				}
+				ctime = 0;
+			}			
+		}
 	}
 //	printf("t0 end\n");
 	vTaskDelete( NULL ); // stop the task (never reached)
@@ -563,7 +696,7 @@ void uartInterfaceTask(void *pvParameters) {
 		checkCommand(t, tmp);
 		
 		uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-		ESP_LOGI("uartInterfaceTask",striWATERMARK,uxHighWaterMark,xPortGetFreeHeapSize( ));
+		ESP_LOGD("uartInterfaceTask",striWATERMARK,uxHighWaterMark,xPortGetFreeHeapSize( ));
 				
 		for(t = 0; t<sizeof(tmp); t++) tmp[t] = 0;
 		t = 0;
@@ -640,13 +773,16 @@ void app_main()
 		saveDeviceSettings(device);
 	}	
 
+	
+	// queur for events of the sleep / wake timers
+	event_queue = xQueueCreate(10, sizeof(queue_event_t));
+	// led blinks
+	xTaskCreate(timerTask, "timerTask",1800, NULL, 1, &pxCreatedTask); 
+	ESP_LOGI(TAG, "%s task: %x","t0",(unsigned int)pxCreatedTask);	
+	
+	
 	// volume
 	setIvol( device->vol);
-	// queur for events of the sleep / wake timers
-	timer_queue = xQueueCreate(10, sizeof(timer_event_t));
-	// led blinks
-	xTaskCreate(ledTask, "ledTask",1800, NULL, 1, &pxCreatedTask); 
-	ESP_LOGI(TAG, "%s task: %x","t0",(unsigned int)pxCreatedTask);	
 	
 	//Display if any	
 	i2c_example_master_init();
@@ -700,7 +836,7 @@ void app_main()
 	ESP_LOGI(TAG, "%s task: %x","uartInterfaceTask",(unsigned int)pxCreatedTask);
 	xTaskCreate(clientTask, "clientTask", 2300, NULL, 4, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","clientTask",(unsigned int)pxCreatedTask);	
-    xTaskCreate(serversTask, "serversTask", 2000, NULL, 3, &pxCreatedTask); 
+    xTaskCreate(serversTask, "serversTask", 2100, NULL, 3, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","serversTask",(unsigned int)pxCreatedTask);	
 	printf("Init ");
 	vTaskDelay(1);
@@ -710,6 +846,7 @@ void app_main()
 		printf(".");
 	}
 	printf(" Done\n");
+	
 	
 	//autostart	
 	kprintf("autostart: playing:%d, currentstation:%d\n",device->autostart,device->currentstation);

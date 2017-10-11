@@ -157,6 +157,9 @@ app_main.o: C:/msys32/home/jp/esp/Ka-Radio32/main/app_main.c \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/icmp6.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/dns.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h \
+ C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/timer.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_reg.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_struct.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/audio_renderer/include/audio_renderer.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/common/include/common_component.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/fifo/include/spiram_fifo.h \
@@ -169,7 +172,7 @@ app_main.o: C:/msys32/home/jp/esp/Ka-Radio32/main/app_main.c \
  C:/msys32/home/jp/esp/Ka-Radio32/components/ssd/include/fonts.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/ssd/include/ssd1306.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/ssd/include/fonts.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio16.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/servers.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/webclient.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/webserver.h \
@@ -181,9 +184,6 @@ app_main.o: C:/msys32/home/jp/esp/Ka-Radio32/main/app_main.c \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/websocket.h \
  C:/msys32/home/jp/esp/esp-idf/components/wpa_supplicant/include/crypto\sha1_i.h \
- C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/timer.h \
- C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_reg.h \
- C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_struct.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h:
@@ -502,6 +502,12 @@ C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/dns.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/timer.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_reg.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_struct.h:
+
 C:/msys32/home/jp/esp/Ka-Radio32/components/audio_renderer/include/audio_renderer.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/common/include/common_component.h:
@@ -526,7 +532,7 @@ C:/msys32/home/jp/esp/Ka-Radio32/components/ssd/include/ssd1306.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/ssd/include/fonts.h:
 
-C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio16.h:
+C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/servers.h:
 
@@ -549,12 +555,6 @@ C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h:
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/websocket.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/wpa_supplicant/include/crypto\sha1_i.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/timer.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_reg.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_struct.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h:
 /home/jp/esp/Ka-Radio32/main/./app_main.c:
