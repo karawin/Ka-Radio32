@@ -252,6 +252,12 @@ bool ClickEncoder::getPinState() {
 }
 
 
-void task_i2sbridge(void *pvParams)
+void task_encoder(void *pvParams)
 {
+	ClickEncoder *encoder;
+	
+	encoder = new ClickEncoder(PIN_ENC_A, PIN_ENC_B, PIN_ENC_BTN);
+	
+	
+	
 }

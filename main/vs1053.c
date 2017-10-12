@@ -206,8 +206,8 @@ void VS1053_ResetChip(){
 	VS1053_spi_write_char(vsspi,&ff,1);
 	vTaskDelay(100);
 	ControlReset(RESET);
-	vTaskDelay(50);
-	while(VS1053_checkDREQ() == 0)taskYIELD ();
+	vTaskDelay(400);
+//	while(VS1053_checkDREQ() == 0)taskYIELD ();
 	vTaskDelay(100);
 }
 

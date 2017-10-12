@@ -61,12 +61,12 @@ const int CONNECTED_BIT = 0x00000001;
 const int CONNECTED_AP  = 0x00000010;
 
 //#define BLINK_GPIO 4
-#define I2C_EXAMPLE_MASTER_SCL_IO    14    /*!< gpio number for I2C master clock */////////////
-#define I2C_EXAMPLE_MASTER_SDA_IO    13    /*!< gpio number for I2C master data  *//////////////
-#define I2C_EXAMPLE_MASTER_NUM I2C_NUM_1   /*!< I2C port number for master dev */
-#define I2C_EXAMPLE_MASTER_TX_BUF_DISABLE   0   /*!< I2C master do not need buffer */
-#define I2C_EXAMPLE_MASTER_RX_BUF_DISABLE   0   /*!< I2C master do not need buffer */
-#define I2C_EXAMPLE_MASTER_FREQ_HZ    100000     /*!< I2C master clock frequency */
+#define I2C_EXAMPLE_MASTER_SCL_IO    PIN_I2C_SCL    /*!< gpio number for I2C master clock */////////////
+#define I2C_EXAMPLE_MASTER_SDA_IO    PIN_I2C_SDA    /*!< gpio number for I2C master data  *//////////////
+#define I2C_EXAMPLE_MASTER_NUM I2C_NUM_1   			/*!< I2C port number for master dev */
+#define I2C_EXAMPLE_MASTER_TX_BUF_DISABLE   0   	/*!< I2C master do not need buffer */
+#define I2C_EXAMPLE_MASTER_RX_BUF_DISABLE   0   	/*!< I2C master do not need buffer */
+#define I2C_EXAMPLE_MASTER_FREQ_HZ    100000    	/*!< I2C master clock frequency */
 
 #define TAG "main"
 
@@ -729,7 +729,9 @@ void app_main()
 
 	//init hardware	
 	partitions_init();
+	ESP_LOGI(TAG, "Partition init done...");
     init_hardware(); 
+	ESP_LOGI(TAG, "Hardware init done...");
 	
 	device = getDeviceSettings();
 	// device partition initialized?
