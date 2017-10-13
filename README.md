@@ -77,6 +77,8 @@ http://karadio.karawin.fr/KaRadio32sup.zip <br/>
 The tool to use is here: http://espressif.com/en/support/download/other-tools <br/>
 (change the security of the installation directory to permit all)<br/>
 See the image at http://karadio.karawin.fr/karawin32Flash.jpg <br/>
+<img src="https://github.com/karawin/Ka-Radio32/blob/master/images/karawin32Flash.jpg" alt="screenshot" border=0> 
+
 <br/><br/>
 original code (w/o OLED) is<br/>
 https://github.com/MrBuddyCasino/ESP32_MP3_Decoder<br/>
