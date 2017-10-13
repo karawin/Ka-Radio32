@@ -70,12 +70,6 @@ python /home/jp/esp/esp-idf/components/esptool_py/esptool/esptool.py --chip esp3
 
 <br/>
 <br/>
-original readme:<br/>
-Modified for OLED display support by kodera2t<br/>
-
-Please use latest esp-idf environment (environment just before will make lots error)<br/>
-
-<br/>
 To flash your KaRadio32 you will need these files:<br/>
 http://karadio.karawin.fr/KaRadio32.bin <br/>
 and<br/>
@@ -86,6 +80,13 @@ See the image at http://karadio.karawin.fr/karawin32Flash.jpg <br/>
 <br/><br/>
 original code (w/o OLED) is<br/>
 https://github.com/MrBuddyCasino/ESP32_MP3_Decoder<br/>
+<br/>
+original readme:<br/>
+Modified for OLED display support by kodera2t<br/>
+
+Please use latest esp-idf environment (environment just before will make lots error)<br/>
+
+
 
 OLED display mode for WiFi Radio/Bluetooth speaker will be set by menuconfig (select BT speaker or Wifi radio)<br/>
 
