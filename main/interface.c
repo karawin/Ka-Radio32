@@ -25,21 +25,21 @@ char parquoteslash[] = {"\")"};
 char msgsys[] = {"##SYS."};
 char msgcli[] = {"##CLI."};
 
-const char stritWIFISTATUS[]  = {"#WIFI.STATUS#\nStatus: %d\nIP: %d.%d.%d.%d\nMask: %d.%d.%d.%d\nGateway: %d.%d.%d.%d\n##WIFI.STATUS#\n"};
-const char stritWIFISTATION[]  = {"\n#WIFI.STATION#\n%s\n%s\n##WIFI.STATION#\n"};
-const char stritPATCH[]  = {"\n##VS1053 Patch will be %s after power Off and On#\n"};
+const char stritWIFISTATUS[]  = {"#WIFI.STATUS#\nIP: %d.%d.%d.%d\nMask: %d.%d.%d.%d\nGateway: %d.%d.%d.%d\n##WIFI.STATUS#\n"};
+const char stritWIFISTATION[]  = {"#WIFI.STATION#\nSSID: %s\nPASSWORD: %s\n##WIFI.STATION#\n"};
+const char stritPATCH[]  = {"#WIFI.PATCH#\nVS1053 Patch will be %s after power Off and On#\n##WIFI.PATCH#\n"};
 const char stritCMDERROR[]  = {"##CMD_ERROR#\n"};
 const char stritHELP0[]  = {" \
 Commands:\n\
 ---------\n\
  Wifi related commands\n\
 //////////////////\n\
-wifi.lis: give the list of received SSID\n\
+wifi.lis or wifi.scan: give the list of received SSID\n\
 wifi.con: Display the AP1 and AP2 SSID\n\
 wifi.con(\"ssid\",\"password\"): Record the given AP ssid with password in AP1 for next reboot\n\
 wifi.discon: disconnect the current ssid\n\
 wifi.station: the current ssid and password\n\
-wifi.status: give #WIFI.STATUS#\n\n\
+wifi.status: give the current IP GW and mask\n\n\
 //////////////////\n\
   Station Client commands\n\
 //////////////////\n\
@@ -221,37 +221,62 @@ void printInfo(char* s)
 {
 	kprintf(PSTR("#INFO:\"%s\"#\n"), s);
 }
-char msg[] = {"#WIFI.LIST#"};
-
-void wifiScanCallback(void *arg, STATUS status)
-{
-	/*
-	if(status == OK)
-	{
-		int i = MAX_WIFI_STATIONS;
-//		char msg[] = {"#WIFI.LIST#"};
-		char* buf;
-		struct bss_info *bss_link = (struct bss_info *) arg;
-//		kprintf(PSTR("\n%s"),msg);
-		buf = malloc(128);
-		if (buf == NULL) return;
-		while(i > 0)
-		{
-			i--;
-			bss_link = bss_link->next.stqe_next;
-			if(bss_link == NULL) break;
-			sprintf(buf, "\n%s;%d;%d;%d", bss_link->ssid, bss_link->channel, bss_link->rssi, bss_link->authmode);
-			kprintf(PSTR("%s\n"),buf);
-		}
-		kprintf(PSTR("\n#%s"),msg);
-		free(buf);
-	}
-	*/
-}
 
 void wifiScan()
 {
-//	wifi_station_scan(NULL, wifiScanCallback);
+// from https://github.com/VALERE91/ESP32_WifiScan
+uint16_t number;
+wifi_ap_record_t *records;
+wifi_scan_config_t config = {
+      .ssid = NULL,
+      .bssid = NULL,
+      .channel = 0,
+      .show_hidden = true
+};
+
+	config.scan_type = WIFI_SCAN_TYPE_PASSIVE;
+	config.scan_time.passive = 500;
+	esp_wifi_scan_start(&config, true);
+	esp_wifi_scan_get_ap_num(&number);
+	records = malloc(sizeof(wifi_ap_record_t) * number);
+	if (records == NULL) return;
+	esp_wifi_scan_get_ap_records(&number, records); // get the records
+	kprintf("#WIFI.SCAN#\n Number of access points found: %d\n",number);
+    if (number == 0) {
+		free (records);
+         return ;
+	}
+	int i;
+	kprintf("=============================================================================\n");
+	kprintf("             SSID                   |    RSSI    |           AUTH            \n");
+	kprintf("=============================================================================\n");
+	for (i=0; i<number; i++) {
+         char *authmode;
+         switch(records[i].authmode) {
+            case WIFI_AUTH_OPEN:
+               authmode = "WIFI_AUTH_OPEN";
+               break;
+            case WIFI_AUTH_WEP:
+               authmode = "WIFI_AUTH_WEP";
+               break;           
+            case WIFI_AUTH_WPA_PSK:
+               authmode = "WIFI_AUTH_WPA_PSK";
+               break;           
+            case WIFI_AUTH_WPA2_PSK:
+               authmode = "WIFI_AUTH_WPA2_PSK";
+               break;           
+            case WIFI_AUTH_WPA_WPA2_PSK:
+               authmode = "WIFI_AUTH_WPA_WPA2_PSK";
+               break;
+            default:
+               authmode = "Unknown";
+               break;
+         }
+         kprintf("%32.32s    |    % 4d    |    %22.22s\n",records[i].ssid, records[i].rssi, authmode);
+	}
+	kprintf("##WIFI.SCAN#: DONE\n");
+
+	free (records);
 }
 
 void wifiConnect(char* cmd)
@@ -289,7 +314,9 @@ void wifiConnect(char* cmd)
 	strncpy( devset->pass1, t, (t_end-t)) ;
 	devset->dhcpEn1 = 1;
 	saveDeviceSettings(devset);
-	kprintf(PSTR("\n##AP1: %s with dhcp on next reset#\n"),devset->ssid1);
+	kprintf("#WIFI.CON#\n");
+	kprintf("\n##AP1: %s with dhcp on next reset#\n",devset->ssid1);
+	kprintf("##WIFI.CON#\n");
 	free(devset);
 }
 
@@ -297,60 +324,34 @@ void wifiConnectMem()
 {
 	
 	struct device_settings* devset = getDeviceSettings();
-	kprintf(PSTR("\n##AP1: %s#"),devset->ssid1);
-	kprintf(PSTR("\n##AP2: %s#\n"),devset->ssid2);
+	kprintf("#WIFI.CON#\n");
+	kprintf("##AP1: %s#",devset->ssid1);
+	kprintf("\n##AP2: %s#\n",devset->ssid2);
+	kprintf("##WIFI.CON#\n");
 	free(devset);
-	 
-/*	int i;
-	struct station_config* cfg = malloc(sizeof(struct station_config));
-	
-	for(i = 0; i < 32; i++) cfg->ssid[i] = 0;
-	for(i = 0; i < 64; i++) cfg->password[i] = 0;
-	cfg->bssid_set = 0;
-	
-	wifi_station_disconnect();
-	
-	struct device_settings* devset = getDeviceSettings();
-	for(i = 0; i < strlen(devset->ssid); i++) cfg->ssid[i] = devset->ssid[i];
-	for(i = 0; i < strlen(devset->pass); i++) cfg->password[i] = devset->pass[i];
-	free(devset);
-
-	wifi_station_set_config(cfg);
-
-	if( wifi_station_connect() ) kprintf(PSTR("\n##WIFI.CONNECTED#"));
-	else kprintf(PSTR("\n##WIFI.NOT_CONNECTED#"));
-	
-	free(cfg);
-	*/
 }
 
 void wifiDisconnect()
 {
-/*	if(wifi_station_disconnect()) kprintf(PSTR("\n##WIFI.NOT_CONNECTED#"));
+	if(esp_wifi_disconnect()!= ESP_OK) kprintf(PSTR("\n##WIFI.NOT_CONNECTED#"));
 	else kprintf(PSTR("\n##WIFI.DISCONNECT_FAILED#"));
-	*/
 }
 
 void wifiStatus()
 {
-	/*
-	struct ip_info ipi;
-	uint8_t t = wifi_station_get_connect_status();	
-	wifi_get_ip_info(0, &ipi);
+	tcpip_adapter_ip_info_t ipi;	
+	tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ipi);
 	kprintf(stritWIFISTATUS,
-			  t, (ipi.ip.addr&0xff), ((ipi.ip.addr>>8)&0xff), ((ipi.ip.addr>>16)&0xff), ((ipi.ip.addr>>24)&0xff),
+			  (ipi.ip.addr&0xff), ((ipi.ip.addr>>8)&0xff), ((ipi.ip.addr>>16)&0xff), ((ipi.ip.addr>>24)&0xff),
 			 (ipi.netmask.addr&0xff), ((ipi.netmask.addr>>8)&0xff), ((ipi.netmask.addr>>16)&0xff), ((ipi.netmask.addr>>24)&0xff),
 			 (ipi.gw.addr&0xff), ((ipi.gw.addr>>8)&0xff), ((ipi.gw.addr>>16)&0xff), ((ipi.gw.addr>>24)&0xff));
-			 */
 }
 
 void wifiGetStation()
 {
-	/*
-	struct station_config cfgg;
-	wifi_station_get_config(&cfgg);
-	kprintf(stritWIFISTATION, cfgg.ssid, cfgg.password);
-	*/
+	wifi_config_t conf;
+	esp_wifi_get_config(ESP_IF_WIFI_STA, &conf);
+	kprintf(stritWIFISTATION, conf.sta.ssid, conf.sta.password);
 }
 
 void clientParseUrl(char* s)
@@ -646,8 +647,9 @@ void clientVol(char *s)
         strncpy(vol, t+2, (t_end-t));
 		if ((atoi(vol)>=0)&&(atoi(vol)<=254))
 		{	
-			setVolumew(vol);	}	
-			free(vol);
+			setVolumew(vol);
+		}	
+		free(vol);
     }	
 }
 
@@ -804,6 +806,7 @@ void checkCommand(int size, char* s)
 	if(startsWith ("wifi.", tmp))
 	{
 		if     (strcmp(tmp+5, "list") == 0) 	wifiScan();
+		else if(strcmp(tmp+5, "scan") == 0) 	wifiScan();
 		else if(strcmp(tmp+5, "con") == 0) 	wifiConnectMem();
 		else if(startsWith ("con", tmp+5)) 	wifiConnect(tmp);
 		else if(strcmp(tmp+5, "discon") == 0) wifiDisconnect();

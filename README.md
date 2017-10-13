@@ -75,6 +75,15 @@ Modified for OLED display support by kodera2t<br/>
 
 Please use latest esp-idf environment (environment just before will make lots error)<br/>
 
+<br/>
+To flash your KaRadio32 you will need these files:<br/>
+http://karadio.karawin.fr/KaRadio32.bin <br/>
+and<br/>
+http://karadio.karawin.fr/KaRadio32sup.zip <br/>
+The tool to use is here: http://espressif.com/en/support/download/other-tools <br/>
+(change the security of the installation directory to permit all)<br/>
+See the image at http://karadio.karawin.fr/karawin32Flash.jpg <br/>
+<br/><br/>
 original code (w/o OLED) is<br/>
 https://github.com/MrBuddyCasino/ESP32_MP3_Decoder<br/>
 

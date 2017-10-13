@@ -26,6 +26,7 @@ char* webInfo();
 char* webList(int id);
 uint16_t getCurrentStation();
 void setCurrentStation( uint16_t vol);
+void clientVol(char *s);
 
 
 #define kprintf(fmt, ...) do {    \

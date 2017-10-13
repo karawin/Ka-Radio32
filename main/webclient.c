@@ -992,9 +992,9 @@ if (l > 80) dump(inpdata,len);
 				}	
 				if (metad >0)
 				{		
-					if (spiRamFifoFree() < metad) ESP_LOGV(TAG,"metaout wait metad: %d, bufferfree: %d",metad,spiRamFifoFree());			
+/*					if (spiRamFifoFree() < metad) ESP_LOGV(TAG,"metaout wait metad: %d, bufferfree: %d",metad,spiRamFifoFree());			
 					while(spiRamFifoFree()<metad)	 // wait some room
-						vTaskDelay(30);
+						vTaskDelay(30);*/
 					audio_stream_consumer((char*)inpdata, metad, (void*)player_config);
 				}
 				metad  = header.members.single.metaint;
@@ -1008,9 +1008,9 @@ if (l > 80) dump(inpdata,len);
 				metad = header.members.single.metaint - rest ; //until next
 				if (rest >0)
 				{
-					if (spiRamFifoFree() < rest) ESP_LOGV(TAG,"metaout wait rest: %d, bufferfree: %d",rest,spiRamFifoFree());			
+/*					if (spiRamFifoFree() < rest) ESP_LOGV(TAG,"metaout wait rest: %d, bufferfree: %d",rest,spiRamFifoFree());			
 					while(spiRamFifoFree()<rest)	 // wait some room						
-						vTaskDelay(30);// 
+						vTaskDelay(30);// */
 					audio_stream_consumer((char*)inpdata, rest, (void*)player_config);					
 				}
 				rest = 0;
@@ -1022,9 +1022,9 @@ if (l > 80) dump(inpdata,len);
 //printf("out len = %d, metad = %d  metaint= %d, rest:%d\n",len,metad,header.members.single.metaint,rest);
 			if (len >0) 
 			{
-				if (spiRamFifoFree() < len) ESP_LOGV(TAG,"metaout wait len: %d, bufferfree: %d",len,spiRamFifoFree());							
+/*				if (spiRamFifoFree() < len) ESP_LOGV(TAG,"metaout wait len: %d, bufferfree: %d",len,spiRamFifoFree());							
 				while(spiRamFifoFree()<len)	 // wait some room	
-						vTaskDelay(30); 
+						vTaskDelay(30); */
 				audio_stream_consumer((char*)pdata+rest, len, (void*)player_config);
 			}			
 		}

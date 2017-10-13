@@ -9,7 +9,7 @@
  */
 
 #include <stdbool.h>
-
+#include <math.h>
 #include "freertos/FreeRTOS.h"
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 #include "esp_log.h"
@@ -87,8 +87,11 @@ static void init_i2s(renderer_config_t *config)
 //KaraDio32
 void renderer_volume(uint32_t vol)
 {
-	if (vol >256) vol = 256;
-	renderer_instance->volume = vol<<8; // *256
+	// log volume (magic)
+	vol = 256  - vol;
+	uint32_t value = (log10(255/((float)vol+1)) * 105.54571334);	
+	if (value > 254) value = 256;
+	renderer_instance->volume = value<<8; // *256
 }
 //-----------
 

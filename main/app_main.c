@@ -1,5 +1,5 @@
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
-
+#include "Arduino.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,6 +30,7 @@
 #include "mdns_task.h"
 #include "audio_player.h"
 
+
 #ifdef CONFIG_BT_SPEAKER_MODE
 #include "bt_speaker.h"
 #endif
@@ -53,6 +54,7 @@
 #include "webserver.h"
 #include "interface.h"
 #include "vs1053.h"
+#include "ClickEncoder.h"
 
 /* The event group allows multiple bits for each event*/
 //   are we connected  to the AP with an IP? */
@@ -609,7 +611,8 @@ void timerTask(void* p) {
 					clientConnect(); // start the player	
 					break;
 					case TIMER_1MS:
-					  ctime++;					 
+					  ctime++;	// for led
+					  if (serviceEncoder != NULL) serviceEncoder(); // for the encoder
 					break;
 					default:
 					break;
@@ -713,6 +716,7 @@ void app_main()
 	xTaskHandle pxCreatedTask;
 	ESP_LOGI(TAG, "starting app_main()");
     ESP_LOGI(TAG, "RAM left: %u", esp_get_free_heap_size());
+	initArduino();
 	const esp_partition_t *running = esp_ota_get_running_partition();
 	ESP_LOGI(TAG, "Running partition type %d subtype %d (offset 0x%08x)",
              running->type, running->subtype, running->address);
@@ -834,12 +838,15 @@ void app_main()
     ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
 
 	//start tasks of KaRadio32
-	xTaskCreate(uartInterfaceTask, "uartInterfaceTask", 2000, NULL, 2, &pxCreatedTask); 
+	xTaskCreate(uartInterfaceTask, "uartInterfaceTask", 2200, NULL, 2, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","uartInterfaceTask",(unsigned int)pxCreatedTask);
 	xTaskCreate(clientTask, "clientTask", 2300, NULL, 4, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","clientTask",(unsigned int)pxCreatedTask);	
     xTaskCreate(serversTask, "serversTask", 2100, NULL, 3, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","serversTask",(unsigned int)pxCreatedTask);	
+	xTaskCreate(task_encoder, "task_encoder", 2100, NULL, 2, &pxCreatedTask); 
+	ESP_LOGI(TAG, "%s task: %x","task_encoder",(unsigned int)pxCreatedTask);
+	
 	printf("Init ");
 	vTaskDelay(1);
 	for (int i=0;i<30;i++)

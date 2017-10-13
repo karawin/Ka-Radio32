@@ -56,18 +56,17 @@
 #endif
 
 // ----------------------------------------------------------------------------
-
-
 typedef gpio_mode_t pinMode_t;
+#undef INPUT
 #define INPUT	GPIO_MODE_INPUT
+#undef INPUT_PULLUP
 #define INPUT_PULLUP GPIO_MODE_INPUT
+#undef LOW
 #define LOW 0
+#undef HIGH
 #define HIGH 1
 #define digitalRead(x) gpio_get_level((gpio_num_t)x)
 
-class ClickEncoder
-{
-public:
   typedef enum Button_e {
     Open = 0,
     Closed,
@@ -81,108 +80,14 @@ public:
     
   } Button;
 
-public:
-  ClickEncoder(int8_t A, int8_t B, int8_t BTN = -1, 
-               uint8_t stepsPerNotch = 4, bool active = LOW);
-
-  void service(void);  
+  void ClickEncoderInit(int8_t A, int8_t B, int8_t BTN );
+  void (*serviceEncoder)();
+  void service(void); 
   int16_t getValue(void);
-
-public:
   Button getButton(void);
-
-protected:
-  int8_t pinA;
-  int8_t pinB;
-  int8_t pinBTN;
-  bool pinsActive;
-  volatile int16_t delta;
-  volatile int16_t last;
-  volatile uint8_t steps;
-  volatile uint16_t acceleration;
-  bool accelerationEnabled;
-#if ENC_DECODER != ENC_NORMAL
-  static const int8_t table[16];
-#endif
-  volatile Button button;
-  bool doubleClickEnabled;
-  bool buttonHeldEnabled;
-  bool buttonOnPinZeroEnabled = false;
-  uint16_t keyDownTicks = 0;
-  uint16_t doubleClickTicks = 0;
-  uint16_t buttonHoldTime = BTN_HOLDTIME;
-  uint16_t buttonDoubleClickTime = BTN_DOUBLECLICKTIME;
-  unsigned long lastButtonCheck = 0;
   bool getPinState();
-
-
-public:
-  void setDoubleClickTime(uint16_t durationMilliseconds)
-  {
-    buttonDoubleClickTime = durationMilliseconds;
-  }
+  void task_encoder(void *pvParams);
   
-public:
-  void setHoldTime(uint16_t durationMilliseconds)
-  {
-    buttonHoldTime = durationMilliseconds;
-  }
-  
-public:
-  void setDoubleClickEnabled(const bool &d)
-  {
-    doubleClickEnabled = d;
-  }
-
-  bool getDoubleClickEnabled()
-  {
-    return doubleClickEnabled;
-  }
-  
-public:
-  void setButtonHeldEnabled(const bool &d)
-  {
-    buttonHeldEnabled = d;
-  }
-
-  bool getButtonHeldEnabled()
-  {
-    return buttonHeldEnabled;
-  }
-  
-public:
-  void setButtonOnPinZeroEnabled(const bool &d)
-  {
-    buttonOnPinZeroEnabled = d;
-  }
-
-  bool getButtonOnPinZeroEnabled()
-  {
-    return buttonOnPinZeroEnabled;
-  }
-
-
-public:
-  void setAccelerationEnabled(const bool &a)
-  {
-    accelerationEnabled = a;
-    if (accelerationEnabled == false) {
-      acceleration = 0;
-    }
-  }
-
-  bool getAccelerationEnabled() 
-  {
-    return accelerationEnabled;
-  }
-
-};
-
-class DigitalButton : public ClickEncoder
-{ 
-  public:
-    explicit DigitalButton(int8_t BTN, bool active = false);  // Constructor for using a button only
-};
 
 
 // ----------------------------------------------------------------------------

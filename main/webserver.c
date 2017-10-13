@@ -197,6 +197,7 @@ static void clientSetOvol(int8_t ovol)
 
 // set the volume with vol,  add offset
 void setVolumei(int16_t vol) {
+	vol += clientOvol;
 	if (vol > 254) vol = 254;
 	if (vol <0) vol = 1;
 	if (get_audio_output_mode() == VS1053) VS1053_SetVolume(vol);

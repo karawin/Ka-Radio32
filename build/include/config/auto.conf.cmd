@@ -1,5 +1,6 @@
 deps_config := \
 	/home/jp/esp/esp-idf/components/app_trace/Kconfig \
+	/home/jp/esp/Ka-Radio32/components/arduino/Kconfig \
 	/home/jp/esp/esp-idf/components/aws_iot/Kconfig \
 	/home/jp/esp/esp-idf/components/bt/Kconfig \
 	/home/jp/esp/esp-idf/components/esp32/Kconfig \

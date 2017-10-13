@@ -204,11 +204,11 @@ void VS1053_ResetChip(){
 	uint8_t ff;
 	ControlReset(SET);
 	VS1053_spi_write_char(vsspi,&ff,1);
-	vTaskDelay(100);
+	vTaskDelay(500);
 	ControlReset(RESET);
-	vTaskDelay(400);
+	vTaskDelay(30);
 //	while(VS1053_checkDREQ() == 0)taskYIELD ();
-	vTaskDelay(100);
+//	vTaskDelay(100);
 }
 
 uint16_t MaskAndShiftRight(uint16_t Source, uint16_t Mask, uint16_t Shift){
@@ -264,7 +264,8 @@ void VS1053_Start(){
 	VS1053_ResetChip();
 	while(VS1053_checkDREQ() == 0) 
 	{
-		if (i++ >= 800) {vsVersion = 0; ESP_LOGI(TAG,"NO VS1053 detected");return;}
+		if (i++ >= 30) {vsVersion = 0; ESP_LOGI(TAG,"NO VS1053 detected");return;}
+		vTaskDelay(1);
 	}	
 // these 4 lines makes board to run on mp3 mode, no soldering required anymore
 	VS1053_WriteRegister16(SPI_WRAMADDR, 0xc017); //address of GPIO_DDR is 0xC017

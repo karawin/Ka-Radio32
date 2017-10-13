@@ -1,6 +1,6 @@
 audio_renderer.o: \
  C:/msys32/home/jp/esp/Ka-Radio32/components/audio_renderer/audio_renderer.c \
- C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/math.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/reent.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/_ansi.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/newlib.h \
@@ -12,6 +12,8 @@ audio_renderer.o: \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/_types.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/_default_types.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/lock.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/_ansi.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdint.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_intsup.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h \
@@ -27,7 +29,6 @@ audio_renderer.o: \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/corebits.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-frames.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdlib.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/_ansi.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/cdefs.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/stdlib.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/alloca.h \
@@ -90,7 +91,7 @@ audio_renderer.o: \
  C:/msys32/home/jp/esp/Ka-Radio32/components/common/include/common_component.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/audio_renderer/include/audio_renderer.h
 
-C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h:
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/math.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/reent.h:
 
@@ -113,6 +114,10 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/_types.h:
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/_default_types.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/lock.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/_ansi.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdint.h:
 
@@ -143,8 +148,6 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/corebits.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-frames.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdlib.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/_ansi.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/cdefs.h:
 
