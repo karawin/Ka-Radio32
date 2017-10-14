@@ -134,13 +134,16 @@ static void serveFile(char* name, int conn)
 			sprintf(buf, "HTTP/1.1 200 OK\r\nContent-Type: %s\r\nContent-Encoding: gzip\r\nContent-Length: %d\r\nConnection: keep-alive\r\n\r\n", (f!=NULL ? f->type : "text/plain"), length);
 			ESP_LOGV(TAG,"serveFile send %d bytes\n%s",strlen(buf),buf);	
 			vTaskDelay(1); // why i need it? Don't know. 
-			write(conn, buf, strlen(buf));
+			if (write(conn, buf, strlen(buf)) == -1) 
+					 {respKo(conn); ESP_LOGE(TAG,"semfile fails 0 errno:%d",errno);xSemaphoreGive(semfile);	return;}
 			progress = length;
 			part = gpart;
 			if (progress <= part) part = progress;
 			while (progress > 0) 
 			{
-				write(conn, content, part);
+				if (write(conn, content, part) == -1) 
+					  {respKo(conn); ESP_LOGE(TAG,"semfile fails 1 errno:%d",errno);xSemaphoreGive(semfile);	return;}
+
 				ESP_LOGV(TAG,"serveFile socket:%d,  read at %x len: %d",conn,(int)content,(int)part);					
 				content += part;
 				progress -= part;
@@ -148,7 +151,7 @@ static void serveFile(char* name, int conn)
 				//vTaskDelay(1);
 			} 
 			xSemaphoreGive(semfile);	
-		} else {respKo(conn); printf(PSTR("semfile fails%c"),0x0D);}
+		} else  {respKo(conn); ESP_LOGE(TAG,"semfile fails 2 errno:%d",errno);xSemaphoreGive(semfile);	return;}
 	}
 	else
 	{
@@ -911,7 +914,7 @@ static bool httpServerHandleConnection(int conn, char* buf, uint16_t buflen) {
 //printf("httpServerHandleConnection  %20c \n",&buf);
 	if( (c = strstr(buf, "GET ")) != NULL)
 	{
-		ESP_LOGV(TAG,"GET socket:%d str:\n%s",conn,buf);
+		ESP_LOGV(TAG,"GET socket:%d len: %d, str:\n%s",conn,buflen,buf);
 		if( ((d = strstr(buf,"Connection:")) !=NULL)&& ((d = strstr(d," Upgrade")) != NULL))
 		{  // a websocket request
 			websocketAccept(conn,buf,buflen);	
@@ -1034,11 +1037,12 @@ static bool httpServerHandleConnection(int conn, char* buf, uint16_t buflen) {
 
 #define RECLEN	768
 #define DRECLEN (RECLEN*2)
-static char buf[2*RECLEN]; 
+
 // Server child task to handle a request from a browser.
 void serverclientTask(void *pvParams) {
 	struct timeval timeout; 
-    timeout.tv_sec = 2000; // bug *1000 for seconds
+	char buf[2*RECLEN]; 
+    timeout.tv_sec = 3000; // bug *1000 for seconds
     timeout.tv_usec = 0;
 	int recbytes ,recb;
 	portBASE_TYPE uxHighWaterMark;
@@ -1080,6 +1084,7 @@ void serverclientTask(void *pvParams) {
 							buf[recbytes+recb] = 0;
 //printf ("Server: received more now: %d bytes, rec:\n%s\nEnd\n", recbytes+recb,buf);
 							if (recb < 0) {
+								ESP_LOGE(TAG,"read fails 0  errno:%d",errno);
 								respKo(client_sock);
 								break;
 /*								if (errno != EAGAIN )
@@ -1100,13 +1105,15 @@ void serverclientTask(void *pvParams) {
 					while(((recb= read(client_sock , buf+recbytes, DRECLEN-recbytes))==0)) vTaskDelay(1);
 //					printf ("Server: received more for end now: %d bytes\n", recbytes+recb);
 					if (recb < 0) {
+						ESP_LOGE(TAG,"read fails 1  errno:%d",errno);
 						respKo(client_sock);
 						break;	
 					}
 					recbytes += recb;
 				} //until "\r\n\r\n"
 			} while (bend == NULL);
-			result = httpServerHandleConnection(client_sock, buf, recbytes);
+			if (bend != NULL)
+				result = httpServerHandleConnection(client_sock, buf, recbytes);
 			//if (buf == NULL) printf("WARNING\n");
 			memset(buf,0,DRECLEN);
 			if (!result) 

@@ -204,9 +204,11 @@ void VS1053_ResetChip(){
 	uint8_t ff;
 	ControlReset(SET);
 	VS1053_spi_write_char(vsspi,&ff,1);
-	vTaskDelay(500);
+	vTaskDelay(200);
 	ControlReset(RESET);
-	vTaskDelay(30);
+	vTaskDelay(10);
+	if (VS1053_checkDREQ() == 1) return;
+	vTaskDelay(100);
 //	while(VS1053_checkDREQ() == 0)taskYIELD ();
 //	vTaskDelay(100);
 }
@@ -264,7 +266,7 @@ void VS1053_Start(){
 	VS1053_ResetChip();
 	while(VS1053_checkDREQ() == 0) 
 	{
-		if (i++ >= 30) {vsVersion = 0; ESP_LOGI(TAG,"NO VS1053 detected");return;}
+		if (i++ >= 20) {vsVersion = 0; ESP_LOGE(TAG,"NO VS1053 detected");return;}
 		vTaskDelay(1);
 	}	
 // these 4 lines makes board to run on mp3 mode, no soldering required anymore

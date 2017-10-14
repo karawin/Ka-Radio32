@@ -54,16 +54,15 @@ static int start_decoder_task(player_t *player)
             task_func = libfaac_decoder_task;
             task_name = "libfaac_decoder_task";
             stack_depth = 54000; //55000
-            break;*/
+            break;
 
-		case AUDIO_MP4:
         case AUDIO_AAC:
         case OCTET_STREAM: // probably .aac
             task_func = fdkaac_decoder_task;
             task_name = "fdkaac_decoder_task";
             stack_depth = 6144; //6144
             break;
-
+*/
         default:
             ESP_LOGW(TAG, "unknown mime type: %d", player->media_stream->content_type);
 			spiRamFifoReset();

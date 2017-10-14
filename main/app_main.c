@@ -718,7 +718,7 @@ void app_main()
     ESP_LOGI(TAG, "RAM left: %u", esp_get_free_heap_size());
 	initArduino();
 	const esp_partition_t *running = esp_ota_get_running_partition();
-	ESP_LOGI(TAG, "Running partition type %d subtype %d (offset 0x%08x)",
+	ESP_LOGE(TAG, "Running partition type %d subtype %d (offset 0x%08x)",
              running->type, running->subtype, running->address);
     // Initialize NVS.
     esp_err_t err = nvs_flash_init();

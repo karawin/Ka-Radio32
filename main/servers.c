@@ -14,7 +14,7 @@
 #include <strings.h>
 #include "driver/timer.h"
 
-#define stack  2500
+#define stack  3700
 #define TAG	"servers"
 
 #define  strsTELNET  "Servers Telnet Socket fails %s errno: %d"
@@ -41,7 +41,7 @@ void serversTask(void* pvParams) {
 	
 
 	semclient = xSemaphoreCreateCounting(3,3); 
-	semfile = xSemaphoreCreateCounting(3,3); 
+	semfile = xSemaphoreCreateCounting(1,1); 
 	
 	portBASE_TYPE uxHighWaterMark;
 	
