@@ -110,7 +110,7 @@ void VS1053_HW_init(){
 	//Initialize non-SPI GPIOs
     gpio_set_direction(PIN_NUM_RST, GPIO_MODE_OUTPUT);
 	gpio_set_direction(PIN_NUM_DREQ, GPIO_MODE_INPUT);
-	gpio_set_pull_mode(PIN_NUM_DREQ, GPIO_PULLUP_ENABLE); //usefull if no vs1053 test
+	gpio_set_pull_mode(PIN_NUM_DREQ, GPIO_PULLDOWN_ENABLE); //usefull for no vs1053 test
 	
 }
 
@@ -222,11 +222,10 @@ void VS1053_regtest()
 	int MP3Status = VS1053_ReadRegister(SPI_STATUS);
 	int MP3Mode = VS1053_ReadRegister(SPI_MODE);
 	int MP3Clock = VS1053_ReadRegister(SPI_CLOCKF);
-	printf(PSTR("SCI_Status  = 0x%X\n"),MP3Status);
-	printf(PSTR("SCI_Mode (0x4800) = 0x%X\n"),MP3Mode);
-	printf("SCI_ClockF = 0x%X\n",MP3Clock);
-//	vsVersion = (MP3Status >> 4) & 0x000F; //Mask out only the four version bits
-	printf("VS Version (VS1053 is 4) = %d\n",vsVersion);
+	ESP_LOGI(TAG,"SCI_Status  = 0x%X",MP3Status);
+	ESP_LOGI(TAG,"SCI_Mode (0x4800) = 0x%X",MP3Mode);
+	ESP_LOGI(TAG,"SCI_ClockF = 0x%X",MP3Clock);
+	ESP_LOGI(TAG,"VS Version (VS1053 is 4) = %d",vsVersion);
 	//The 1053B should respond with 4. VS1001 = 0, VS1011 = 1, VS1002 = 2, VS1003 = 3, VS1054 = 4
 }
 
@@ -261,14 +260,21 @@ void VS1053_HighPower(){
 
 void VS1053_Start(){
 	struct device_settings *device;
-	int i = 0;
+	
+	ControlReset(SET);
+	vTaskDelay(100);
+	ControlReset(RESET);
+	vTaskDelay(200);	
+	//Check DREQ
+	if (VS1053_checkDREQ() == 0)
+	{
+		vsVersion = 0; 
+		ESP_LOGE(TAG,"NO VS1053 detected");
+		return;
+	} 
 	
 	VS1053_ResetChip();
-	while(VS1053_checkDREQ() == 0) 
-	{
-		if (i++ >= 20) {vsVersion = 0; ESP_LOGE(TAG,"NO VS1053 detected");return;}
-		vTaskDelay(1);
-	}	
+	ESP_LOGE(TAG,"VS1053/VS1003 detected");
 // these 4 lines makes board to run on mp3 mode, no soldering required anymore
 	VS1053_WriteRegister16(SPI_WRAMADDR, 0xc017); //address of GPIO_DDR is 0xC017
 	VS1053_WriteRegister16(SPI_WRAM, 0x0003); //GPIO_DDR=3
@@ -288,7 +294,6 @@ void VS1053_Start(){
 		VS1053_WriteRegister16(SPI_CLOCKF,0xB000);
 	
 	VS1053_SoftwareReset();
-	printf("mode: %x\n", (SM_SDINEW|SM_LINE1)| SM_LAYER12);
 	while(VS1053_checkDREQ() == 0)taskYIELD ();
 	
 	VS1053_regtest();

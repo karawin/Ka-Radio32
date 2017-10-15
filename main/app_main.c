@@ -1,5 +1,5 @@
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
-#include "Arduino.h"
+//#include "Arduino.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -29,6 +29,7 @@
 #include "audio_renderer.h"
 #include "mdns_task.h"
 #include "audio_player.h"
+//#include "U8g2lib.h"
 
 
 #ifdef CONFIG_BT_SPEAKER_MODE
@@ -414,8 +415,7 @@ static void start_wifi()
     /* FreeRTOS event group to signal when we are connected & ready to make a request */
 //    EventGroupHandle_t wifi_event_group = xEventGroupCreate();
 
-    /* init wifi & network*/
-    initialise_wifi_and_network();
+
 	
 	device = getDeviceSettings();
 	while (1)
@@ -493,9 +493,9 @@ void start_network(){
 	struct device_settings *device;	
 	tcpip_adapter_ip_info_t info;
 	
-	struct ip4_addr ipAddr;
-	struct ip4_addr mask;
-	struct ip4_addr gate;
+	ip4_addr_t ipAddr;
+	ip4_addr_t mask;
+	ip4_addr_t gate;
 	uint8_t dhcpEn = 0;
 	
 	device = getDeviceSettings();	
@@ -522,6 +522,7 @@ void start_network(){
 			IP4_ADDR(&mask,255,255,255,0);
 	}	
 	
+
 	IPADDR2_COPY(&info.ip,&ipAddr);
 	IPADDR2_COPY(&info.gw,&gate);
 	IPADDR2_COPY(&info.netmask,&mask);	
@@ -540,9 +541,13 @@ void start_network(){
 	{	
 		if ((!dhcpEn) ) // check if ip is valid without dhcp
 		{
-			tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA);  // stop dhcp client	
+
+			tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA);  // stop dhcp client
+			vTaskDelay(1);		
 			tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_STA, &info);
+			IP_SET_TYPE(( ip_addr_t* )&info.gw, IPADDR_TYPE_V4); // mandatory
 			dns_setserver(0,( ip_addr_t* ) &info.gw);
+			dns_setserver(1,( ip_addr_t* ) &info.gw);			
 			//ip_addr_t ipdns = dns_getserver(0);
 			//printf("DNS: %s  \n",ip4addr_ntoa(( struct ip4_addr* ) &ipdns));
 		}
@@ -570,9 +575,9 @@ void start_network(){
 		else
 		{
 			// if static ip	check dns
-//			dns_setserver(0,( ip_addr_t* ) &gate);
-			ip_addr_t ipdns = dns_getserver(0);
-			printf("\nDNS: %s\n",ip4addr_ntoa(( struct ip4_addr* ) &ipdns));
+			ip_addr_t ipdns0 = dns_getserver(0);
+			ip_addr_t ipdns1 = dns_getserver(1);
+			printf("\nDNS: %s   %s\n",ip4addr_ntoa(( struct ip4_addr* ) &ipdns0),ip4addr_ntoa(( struct ip4_addr* ) &ipdns1));
 		}
 	}
 	
@@ -716,7 +721,7 @@ void app_main()
 	xTaskHandle pxCreatedTask;
 	ESP_LOGI(TAG, "starting app_main()");
     ESP_LOGI(TAG, "RAM left: %u", esp_get_free_heap_size());
-	initArduino();
+	//initArduino();
 	const esp_partition_t *running = esp_ota_get_running_partition();
 	ESP_LOGE(TAG, "Running partition type %d subtype %d (offset 0x%08x)",
              running->type, running->subtype, running->address);
@@ -803,6 +808,8 @@ void app_main()
 //-----------------------------
 // start the network
 //-----------------------------
+    /* init wifi & network*/
+    initialise_wifi_and_network();
     start_wifi();
 	start_network();
 	

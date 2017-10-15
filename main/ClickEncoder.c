@@ -8,12 +8,13 @@
 // Timer-based rotary encoder logic by Peter Dannegger
 // http://www.mikrocontroller.net/articles/Drehgeber
 // ----------------------------------------------------------------------------
-
+#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 #include "ClickEncoder.h"
 #include "app_main.h"
 #include "gpio.h"
 #include "webclient.h"
 #include "webserver.h"
+#include "interface.h"
 
 // ----------------------------------------------------------------------------
 // Button configuration (values for 1ms timer service calls)
@@ -52,7 +53,7 @@
   unsigned long lastButtonCheck = 0;
 
 
-
+#define TAG "ClickEncoder"
 
 
 void noInterrupts()
@@ -87,7 +88,7 @@ void ClickEncoderInit(int8_t A, int8_t B, int8_t BTN)
 	gpio_config_t gpio_conf;
 	gpio_conf.mode = GPIO_MODE_INPUT;
 	gpio_conf.pull_up_en =  (pinsActive == LOW) ?GPIO_PULLUP_ENABLE : GPIO_PULLUP_DISABLE;
-	gpio_conf.pull_down_en =  GPIO_PULLDOWN_DISABLE;
+	gpio_conf.pull_down_en = (pinsActive == LOW) ?GPIO_PULLDOWN_DISABLE : GPIO_PULLDOWN_ENABLE;
 	gpio_conf.intr_type = GPIO_INTR_DISABLE;
 	
   if (pinA >= 0) 
@@ -291,8 +292,7 @@ void task_encoder(void *pvParams)
   static int16_t oldValue = 0;
 	
 	ClickEncoderInit(PIN_ENC_A, PIN_ENC_B, PIN_ENC_BTN);
-	serviceEncoder = &service;	
-	uint16_t volume = getVolume();
+	serviceEncoder = &service;	;
 	while (1)
 	{
 		newValue = - getValue();
@@ -311,23 +311,22 @@ void task_encoder(void *pvParams)
 			if (oldValue >0) oldValue--;
 		}
     
-/*		if (newButton != Open)
+		if (getPinState() == pinsActive)
 		{    
-		//    Serial.print("Button: ");Serial.println(newButton);
-			if (newButton == Clicked) {stationOk();}
-			if (newButton == DoubleClicked) {startStop();}
-			if (newButton == Held) {stopStation();}
-		}
-*/
+		    ESP_LOGD(TAG,"Button: %d" ,newButton);
+			//if (newButton == Held) 
+			{
+				if (newValue > 0) wsStationNext();
+				else if (newValue < 0) wsStationPrev();
+			}
+		} else
+
 		if (/*(stateScreen  != sstation)&&*/(newValue != 0))
 		{    
-		//    Serial.print("Value: ");Serial.println(newValue);
-		//    Serial.print("Volume: ");Serial.println(volume+newValue+(oldValue*2));
-			char avolume[5];
-			sprintf(avolume,"%d",volume+newValue+(oldValue*3));
-			clientVol(avolume);
+			ESP_LOGD(TAG,"Enc value: %d, oldValue: %d,  incr volume: %d",newValue, oldValue,newValue+(oldValue*3));
+			setRelVolume(newValue+(oldValue*3));
 		} 		
-		vTaskDelay(100);
+		vTaskDelay(10);
 		oldValue += newValue;
 	}
 	vTaskDelete( NULL ); 
