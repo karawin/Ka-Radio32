@@ -108,9 +108,32 @@ void VS1053_HW_init(){
 	ESP_ERROR_CHECK(spi_bus_add_device(HSPI_HOST, &devcfg, &hvsspi));
 	
 	//Initialize non-SPI GPIOs
-    gpio_set_direction(PIN_NUM_RST, GPIO_MODE_OUTPUT);
-	gpio_set_direction(PIN_NUM_DREQ, GPIO_MODE_INPUT);
-	gpio_set_pull_mode(PIN_NUM_DREQ, GPIO_PULLDOWN_ENABLE); //usefull for no vs1053 test
+	gpio_config_t gpio_conf;
+	
+	gpio_conf.mode = GPIO_MODE_OUTPUT;
+	gpio_conf.pull_up_en =  GPIO_PULLUP_DISABLE;
+	gpio_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+	gpio_conf.intr_type = GPIO_INTR_DISABLE;	
+	//gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<PIN_NUM_XCS));
+	//ESP_ERROR_CHECK(gpio_config(&gpio_conf));
+	//gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<PIN_NUM_XDCS));
+	//ESP_ERROR_CHECK(gpio_config(&gpio_conf));
+	gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<PIN_NUM_RST));
+	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
+	
+    //gpio_set_direction(PIN_NUM_RST, GPIO_MODE_OUTPUT);
+	
+	
+	gpio_conf.mode = GPIO_MODE_INPUT;
+	gpio_conf.pull_up_en =  GPIO_PULLUP_DISABLE;
+	gpio_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
+	gpio_conf.intr_type = GPIO_INTR_DISABLE;	
+	gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<PIN_NUM_DREQ));
+	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
+
+	
+	//gpio_set_direction(PIN_NUM_DREQ, GPIO_MODE_INPUT);
+	//gpio_set_pull_mode(PIN_NUM_DREQ, GPIO_PULLDOWN_ENABLE); //usefull for no vs1053 test
 	
 }
 
@@ -274,7 +297,6 @@ void VS1053_Start(){
 	} 
 	
 	VS1053_ResetChip();
-	ESP_LOGE(TAG,"VS1053/VS1003 detected");
 // these 4 lines makes board to run on mp3 mode, no soldering required anymore
 	VS1053_WriteRegister16(SPI_WRAMADDR, 0xc017); //address of GPIO_DDR is 0xC017
 	VS1053_WriteRegister16(SPI_WRAM, 0x0003); //GPIO_DDR=3
@@ -286,6 +308,7 @@ void VS1053_Start(){
 	vsVersion = (MP3Status >> 4) & 0x000F; //Mask out only the four version bits
 //0 for VS1001, 1 for VS1011, 2 for VS1002, 3 for VS1003, 4 for VS1053 and VS8053,
 //5 for VS1033, 7 for VS1103, and 6 for VS1063	
+	ESP_LOGE(TAG,"VS1053/VS1003 detected. Version: %d",vsVersion);
    if (vsVersion == 4) // only 1053b  	
 //		VS1053_WriteRegister(SPI_CLOCKF,0x78,0x00); // SC_MULT = x3, SC_ADD= x2
 		VS1053_WriteRegister16(SPI_CLOCKF,0xB800); // SC_MULT = x1, SC_ADD= x1

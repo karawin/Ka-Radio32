@@ -1124,9 +1124,9 @@ void clientTask(void *pvParams) {
 				send(sockfd, (char*)bufrec, strlen((char*)bufrec), 0);								
 ///// set timeout
 				if (once == 0)
-					timeout.tv_sec = 10000; // bug *1000 for seconds
+					timeout.tv_sec = 10; 
 				else
-					timeout.tv_sec = 3000; // bug *1000 for seconds
+					timeout.tv_sec = 3; 
 
 				if (setsockopt (sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0)
 					printf(strcSOCKET,"setsockopt",errno);

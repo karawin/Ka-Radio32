@@ -1042,7 +1042,7 @@ static bool httpServerHandleConnection(int conn, char* buf, uint16_t buflen) {
 void serverclientTask(void *pvParams) {
 	struct timeval timeout; 
 	char buf[2*RECLEN]; 
-    timeout.tv_sec = 3000; // bug *1000 for seconds
+    timeout.tv_sec = 3; 
     timeout.tv_usec = 0;
 	int recbytes ,recb;
 	portBASE_TYPE uxHighWaterMark;

@@ -36,7 +36,7 @@ void ntpTask(void *pvParams) {
 bool ntp_get_time(struct tm **dt) {
 	struct timeval timeout; 
     timeout.tv_usec = 0;
-	timeout.tv_sec = 5000;  // bug *1000 for seconds
+	timeout.tv_sec = 5; 
 	int sockfd = 0;
 	ntp_t* ntp;
 	char *msg;

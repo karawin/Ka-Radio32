@@ -388,7 +388,7 @@ void websocketAccept(int wsocket,char* bufin,int buflen)
 int32_t recbytes = 0;
 char *buf = NULL;
 	struct timeval timeout;      
-    timeout.tv_sec = 1000; // bug *1000 for seconds
+    timeout.tv_sec = 1; 
     timeout.tv_usec = 0;	
 	buf = (char *)inwmalloc(MAXDATA);	
 	bufin[buflen] = 0;

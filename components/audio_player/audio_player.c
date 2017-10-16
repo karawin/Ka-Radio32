@@ -103,29 +103,27 @@ int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read,
         spiRamFifoWrite(recv_buf, bytes_read);
     }
 
-//	if (get_audio_output_mode() != VS1053)
-	{
-		int bytes_in_buf = spiRamFifoFill();
-		uint8_t fill_level = (bytes_in_buf * 100) / spiRamFifoLen();
 
-		// seems 4k is enough to prevent initial buffer underflow
-		uint8_t min_fill_lvl = player->buffer_pref == BUF_PREF_FAST ? 20 : 90;
-		bool buffer_ok = fill_level > min_fill_lvl;
-		if (player->decoder_status != RUNNING && buffer_ok) {
+	int bytes_in_buf = spiRamFifoFill();
+	uint8_t fill_level = (bytes_in_buf * 100) / spiRamFifoLen();
 
-			// buffer is filled, start decoder
-			if (start_decoder_task(player) != 0) {
-				ESP_LOGE(TAG, "failed to start decoder task");
-				audio_player_stop();
-				clientDisconnect("unsupported mime type"); 
-				return -1;
-			}
+	// seems 4k is enough to prevent initial buffer underflow
+	uint8_t min_fill_lvl = player->buffer_pref == BUF_PREF_FAST ? 20 : 90;
+	bool buffer_ok = fill_level > min_fill_lvl;
+	if (player->decoder_status != RUNNING && buffer_ok) {
+
+		// buffer is filled, start decoder
+		if (start_decoder_task(player) != 0) {
+			ESP_LOGE(TAG, "failed to start decoder task");
+			audio_player_stop();
+			clientDisconnect("unsupported mime type"); 
+			return -1;
 		}
+	}
 
-		t = (t + 1) & 255;
-		if (t == 0) {
-			ESP_LOGD(TAG, "Buffer fill %u%%, %d bytes", fill_level, bytes_in_buf);
-		}
+	t = (t + 1) & 255;
+	if (t == 0) {
+		ESP_LOGD(TAG, "Buffer fill %u%%, %d bytes", fill_level, bytes_in_buf);
 	}
 
     return 0;
