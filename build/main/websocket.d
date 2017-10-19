@@ -1,44 +1,33 @@
 websocket.o: C:/msys32/home/jp/esp/Ka-Radio32/main/websocket.c \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/string.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/_ansi.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/newlib.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/config.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/ieeefp.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/features.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core-isa.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/cdefs.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/_default_types.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/reent.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/_ansi.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_types.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/_types.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/_default_types.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/lock.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/types.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/types.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/sched.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stdio.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/string.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/cdefs.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/string.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdlib.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/stdlib.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/alloca.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/opt.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/lwipopts.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/time.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/time.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/unistd.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/unistd.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/time.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/fcntl.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_default_fcntl.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stat.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_task.h \
- C:/msys32/home/jp/esp/Ka-Radio32/build/include/sdkconfig.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_system.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdint.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_intsup.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/types.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/types.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/sched.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stdio.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/platform_include/assert.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/build/include/sdkconfig.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdlib.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/stdlib.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/alloca.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_sleep.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/gpio.h \
@@ -68,6 +57,18 @@ websocket.o: C:/msys32/home/jp/esp/Ka-Radio32/main/websocket.c \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtensa-versions.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core-matmap.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h \
+ C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/api.h \
+ C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/opt.h \
+ C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/lwipopts.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/time.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/time.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/unistd.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/unistd.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/time.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/fcntl.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_default_fcntl.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stat.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_task.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/debug.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/arch.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/arch/cc.h \
@@ -99,7 +100,6 @@ websocket.o: C:/msys32/home/jp/esp/Ka-Radio32/main/websocket.c \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/semphr.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/arch/vfs_lwip.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/api.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netbuf.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/pbuf.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/err.h \
@@ -110,8 +110,6 @@ websocket.o: C:/msys32/home/jp/esp/Ka-Radio32/main/websocket.c \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/sys.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/sockets.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/inet.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/dns.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netdb.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/websocket.h \
  C:/msys32/home/jp/esp/esp-idf/components/wpa_supplicant/include/crypto\sha1_i.h \
@@ -119,11 +117,10 @@ websocket.o: C:/msys32/home/jp/esp/Ka-Radio32/main/websocket.c \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/webserver.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/websocket.h
 
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h:
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/string.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/_ansi.h:
 
@@ -137,10 +134,6 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/features.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core-isa.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/cdefs.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/_default_types.h:
-
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/reent.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/_ansi.h:
@@ -149,49 +142,13 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_types.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/_types.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/_default_types.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/lock.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/types.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/types.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/sched.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stdio.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/string.h:
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/cdefs.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/string.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdlib.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/stdlib.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/alloca.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/opt.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/lwipopts.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/time.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/time.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/unistd.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/unistd.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/time.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/fcntl.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_default_fcntl.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stat.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_task.h:
-
-C:/msys32/home/jp/esp/Ka-Radio32/build/include/sdkconfig.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_system.h:
 
@@ -201,7 +158,25 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_intsup.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/types.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/types.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/sched.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stdio.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/newlib/platform_include/assert.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/build/include/sdkconfig.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdlib.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/stdlib.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/alloca.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h:
 
@@ -260,6 +235,30 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtensa-versions.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core-matmap.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/api.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/opt.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/lwipopts.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/time.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/time.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/unistd.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/unistd.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/time.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/fcntl.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_default_fcntl.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stat.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_task.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/debug.h:
 
@@ -323,8 +322,6 @@ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/arch/vfs_lwip.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/api.h:
-
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netbuf.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/pbuf.h:
@@ -345,10 +342,6 @@ C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/sockets.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/inet.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/dns.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netdb.h:
-
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/websocket.h:
@@ -362,8 +355,6 @@ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h:
 C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h:
-
-C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/webserver.h:
 

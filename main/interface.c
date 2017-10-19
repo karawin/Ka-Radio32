@@ -1,12 +1,13 @@
 /******************************************************************************
- * Copyright 2015 Piotr Sperka (http://www.piotrsperka.info)
- * Copyright 2016 karawin (http://www.karawin.fr)
-*/
+ * 
+ * Copyright 2017 karawin (http://www.karawin.fr)
+ *
+*******************************************************************************/
+
+
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 
 #include "interface.h"
-//#include "user_interface.h"
-//#include "osapi.h"
 #include "stdio.h"
 #include "string.h"
 #include "stdlib.h"
@@ -16,12 +17,15 @@
 #include "webserver.h"
 #include "vs1053.h"
 #include "gpio.h"
+#include "ota.h"
+
+
 #include "lwip/sockets.h"
 #include "lwip/dns.h"
 #include "lwip/netdb.h"
 
 #include "esp_system.h"
-#include "esp_log.h"
+
 #include "esp_wifi.h"
 
 char parslashquote[] = {"(\""};

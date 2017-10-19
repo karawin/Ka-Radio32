@@ -5,17 +5,15 @@
 	Main task for the web websocket and telnet servers.
 */
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
+#include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
+#include <stdlib.h> 
 #include "lwip/sockets.h"
 #include "telnet.h"
 #include "websocket.h"
 #include "webserver.h"
 #include "interface.h"
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
-#include <stdlib.h> 
-#include "driver/timer.h"
-
 
 #define stack  3900
 #define TAG	"servers"

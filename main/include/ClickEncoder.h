@@ -15,6 +15,7 @@
 #ifndef __have__ClickEncoder_h__
 #define __have__ClickEncoder_h__
 
+#include "driver/gpio.h"
 // ---Button defaults-------------------------------------------------------------
 
 #define BTN_DOUBLECLICKTIME  400  // second click within 400ms
@@ -23,19 +24,7 @@
 
 // ----------------------------------------------------------------------------
 
-#include <stdlib.h>
-#include <stddef.h>
-#include <inttypes.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <sys/time.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/event_groups.h"
-#include "esp_system.h"
-#include "esp_log.h"
-#include "driver/gpio.h"
+
 
 
 // ----------------------------------------------------------------------------

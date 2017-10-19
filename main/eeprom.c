@@ -1,9 +1,17 @@
+/******************************************************************************
+ * 
+ * Copyright 2017 karawin (http://www.karawin.fr)
+ *
+*******************************************************************************/
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "esp_spi_flash.h"
 #include "esp_partition.h"
 #include "esp_task_wdt.h"
 #include "freertos/FreeRTOS.h"
 #include "esp_log.h"
-#include "driver/uart.h"
+//#include "driver/uart.h"
 
 #include "eeprom.h"
 #include "stdio.h"

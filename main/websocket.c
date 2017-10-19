@@ -6,23 +6,16 @@
 	minimal implementaion for short data messages
 */
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
-#include <stdio.h>
-#include <stdarg.h>
 #include <string.h>
-#include <stdlib.h>
-#include "lwip/opt.h"
-#include "lwip/arch.h"
-#include "lwip/api.h"
 #include "esp_system.h"
+#include "lwip/api.h"
 #include "lwip/sockets.h"
-#include "lwip/dns.h"
-#include "lwip/netdb.h"
 #include "cencode_inc.h"
 #include "websocket.h"
 #include "interface.h"
 #include "webserver.h"
 #include "cencode_inc.h"
-#include <stddef.h> /* for size_t */
+//#include <stddef.h> /* for size_t */
 
 #define TAG	"websocket"
 
@@ -400,9 +393,9 @@ void websocketAccept(int wsocket,char* bufin,int buflen)
 {
 int32_t recbytes = 0;
 char *buf = NULL;
-	struct timeval timeout;      
+/*	struct timeval timeout;      
     timeout.tv_sec = 1; 
-    timeout.tv_usec = 0;	
+    timeout.tv_usec = 0;	*/
 	buf = (char *)inwmalloc(MAXDATA);	
 	bufin[buflen] = 0;
 //printf("ws write accept request entry soc: %d\n",wsocket);

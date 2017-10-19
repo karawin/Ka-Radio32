@@ -3,7 +3,6 @@
 #define INTERFACE_H
 #include "esp_log.h"
 #include "telnet.h"
-#include "ota.h"
 
 // need this for ported soft to esp32
 #define ESP32_IDF

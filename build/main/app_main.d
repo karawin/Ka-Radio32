@@ -184,10 +184,8 @@ app_main.o: C:/msys32/home/jp/esp/Ka-Radio32/main/app_main.c \
  C:/msys32/home/jp/esp/esp-idf/components/wpa_supplicant/include/crypto\sha1_i.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/ClickEncoder.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/inttypes.h
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/ClickEncoder.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h:
 
@@ -559,11 +557,7 @@ C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h:
 
-C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h:
-
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/ClickEncoder.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/inttypes.h:
 /home/jp/esp/Ka-Radio32/main/./app_main.c:

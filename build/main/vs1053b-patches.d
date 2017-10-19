@@ -61,8 +61,7 @@ vs1053b-patches.o: \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h:
 
@@ -187,6 +186,4 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h:
 C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h:
-
-C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h:
 /home/jp/esp/Ka-Radio32/main/./vs1053b-patches.c:

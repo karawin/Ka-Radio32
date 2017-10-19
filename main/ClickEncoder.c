@@ -9,12 +9,19 @@
 // http://www.mikrocontroller.net/articles/Drehgeber
 // ----------------------------------------------------------------------------
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
+#include <stddef.h>
+#include <string.h>
+#include <stdio.h>
+#include <sys/time.h>
 #include "ClickEncoder.h"
 #include "app_main.h"
 #include "gpio.h"
 #include "webclient.h"
 #include "webserver.h"
 #include "interface.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
 
 // ----------------------------------------------------------------------------
 // Button configuration (values for 1ms timer service calls)

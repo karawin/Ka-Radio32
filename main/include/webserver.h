@@ -10,14 +10,10 @@
 #include "freertos/task.h"
 #include "freertos/semphr.h"
 
-
 #include "websocket.h"
 
 extern xSemaphoreHandle semclient;
 extern xSemaphoreHandle semfile;
-
-//void serverTask(void *pvParams);
-
 
 void serverclientTask(void *pvParams);
 void playStationInt(int sid);

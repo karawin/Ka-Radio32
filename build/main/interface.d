@@ -27,7 +27,6 @@ interface.o: C:/msys32/home/jp/esp/Ka-Radio32/main/interface.c \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/types.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/types.h \
@@ -104,6 +103,7 @@ interface.o: C:/msys32/home/jp/esp/Ka-Radio32/main/interface.c \
  C:/msys32/home/jp/esp/esp-idf/components/wpa_supplicant/include/crypto\sha1_i.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/sockets.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/opt.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/lwipopts.h \
@@ -196,8 +196,6 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h:
 C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h:
-
-C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h:
 
@@ -350,6 +348,8 @@ C:/msys32/home/jp/esp/esp-idf/components/wpa_supplicant/include/crypto\sha1_i.h:
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/sockets.h:
 

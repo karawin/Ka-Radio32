@@ -99,22 +99,15 @@ vs1053.o: C:/msys32/home/jp/esp/Ka-Radio32/main/vs1053.c \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/timer.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_reg.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_struct.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/audio_player/include/audio_player.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/fifo/include/spiram_fifo.h \
- C:/msys32/home/jp/esp/Ka-Radio32/components/common/include/common_buffer.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/inttypes.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/task.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/limits.h \
- C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h \
- C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/event_groups.h \
- C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/timers.h \
- C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/task.h \
- C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos\queue.h
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h:
 
@@ -316,8 +309,6 @@ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h:
 
-C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h:
-
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/timer.h:
@@ -330,21 +321,9 @@ C:/msys32/home/jp/esp/Ka-Radio32/components/audio_player/include/audio_player.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/fifo/include/spiram_fifo.h:
 
-C:/msys32/home/jp/esp/Ka-Radio32/components/common/include/common_buffer.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/inttypes.h:
-
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/task.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/limits.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/event_groups.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/timers.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/task.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos\queue.h:
 /home/jp/esp/Ka-Radio32/main/./vs1053.c:

@@ -3,10 +3,8 @@
 */
 
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
-#include <stdio.h>
-#include <stdlib.h>
+
 #include <string.h>
-#include <stdbool.h>
 #include "interface.h"
 #include "webserver.h"
 #include "serv-fs.h"
@@ -20,16 +18,13 @@
 #include "esp_system.h"
 #include "webclient.h"
 #include "vs1053.h"
+#include "eeprom.h"
+#include "interface.h"
 
 #include "lwip/opt.h"
 #include "lwip/arch.h"
 #include "lwip/api.h"
-
 #include "lwip/sockets.h"
-#include "lwip/dns.h"
-#include "lwip/netdb.h"
-#include "eeprom.h"
-#include "interface.h"
 
 
 #define TAG "webserver"

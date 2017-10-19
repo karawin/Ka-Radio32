@@ -6,14 +6,10 @@
 
 #include "webclient.h"
 #include "webserver.h"
-#include <stdio.h>
-#include <stdarg.h>
 #include <string.h>
-#include <stdlib.h>
 #include "lwip/sockets.h"
 #include "lwip/api.h"
 #include "lwip/netdb.h"
-
 
 #include "freertos/semphr.h"
 

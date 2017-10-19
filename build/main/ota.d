@@ -117,7 +117,6 @@ ota.o: C:/msys32/home/jp/esp/Ka-Radio32/main/ota.c \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netdb.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/webclient.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/string.h:
@@ -355,8 +354,6 @@ C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netdb.h:
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h:
-
-C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/webclient.h:
 /home/jp/esp/Ka-Radio32/main/./ota.c:

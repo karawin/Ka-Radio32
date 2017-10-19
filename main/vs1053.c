@@ -17,8 +17,6 @@
 #include "vs1053.h"
 #include "gpio.h"
 #include "eeprom.h"
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include "driver/spi_master.h"
 #include "soc/gpio_struct.h"
@@ -28,11 +26,11 @@
 #include "app_main.h"
 #include "audio_player.h"
 #include "spiram_fifo.h"
-#include "common_buffer.h"
+//#include "common_buffer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "freertos/event_groups.h"
-#include "freertos\queue.h"
+//#include "freertos/event_groups.h"
+//#include "freertos\queue.h"
 
 extern void  LoadUserCodes(void);
 
