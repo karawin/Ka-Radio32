@@ -5,15 +5,26 @@
 	quick and dirty websocket inplementation for wifi webradio
 	minimal implementaion for short data messages
 */
+#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
+#include "lwip/opt.h"
+#include "lwip/arch.h"
+#include "lwip/api.h"
+#include "esp_system.h"
+#include "lwip/sockets.h"
+#include "lwip/dns.h"
+#include "lwip/netdb.h"
+#include "cencode_inc.h"
 #include "websocket.h"
 #include "interface.h"
 #include "webserver.h"
 #include "cencode_inc.h"
+#include <stddef.h> /* for size_t */
 
+#define TAG	"websocket"
 
 char strwMALLOC[]  = {"inwmalloc fails for %d\n"};
 char strwMALLOC1[]  = {"Websocket %s malloc fails\n"};
@@ -363,6 +374,7 @@ void websocketwrite(int socket, char* buf, int len)
 void websocketbroadcast(char* buf, int len)
 {
 	int i ;
+	ESP_LOGD(TAG,"websocketbroadcast: %s",buf);
 	for (i = 0;i<NBCLIENT;i++)	
 		if (iswebsocket( webserverclients[i].socket))
 		{
@@ -374,6 +386,7 @@ void websocketbroadcast(char* buf, int len)
 void websocketlimitedbroadcast(int socket,char* buf, int len)
 {
 	int i ;
+	ESP_LOGD(TAG,"websocketlimitedbroadcast: %s",buf);
 	for (i = 0;i<NBCLIENT;i++)	
 		if (iswebsocket( webserverclients[i].socket))
 		{

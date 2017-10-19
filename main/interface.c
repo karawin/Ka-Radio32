@@ -14,11 +14,15 @@
 #include "ntp.h"
 #include "webclient.h"
 #include "webserver.h"
+#include "vs1053.h"
 #include "gpio.h"
+#include "lwip/sockets.h"
+#include "lwip/dns.h"
+#include "lwip/netdb.h"
 
-#include <driver/adc.h>
 #include "esp_system.h"
 #include "esp_log.h"
+#include "esp_wifi.h"
 
 char parslashquote[] = {"(\""};
 char parquoteslash[] = {"\")"};

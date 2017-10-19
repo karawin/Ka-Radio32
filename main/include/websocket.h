@@ -12,14 +12,7 @@ Inspirated by:
 // max size of the WS Message Header
 #define WEBSOCKETS_MAX_HEADER_SIZE  (14)
 
-#include "lwip/opt.h"
-#include "lwip/arch.h"
-#include "lwip/api.h"
-#include "esp_system.h"
-#include "lwip/sockets.h"
-#include "lwip/dns.h"
-#include "lwip/netdb.h"
-#include "cencode_inc.h"
+
 
 typedef  uint32_t u32;
 #include "crypto\sha1_i.h"

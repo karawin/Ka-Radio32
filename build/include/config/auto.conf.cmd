@@ -1,6 +1,5 @@
 deps_config := \
 	/home/jp/esp/esp-idf/components/app_trace/Kconfig \
-	/home/jp/esp/Ka-Radio32/components/arduino/Kconfig \
 	/home/jp/esp/esp-idf/components/aws_iot/Kconfig \
 	/home/jp/esp/esp-idf/components/bt/Kconfig \
 	/home/jp/esp/esp-idf/components/esp32/Kconfig \
@@ -8,6 +7,7 @@ deps_config := \
 	/home/jp/esp/esp-idf/components/fatfs/Kconfig \
 	/home/jp/esp/esp-idf/components/freertos/Kconfig \
 	/home/jp/esp/esp-idf/components/heap/Kconfig \
+	/home/jp/esp/esp-idf/components/libsodium/Kconfig \
 	/home/jp/esp/esp-idf/components/log/Kconfig \
 	/home/jp/esp/esp-idf/components/lwip/Kconfig \
 	/home/jp/esp/esp-idf/components/mbedtls/Kconfig \

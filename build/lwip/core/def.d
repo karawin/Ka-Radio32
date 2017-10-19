@@ -22,6 +22,8 @@ core/def.o: C:/msys32/home/jp/esp/esp-idf/components/lwip/core/def.c \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/types.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/types.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/sched.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/unistd.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/unistd.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/time.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/fcntl.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_default_fcntl.h \
@@ -94,6 +96,7 @@ core/def.o: C:/msys32/home/jp/esp/esp-idf/components/lwip/core/def.c \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/semphr.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h \
+ C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/arch/vfs_lwip.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/def.h
 
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/opt.h:
@@ -141,6 +144,10 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/types.h:
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/types.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/sched.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/unistd.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/unistd.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/time.h:
 
@@ -285,6 +292,8 @@ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h:
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/semphr.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/arch/vfs_lwip.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/def.h:
 /home/jp/esp/esp-idf/components/lwip/core/def.c:

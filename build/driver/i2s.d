@@ -14,6 +14,7 @@ i2s.o: C:/msys32/home/jp/esp/esp-idf/components/driver/i2s.c \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/lock.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/cdefs.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/string.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/math.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_types.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdint.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_intsup.h \
@@ -81,6 +82,8 @@ i2s.o: C:/msys32/home/jp/esp/esp-idf/components/driver/i2s.c \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_dport_access.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc_cntl_reg.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/sens_reg.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/efuse_reg.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/lldesc.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/queue.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/i2s.h \
@@ -125,6 +128,8 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/lock.h:
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/cdefs.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/string.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/math.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_types.h:
 
@@ -259,6 +264,10 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_dport_access.h:
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc_cntl_reg.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/sens_reg.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/efuse_reg.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/lldesc.h:
 

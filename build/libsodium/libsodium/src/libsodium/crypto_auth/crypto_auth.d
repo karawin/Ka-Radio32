@@ -1,7 +1,9 @@
 libsodium/src/libsodium/crypto_auth/crypto_auth.o: \
  C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/crypto_auth/crypto_auth.c \
- C:/msys32/home/jp/esp/esp-idf/components/libsodium/port_include/sodium/crypto_auth.h \
- C:/msys32/home/jp/esp/esp-idf/components/libsodium/port_include/sodium/crypto_hash_sha512.h \
+ C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_auth.h \
+ C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_auth_hmacsha512256.h \
+ C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_auth_hmacsha512.h \
+ C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_hash_sha512.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdint.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/_default_types.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/features.h \
@@ -20,27 +22,19 @@ libsodium/src/libsodium/crypto_auth/crypto_auth.o: \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/cdefs.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/stdlib.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/alloca.h \
- C:/msys32/home/jp/esp/esp-idf/components/mbedtls/include/mbedtls/sha512.h \
- C:/msys32/home/jp/esp/esp-idf/components/mbedtls/port/include/mbedtls/esp_config.h \
- C:/msys32/home/jp/esp/Ka-Radio32/build/include/sdkconfig.h \
- C:/msys32/home/jp/esp/esp-idf/components/mbedtls/include/mbedtls/check_config.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/limits.h \
- C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/export.h \
- C:/msys32/home/jp/esp/esp-idf/components/libsodium/port_include/sodium/crypto_hash_sha256.h \
- C:/msys32/home/jp/esp/esp-idf/components/mbedtls/include/mbedtls/sha256.h \
- C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_auth.h \
- C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_auth_hmacsha512256.h \
- C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_auth_hmacsha512.h \
- C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_hash_sha512.h \
  C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/export.h \
  C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/randombytes.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/types.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/types.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/sched.h
 
-C:/msys32/home/jp/esp/esp-idf/components/libsodium/port_include/sodium/crypto_auth.h:
+C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_auth.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/libsodium/port_include/sodium/crypto_hash_sha512.h:
+C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_auth_hmacsha512256.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_auth_hmacsha512.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_hash_sha512.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdint.h:
 
@@ -77,30 +71,6 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/cdefs.h:
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/stdlib.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/alloca.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/mbedtls/include/mbedtls/sha512.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/mbedtls/port/include/mbedtls/esp_config.h:
-
-C:/msys32/home/jp/esp/Ka-Radio32/build/include/sdkconfig.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/mbedtls/include/mbedtls/check_config.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/limits.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/export.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/libsodium/port_include/sodium/crypto_hash_sha256.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/mbedtls/include/mbedtls/sha256.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_auth.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_auth_hmacsha512256.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_auth_hmacsha512.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_hash_sha512.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/export.h:
 

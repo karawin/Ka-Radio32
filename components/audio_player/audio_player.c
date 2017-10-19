@@ -39,7 +39,7 @@ static int start_decoder_task(player_t *player)
 	if (get_audio_output_mode() == VS1053)
 	{
 		task_func = vsTask;
-        task_name = "t2";
+        task_name = "vsTask";
         stack_depth = 2800;
 	} else
     switch (player->media_stream->content_type)
@@ -108,7 +108,7 @@ int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read,
 	uint8_t fill_level = (bytes_in_buf * 100) / spiRamFifoLen();
 
 	// seems 4k is enough to prevent initial buffer underflow
-	uint8_t min_fill_lvl = player->buffer_pref == BUF_PREF_FAST ? 20 : 90;
+	uint8_t min_fill_lvl = player->buffer_pref == BUF_PREF_FAST ? 40 : 90;
 	bool buffer_ok = fill_level > min_fill_lvl;
 	if (player->decoder_status != RUNNING && buffer_ok) {
 
@@ -123,7 +123,7 @@ int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read,
 
 	t = (t + 1) & 255;
 	if (t == 0) {
-		ESP_LOGD(TAG, "Buffer fill %u%%, %d bytes", fill_level, bytes_in_buf);
+		ESP_LOGV(TAG, "Buffer fill %u%%, %d bytes", fill_level, bytes_in_buf);
 	}
 
     return 0;

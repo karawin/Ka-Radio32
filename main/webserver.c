@@ -16,6 +16,21 @@
 #include "audio_renderer.h"
 #include "app_main.h"
 #include "ota.h"
+#include "esp_wifi.h"
+#include "esp_system.h"
+#include "webclient.h"
+#include "vs1053.h"
+
+#include "lwip/opt.h"
+#include "lwip/arch.h"
+#include "lwip/api.h"
+
+#include "lwip/sockets.h"
+#include "lwip/dns.h"
+#include "lwip/netdb.h"
+#include "eeprom.h"
+#include "interface.h"
+
 
 #define TAG "webserver"
 
@@ -1139,7 +1154,7 @@ void serverclientTask(void *pvParams) {
 	xSemaphoreGive(semclient);	
 	ESP_LOGV(TAG,"Give client_sock: %d",client_sock);		
 	uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-	ESP_LOGI(TAG,"watermark serverClientTask: %x  %d",uxHighWaterMark,uxHighWaterMark);	
+	ESP_LOGD(TAG,"watermark serverClientTask: %x  %d",uxHighWaterMark,uxHighWaterMark);	
 
 
 	ESP_LOGV(TAG,"Client exit socket:%d result %d \n",client_sock,result);

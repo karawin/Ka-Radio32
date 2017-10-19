@@ -6,19 +6,11 @@
 #ifndef __WEBSERVER_H__
 #define __WEBSERVER_H__
 
-#include "esp_system.h"
-#include "webclient.h"
-#include "vs1053.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/semphr.h"
 
-#include "lwip/opt.h"
-#include "lwip/arch.h"
-#include "lwip/api.h"
 
-#include "lwip/sockets.h"
-#include "lwip/dns.h"
-#include "lwip/netdb.h"
-#include "eeprom.h"
-#include "interface.h"
 #include "websocket.h"
 
 extern xSemaphoreHandle semclient;

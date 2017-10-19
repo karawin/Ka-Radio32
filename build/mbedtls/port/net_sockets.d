@@ -53,6 +53,8 @@ port/net_sockets.o: \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/sockets.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/opt.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/lwipopts.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/unistd.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/unistd.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/time.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/fcntl.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_default_fcntl.h \
@@ -119,14 +121,13 @@ port/net_sockets.o: \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/semphr.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h \
+ C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/arch/vfs_lwip.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/ip_addr.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/def.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/ip4_addr.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/ip6_addr.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/err.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/inet.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/unistd.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/unistd.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/posix/netdb.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netdb.h
 
@@ -235,6 +236,10 @@ C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/sockets.h:
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/opt.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/lwipopts.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/unistd.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/unistd.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/time.h:
 
@@ -368,6 +373,8 @@ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/semphr.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/arch/vfs_lwip.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/ip_addr.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/def.h:
@@ -379,10 +386,6 @@ C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/ip6_addr.h:
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/err.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/inet.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/unistd.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/unistd.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/posix/netdb.h:
 

@@ -40,6 +40,8 @@ src/crypto/ms_funcs.o: \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/lwipopts.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/time.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/time.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/unistd.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/unistd.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/time.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/fcntl.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_default_fcntl.h \
@@ -101,6 +103,7 @@ src/crypto/ms_funcs.o: \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/semphr.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h \
+ C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/arch/vfs_lwip.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/endian.h \
  C:/msys32/home/jp/esp/esp-idf/components/wpa_supplicant/port/include/endian.h \
  C:/msys32/home/jp/esp/esp-idf/components/wpa_supplicant/port/include/byteswap.h \
@@ -190,6 +193,10 @@ C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/lwipopts.h:
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/time.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/time.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/unistd.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/unistd.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/time.h:
 
@@ -312,6 +319,8 @@ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h:
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/semphr.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/arch/vfs_lwip.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/endian.h:
 

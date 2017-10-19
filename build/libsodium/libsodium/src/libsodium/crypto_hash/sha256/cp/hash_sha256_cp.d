@@ -23,6 +23,7 @@ libsodium/src/libsodium/crypto_hash/sha256/cp/hash_sha256_cp.o: \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/string.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/types.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/types.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/sched.h \
  C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_hash_sha256.h \
  C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/export.h \
  C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/private/common.h \
@@ -73,6 +74,8 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/string.h:
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/types.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/types.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/sched.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_hash_sha256.h:
 

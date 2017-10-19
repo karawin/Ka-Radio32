@@ -99,49 +99,6 @@ vs1053.o: C:/msys32/home/jp/esp/Ka-Radio32/main/vs1053.c \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/opt.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/lwipopts.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/time.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/time.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/time.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/fcntl.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_default_fcntl.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stat.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_task.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/debug.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/arch.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/arch/cc.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/errno.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/errno.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/arch/sys_arch.h \
- C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/task.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/limits.h \
- C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h \
- C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/api.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netbuf.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/pbuf.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/err.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/ip_addr.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/def.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/ip4_addr.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/ip6_addr.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/sys.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_wifi.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/queue.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_wifi_types.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_interface.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_wifi_crypto_types.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_event.h \
- C:/msys32/home/jp/esp/esp-idf/components/tcpip_adapter/include/tcpip_adapter.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/queue.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_wifi_types.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/apps/dhcpserver.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/sockets.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/inet.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/dns.h \
- C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netdb.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/timer.h \
@@ -150,7 +107,14 @@ vs1053.o: C:/msys32/home/jp/esp/Ka-Radio32/main/vs1053.c \
  C:/msys32/home/jp/esp/Ka-Radio32/components/audio_player/include/audio_player.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/fifo/include/spiram_fifo.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/common/include/common_buffer.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/inttypes.h
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/inttypes.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/task.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/limits.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/event_groups.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/timers.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/task.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos\queue.h
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h:
 
@@ -352,92 +316,6 @@ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/opt.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/lwipopts.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/time.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/time.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/time.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/fcntl.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_default_fcntl.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stat.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_task.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/debug.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/arch.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/arch/cc.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/errno.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/errno.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/arch/sys_arch.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/task.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/limits.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/api.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netbuf.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/pbuf.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/err.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/ip_addr.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/def.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/ip4_addr.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/ip6_addr.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/sys.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_wifi.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/queue.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_wifi_types.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_interface.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_wifi_crypto_types.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_event.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/tcpip_adapter/include/tcpip_adapter.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/queue.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_wifi_types.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/apps/dhcpserver.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/sockets.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/inet.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/dns.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netdb.h:
-
-C:/msys32/home/jp/esp/Ka-Radio32/main/include/cencode_inc.h:
-
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h:
@@ -455,4 +333,18 @@ C:/msys32/home/jp/esp/Ka-Radio32/components/fifo/include/spiram_fifo.h:
 C:/msys32/home/jp/esp/Ka-Radio32/components/common/include/common_buffer.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/inttypes.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/task.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/limits.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/event_groups.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/timers.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/task.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos\queue.h:
 /home/jp/esp/Ka-Radio32/main/./vs1053.c:

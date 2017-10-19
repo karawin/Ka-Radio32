@@ -14,7 +14,7 @@
 #define ICY_HEADERS_COUNT 9
 #define ICY_HEADER_COUNT 10
 //2000 1440 1460
-#define RECEIVE 1436*2
+#define RECEIVE 1436
 
 
 typedef enum

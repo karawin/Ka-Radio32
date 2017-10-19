@@ -472,15 +472,15 @@ void  LoadUserCode( const unsigned short* plugin,uint16_t size) {
   iplugin = (unsigned short*)malloc(size+16);
   if (iplugin == NULL) 
   {
-	   kprintf(PSTR("malloc fails for plugin%c"),0x0d);
+	   printf(PSTR("malloc fails for plugin%c"),0x0d);
 	   return ;
   }
-  kprintf(PSTR("plugin size %d %d \n"),size,ssize);
+  printf(PSTR("plugin size %d %d \n"),size,ssize);
   
   //flashRead( iplugin,(uint32_t) plugin, size );
   iplugin = plugin;
   
-  kprintf(PSTR("plugin start: %x %x %x %x\n"),*iplugin,*(iplugin+1),*(iplugin+2),*(iplugin+3));
+  printf(PSTR("plugin start: %x %x %x %x\n"),*iplugin,*(iplugin+1),*(iplugin+2),*(iplugin+3));
   while (i<ssize) {
     unsigned short addr, n, val;
     addr = iplugin[i++];

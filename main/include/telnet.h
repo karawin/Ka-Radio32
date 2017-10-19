@@ -11,20 +11,6 @@ Inspirated by:
 #define __TELNET_H__
 // max size of the WS Message Header
 
-
-#include "lwip/opt.h"
-#include "lwip/arch.h"
-#include "lwip/api.h"
-//#include "esp_common.h"
-//#include "esp_softap.h"
-#include "esp_wifi.h"
-#include "lwip/sockets.h"
-#include "lwip/dns.h"
-#include "lwip/netdb.h"
-//#include "ssl/ssl_crypto.h"
-#include "cencode_inc.h"
-#include "esp_system.h"
-
 #define NBCLIENTT 5
 //#define MAXDATAT	 256
 

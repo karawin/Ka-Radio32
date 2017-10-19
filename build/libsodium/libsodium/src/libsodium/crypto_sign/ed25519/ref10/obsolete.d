@@ -18,17 +18,12 @@ libsodium/src/libsodium/crypto_sign/ed25519/ref10/obsolete.o: \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/lock.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/cdefs.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/string.h \
- C:/msys32/home/jp/esp/esp-idf/components/libsodium/port_include/sodium/crypto_hash_sha512.h \
+ C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_hash_sha512.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdlib.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/stdlib.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/alloca.h \
- C:/msys32/home/jp/esp/esp-idf/components/mbedtls/include/mbedtls/sha512.h \
- C:/msys32/home/jp/esp/esp-idf/components/mbedtls/port/include/mbedtls/esp_config.h \
- C:/msys32/home/jp/esp/Ka-Radio32/build/include/sdkconfig.h \
- C:/msys32/home/jp/esp/esp-idf/components/mbedtls/include/mbedtls/check_config.h \
  C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/export.h \
  C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_sign_edwards25519sha512batch.h \
- C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/export.h \
  C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_verify_32.h \
  C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/private/curve25519_ref10.h \
  C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/randombytes.h \
@@ -73,7 +68,7 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/cdefs.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/string.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/libsodium/port_include/sodium/crypto_hash_sha512.h:
+C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_hash_sha512.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdlib.h:
 
@@ -81,19 +76,9 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/stdlib.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/alloca.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/mbedtls/include/mbedtls/sha512.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/mbedtls/port/include/mbedtls/esp_config.h:
-
-C:/msys32/home/jp/esp/Ka-Radio32/build/include/sdkconfig.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/mbedtls/include/mbedtls/check_config.h:
-
 C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/export.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_sign_edwards25519sha512batch.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/export.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/libsodium/libsodium/src/libsodium/include/sodium/crypto_verify_32.h:
 

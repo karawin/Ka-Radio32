@@ -5,10 +5,20 @@
 	quick and dirty telnet inplementation for wifi webradio
 	minimal implementaion for log and command
 */
+#include "lwip/sockets.h"
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
+#include "lwip/opt.h"
+#include "lwip/arch.h"
+#include "lwip/api.h"
+#include "esp_wifi.h"
+#include "lwip/dns.h"
+#include "lwip/netdb.h"
+//#include "ssl/ssl_crypto.h"
+#include "cencode_inc.h"
+#include "esp_system.h"
 #include "telnet.h"
 #include "interface.h"
 

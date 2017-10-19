@@ -8,6 +8,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
+#include "freertos\queue.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
 #include "esp_event_loop.h"
@@ -770,6 +771,10 @@ void app_main()
 	}
 	ESP_LOGI(TAG, "audio_output_mode %d\nOne of I2S=0, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053",audio_output_mode);
 	
+	// init softwares
+	telnetinit();
+	websocketinit();
+	
 	// log level
 	setLogLevel(device->trace_level);
 	
@@ -849,9 +854,9 @@ void app_main()
 	ESP_LOGI(TAG, "%s task: %x","uartInterfaceTask",(unsigned int)pxCreatedTask);
 	xTaskCreate(clientTask, "clientTask", 2300, NULL, 4, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","clientTask",(unsigned int)pxCreatedTask);	
-    xTaskCreate(serversTask, "serversTask", 2100, NULL, 3, &pxCreatedTask); 
+    xTaskCreate(serversTask, "serversTask", 2300, NULL, 3, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","serversTask",(unsigned int)pxCreatedTask);	
-	xTaskCreate(task_encoder, "task_encoder", 2100, NULL, 2, &pxCreatedTask); 
+	xTaskCreate(task_encoder, "task_encoder", 2100, NULL, 1, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","task_encoder",(unsigned int)pxCreatedTask);
 	
 	printf("Init ");

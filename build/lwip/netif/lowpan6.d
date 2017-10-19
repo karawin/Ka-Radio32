@@ -25,6 +25,8 @@ netif/lowpan6.o: \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/types.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/types.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/sched.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/unistd.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/unistd.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/time.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/fcntl.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_default_fcntl.h \
@@ -96,7 +98,8 @@ netif/lowpan6.o: \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/semphr.h \
- C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h \
+ C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/arch/vfs_lwip.h
 
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/netif/lowpan6.h:
 
@@ -147,6 +150,10 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/types.h:
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/types.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/sched.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/unistd.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/unistd.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/time.h:
 
@@ -291,4 +298,6 @@ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h:
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/semphr.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/arch/vfs_lwip.h:
 /home/jp/esp/esp-idf/components/lwip/netif/lowpan6.c:

@@ -313,7 +313,6 @@ void task_encoder(void *pvParams)
     
 		if (getPinState() == pinsActive)
 		{    
-		    ESP_LOGD(TAG,"Button: %d" ,newButton);
 			//if (newButton == Held) 
 			{
 				if (newValue > 0) wsStationNext();

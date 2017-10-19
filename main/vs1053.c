@@ -29,6 +29,10 @@
 #include "audio_player.h"
 #include "spiram_fifo.h"
 #include "common_buffer.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/event_groups.h"
+#include "freertos\queue.h"
 
 extern void  LoadUserCodes(void);
 
@@ -114,23 +118,17 @@ void VS1053_HW_init(){
 	gpio_conf.pull_up_en =  GPIO_PULLUP_DISABLE;
 	gpio_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
 	gpio_conf.intr_type = GPIO_INTR_DISABLE;	
-	//gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<PIN_NUM_XCS));
-	//ESP_ERROR_CHECK(gpio_config(&gpio_conf));
-	//gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<PIN_NUM_XDCS));
-	//ESP_ERROR_CHECK(gpio_config(&gpio_conf));
 	gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<PIN_NUM_RST));
 	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
 	
     //gpio_set_direction(PIN_NUM_RST, GPIO_MODE_OUTPUT);
-	
-	
+		
 	gpio_conf.mode = GPIO_MODE_INPUT;
 	gpio_conf.pull_up_en =  GPIO_PULLUP_DISABLE;
 	gpio_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
 	gpio_conf.intr_type = GPIO_INTR_DISABLE;	
 	gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<PIN_NUM_DREQ));
 	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
-
 	
 	//gpio_set_direction(PIN_NUM_DREQ, GPIO_MODE_INPUT);
 	//gpio_set_pull_mode(PIN_NUM_DREQ, GPIO_PULLDOWN_ENABLE); //usefull for no vs1053 test
