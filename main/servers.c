@@ -133,12 +133,12 @@ void serversTask(void* pvParams) {
 			//add server_sock to set (webserver)
 			FD_SET(server_sock, &readfds);
 			max_sd = server_sock ; 
-printf("server_sock SD_set %d\n",server_sock);			
+//printf("server_sock SD_set %d\n",server_sock);			
 				
 			//add telnetServer_sock to set (telnet)
 			FD_SET(telnetServer_sock, &readfds);
 			max_sd = telnetServer_sock > max_sd ? telnetServer_sock : max_sd;  
-printf("telnetServer_sock SD_set %d\n",telnetServer_sock);		
+//printf("telnetServer_sock SD_set %d\n",telnetServer_sock);		
 			//add child sockets to set (wssocket)
 			for (i = 0;i<NBCLIENT;i++) 
 			{
@@ -147,7 +147,7 @@ printf("telnetServer_sock SD_set %d\n",telnetServer_sock);
 				if(sd != -1)
 				{	
 					FD_SET( sd , &readfds);   
-					printf("wssocket SD_set %d\n",sd);
+//printf("wssocket SD_set %d\n",sd);
 					//highest file descriptor number, need it for the select function
 					max_sd = sd > max_sd ? sd : max_sd;
 				}				
@@ -161,7 +161,7 @@ printf("telnetServer_sock SD_set %d\n",telnetServer_sock);
 				if(sd != -1)
 				{	
 					FD_SET( sd , &readfds);   
-					printf("SD_set %d, max_sd: %d\n",sd,max_sd);
+//printf("SD_set %d, max_sd: %d\n",sd,max_sd);
 					//highest file descriptor number, need it for the select function
 					max_sd = sd > max_sd ? sd : max_sd;
 				}				
@@ -169,8 +169,8 @@ printf("telnetServer_sock SD_set %d\n",telnetServer_sock);
 
 
 		
-printf("lwip_socket_offset: %d\n",lwip_socket_offset);	
-printf("ws call select. Max sd: %d\n",max_sd);
+//printf("lwip_socket_offset: %d\n",lwip_socket_offset);	
+//printf("ws call select. Max sd: %d\n",max_sd);
 
 			//wait for an activity on one of the sockets , 
 			activity = select( max_sd + 1 , &readfds , NULL , NULL , NULL);
@@ -254,7 +254,7 @@ printf("ws call select. Max sd: %d\n",max_sd);
 					FD_CLR(sd , &readfds);  
 					ESP_LOGV(TAG,"telnetclients .");	
 					ret =telnetRead(sd);
-printf("Call telnetRead i: %d, socket: %d, ret: %d\n" ,i, sd,ret);  
+//printf("Call telnetRead i: %d, socket: %d, ret: %d\n" ,i, sd,ret);  
 					if (ret == 0) 
 					{
 						telnetremoveclient(sd);						
