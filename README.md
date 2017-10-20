@@ -1,5 +1,11 @@
 #### State
 KaraDio32 in dev state: use at your own risk<br/>
+Works on every esp32 board.<br/>
+See the feature on https://hackaday.io/project/11570-wifi-webradio-with-esp8266-and-vs1053 <br/>
+The esp32 adds the output on the internal dac or with i2s to an external dac<br/>
+but only mp3 stations can be played.<br/>
+Adding a vs1053 board, all stations can be played.<br/>
+<br/>
 
 Based on KaraDio for esp8266 and https://github.com/kodera2t/ESP32_OLED_webradio<br/>
 <br/>
