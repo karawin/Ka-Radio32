@@ -11,7 +11,7 @@
 #define MAXDATAT	 256
 
 
-#define RELEASE "0.3"
+#define RELEASE "0.4"
 #define REVISION "0"
 
 uint32_t checkUart(uint32_t speed);

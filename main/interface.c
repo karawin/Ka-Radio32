@@ -18,6 +18,7 @@
 #include "vs1053.h"
 #include "gpio.h"
 #include "ota.h"
+#include "spiram_fifo.h"
 
 
 #include "lwip/sockets.h"
@@ -811,6 +812,14 @@ void checkCommand(int size, char* s)
 	for(i=0;i<size;i++) tmp[i] = s[i];
 	tmp[size] = 0;
 //	kprintf(PSTR("size: %d, cmd=%s\n"),size,tmp);
+
+		if(startsWith ("dbg.", tmp))
+	{
+		if     (strcmp(tmp+4, "fifo") == 0) 	kprintf( "Buffer fill %u%%, %d bytes, OverRun: %ld, UnderRun: %ld\n",
+												(spiRamFifoFill() * 100) / spiRamFifoLen(), spiRamFifoFill(),spiRamGetOverrunCt(),spiRamGetUnderrunCt());
+		else if(strcmp(tmp+4, "clear") == 0) 	spiRamFifoReset();
+		else printInfo(tmp);
+	} else
 	if(startsWith ("wifi.", tmp))
 	{
 		if     (strcmp(tmp+5, "list") == 0) 	wifiScan();

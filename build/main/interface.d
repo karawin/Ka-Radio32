@@ -104,6 +104,7 @@ interface.o: C:/msys32/home/jp/esp/Ka-Radio32/main/interface.c \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/fifo/include/spiram_fifo.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/sockets.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/opt.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/lwipopts.h \
@@ -350,6 +351,8 @@ C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h:
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/components/fifo/include/spiram_fifo.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/sockets.h:
 

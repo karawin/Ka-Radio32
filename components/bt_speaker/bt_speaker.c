@@ -85,6 +85,7 @@ static void bt_av_hdl_stack_evt(uint16_t event, void *p_param)
     case BT_APP_EVT_STACK_UP: {
         /* set up device name */
         esp_bt_dev_set_device_name(CONFIG_BT_NAME);
+	
 
         /* initialize A2DP sink */
         esp_a2d_register_callback(&bt_app_a2d_cb);

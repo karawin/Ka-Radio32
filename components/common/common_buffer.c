@@ -144,7 +144,7 @@ int buf_seek_abs(buffer_t *buf, uint32_t pos)
 
     size_t delta = pos - (uint32_t) buf->read_pos;
     buf->bytes_consumed += delta;
-    buf->read_pos = (uint8_t)pos;
+    buf->read_pos = (uint8_t*)pos;
 
     return 0;
 }

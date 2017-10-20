@@ -133,18 +133,17 @@ void VS1053_HW_init(){
 	
 }
 
-int VS1053_spi_write_char(spi_device_handle_t ivsspi, uint8_t *cbyte, uint16_t len)
+void VS1053_spi_write_char(spi_device_handle_t ivsspi, uint8_t *cbyte, uint16_t len)
 {
-	esp_err_t ret=0;
+	//esp_err_t ret=0;
     spi_transaction_t t;
     memset(&t, 0, sizeof(t));       //Zero out the transaction
-	//t.flags |= SPI_TRANS_USE_RXDATA;
 	t.tx_buffer = cbyte;	
-    t.length= len*8;                     //Command is 4 bytes *8 =32 bits
+    t.length= len*8; 
     //t.rxlength=0;	
-    ESP_ERROR_CHECK(ret=spi_device_transmit(ivsspi, &t));  //Transmit!
+    ESP_ERROR_CHECK(spi_device_transmit(ivsspi, &t));  //Transmit!
 	//printf("VS1053_spi_write val: %x  rxlen: %x \n",*cbyte,t.rxlength);
-    return ret;
+   // return ret;
 }
 
 
@@ -227,7 +226,7 @@ void VS1053_ResetChip(){
 	ControlReset(RESET);
 	vTaskDelay(10);
 	if (VS1053_checkDREQ() == 1) return;
-	vTaskDelay(100);
+	vTaskDelay(10);
 //	while(VS1053_checkDREQ() == 0)taskYIELD ();
 //	vTaskDelay(100);
 }
@@ -353,7 +352,7 @@ int VS1053_SendMusicBytes(uint8_t* music, uint16_t quantity){
 	if(quantity ==0) return 0;
 	int oo = 0;
 	spi_take_semaphore();
-	while(VS1053_checkDREQ() == 0) taskYIELD ();
+	while(VS1053_checkDREQ() == 0);taskYIELD ();
 	while(quantity)
 	{
 		if(VS1053_checkDREQ()) 
@@ -363,7 +362,7 @@ int VS1053_SendMusicBytes(uint8_t* music, uint16_t quantity){
 			VS1053_spi_write_char(hvsspi, &music[oo], t);
 			oo += t;
 			quantity -= t;
-		} 
+		}  else taskYIELD ();
 	}
 	spi_give_semaphore();
 	return oo;
@@ -628,34 +627,27 @@ IRAM_ATTR void vsTask(void *pvParams) {
 		// stop requested, terminate immediately
         if(player->decoder_command == CMD_STOP) {
             break;
-        }		
-//		if(playing)
-		{			
-			//size = bufferRead(b, VSTASKBUF);
-			size = min(VSTASKBUF, spiRamFifoFill());
+        }				
+		//size = bufferRead(b, VSTASKBUF);
+		size = min(VSTASKBUF, spiRamFifoFill());			
+		if (size >0)
+		{
 			spiRamFifoRead((char*)b, size);
 			s = 0; 			
 			while(s < size) 
 			{
 				s += VS1053_SendMusicBytes(b+s, size-s);	
 			}
-			vTaskDelay(2);	
-		} 
-/*		else 
-		{
-			vTaskDelay(40);				
-//			uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-//			printf("watermark vstask: %x  %d\n",uxHighWaterMark,uxHighWaterMark);			
-		}	
-*/
-	}
-	uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-	ESP_LOGI(TAG,"watermark: %x  %d",uxHighWaterMark,uxHighWaterMark);	
+		}
+		vTaskDelay(2);		
+	}	
 	
 	spiRamFifoReset();
     player->decoder_status = STOPPED;
     player->decoder_command = CMD_NONE;
     ESP_LOGD(TAG, "Decoder vs1053 stopped.\n");
+	uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+	ESP_LOGI(TAG,"watermark: %x  %d",uxHighWaterMark,uxHighWaterMark);	
 	vTaskDelete(NULL);
 	
 }

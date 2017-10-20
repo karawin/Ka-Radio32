@@ -26,9 +26,9 @@
 
 #define SPIREADSIZE 64
 
-static int fifoRpos;
-static int fifoWpos;
-static int fifoFill;
+static unsigned fifoRpos;
+static unsigned fifoWpos;
+static unsigned fifoFill;
 static xSemaphoreHandle semCanRead;
 static xSemaphoreHandle semCanWrite;
 static xSemaphoreHandle mux;
@@ -77,8 +77,8 @@ void spiRamFifoReset() {
 }
 
 //Read bytes from the FIFO
-void spiRamFifoRead(char *buff, int len) {
-	int n;
+void spiRamFifoRead(char *buff, unsigned len) {
+	unsigned n;
 	while (len > 0) {
 		n = len;
 		if (n>SPIREADSIZE) n=SPIREADSIZE;			//don't read more than SPIREADSIZE
@@ -90,6 +90,7 @@ void spiRamFifoRead(char *buff, int len) {
 			fifoUdrCnt++;
 			xSemaphoreGive(mux);
 			if (fifoFill < FIFO_LOWMARK) xSemaphoreTake(semCanRead, portMAX_DELAY);
+			vTaskDelay(1);
 		} else {
 			//Read the data.
 			spiRamRead(fifoRpos, buff, n);
@@ -105,8 +106,8 @@ void spiRamFifoRead(char *buff, int len) {
 }
 
 //Write bytes to the FIFO
-void spiRamFifoWrite(const char *buff, int buffLen) {
-	int n;
+void spiRamFifoWrite(const char *buff, unsigned buffLen) {
+	unsigned n;
 	while (buffLen > 0) {
 		n = buffLen;
 
@@ -142,7 +143,7 @@ void spiRamFifoWrite(const char *buff, int buffLen) {
 }
 
 //Get amount of bytes in use
-int spiRamFifoFill() {
+unsigned spiRamFifoFill() {
 	int ret;
 	xSemaphoreTake(mux, portMAX_DELAY);
 	ret=fifoFill;
@@ -150,11 +151,11 @@ int spiRamFifoFill() {
 	return ret;
 }
 
-int spiRamFifoFree() {
+unsigned spiRamFifoFree() {
 	return (SPIRAMSIZE-spiRamFifoFill());
 }
 
-int spiRamFifoLen() {
+unsigned spiRamFifoLen() {
 	return SPIRAMSIZE;
 }
 
