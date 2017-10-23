@@ -27,7 +27,7 @@ esp_timer_esp32.o: \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/stdlib.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/alloca.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/esp_timer.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_system.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_sleep.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/gpio.h \
@@ -61,6 +61,7 @@ esp_timer_esp32.o: \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_clk.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/esp_timer_impl.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/frc_timer_reg.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc.h \
@@ -141,7 +142,7 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/alloca.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/esp32/esp_timer.h:
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_system.h:
 
@@ -208,6 +209,8 @@ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_clk.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/esp_timer_impl.h:
 

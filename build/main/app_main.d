@@ -134,6 +134,8 @@ app_main.o: C:/msys32/home/jp/esp/Ka-Radio32/main/app_main.c \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_reg.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_access.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_dport_access.h \
+ C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/adc.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/adc_channel.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/uart.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/uart_reg.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/uart_struct.h \
@@ -169,9 +171,18 @@ app_main.o: C:/msys32/home/jp/esp/Ka-Radio32/main/app_main.c \
  C:/msys32/home/jp/esp/Ka-Radio32/components/fifo/include/spiram_fifo.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/mdns_task/include/mdns_task.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/audio_player/include/audio_player.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8x8.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2_esp32_hal.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h \
+ C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/spi_master.h \
+ C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/spi_common.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/spi_struct.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/lldesc.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/queue.h \
+ C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/i2c.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/eeprom.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/bt_config.h \
- C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/i2c.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/xi2c/include/xi2c.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/ssd/include/fonts.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/ssd/include/ssd1306.h \
@@ -185,7 +196,8 @@ app_main.o: C:/msys32/home/jp/esp/Ka-Radio32/main/app_main.c \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/ClickEncoder.h
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/ClickEncoder.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h:
 
@@ -457,6 +469,10 @@ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_access.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_dport_access.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/adc.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/adc_channel.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/uart.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/uart_reg.h:
@@ -527,11 +543,29 @@ C:/msys32/home/jp/esp/Ka-Radio32/components/mdns_task/include/mdns_task.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/audio_player/include/audio_player.h:
 
+C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8x8.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2_esp32_hal.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/spi_master.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/spi_common.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/spi_struct.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/lldesc.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/queue.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/i2c.h:
+
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/eeprom.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/bt_config.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/i2c.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/xi2c/include/xi2c.h:
 
@@ -560,4 +594,6 @@ C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h:
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/ClickEncoder.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h:
 /home/jp/esp/Ka-Radio32/main/./app_main.c:

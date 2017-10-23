@@ -53,6 +53,7 @@ struct device_settings {
 // esp32
 	output_mode_t audio_output_mode; // 
 	uint8_t trace_level;
+	uint8_t lcd_type; // the lcd in use
 	char filler[32]; 
 
 };

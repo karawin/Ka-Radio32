@@ -152,8 +152,11 @@ cpu_start.o: C:/msys32/home/jp/esp/esp-idf/components/esp32/cpu_start.c \
  C:/msys32/home/jp/esp/esp-idf/components/bootloader_support/include/esp_efuse.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/efuse_reg.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_spiram.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_clk.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/esp_timer.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/esp_clk_internal.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_pm.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp32/pm.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/pm_impl.h \
  C:/msys32/home/jp/esp/esp-idf/components/xtensa-debug-module/include/trax.h \
  C:/msys32/home/jp/esp/esp-idf/components/xtensa-debug-module/include/eri.h \
  C:/msys32/home/jp/esp/esp-idf/components/xtensa-debug-module/include/xtensa-debug-module.h
@@ -464,9 +467,15 @@ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/efuse_reg.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_spiram.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_clk.h:
+C:/msys32/home/jp/esp/esp-idf/components/esp32/esp_clk_internal.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/esp32/esp_timer.h:
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_pm.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp32/pm.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/pm_impl.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/xtensa-debug-module/include/trax.h:
 

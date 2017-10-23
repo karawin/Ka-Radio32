@@ -42,7 +42,7 @@ time.o: C:/msys32/home/jp/esp/esp-idf/components/newlib/time.c \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stdio.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_clk.h \
- c:\msys32\home\jp\esp\esp-idf\components\esp32\esp_timer.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc_cntl_reg.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h \
@@ -179,7 +179,7 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stdio.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_clk.h:
 
-c:\msys32\home\jp\esp\esp-idf\components\esp32\esp_timer.h:
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc.h:
 

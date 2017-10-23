@@ -122,6 +122,9 @@ emac_main.o: \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
  C:/msys32/home/jp/esp/esp-idf/components/ethernet/include/esp_eth.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_pm.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp32/pm.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/periph_ctrl.h \
  C:/msys32/home/jp/esp/esp-idf/components/ethernet/emac_common.h \
  C:/msys32/home/jp/esp/esp-idf/components/ethernet/emac_dev.h \
@@ -373,6 +376,12 @@ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h:
 C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/ethernet/include/esp_eth.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_pm.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp32/pm.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/periph_ctrl.h:
 

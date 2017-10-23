@@ -40,7 +40,6 @@ port.o: C:/msys32/home/jp/esp/esp-idf/components/freertos/port.c \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_rtos.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/cpu.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h \
- C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/projdefs.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portable.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/deprecated_definitions.h \
@@ -166,8 +165,6 @@ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_rtos.h
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/cpu.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/projdefs.h:
 

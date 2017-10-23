@@ -89,6 +89,9 @@ spi_master.o: \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_dport_access.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_pm.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp32/pm.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/task.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/limits.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h \
@@ -272,6 +275,12 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_dport_access.h:
 C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_pm.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp32/pm.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/task.h:
 

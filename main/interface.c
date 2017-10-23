@@ -105,6 +105,8 @@ sys.version: Display the release and Revision of KaraDio\n\
 sys.dlog: Display the current log level\n\
 sys.logx: Set log level to x with x=n for none, v for verbose, d for debug, i for info, w for warning, e for error\n\
 sys.log: do nothing apart a trace on uart (debug use)\n\
+sys.lcd: Display the current lcd type\n\
+sys.lcd(\"x\"): Change the lcd type to x on next reset\n\
 ///////////\n\
   Other\n\
 ///////////\n\
@@ -694,6 +696,31 @@ void syspatch(char* s)
 	free(device);	
 }
 
+void syslcd(char* s)
+{
+    char *t = strstr(s, parslashquote);
+	struct device_settings *device;
+	device = getDeviceSettings();
+	if(t == NULL)
+	{
+		kprintf("##LCD is %d#\n",device->lcd_type);
+		free(device);
+		return;
+	}
+	char *t_end  = strstr(t, parquoteslash);
+    if(t_end == NULL)
+    {
+		kprintf(stritCMDERROR);
+		free(device);
+		return;
+    }	
+	uint8_t value = atoi(t+2);
+	device->lcd_type = value; 
+	saveDeviceSettings(device);	
+	kprintf("##LCD is in %d on next reset#\n",value);
+	free(device);	
+	
+}
 void sysled(char* s)
 {
     char *t = strstr(s, parslashquote);
@@ -702,7 +729,7 @@ void sysled(char* s)
 	extern bool ledStatus;
 	if(t == NULL)
 	{
-		kprintf(PSTR("##Led is in %s mode#\n"),((device->options & T_LED)== 0)?"Blink":"Play");
+		kprintf("##Led is in %s mode#\n",((device->options & T_LED)== 0)?"Blink":"Play");
 		free(device);
 		return;
 	}
@@ -720,7 +747,7 @@ void sysled(char* s)
 	{device->options &= NT_LED; ledStatus =true;} // options:0 = ledStatus true = Blink mode
 	
 	saveDeviceSettings(device);	
-	kprintf(PSTR("##LED is in %s mode#\n"),((device->options & T_LED)== 0)?"Blink":"Play");
+	kprintf("##LED is in %s mode#\n",((device->options & T_LED)== 0)?"Blink":"Play");
 	free(device);
 	
 }
@@ -872,6 +899,7 @@ void checkCommand(int size, char* s)
 		else if(strcmp(tmp+4, "logv") == 0) 	setLogLevel(ESP_LOG_VERBOSE); 
 		else if(strcmp(tmp+4, "dlog") == 0) 	displayLogLevel();
 		else if(startsWith(   "log",tmp+4)) 	; // do nothing
+		else if(startsWith (  "lcd",tmp+4)) 	syslcd(tmp);
 		else printInfo(tmp);
 	}
 	else 

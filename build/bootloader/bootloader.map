@@ -174,6 +174,14 @@ Discarded input sections
                 0x00000000       0x50 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
  .literal.rtc_clk_slow_freq_get_hz
                 0x00000000       0x10 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+ .literal.rtc_clk_cpu_freq_from_mhz
+                0x00000000        0x4 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+ .literal.rtc_clk_cpu_freq_to_xtal
+                0x00000000       0x30 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+ .literal.rtc_clk_cpu_freq_to_pll
+                0x00000000       0x30 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+ .literal.rtc_clk_cpu_freq_set_fast
+                0x00000000       0x10 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
  .text          0x00000000        0x0 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
  .data          0x00000000        0x0 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
  .bss           0x00000000        0x0 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
@@ -189,8 +197,16 @@ Discarded input sections
                 0x00000000      0x162 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
  .text.rtc_clk_slow_freq_get_hz
                 0x00000000       0x29 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
- .xt.lit        0x00000000       0xb8 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
- .xt.prop       0x00000000      0x960 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+ .text.rtc_clk_cpu_freq_from_mhz
+                0x00000000       0x4c C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+ .text.rtc_clk_cpu_freq_to_xtal
+                0x00000000       0x6f C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+ .text.rtc_clk_cpu_freq_to_pll
+                0x00000000       0xad C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+ .text.rtc_clk_cpu_freq_set_fast
+                0x00000000       0x32 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+ .xt.lit        0x00000000       0xd8 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+ .xt.prop       0x00000000      0xb70 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
  .literal.rtc_clk_cal
                 0x00000000        0xc C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
  .literal.rtc_time_us_to_slowclk
@@ -247,7 +263,7 @@ END GROUP
  *(.init.literal)
  *(.init)
 
-.dram0.bss      0x3fff0000       0x10
+.dram0.bss      0x3fff0000       0x18
                 0x3fff0000                . = ALIGN (0x8)
                 0x3fff0000                _bss_start = ABSOLUTE (.)
  *(.dynsbss)
@@ -267,17 +283,21 @@ END GROUP
  *fill*         0x3fff0009        0x3 
  .bss.words_hashed
                 0x3fff000c        0x4 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_sha.o)
+ .bss.s_pll_freq
+                0x3fff0010        0x4 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+ .bss.s_cur_freq
+                0x3fff0014        0x4 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
  *(.gnu.linkonce.b.*)
  *(COMMON)
-                0x3fff0010                . = ALIGN (0x8)
-                0x3fff0010                _bss_end = ABSOLUTE (.)
+                0x3fff0018                . = ALIGN (0x8)
+                0x3fff0018                _bss_end = ABSOLUTE (.)
 
-.dram0.data     0x3fff0010        0x4
-                0x3fff0010                _data_start = ABSOLUTE (.)
+.dram0.data     0x3fff0018        0x4
+                0x3fff0018                _data_start = ABSOLUTE (.)
  *(.data)
  *(.data.*)
  .data.current_read_mapping
-                0x3fff0010        0x4 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_flash.o)
+                0x3fff0018        0x4 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_flash.o)
  *(.gnu.linkonce.d.*)
  *(.data1)
  *(.sdata)
@@ -287,83 +307,83 @@ END GROUP
  *(.sdata2.*)
  *(.gnu.linkonce.s2.*)
  *(.jcr)
-                0x3fff0014                _data_end = ABSOLUTE (.)
+                0x3fff001c                _data_end = ABSOLUTE (.)
 
-.dram0.rodata   0x3fff0014      0xba4
-                0x3fff0014                _rodata_start = ABSOLUTE (.)
+.dram0.rodata   0x3fff001c      0xba4
+                0x3fff001c                _rodata_start = ABSOLUTE (.)
  *(.rodata)
- .rodata        0x3fff0014       0x1c C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
+ .rodata        0x3fff001c       0x1c C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
  *(.rodata.*)
  .rodata.str1.4
-                0x3fff0030      0x3aa C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
- *fill*         0x3fff03da        0x2 
- .rodata.__func__$3777
-                0x3fff03dc       0x10 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
+                0x3fff0038      0x3aa C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
+ *fill*         0x3fff03e2        0x2 
+ .rodata.__func__$3782
+                0x3fff03e4       0x10 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
  .rodata.str1.4
-                0x3fff03ec      0x2b7 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
+                0x3fff03f4      0x2b7 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
                                 0x2e7 (size before relaxing)
- *fill*         0x3fff06a3        0x1 
+ *fill*         0x3fff06ab        0x1 
  .rodata.str1.4
-                0x3fff06a4       0xd8 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(flash_partitions.o)
+                0x3fff06ac       0xd8 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(flash_partitions.o)
  .rodata.str1.4
-                0x3fff077c      0x227 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_flash.o)
- *fill*         0x3fff09a3        0x1 
+                0x3fff0784      0x227 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_flash.o)
+ *fill*         0x3fff09ab        0x1 
  .rodata.str1.4
-                0x3fff09a4       0xd0 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_sha.o)
+                0x3fff09ac       0xd0 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_sha.o)
  .rodata.padding$2493
-                0x3fff0a74       0x40 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_sha.o)
+                0x3fff0a7c       0x40 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_sha.o)
  .rodata.__func__$2489
-                0x3fff0ab4       0x19 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_sha.o)
- *fill*         0x3fff0acd        0x3 
+                0x3fff0abc       0x19 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_sha.o)
+ *fill*         0x3fff0ad5        0x3 
  .rodata.__func__$2469
-                0x3fff0ad0       0x17 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_sha.o)
- *fill*         0x3fff0ae7        0x1 
+                0x3fff0ad8       0x17 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_sha.o)
+ *fill*         0x3fff0aef        0x1 
  .rodata.str1.4
-                0x3fff0ae8       0x8c C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                0x3fff0af0       0x8c C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
  .rodata.rtc_clk_cpu_freq_value
-                0x3fff0b74       0x14 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
- .rodata.__func__$2585
-                0x3fff0b88       0x17 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
- *fill*         0x3fff0b9f        0x1 
- .rodata.__func__$2570
-                0x3fff0ba0       0x15 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                0x3fff0b7c       0x14 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+ .rodata.__func__$2602
+                0x3fff0b90       0x17 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+ *fill*         0x3fff0ba7        0x1 
+ .rodata.__func__$2587
+                0x3fff0ba8       0x15 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
  *(.gnu.linkonce.r.*)
  *(.rodata1)
-                0x3fff0bb5                __XT_EXCEPTION_TABLE_ = ABSOLUTE (.)
+                0x3fff0bbd                __XT_EXCEPTION_TABLE_ = ABSOLUTE (.)
  *(.xt_except_table)
  *(.gcc_except_table)
  *(.gnu.linkonce.e.*)
  *(.gnu.version_r)
  *(.eh_frame)
-                0x3fff0bb8                . = ((. + 0x3) & 0xfffffffc)
- *fill*         0x3fff0bb5        0x3 
-                0x3fff0bb8                __init_array_start = ABSOLUTE (.)
+                0x3fff0bc0                . = ((. + 0x3) & 0xfffffffc)
+ *fill*         0x3fff0bbd        0x3 
+                0x3fff0bc0                __init_array_start = ABSOLUTE (.)
  *crtbegin.o(.ctors)
  *(EXCLUDE_FILE(*crtend.o) .ctors)
  *(SORT(.ctors.*))
  *(.ctors)
-                0x3fff0bb8                __init_array_end = ABSOLUTE (.)
+                0x3fff0bc0                __init_array_end = ABSOLUTE (.)
  *crtbegin.o(.dtors)
  *(EXCLUDE_FILE(*crtend.o) .dtors)
  *(SORT(.dtors.*))
  *(.dtors)
-                0x3fff0bb8                __XT_EXCEPTION_DESCS_ = ABSOLUTE (.)
+                0x3fff0bc0                __XT_EXCEPTION_DESCS_ = ABSOLUTE (.)
  *(.xt_except_desc)
  *(.gnu.linkonce.h.*)
-                0x3fff0bb8                __XT_EXCEPTION_DESCS_END__ = ABSOLUTE (.)
+                0x3fff0bc0                __XT_EXCEPTION_DESCS_END__ = ABSOLUTE (.)
  *(.xt_except_desc_end)
  *(.dynamic)
  *(.gnu.version_d)
-                0x3fff0bb8                _rodata_end = ABSOLUTE (.)
-                0x3fff0bb8                _lit4_start = ABSOLUTE (.)
+                0x3fff0bc0                _rodata_end = ABSOLUTE (.)
+                0x3fff0bc0                _lit4_start = ABSOLUTE (.)
  *(*.lit4)
  *(.lit4.*)
  *(.gnu.linkonce.lit4.*)
-                0x3fff0bb8                _lit4_end = ABSOLUTE (.)
-                0x3fff0bb8                . = ALIGN (0x4)
-                0x3fff0bb8                _heap_start = ABSOLUTE (.)
+                0x3fff0bc0                _lit4_end = ABSOLUTE (.)
+                0x3fff0bc0                . = ALIGN (0x4)
+                0x3fff0bc0                _heap_start = ABSOLUTE (.)
 
-.iram.text      0x40078000     0x2c55
+.iram.text      0x40078000     0x2c85
                 0x40078000                _stext = .
                 0x40078000                _text_start = ABSOLUTE (.)
  *(.literal .text .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
@@ -544,348 +564,350 @@ END GROUP
                 0x400783c4        0x4 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
                                   0x8 (size before relaxing)
  .literal.rtc_clk_cpu_freq_set
-                0x400783c8       0x18 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
-                                 0x74 (size before relaxing)
+                0x400783c8       0x20 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                                 0x7c (size before relaxing)
  .literal.rtc_clk_apb_freq_get
-                0x400783e0        0x8 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                0x400783e8        0x8 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
                                  0x14 (size before relaxing)
  .literal.rtc_clk_init
-                0x400783e8       0x1c C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                0x400783f0       0x1c C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
                                  0x70 (size before relaxing)
  .literal.rtc_clk_cal_internal
-                0x40078404       0x20 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
+                0x4007840c       0x20 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
                                  0x3c (size before relaxing)
  .literal.rtc_clk_cal_ratio
-                0x40078424        0x0 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
+                0x4007842c        0x0 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
                                   0x8 (size before relaxing)
- .literal       0x40078424        0x8 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_bswapsi2.o)
+ .literal       0x4007842c        0x8 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_bswapsi2.o)
  .text.print_flash_info
-                0x4007842c        0xd C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
- *fill*         0x40078439        0x3 
+                0x40078434        0xd C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
+ *fill*         0x40078441        0x3 
  .text.wdt_reset_cpu0_info_enable
-                0x4007843c       0x27 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
- *fill*         0x40078463        0x1 
+                0x40078444       0x27 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
+ *fill*         0x4007846b        0x1 
  .text.wdt_reset_info_dump
-                0x40078464       0x9a C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
- *fill*         0x400784fe        0x2 
+                0x4007846c       0x9a C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
+ *fill*         0x40078506        0x2 
  .text.log_invalid_app_partition
-                0x40078500       0x57 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
+                0x40078508       0x57 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
                                  0x5b (size before relaxing)
- *fill*         0x40078557        0x1 
+ *fill*         0x4007855f        0x1 
  .text.clock_configure
-                0x40078558       0x5e C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
+                0x40078560       0x5e C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
                                  0x6a (size before relaxing)
- *fill*         0x400785b6        0x2 
+ *fill*         0x400785be        0x2 
  .text.uart_console_configure
-                0x400785b8       0x36 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
+                0x400785c0       0x36 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
                                  0x3a (size before relaxing)
- *fill*         0x400785ee        0x2 
+ *fill*         0x400785f6        0x2 
  .text.wdt_reset_check
-                0x400785f0       0xa1 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
+                0x400785f8       0xa1 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
                                  0xa8 (size before relaxing)
- *fill*         0x40078691        0x3 
+ *fill*         0x40078699        0x3 
  .text.update_flash_config
-                0x40078694       0x68 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
+                0x4007869c       0x68 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
  .text.ota_select_crc
-                0x400786fc       0x14 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
+                0x40078704       0x14 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
  .text.ota_select_valid
-                0x40078710       0x20 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
+                0x40078718       0x20 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
                                  0x24 (size before relaxing)
  .text.get_selected_boot_partition
-                0x40078730      0x11c C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
+                0x40078738      0x11c C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
                                 0x124 (size before relaxing)
  .text.try_load_partition
-                0x4007884c       0x1e C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
+                0x40078854       0x1e C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
                                  0x22 (size before relaxing)
- *fill*         0x4007886a        0x2 
+ *fill*         0x40078872        0x2 
  .text.load_boot_image
-                0x4007886c       0x8d C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
+                0x40078874       0x8d C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
                                  0xa5 (size before relaxing)
- *fill*         0x400788f9        0x3 
+ *fill*         0x40078901        0x3 
  .text.set_cache_and_start_app
-                0x400788fc       0xcf C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
- *fill*         0x400789cb        0x1 
+                0x40078904       0xcf C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
+ *fill*         0x400789d3        0x1 
  .text.unpack_load_app
-                0x400789cc       0xb2 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
+                0x400789d4       0xb2 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
                                  0xb6 (size before relaxing)
- *fill*         0x40078a7e        0x2 
+ *fill*         0x40078a86        0x2 
  .text.load_partition_table
-                0x40078a80       0xc9 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
+                0x40078a88       0xc9 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
                                  0xd5 (size before relaxing)
-                0x40078a80                load_partition_table
- *fill*         0x40078b49        0x3 
+                0x40078a88                load_partition_table
+ *fill*         0x40078b51        0x3 
  .text.bootloader_main
-                0x40078b4c       0xc2 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
+                0x40078b54       0xc2 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
                                  0xee (size before relaxing)
-                0x40078b4c                bootloader_main
- *fill*         0x40078c0e        0x2 
+                0x40078b54                bootloader_main
+ *fill*         0x40078c16        0x2 
  .text.__assert_func
-                0x40078c10       0x1f C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
+                0x40078c18       0x1f C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
                                  0x23 (size before relaxing)
-                0x40078c10                __assert_func
- *fill*         0x40078c2f        0x1 
+                0x40078c18                __assert_func
+ *fill*         0x40078c37        0x1 
  .text.call_start_cpu0
-                0x40078c30      0x124 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
+                0x40078c38      0x124 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
                                 0x130 (size before relaxing)
-                0x40078c30                call_start_cpu0
+                0x40078c38                call_start_cpu0
  .text.bootloader_fill_random
-                0x40078d54       0x59 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_random.o)
-                0x40078d54                bootloader_fill_random
- *fill*         0x40078dad        0x3 
+                0x40078d5c       0x59 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_random.o)
+                0x40078d5c                bootloader_fill_random
+ *fill*         0x40078db5        0x3 
  .text.bootloader_random_enable
-                0x40078db0      0x1d5 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_random.o)
-                0x40078db0                bootloader_random_enable
- *fill*         0x40078f85        0x3 
+                0x40078db8      0x1d5 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_random.o)
+                0x40078db8                bootloader_random_enable
+ *fill*         0x40078f8d        0x3 
  .text.bootloader_random_disable
-                0x40078f88      0x11c C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_random.o)
-                0x40078f88                bootloader_random_disable
+                0x40078f90      0x11c C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_random.o)
+                0x40078f90                bootloader_random_disable
  .text.should_map
-                0x400790a4       0x30 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
+                0x400790ac       0x30 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
  .text.verify_image_header
-                0x400790d4       0x32 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
- *fill*         0x40079106        0x2 
+                0x400790dc       0x32 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
+ *fill*         0x4007910e        0x2 
  .text.verify_segment_header
-                0x40079108       0x71 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
+                0x40079110       0x71 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
                                  0x79 (size before relaxing)
- *fill*         0x40079179        0x3 
+ *fill*         0x40079181        0x3 
  .text.verify_checksum
-                0x4007917c       0x87 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
+                0x40079184       0x87 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
                                  0x8f (size before relaxing)
- *fill*         0x40079203        0x1 
+ *fill*         0x4007920b        0x1 
  .text.verify_simple_hash
-                0x40079204       0x5b C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
+                0x4007920c       0x5b C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
                                  0x6a (size before relaxing)
- *fill*         0x4007925f        0x1 
+ *fill*         0x40079267        0x1 
  .text.should_load
-                0x40079260       0x44 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
+                0x40079268       0x44 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
                                  0x48 (size before relaxing)
  .text.process_segment
-                0x400792a4      0x181 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
+                0x400792ac      0x181 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
                                 0x195 (size before relaxing)
- *fill*         0x40079425        0x3 
+ *fill*         0x4007942d        0x3 
  .text.esp_image_load
-                0x40079428      0x245 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
+                0x40079430      0x245 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
                                 0x261 (size before relaxing)
-                0x40079428                esp_image_load
- *fill*         0x4007966d        0x3 
+                0x40079430                esp_image_load
+ *fill*         0x40079675        0x3 
  .text.esp_partition_table_basic_verify
-                0x40079670       0xb1 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(flash_partitions.o)
+                0x40079678       0xb1 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(flash_partitions.o)
                                  0xb5 (size before relaxing)
-                0x40079670                esp_partition_table_basic_verify
- *fill*         0x40079721        0x3 
+                0x40079678                esp_partition_table_basic_verify
+ *fill*         0x40079729        0x3 
  .text.spi_to_esp_err
-                0x40079724       0x22 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_flash.o)
- *fill*         0x40079746        0x2 
+                0x4007972c       0x22 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_flash.o)
+ *fill*         0x4007974e        0x2 
  .text.bootloader_flash_read_allow_decrypt
-                0x40079748       0x97 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_flash.o)
+                0x40079750       0x97 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_flash.o)
                                  0x9b (size before relaxing)
- *fill*         0x400797df        0x1 
+ *fill*         0x400797e7        0x1 
  .text.bootloader_flash_read_no_decrypt
-                0x400797e0       0x32 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_flash.o)
+                0x400797e8       0x32 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_flash.o)
                                  0x36 (size before relaxing)
- *fill*         0x40079812        0x2 
+ *fill*         0x4007981a        0x2 
  .text.bootloader_mmap
-                0x40079814       0xb1 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_flash.o)
+                0x4007981c       0xb1 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_flash.o)
                                  0xb9 (size before relaxing)
-                0x40079814                bootloader_mmap
- *fill*         0x400798c5        0x3 
+                0x4007981c                bootloader_mmap
+ *fill*         0x400798cd        0x3 
  .text.bootloader_munmap
-                0x400798c8       0x36 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_flash.o)
-                0x400798c8                bootloader_munmap
- *fill*         0x400798fe        0x2 
+                0x400798d0       0x36 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_flash.o)
+                0x400798d0                bootloader_munmap
+ *fill*         0x40079906        0x2 
  .text.bootloader_flash_read
-                0x40079900       0x86 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_flash.o)
-                0x40079900                bootloader_flash_read
- *fill*         0x40079986        0x2 
+                0x40079908       0x86 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_flash.o)
+                0x40079908                bootloader_flash_read
+ *fill*         0x4007998e        0x2 
  .text.bootloader_sha256_start
-                0x40079988       0x12 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_sha.o)
-                0x40079988                bootloader_sha256_start
- *fill*         0x4007999a        0x2 
+                0x40079990       0x12 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_sha.o)
+                0x40079990                bootloader_sha256_start
+ *fill*         0x400799a2        0x2 
  .text.bootloader_sha256_data
-                0x4007999c       0xa1 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_sha.o)
+                0x400799a4       0xa1 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_sha.o)
                                  0xa9 (size before relaxing)
-                0x4007999c                bootloader_sha256_data
- *fill*         0x40079a3d        0x3 
+                0x400799a4                bootloader_sha256_data
+ *fill*         0x40079a45        0x3 
  .text.bootloader_sha256_finish
-                0x40079a40       0xdc C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_sha.o)
+                0x40079a48       0xdc C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_sha.o)
                                  0xf0 (size before relaxing)
-                0x40079a40                bootloader_sha256_finish
+                0x40079a48                bootloader_sha256_finish
  .text.esp_log_early_timestamp
-                0x40079b1c       0x1f C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/log\liblog.a(log.o)
-                0x40079b1c                esp_log_early_timestamp
-                0x40079b1c                esp_log_timestamp
- *fill*         0x40079b3b        0x1 
+                0x40079b24       0x1f C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/log\liblog.a(log.o)
+                0x40079b24                esp_log_early_timestamp
+                0x40079b24                esp_log_timestamp
+ *fill*         0x40079b43        0x1 
  .text.esp_rom_spiflash_read_status
-                0x40079b3c       0x61 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/spi_flash\libspi_flash.a(spi_flash_rom_patch.o)
-                0x40079b3c                esp_rom_spiflash_read_status
- *fill*         0x40079b9d        0x3 
+                0x40079b44       0x61 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/spi_flash\libspi_flash.a(spi_flash_rom_patch.o)
+                0x40079b44                esp_rom_spiflash_read_status
+ *fill*         0x40079ba5        0x3 
  .text.esp_rom_spiflash_wait_idle
-                0x40079ba0       0x32 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/spi_flash\libspi_flash.a(spi_flash_rom_patch.o)
-                0x40079ba0                esp_rom_spiflash_wait_idle
- *fill*         0x40079bd2        0x2 
+                0x40079ba8       0x32 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/spi_flash\libspi_flash.a(spi_flash_rom_patch.o)
+                0x40079ba8                esp_rom_spiflash_wait_idle
+ *fill*         0x40079bda        0x2 
  .text.esp_rom_spiflash_read_data
-                0x40079bd4       0xe2 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/spi_flash\libspi_flash.a(spi_flash_rom_patch.o)
- *fill*         0x40079cb6        0x2 
+                0x40079bdc       0xe2 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/spi_flash\libspi_flash.a(spi_flash_rom_patch.o)
+ *fill*         0x40079cbe        0x2 
  .text.esp_rom_spiflash_read_statushigh
-                0x40079cb8       0x21 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/spi_flash\libspi_flash.a(spi_flash_rom_patch.o)
-                0x40079cb8                esp_rom_spiflash_read_statushigh
- *fill*         0x40079cd9        0x3 
+                0x40079cc0       0x21 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/spi_flash\libspi_flash.a(spi_flash_rom_patch.o)
+                0x40079cc0                esp_rom_spiflash_read_statushigh
+ *fill*         0x40079ce1        0x3 
  .text.esp_rom_spiflash_write_status
-                0x40079cdc       0x34 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/spi_flash\libspi_flash.a(spi_flash_rom_patch.o)
+                0x40079ce4       0x34 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/spi_flash\libspi_flash.a(spi_flash_rom_patch.o)
                                  0x38 (size before relaxing)
-                0x40079cdc                esp_rom_spiflash_write_status
+                0x40079ce4                esp_rom_spiflash_write_status
  .text.esp_rom_spiflash_unlock
-                0x40079d10       0x6a C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/spi_flash\libspi_flash.a(spi_flash_rom_patch.o)
+                0x40079d18       0x6a C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/spi_flash\libspi_flash.a(spi_flash_rom_patch.o)
                                  0x7e (size before relaxing)
-                0x40079d10                esp_rom_spiflash_unlock
- *fill*         0x40079d7a        0x2 
+                0x40079d18                esp_rom_spiflash_unlock
+ *fill*         0x40079d82        0x2 
  .text.esp_rom_spiflash_read
-                0x40079d7c      0x284 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/spi_flash\libspi_flash.a(spi_flash_rom_patch.o)
-                0x40079d7c                esp_rom_spiflash_read
+                0x40079d84      0x284 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/spi_flash\libspi_flash.a(spi_flash_rom_patch.o)
+                0x40079d84                esp_rom_spiflash_read
  .text.rtc_clk_32k_enable_internal
-                0x4007a000       0x81 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
- *fill*         0x4007a081        0x3 
+                0x4007a008       0x81 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+ *fill*         0x4007a089        0x3 
  .text.rtc_clk_xtal_freq_estimate
-                0x4007a084       0x3d C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
- *fill*         0x4007a0c1        0x3 
+                0x4007a08c       0x3d C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+ *fill*         0x4007a0c9        0x3 
  .text.rtc_clk_32k_enable
-                0x4007a0c4       0x2b C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
-                0x4007a0c4                rtc_clk_32k_enable
- *fill*         0x4007a0ef        0x1 
+                0x4007a0cc       0x2b C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                0x4007a0cc                rtc_clk_32k_enable
+ *fill*         0x4007a0f7        0x1 
  .text.rtc_clk_8m_enable
-                0x4007a0f0       0x9d C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
-                0x4007a0f0                rtc_clk_8m_enable
- *fill*         0x4007a18d        0x3 
+                0x4007a0f8       0x9d C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                0x4007a0f8                rtc_clk_8m_enable
+ *fill*         0x4007a195        0x3 
  .text.rtc_clk_slow_freq_set
-                0x4007a190       0x27 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
-                0x4007a190                rtc_clk_slow_freq_set
- *fill*         0x4007a1b7        0x1 
+                0x4007a198       0x27 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                0x4007a198                rtc_clk_slow_freq_set
+ *fill*         0x4007a1bf        0x1 
  .text.rtc_clk_slow_freq_get
-                0x4007a1b8       0x10 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
-                0x4007a1b8                rtc_clk_slow_freq_get
+                0x4007a1c0       0x10 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                0x4007a1c0                rtc_clk_slow_freq_get
  .text.rtc_clk_fast_freq_set
-                0x4007a1c8       0x2a C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
-                0x4007a1c8                rtc_clk_fast_freq_set
- *fill*         0x4007a1f2        0x2 
+                0x4007a1d0       0x2a C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                0x4007a1d0                rtc_clk_fast_freq_set
+ *fill*         0x4007a1fa        0x2 
  .text.rtc_clk_fast_freq_get
-                0x4007a1f4       0x10 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
-                0x4007a1f4                rtc_clk_fast_freq_get
+                0x4007a1fc       0x10 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                0x4007a1fc                rtc_clk_fast_freq_get
  .text.rtc_clk_bbpll_set
-                0x4007a204      0x154 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                0x4007a20c      0x154 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
                                 0x15c (size before relaxing)
-                0x4007a204                rtc_clk_bbpll_set
+                0x4007a20c                rtc_clk_bbpll_set
  .text.rtc_clk_xtal_freq_get
-                0x4007a358       0x22 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                0x4007a360       0x22 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
                                  0x26 (size before relaxing)
-                0x4007a358                rtc_clk_xtal_freq_get
-                0x4007a358                rtc_get_xtal
- *fill*         0x4007a37a        0x2 
+                0x4007a360                rtc_clk_xtal_freq_get
+                0x4007a360                rtc_get_xtal
+ *fill*         0x4007a382        0x2 
  .text.rtc_clk_cpu_freq_get
-                0x4007a37c       0x88 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                0x4007a384       0x88 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
                                  0x94 (size before relaxing)
-                0x4007a37c                rtc_clk_cpu_freq_get
+                0x4007a384                rtc_clk_cpu_freq_get
  .text.rtc_clk_cpu_freq_value
-                0x4007a404       0x48 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
-                0x4007a404                rtc_clk_cpu_freq_value
+                0x4007a40c       0x48 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                0x4007a40c                rtc_clk_cpu_freq_value
  .text.rtc_clk_xtal_freq_update
-                0x4007a44c       0x12 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                0x4007a454       0x12 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
                                  0x16 (size before relaxing)
-                0x4007a44c                rtc_clk_xtal_freq_update
- *fill*         0x4007a45e        0x2 
+                0x4007a454                rtc_clk_xtal_freq_update
+ *fill*         0x4007a466        0x2 
  .text.rtc_clk_apb_freq_update
-                0x4007a460       0x13 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                0x4007a468       0x13 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
                                  0x16 (size before relaxing)
-                0x4007a460                rtc_clk_apb_freq_update
- *fill*         0x4007a473        0x1 
+                0x4007a468                rtc_clk_apb_freq_update
+ *fill*         0x4007a47b        0x1 
  .text.rtc_clk_cpu_freq_set
-                0x4007a474      0x1b4 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
-                                0x1c4 (size before relaxing)
-                0x4007a474                rtc_clk_cpu_freq_set
+                0x4007a47c      0x1d9 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                                0x1e9 (size before relaxing)
+                0x4007a47c                rtc_clk_cpu_freq_set
+ *fill*         0x4007a655        0x3 
  .text.rtc_clk_apb_freq_get
-                0x4007a628       0x2a C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
-                0x4007a628                rtc_clk_apb_freq_get
- *fill*         0x4007a652        0x2 
+                0x4007a658       0x2a C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                0x4007a658                rtc_clk_apb_freq_get
+ *fill*         0x4007a682        0x2 
  .text.rtc_clk_init
-                0x4007a654      0x152 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                0x4007a684      0x152 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
                                 0x17e (size before relaxing)
-                0x4007a654                rtc_clk_init
- *fill*         0x4007a7a6        0x2 
+                0x4007a684                rtc_clk_init
+ *fill*         0x4007a7d6        0x2 
  .text.rtc_clk_cal_internal
-                0x4007a7a8      0x161 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
- *fill*         0x4007a909        0x3 
+                0x4007a7d8      0x161 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
+ *fill*         0x4007a939        0x3 
  .text.rtc_clk_cal_ratio
-                0x4007a90c       0x20 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
+                0x4007a93c       0x20 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
                                  0x24 (size before relaxing)
-                0x4007a90c                rtc_clk_cal_ratio
- .text          0x4007a92c       0x26 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_bswapsi2.o)
-                0x4007a92c                __bswapsi2
- *fill*         0x4007a952        0x2 
+                0x4007a93c                rtc_clk_cal_ratio
+ .text          0x4007a95c       0x26 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_bswapsi2.o)
+                0x4007a95c                __bswapsi2
+ *fill*         0x4007a982        0x2 
  .text.index_to_partition
-                0x4007a954       0x48 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
- *fill*         0x4007a99c        0x0 
+                0x4007a984       0x48 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
+ *fill*         0x4007a9cc        0x0 
  .text.clk_val_is_valid
-                0x4007a99c       0x20 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                0x4007a9cc       0x20 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
  .text.reg_val_to_clk_val
-                0x4007a9bc        0x8 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                0x4007a9ec        0x8 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
  .text.clk_val_to_reg_val
-                0x4007a9c4        0xe C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
- *fill*         0x4007a9d2        0x0 
- *fill*         0x4007a9d2        0x0 
- *fill*         0x4007a9d2        0x0 
- *fill*         0x4007a9d2        0x0 
- *fill*         0x4007a9d2        0x0 
- *fill*         0x4007a9d2        0x0 
- *fill*         0x4007a9d2        0x0 
- *fill*         0x4007a9d2        0x0 
- *fill*         0x4007a9d2        0x0 
- *fill*         0x4007a9d2        0x0 
- *fill*         0x4007a9d2        0x0 
- *fill*         0x4007a9d2        0x0 
- *fill*         0x4007a9d2        0x2 
- .text          0x4007a9d4      0x281 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_udivdi3.o)
-                0x4007a9d4                __udivdi3
+                0x4007a9f4        0xe C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+ *fill*         0x4007aa02        0x0 
+ *fill*         0x4007aa02        0x0 
+ *fill*         0x4007aa02        0x0 
+ *fill*         0x4007aa02        0x0 
+ *fill*         0x4007aa02        0x0 
+ *fill*         0x4007aa02        0x0 
+ *fill*         0x4007aa02        0x0 
+ *fill*         0x4007aa02        0x0 
+ *fill*         0x4007aa02        0x0 
+ *fill*         0x4007aa02        0x0 
+ *fill*         0x4007aa02        0x0 
+ *fill*         0x4007aa02        0x0 
+ *fill*         0x4007aa02        0x0 
+ *fill*         0x4007aa02        0x2 
+ .text          0x4007aa04      0x281 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_udivdi3.o)
+                0x4007aa04                __udivdi3
  *(.iram1 .iram1.*)
  *(.fini.literal)
  *(.fini)
  *(.gnu.version)
-                0x4007ac55                _text_end = ABSOLUTE (.)
-                0x4007ac55                _etext = .
+                0x4007ac85                _text_end = ABSOLUTE (.)
+                0x4007ac85                _etext = .
                 [!provide]                PROVIDE (abort, 0x4000bba4)
                 [!provide]                PROVIDE (__absvdi2, 0x4006387c)
                 [!provide]                PROVIDE (__absvsi2, 0x40063868)
@@ -2704,15 +2726,16 @@ END GROUP
                 [!provide]                PROVIDE (TIMERG1, 0x3ff60000)
                 [!provide]                PROVIDE (SPI2, 0x3ff64000)
                 [!provide]                PROVIDE (SPI3, 0x3ff65000)
+                [!provide]                PROVIDE (SYSCON, 0x3ff66000)
                 [!provide]                PROVIDE (I2C1, 0x3ff67000)
+                [!provide]                PROVIDE (SDMMC, 0x3ff68000)
                 [!provide]                PROVIDE (MCPWM1, 0x3ff6c000)
                 [!provide]                PROVIDE (I2S1, 0x3ff6d000)
                 [!provide]                PROVIDE (UART2, 0x3ff6e000)
-                [!provide]                PROVIDE (SDMMC, 0x3ff68000)
                 0x40008550                PROVIDE (ets_update_cpu_frequency, 0x40008550)
 OUTPUT(C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader.elf elf32-xtensa-le)
 
-.debug_frame    0x00000000      0xa68
+.debug_frame    0x00000000      0xac8
  .debug_frame   0x00000000      0x1f0 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
  .debug_frame   0x000001f0       0x58 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_random.o)
  .debug_frame   0x00000248       0xe8 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
@@ -2721,12 +2744,12 @@ OUTPUT(C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader.elf elf32-xt
  .debug_frame   0x00000428       0x58 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_sha.o)
  .debug_frame   0x00000480       0x70 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/log\liblog.a(log.o)
  .debug_frame   0x000004f0      0x208 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/spi_flash\libspi_flash.a(spi_flash_rom_patch.o)
- .debug_frame   0x000006f8      0x280 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
- .debug_frame   0x00000978       0xa0 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
- .debug_frame   0x00000a18       0x28 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_bswapsi2.o)
- .debug_frame   0x00000a40       0x28 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_udivdi3.o)
+ .debug_frame   0x000006f8      0x2e0 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+ .debug_frame   0x000009d8       0xa0 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
+ .debug_frame   0x00000a78       0x28 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_bswapsi2.o)
+ .debug_frame   0x00000aa0       0x28 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_udivdi3.o)
 
-.debug_info     0x00000000     0x79d0
+.debug_info     0x00000000     0x7b54
  .debug_info    0x00000000     0x23e9 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
  .debug_info    0x000023e9      0x278 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_random.o)
  .debug_info    0x00002661     0x111d C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
@@ -2735,12 +2758,12 @@ OUTPUT(C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader.elf elf32-xt
  .debug_info    0x00004704      0x44d C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_sha.o)
  .debug_info    0x00004b51      0x900 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/log\liblog.a(log.o)
  .debug_info    0x00005451      0xaf5 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/spi_flash\libspi_flash.a(spi_flash_rom_patch.o)
- .debug_info    0x00005f46     0x1092 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
- .debug_info    0x00006fd8      0x363 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
- .debug_info    0x0000733b       0xcd c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_bswapsi2.o)
- .debug_info    0x00007408      0x5c8 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_udivdi3.o)
+ .debug_info    0x00005f46     0x1216 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+ .debug_info    0x0000715c      0x363 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
+ .debug_info    0x000074bf       0xcd c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_bswapsi2.o)
+ .debug_info    0x0000758c      0x5c8 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_udivdi3.o)
 
-.debug_abbrev   0x00000000     0x1830
+.debug_abbrev   0x00000000     0x186d
  .debug_abbrev  0x00000000      0x4ad C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
  .debug_abbrev  0x000004ad      0x126 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_random.o)
  .debug_abbrev  0x000005d3      0x2b1 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
@@ -2749,12 +2772,12 @@ OUTPUT(C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader.elf elf32-xt
  .debug_abbrev  0x00000c1f      0x17d C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_sha.o)
  .debug_abbrev  0x00000d9c      0x1f3 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/log\liblog.a(log.o)
  .debug_abbrev  0x00000f8f      0x22e C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/spi_flash\libspi_flash.a(spi_flash_rom_patch.o)
- .debug_abbrev  0x000011bd      0x352 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
- .debug_abbrev  0x0000150f      0x162 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
- .debug_abbrev  0x00001671       0x60 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_bswapsi2.o)
- .debug_abbrev  0x000016d1      0x15f c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_udivdi3.o)
+ .debug_abbrev  0x000011bd      0x38f C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+ .debug_abbrev  0x0000154c      0x162 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
+ .debug_abbrev  0x000016ae       0x60 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_bswapsi2.o)
+ .debug_abbrev  0x0000170e      0x15f c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_udivdi3.o)
 
-.debug_loc      0x00000000     0x447f
+.debug_loc      0x00000000     0x452e
  .debug_loc     0x00000000      0xd16 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
  .debug_loc     0x00000d16       0x91 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_random.o)
  .debug_loc     0x00000da7      0xadf C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
@@ -2763,12 +2786,12 @@ OUTPUT(C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader.elf elf32-xt
  .debug_loc     0x00001fd4      0x135 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_sha.o)
  .debug_loc     0x00002109      0x4ad C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/log\liblog.a(log.o)
  .debug_loc     0x000025b6      0xa20 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/spi_flash\libspi_flash.a(spi_flash_rom_patch.o)
- .debug_loc     0x00002fd6      0x8d6 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
- .debug_loc     0x000038ac      0x1ca C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
- .debug_loc     0x00003a76       0x21 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_bswapsi2.o)
- .debug_loc     0x00003a97      0x9e8 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_udivdi3.o)
+ .debug_loc     0x00002fd6      0x985 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+ .debug_loc     0x0000395b      0x1ca C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
+ .debug_loc     0x00003b25       0x21 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_bswapsi2.o)
+ .debug_loc     0x00003b46      0x9e8 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_udivdi3.o)
 
-.debug_aranges  0x00000000      0x458
+.debug_aranges  0x00000000      0x478
  .debug_aranges
                 0x00000000       0xb8 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
  .debug_aranges
@@ -2786,15 +2809,15 @@ OUTPUT(C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader.elf elf32-xt
  .debug_aranges
                 0x00000228       0xc0 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/spi_flash\libspi_flash.a(spi_flash_rom_patch.o)
  .debug_aranges
-                0x000002e8       0xe8 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                0x000002e8      0x108 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
  .debug_aranges
-                0x000003d0       0x48 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
+                0x000003f0       0x48 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
  .debug_aranges
-                0x00000418       0x20 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_bswapsi2.o)
+                0x00000438       0x20 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_bswapsi2.o)
  .debug_aranges
-                0x00000438       0x20 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_udivdi3.o)
+                0x00000458       0x20 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_udivdi3.o)
 
-.debug_ranges   0x00000000      0x468
+.debug_ranges   0x00000000      0x488
  .debug_ranges  0x00000000       0xd8 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
  .debug_ranges  0x000000d8       0x20 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_random.o)
  .debug_ranges  0x000000f8       0x68 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
@@ -2803,11 +2826,11 @@ OUTPUT(C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader.elf elf32-xt
  .debug_ranges  0x000001d0       0x20 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_sha.o)
  .debug_ranges  0x000001f0       0x28 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/log\liblog.a(log.o)
  .debug_ranges  0x00000218       0xb0 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/spi_flash\libspi_flash.a(spi_flash_rom_patch.o)
- .debug_ranges  0x000002c8      0x108 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
- .debug_ranges  0x000003d0       0x38 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
- .debug_ranges  0x00000408       0x60 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_udivdi3.o)
+ .debug_ranges  0x000002c8      0x128 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+ .debug_ranges  0x000003f0       0x38 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
+ .debug_ranges  0x00000428       0x60 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_udivdi3.o)
 
-.debug_line     0x00000000     0x4497
+.debug_line     0x00000000     0x464b
  .debug_line    0x00000000      0xc0c C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
  .debug_line    0x00000c0c      0x382 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_random.o)
  .debug_line    0x00000f8e      0x9b5 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(esp_image_format.o)
@@ -2816,12 +2839,12 @@ OUTPUT(C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader.elf elf32-xt
  .debug_line    0x0000218e      0x3bf C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_sha.o)
  .debug_line    0x0000254d      0x4e2 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/log\liblog.a(log.o)
  .debug_line    0x00002a2f      0xaca C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/spi_flash\libspi_flash.a(spi_flash_rom_patch.o)
- .debug_line    0x000034f9      0xa3c C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
- .debug_line    0x00003f35      0x34b C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
- .debug_line    0x00004280       0x89 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_bswapsi2.o)
- .debug_line    0x00004309      0x18e c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_udivdi3.o)
+ .debug_line    0x000034f9      0xbf0 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+ .debug_line    0x000040e9      0x34b C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
+ .debug_line    0x00004434       0x89 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_bswapsi2.o)
+ .debug_line    0x000044bd      0x18e c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_udivdi3.o)
 
-.debug_str      0x00000000     0x23f3
+.debug_str      0x00000000     0x2476
  .debug_str     0x00000000      0xed7 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/main\libmain.a(bootloader_start.o)
                                 0xfb5 (size before relaxing)
  .debug_str     0x00000ed7       0xd8 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader_support\libbootloader_support.a(bootloader_random.o)
@@ -2838,13 +2861,13 @@ OUTPUT(C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/bootloader.elf elf32-xt
                                 0x362 (size before relaxing)
  .debug_str     0x000017b2      0x4a4 C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/spi_flash\libspi_flash.a(spi_flash_rom_patch.o)
                                 0x767 (size before relaxing)
- .debug_str     0x00001c56      0x45c C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
-                                0x82f (size before relaxing)
- .debug_str     0x000020b2      0x12d C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
+ .debug_str     0x00001c56      0x4df C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_clk.o)
+                                0x8b7 (size before relaxing)
+ .debug_str     0x00002135      0x12d C:/msys32/home/jp/esp/Ka-Radio32/build/bootloader/soc\libsoc.a(rtc_time.o)
                                 0x368 (size before relaxing)
- .debug_str     0x000021df      0x138 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_bswapsi2.o)
+ .debug_str     0x00002262      0x138 c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_bswapsi2.o)
                                 0x1de (size before relaxing)
- .debug_str     0x00002317       0xdc c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_udivdi3.o)
+ .debug_str     0x0000239a       0xdc c:/msys32/opt/xtensa-esp32-elf/bin/../lib/gcc/xtensa-esp32-elf/5.2.0\libgcc.a(_udivdi3.o)
                                 0x258 (size before relaxing)
 
 .comment        0x00000000       0x3a

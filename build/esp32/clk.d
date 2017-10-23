@@ -16,6 +16,10 @@ clk.o: C:/msys32/home/jp/esp/esp-idf/components/esp32/clk.c \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/lock.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/types.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/sched.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/param.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/syslimits.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/endian.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/param.h \
  C:/msys32/home/jp/esp/Ka-Radio32/build/include/sdkconfig.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_attr.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
@@ -31,6 +35,7 @@ clk.o: C:/msys32/home/jp/esp/esp-idf/components/esp32/clk.c \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_clk.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/esp_clk_internal.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/uart.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_types.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h \
@@ -84,6 +89,14 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/types.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/sched.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/param.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/syslimits.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/endian.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/param.h:
+
 C:/msys32/home/jp/esp/Ka-Radio32/build/include/sdkconfig.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_attr.h:
@@ -113,6 +126,8 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h:
 C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_clk.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/esp_clk_internal.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/uart.h:
 

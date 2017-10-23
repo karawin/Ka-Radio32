@@ -114,7 +114,7 @@ void VS1053_HW_init(){
 	
 	gpio_conf.mode = GPIO_MODE_OUTPUT;
 	gpio_conf.pull_up_en =  GPIO_PULLUP_DISABLE;
-	gpio_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+	gpio_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
 	gpio_conf.intr_type = GPIO_INTR_DISABLE;	
 	gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<PIN_NUM_RST));
 	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
@@ -133,19 +133,6 @@ void VS1053_HW_init(){
 	
 }
 
-void VS1053_spi_write_char(spi_device_handle_t ivsspi, uint8_t *cbyte, uint16_t len)
-{
-	//esp_err_t ret=0;
-    spi_transaction_t t;
-    memset(&t, 0, sizeof(t));       //Zero out the transaction
-	t.tx_buffer = cbyte;	
-    t.length= len*8; 
-    //t.rxlength=0;	
-    ESP_ERROR_CHECK(spi_device_transmit(ivsspi, &t));  //Transmit!
-	//printf("VS1053_spi_write val: %x  rxlen: %x \n",*cbyte,t.rxlength);
-   // return ret;
-}
-
 
 void ControlReset(uint8_t State){
 	gpio_set_level(PIN_NUM_RST, State);
@@ -155,12 +142,29 @@ uint8_t VS1053_checkDREQ() {
 	return gpio_get_level(PIN_NUM_DREQ);
 }
 
+void VS1053_spi_write_char(spi_device_handle_t ivsspi, uint8_t *cbyte, uint16_t len)
+{
+	//esp_err_t ret=0;
+    spi_transaction_t t;
+    memset(&t, 0, sizeof(t));       //Zero out the transaction
+	t.tx_buffer = cbyte;	
+    t.length= len*8; 
+    //t.rxlength=0;	
+	spi_take_semaphore();
+	while(VS1053_checkDREQ() == 0)taskYIELD ();
+    ESP_ERROR_CHECK(spi_device_transmit(ivsspi, &t));  //Transmit!
+	while(VS1053_checkDREQ() == 0);
+	spi_give_semaphore();
+	//printf("VS1053_spi_write val: %x  rxlen: %x \n",*cbyte,t.rxlength);
+   // return ret;
+}
+
+
+
+
 
 void VS1053_WriteRegister(uint8_t addressbyte, uint8_t highbyte, uint8_t lowbyte)
 {
-	spi_take_semaphore();
-	while(VS1053_checkDREQ() == 0)taskYIELD ();
-
     spi_transaction_t t;
     memset(&t, 0, sizeof(t));       //Zero out the transaction
 	t.flags |= SPI_TRANS_USE_TXDATA;
@@ -169,6 +173,8 @@ void VS1053_WriteRegister(uint8_t addressbyte, uint8_t highbyte, uint8_t lowbyte
 	t.tx_data[0] = highbyte;
 	t.tx_data[1] = lowbyte;		
     t.length= 16;
+	spi_take_semaphore();
+	while(VS1053_checkDREQ() == 0)taskYIELD ();
     ESP_ERROR_CHECK(spi_device_transmit(vsspi, &t));  //Transmit!	
 	while(VS1053_checkDREQ() == 0);
 	spi_give_semaphore();
@@ -176,9 +182,6 @@ void VS1053_WriteRegister(uint8_t addressbyte, uint8_t highbyte, uint8_t lowbyte
 
 void VS1053_WriteRegister16(uint8_t addressbyte, uint16_t value)
 {
-	spi_take_semaphore();
-	while(VS1053_checkDREQ() == 0)taskYIELD ();
-
     spi_transaction_t t;
     memset(&t, 0, sizeof(t));       //Zero out the transaction
 	t.flags |= SPI_TRANS_USE_TXDATA;
@@ -187,16 +190,15 @@ void VS1053_WriteRegister16(uint8_t addressbyte, uint16_t value)
 	t.tx_data[0] = (value>>8)&0xff;	;
 	t.tx_data[1] = value&0xff;		
     t.length= 16;
+	spi_take_semaphore();
+	while(VS1053_checkDREQ() == 0)taskYIELD ();
     ESP_ERROR_CHECK(spi_device_transmit(vsspi, &t));  //Transmit!	
 	while(VS1053_checkDREQ() == 0);
 	spi_give_semaphore();
 }
 
 uint16_t VS1053_ReadRegister(uint8_t addressbyte){
-	spi_take_semaphore();
 	uint16_t result;
-	while(VS1053_checkDREQ() == 0)taskYIELD ();
-
     spi_transaction_t t;
     uint16_t data;
     memset(&t, 0, sizeof(t));       //Zero out the transaction
@@ -204,7 +206,8 @@ uint16_t VS1053_ReadRegister(uint8_t addressbyte){
 	t.cmd = VS_READ_COMMAND;
 	t.addr = addressbyte;
     t.rx_buffer=&data;
-    ESP_ERROR_CHECK(spi_device_transmit(vsspi, &t));  //Transmit!
+	spi_take_semaphore();    ESP_ERROR_CHECK(spi_device_transmit(vsspi, &t));  //Transmit!
+	while(VS1053_checkDREQ() == 0)taskYIELD ();
 	result =  (((data&0xFF)<<8) | ((data>>8)&0xFF)) ;  	
 	while(VS1053_checkDREQ() == 0);
 	spi_give_semaphore();
@@ -219,10 +222,10 @@ void WriteVS10xxRegister(unsigned short addr,unsigned short val)
 
 
 void VS1053_ResetChip(){
-	uint8_t ff;
+//	uint8_t ff;
 	ControlReset(SET);
-	VS1053_spi_write_char(vsspi,&ff,1);
-	vTaskDelay(200);
+//	VS1053_spi_write_char(vsspi,&ff,1);
+	vTaskDelay(20);
 	ControlReset(RESET);
 	vTaskDelay(10);
 	if (VS1053_checkDREQ() == 1) return;
@@ -351,20 +354,20 @@ void VS1053_Start(){
 int VS1053_SendMusicBytes(uint8_t* music, uint16_t quantity){
 	if(quantity ==0) return 0;
 	int oo = 0;
-	spi_take_semaphore();
-	while(VS1053_checkDREQ() == 0);taskYIELD ();
+//	spi_take_semaphore();
+//	while(VS1053_checkDREQ() == 0);taskYIELD ();
 	while(quantity)
 	{
-		if(VS1053_checkDREQ()) 
+//		if(VS1053_checkDREQ()) 
 		{
 			int t = quantity;
 			if(t > 32) t = 32;	
 			VS1053_spi_write_char(hvsspi, &music[oo], t);
 			oo += t;
 			quantity -= t;
-		}  else taskYIELD ();
+		} // else taskYIELD ();
 	}
-	spi_give_semaphore();
+//	spi_give_semaphore();
 	return oo;
 }
 

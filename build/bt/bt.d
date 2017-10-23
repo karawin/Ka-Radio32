@@ -87,7 +87,10 @@ bt.o: C:/msys32/home/jp/esp/esp-idf/components/bt/bt.c \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_phy_init.h \
  C:/msys32/home/jp/esp/esp-idf/components/bt/include/bt.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
- C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h
+ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_pm.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp32/pm.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdlib.h:
 
@@ -266,4 +269,10 @@ C:/msys32/home/jp/esp/esp-idf/components/bt/include/bt.h:
 C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_pm.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp32/pm.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc.h:
 /home/jp/esp/esp-idf/components/bt/./bt.c:

@@ -25,7 +25,6 @@
 static fd_set readfds;
 xSemaphoreHandle semclient = NULL ;
 
-extern unsigned lwip_socket_offset;
 
 const char strsocket[] = {"Socket"};
 const char strbind[] = {"Bind"};

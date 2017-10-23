@@ -1,5 +1,5 @@
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
-//#include "Arduino.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,8 +30,8 @@
 #include "audio_renderer.h"
 #include "mdns_task.h"
 #include "audio_player.h"
-//#include "U8g2lib.h"
-
+#include <u8g2.h>
+#include "u8g2_esp32_hal.h"
 
 #ifdef CONFIG_BT_SPEAKER_MODE
 #include "bt_speaker.h"
@@ -57,6 +57,7 @@
 #include "interface.h"
 #include "vs1053.h"
 #include "ClickEncoder.h"
+#include "addon.h"
 
 /* The event group allows multiple bits for each event*/
 //   are we connected  to the AP with an IP? */
@@ -101,6 +102,18 @@ void noInterrupt1Ms()
 void interrupt1Ms()
 {
 	timer_enable_intr(TIMERGROUP1MS, msTimer);
+}
+
+IRAM_ATTR void   microsCallback(void *pArg) {
+	int timer_idx = (int) pArg;
+	queue_event_t evt;	
+	TIMERG1.hw_timer[timer_idx].update = 1;
+	TIMERG1.int_clr_timers.t1 = 1; //isr ack
+		evt.type = TIMER_1mS;
+        evt.i1 = TIMERGROUP1mS;
+        evt.i2 = timer_idx;
+	xQueueSendFromISR(event_queue, &evt, NULL);	
+	TIMERG1.hw_timer[timer_idx].config.alarm_en = 1;
 }
 //-----------------------------------
 IRAM_ATTR void   msCallback(void *pArg) {
@@ -199,48 +212,52 @@ timer_config_t config;
 	ESP_ERROR_CHECK(timer_enable_intr(TIMERGROUP1MS, msTimer));
 	ESP_ERROR_CHECK(timer_set_alarm(TIMERGROUP1MS, msTimer,TIMER_ALARM_EN));
 	ESP_ERROR_CHECK(timer_start(TIMERGROUP1MS, msTimer));
+	
+	/*Configure timer 1µS*/
+	config.auto_reload = TIMER_AUTORELOAD_EN;
+	config.divider = TIMER_DIVIDER1mS;
+	ESP_ERROR_CHECK(timer_init(TIMERGROUP1mS, microsTimer, &config));
+	ESP_ERROR_CHECK(timer_pause(TIMERGROUP1mS, microsTimer));
+	ESP_ERROR_CHECK(timer_isr_register(TIMERGROUP1mS, microsTimer, microsCallback, (void*) microsTimer, 0, NULL));
+	/* start 1µS timer*/
+	ESP_ERROR_CHECK(timer_set_counter_value(TIMERGROUP1mS, microsTimer, 0x00000000ULL));
+	ESP_ERROR_CHECK(timer_set_alarm_value(TIMERGROUP1mS, microsTimer,TIMERVALUE1mS(10))); // 10 ms timer
+	ESP_ERROR_CHECK(timer_enable_intr(TIMERGROUP1mS, microsTimer));
+	ESP_ERROR_CHECK(timer_set_alarm(TIMERGROUP1mS, microsTimer,TIMER_ALARM_EN));
+	ESP_ERROR_CHECK(timer_start(TIMERGROUP1mS, microsTimer));
 }
 
 
 output_mode_t get_audio_output_mode() 
 { return audio_output_mode;}
 
-static void i2c_state(char* State)
-{
-	SSD1306_GotoXY(2, 30); 
-	SSD1306_DrawRectangle(2, 30, SSD1306_WIDTH - 1, 10, SSD1306_COLOR_BLACK);	
-    SSD1306_Puts(State, &Font_7x10, SSD1306_COLOR_WHITE);
-	SSD1306_UpdateScreen();
-}
-
-static void i2c_test(char* ip)
+static void lcd_state(char* State)
 {
 	
-    char *url = "Stopped";// get_url(); // play_url();
+	u8g2_SetDrawColor(&u8g2, 0);
+	u8g2_DrawBox(&u8g2, 2, 40, 128-30, 12);
+	u8g2_SetDrawColor(&u8g2, 1);
+	u8g2_SetFont(&u8g2, u8g2_font_timB08_tr);
+	u8g2_DrawStr(&u8g2, 2,40,State);
+	u8g2_SendBuffer(&u8g2);
+	
+}
 
-    SSD1306_Fill(SSD1306_COLOR_BLACK); // clear screen
+static void lcd_welcome(char* ip)
+{
+    char *url = "Stopped";// get_url(); // play_url();	
 
-    SSD1306_GotoXY(20, 4);
-    SSD1306_Puts("KaraDio", &Font_11x18, SSD1306_COLOR_WHITE);
-    
-    SSD1306_GotoXY(2, 20);
+	u8g2_ClearBuffer(&u8g2);
+    u8g2_SetFont(&u8g2, u8g2_font_ncenB14_tr);
+    u8g2_DrawStr(&u8g2, 10,2,"KaRadio32");
+	u8g2_SetFont(&u8g2, u8g2_font_timB08_tr);
+	u8g2_DrawStr(&u8g2, 2,24,"WiFi Webradio");
+	u8g2_SetFont(&u8g2, u8g2_font_timB08_tr);
+	u8g2_DrawStr(&u8g2, 2,40,url);
+	u8g2_DrawStr(&u8g2, u8g2_DrawStr(&u8g2, 2,53,"IP")+18,53,ip);
+	
+	u8g2_SendBuffer(&u8g2);
 
-    SSD1306_Puts("WiFi Webradio", &Font_7x10, SSD1306_COLOR_WHITE);
-    SSD1306_GotoXY(2, 30);
-    
-    SSD1306_Puts(url, &Font_7x10, SSD1306_COLOR_WHITE);
-    if (strlen(url) > 18)  {
-      SSD1306_GotoXY(2, 39);
-      SSD1306_Puts(url + 18, &Font_7x10, SSD1306_COLOR_WHITE);
-    }
-    SSD1306_GotoXY(16, 53);
-
-    SSD1306_GotoXY(2, 53);
-    SSD1306_Puts("IP:", &Font_7x10, SSD1306_COLOR_WHITE);
-    SSD1306_Puts(ip, &Font_7x10, SSD1306_COLOR_WHITE);    
-
-    // Update screen, send changes to LCD 
-    SSD1306_UpdateScreen();
    
 /* for class-D amplifier system. Dim OLED to avoid noise from panel*/
 /* PLEASE comment out next three lines for ESP32-ADB system*/  
@@ -250,25 +267,6 @@ static void i2c_test(char* ip)
 /* The above part is for class-D webradio system*/  
 }
 
-
-/**
- * @brief i2c master initialization
- */
-static void i2c_example_master_init()
-{
-    int i2c_master_port = I2C_EXAMPLE_MASTER_NUM;
-    i2c_config_t conf;
-    conf.mode = I2C_MODE_MASTER;
-    conf.sda_io_num = I2C_EXAMPLE_MASTER_SDA_IO;
-    conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
-    conf.scl_io_num = I2C_EXAMPLE_MASTER_SCL_IO;
-    conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
-    conf.master.clk_speed = I2C_EXAMPLE_MASTER_FREQ_HZ;
-    i2c_param_config(i2c_master_port, &conf);
-    i2c_driver_install(i2c_master_port, conf.mode,
-                       I2C_EXAMPLE_MASTER_RX_BUF_DISABLE,
-                       I2C_EXAMPLE_MASTER_TX_BUF_DISABLE, 0);
-}
 
 //////////////////////////////////////////////////////////////////
 
@@ -282,7 +280,7 @@ void setIvol( uint8_t vol)
 	clientIvol = vol;
 }
 
-
+// Renderer config creation
 static renderer_config_t *create_renderer_config()
 {
     renderer_config_t *renderer_config = calloc(1, sizeof(renderer_config_t));
@@ -486,7 +484,6 @@ static void start_wifi()
 			//esp_restart();		
 		}	else break;						
 	}					
-	i2c_state("Connected to AP");	
 	free(device);
 }
 
@@ -582,7 +579,7 @@ void start_network(){
 		}
 	}
 	
-	i2c_state("IP found");	
+	lcd_state("IP found");	
   /* start mDNS */
     // xTaskCreatePinnedToCore(&mdns_task, "mdns_task", 2048, wifi_event_group, 5, NULL, 0);
 
@@ -616,9 +613,11 @@ void timerTask(void* p) {
 					case TIMER_WAKE:
 					clientConnect(); // start the player	
 					break;
-					case TIMER_1MS:
+					case TIMER_1MS: // 1 ms 
 					  ctime++;	// for led
 					  if (serviceEncoder != NULL) serviceEncoder(); // for the encoder
+					break;
+					case TIMER_1mS:  //10µs
 					break;
 					default:
 					break;
@@ -656,6 +655,7 @@ void timerTask(void* p) {
 				ctime = 0;
 			}			
 		}
+		taskYIELD();
 	}
 //	printf("t0 end\n");
 	vTaskDelete( NULL ); // stop the task (never reached)
@@ -772,6 +772,8 @@ void app_main()
 	ESP_LOGI(TAG, "audio_output_mode %d\nOne of I2S=0, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053",audio_output_mode);
 	
 	// init softwares
+	ESP_LOGI(TAG, "LCD Device type: %d",device->lcd_type);
+	lcd_init(device->lcd_type);
 	telnetinit();
 	websocketinit();
 	
@@ -801,9 +803,9 @@ void app_main()
 	setIvol( device->vol);
 	
 	//Display if any	
-	i2c_example_master_init();
-	SSD1306_Init();
-	i2c_test("");
+	//i2c_example_master_init();
+	//SSD1306_Init();
+	lcd_welcome("");
 	
 	// Version infos
 	ESP_LOGI(TAG, "Release %s, Revision %s",RELEASE,REVISION);
@@ -844,8 +846,8 @@ void app_main()
 	printf("\nIP: %s\n\n",ip4addr_ntoa(&ip_info.ip));
 	
 	// LCD Display infos
-    i2c_test(ip4addr_ntoa(&ip_info.ip));
-	i2c_state("Started");
+    lcd_welcome(ip4addr_ntoa(&ip_info.ip));
+	lcd_state("Started");
 	
     ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
 
@@ -856,12 +858,12 @@ void app_main()
 	ESP_LOGI(TAG, "%s task: %x","clientTask",(unsigned int)pxCreatedTask);	
     xTaskCreate(serversTask, "serversTask", 2300, NULL, 3, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","serversTask",(unsigned int)pxCreatedTask);	
-	xTaskCreate(task_encoder, "task_encoder", 2100, NULL, 1, &pxCreatedTask); 
-	ESP_LOGI(TAG, "%s task: %x","task_encoder",(unsigned int)pxCreatedTask);
+	xTaskCreate(task_addon, "task_addon", 2100, NULL, 1, &pxCreatedTask); 
+	ESP_LOGI(TAG, "%s task: %x","task_addon",(unsigned int)pxCreatedTask);
 	
 	printf("Init ");
 	vTaskDelay(1);
-	for (int i=0;i<30;i++)
+	for (int i=0;i<20;i++)
 	{
 		vTaskDelay(10);// wait tasks init
 		printf(".");

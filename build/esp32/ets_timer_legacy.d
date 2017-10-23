@@ -84,7 +84,7 @@ ets_timer_legacy.o: \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/semphr.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/esp_timer.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/esp_timer_impl.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/string.h:
@@ -255,7 +255,7 @@ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/semphr.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/esp32/esp_timer.h:
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/esp_timer_impl.h:
 /home/jp/esp/esp-idf/components/esp32/./ets_timer_legacy.c:

@@ -75,7 +75,7 @@ typedef gpio_mode_t pinMode_t;
   int16_t getValue(void);
   Button getButton(void);
   bool getPinState();
-  void task_encoder(void *pvParams);
+  bool getpinsActive();
   
 
 

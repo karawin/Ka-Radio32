@@ -34,6 +34,9 @@ sdmmc_transaction.o: \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_assert.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_pm.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp32/pm.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_config.h \
@@ -157,6 +160,12 @@ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_assert.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_pm.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp32/pm.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h:
 

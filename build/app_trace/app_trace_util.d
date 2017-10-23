@@ -77,7 +77,8 @@ app_trace_util.o: \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/task.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/limits.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h \
- C:/msys32/home/jp/esp/esp-idf/components/app_trace/include/esp_app_trace_util.h
+ C:/msys32/home/jp/esp/esp-idf/components/app_trace/include/esp_app_trace_util.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_clk.h
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h:
 
@@ -234,4 +235,6 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/limits.h:
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/app_trace/include/esp_app_trace_util.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_clk.h:
 /home/jp/esp/esp-idf/components/app_trace/./app_trace_util.c:

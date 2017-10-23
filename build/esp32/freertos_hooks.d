@@ -74,7 +74,12 @@ freertos_hooks.o: \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_api.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_freertos_hooks.h
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_freertos_hooks.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_pm.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp32/pm.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/pm_impl.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdint.h:
 
@@ -225,4 +230,14 @@ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_api.h:
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_freertos_hooks.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_pm.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp32/pm.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/pm_impl.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h:
 /home/jp/esp/esp-idf/components/esp32/./freertos_hooks.c:

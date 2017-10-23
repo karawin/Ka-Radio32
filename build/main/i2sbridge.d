@@ -92,6 +92,8 @@ i2sbridge.o: C:/msys32/home/jp/esp/Ka-Radio32/main/i2sbridge.c \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_reg.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_access.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_dport_access.h \
+ C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/adc.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/adc_channel.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/semphr.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h
 
@@ -280,6 +282,10 @@ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_reg.h:
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_access.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_dport_access.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/adc.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/adc_channel.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/semphr.h:
 

@@ -38,7 +38,8 @@ xtensa_init.o: \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/platform_include/assert.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_timer.h \
- C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_rtos.h
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_rtos.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_clk.h
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_rtos.h:
 
@@ -117,4 +118,6 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h:
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_timer.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_rtos.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_clk.h:
 /home/jp/esp/esp-idf/components/freertos/./xtensa_init.c:

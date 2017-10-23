@@ -112,6 +112,8 @@ webserver.o: C:/msys32/home/jp/esp/Ka-Radio32/main/webserver.c \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/i2s.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/i2s_struct.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/i2s_reg.h \
+ C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/adc.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/adc_channel.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/common/include/common_component.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h \
@@ -383,6 +385,10 @@ C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/i2s.h:
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/i2s_struct.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/i2s_reg.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/adc.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/adc_channel.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/common/include/common_component.h:
 

@@ -88,6 +88,7 @@ pthread.o: C:/msys32/home/jp/esp/esp-idf/components/pthread/pthread.c \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/semphr.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h \
+ C:/msys32/home/jp/esp/esp-idf/components/pthread/pthread_internal.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h
 
@@ -268,6 +269,8 @@ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/semphr.h:
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/pthread/pthread_internal.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h:
 

@@ -86,6 +86,8 @@ void interrupts()
 
 // ----------------------------------------------------------------------------
 
+bool getpinsActive() {return pinsActive;}
+
 void ClickEncoderInit(int8_t A, int8_t B, int8_t BTN)
 {
 	pinA = A; pinB = B; pinBTN = BTN;
@@ -290,50 +292,3 @@ bool getPinState() {
 
   
 
-void task_encoder(void *pvParams)
-{
-  enum modeStateEncoder { encVolume, encStation } ;
-  static enum modeStateEncoder stateEncoder = encVolume;
-  int16_t newValue = 0;
-  Button newButton = Open;
-  static int16_t oldValue = 0;
-	
-	ClickEncoderInit(PIN_ENC_A, PIN_ENC_B, PIN_ENC_BTN);
-	serviceEncoder = &service;	;
-	while (1)
-	{
-		newValue = - getValue();
-		newButton = getButton();
-		if (newValue != 0) 
-		{
-		//    Serial.print("Encoder: ");Serial.println(newValue);
-			// reset our accelerator
-			if ((newValue >0)&&(oldValue<0)) oldValue = 0;
-			if ((newValue <0)&&(oldValue>0)) oldValue = 0;
-		}
-		else
-		{
-			// lower accelerator 
-			if (oldValue <0) oldValue++;
-			if (oldValue >0) oldValue--;
-		}
-    
-		if (getPinState() == pinsActive)
-		{    
-			//if (newButton == Held) 
-			{
-				if (newValue > 0) wsStationNext();
-				else if (newValue < 0) wsStationPrev();
-			}
-		} else
-
-		if (/*(stateScreen  != sstation)&&*/(newValue != 0))
-		{    
-			ESP_LOGD(TAG,"Enc value: %d, oldValue: %d,  incr volume: %d",newValue, oldValue,newValue+(oldValue*3));
-			setRelVolume(newValue+(oldValue*3));
-		} 		
-		vTaskDelay(10);
-		oldValue += newValue;
-	}
-	vTaskDelete( NULL ); 
-}

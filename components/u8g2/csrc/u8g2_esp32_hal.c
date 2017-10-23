@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-
+#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 #include "sdkconfig.h"
 #include "esp_log.h"
 
@@ -8,6 +8,7 @@
 #include "freertos/task.h"
 
 #include "u8g2_esp32_hal.h"
+
 
 static const char *TAG = "u8g2_hal";
 
