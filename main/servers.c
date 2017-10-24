@@ -41,7 +41,7 @@ void serversTask(void* pvParams) {
 	int  client_sock;
 	socklen_t sin_size;
 	
-	semclient = xSemaphoreCreateCounting(3,3); 
+	semclient = xSemaphoreCreateCounting(5,5); 
 	semfile = xSemaphoreCreateCounting(1,1); 
 	
 	portBASE_TYPE uxHighWaterMark;

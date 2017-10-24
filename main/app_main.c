@@ -233,14 +233,12 @@ output_mode_t get_audio_output_mode()
 
 static void lcd_state(char* State)
 {
-	
 	u8g2_SetDrawColor(&u8g2, 0);
 	u8g2_DrawBox(&u8g2, 2, 40, 128-30, 12);
 	u8g2_SetDrawColor(&u8g2, 1);
 	u8g2_SetFont(&u8g2, u8g2_font_timB08_tr);
 	u8g2_DrawStr(&u8g2, 2,40,State);
 	u8g2_SendBuffer(&u8g2);
-	
 }
 
 static void lcd_welcome(char* ip)
@@ -255,7 +253,6 @@ static void lcd_welcome(char* ip)
 	u8g2_SetFont(&u8g2, u8g2_font_timB08_tr);
 	u8g2_DrawStr(&u8g2, 2,40,url);
 	u8g2_DrawStr(&u8g2, u8g2_DrawStr(&u8g2, 2,53,"IP")+18,53,ip);
-	
 	u8g2_SendBuffer(&u8g2);
 
    
@@ -616,12 +613,14 @@ void timerTask(void* p) {
 					case TIMER_1MS: // 1 ms 
 					  ctime++;	// for led
 					  if (serviceEncoder != NULL) serviceEncoder(); // for the encoder
+					  if (serviceAddon != NULL) serviceAddon(); // for the encoder
 					break;
 					case TIMER_1mS:  //10µs
 					break;
 					default:
 					break;
 			}
+			taskYIELD();
 		}
 		taskYIELD();
 		if (ledStatus)
@@ -646,7 +645,7 @@ void timerTask(void* p) {
 						if (device->vol != getIvol()){ 			
 							device->vol = getIvol();
 							taskYIELD();
-							saveDeviceSettings(device);
+							saveDeviceSettingsVolume(device);
 //							ESP_LOGD("timerTask",striWATERMARK,uxTaskGetStackHighWaterMark( NULL ),xPortGetFreeHeapSize( ));
 						}
 						free(device);	
@@ -740,25 +739,37 @@ void app_main()
 	//init hardware	
 	partitions_init();
 	ESP_LOGI(TAG, "Partition init done...");
-    init_hardware(); 
-	ESP_LOGI(TAG, "Hardware init done...");
 	
 	device = getDeviceSettings();
 	// device partition initialized?
+	//vTaskDelay(1000);eeErasesettings();copyDeviceSettings();
 	if (device->cleared != 0xAABB)
-	{		
-		ESP_LOGI(TAG,"Device not cleared. Clear it.");
-		eeErasesettings();
+	{	
 		free(device);
-		device = getDeviceSettings();
-		device->cleared = 0xAABB; //marker init done
-		device->uartspeed = 115200; // default
-		device->audio_output_mode = VS1053; // default
-		device->trace_level = ESP_LOG_ERROR; //default
-		device->vol = 100; //default
-		saveDeviceSettings(device);
+		ESP_LOGE(TAG,"Device config not ok. Try to restore");
+		restoreDeviceSettings(); // try to restore the config from the saved one
+		device = getDeviceSettings();		
+		if (device->cleared != 0xAABB)
+		{
+			ESP_LOGE(TAG,"Device config not cleared. Clear it.");
+			eeErasesettings();
+			//else device->current_ap = 1;
+			device->cleared = 0xAABB; //marker init done
+			device->uartspeed = 115200; // default
+			device->audio_output_mode = VS1053; // default
+			device->trace_level = ESP_LOG_ERROR; //default
+			device->vol = 100; //default
+			saveDeviceSettings(device);			
+		} else
+			ESP_LOGE(TAG,"Device config restored");
 	}	
 	
+	copyDeviceSettings(); // copy in the safe partion
+	// init softwares
+	telnetinit();
+	websocketinit();
+	// log level
+	setLogLevel(device->trace_level);
 	// output mode
 	//I2S, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053
 	audio_output_mode = device->audio_output_mode;
@@ -770,15 +781,14 @@ void app_main()
 		saveDeviceSettings(device);
 	}
 	ESP_LOGI(TAG, "audio_output_mode %d\nOne of I2S=0, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053",audio_output_mode);
-	
-	// init softwares
+
 	ESP_LOGI(TAG, "LCD Device type: %d",device->lcd_type);
 	lcd_init(device->lcd_type);
-	telnetinit();
-	websocketinit();
 	
-	// log level
-	setLogLevel(device->trace_level);
+
+
+    init_hardware(); 
+	ESP_LOGI(TAG, "Hardware init done...");
 	
 	//uart speed
 	uspeed = device->uartspeed;	
@@ -790,7 +800,7 @@ void app_main()
 		device->uartspeed = uspeed;
 		saveDeviceSettings(device);
 	}	
-
+	
 	
 	// queur for events of the sleep / wake timers
 	event_queue = xQueueCreate(10, sizeof(queue_event_t));
@@ -802,15 +812,16 @@ void app_main()
 	// volume
 	setIvol( device->vol);
 	
+	// Version infos
+	ESP_LOGI(TAG, "Release %s, Revision %s",RELEASE,REVISION);
+	ESP_LOGI(TAG, "SDK %s",esp_get_idf_version());
+	ESP_LOGI(TAG, "Heap size: %d",xPortGetFreeHeapSize( ));
+
 	//Display if any	
 	//i2c_example_master_init();
 	//SSD1306_Init();
 	lcd_welcome("");
 	
-	// Version infos
-	ESP_LOGI(TAG, "Release %s, Revision %s",RELEASE,REVISION);
-	ESP_LOGI(TAG, "SDK %s",esp_get_idf_version());
-	ESP_LOGI(TAG, "Heap size: %d",xPortGetFreeHeapSize( ));
 
 //-----------------------------
 // start the network

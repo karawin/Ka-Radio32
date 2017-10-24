@@ -3,7 +3,7 @@
  * Copyright 2017 karawin (http://www.karawin.fr)
  *
 *******************************************************************************/
-
+#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_spi_flash.h"
@@ -33,7 +33,7 @@
 */
 #define NBSTATIONS		255
 const static char *TAG = "eeprom";
-
+static xSemaphoreHandle muxDevice;
 //const char streMSG[]   = {"Warning %s malloc low memory\n"};
 //const char saveStationPos[]  = {"saveStation fails pos=%d\n"};
 //const char getStationPos[]  = {"getStation fails pos=%d\n"};
@@ -42,6 +42,7 @@ const static char *TAG = "eeprom";
 //const char streSETDEVICE[]  = {"saveDeviceSetting%d:  null\n"};
 
 const esp_partition_t * DEVICE;
+const esp_partition_t * DEVICE1;
 const esp_partition_t * STATIONS;
 
 
@@ -50,8 +51,11 @@ void partitions_init(void)
 {
 	DEVICE = esp_partition_find_first(64,0,NULL);
 	if (DEVICE == NULL) ESP_LOGE(TAG, "DEVICE Partition not found");
+	DEVICE1 = esp_partition_find_first(66,0,NULL);
+	if (DEVICE == NULL) ESP_LOGE(TAG, "DEVICE Partition not found");
 	STATIONS = esp_partition_find_first(65,0,NULL);
 	if (STATIONS == NULL) ESP_LOGE(TAG, "STATIONS Partition not found");
+	muxDevice=xSemaphoreCreateMutex();
 }
 
 
@@ -200,15 +204,48 @@ struct shoutcast_info* getStation(uint8_t position) {
 	return (struct shoutcast_info*)buffer;
 }
 
-void saveDeviceSettings(struct device_settings *settings) {
-	if (settings == NULL) { ESP_LOGE(TAG,"saveDeviceSetting fails");return;}
-	vTaskDelay(1);
-	ESP_ERROR_CHECK(esp_partition_erase_range(DEVICE,0,DEVICE->size));
-	vTaskDelay(1);
-	ESP_ERROR_CHECK(esp_partition_write(DEVICE,0,settings,DEVICE->size));	
-	vTaskDelay(1);
+void copyDeviceSettings()
+{
+	uint8_t* buffer= malloc(4096);
+	if(buffer) {	
+		ESP_ERROR_CHECK(esp_partition_read(DEVICE, 0, buffer, sizeof(struct device_settings)));
+		ESP_ERROR_CHECK(esp_partition_erase_range(DEVICE1,0,DEVICE1->size));
+		ESP_ERROR_CHECK(esp_partition_write(DEVICE1,0,buffer,DEVICE1->size));
+	} 
+	free (buffer);	
 }
 
+void restoreDeviceSettings()
+{
+	uint8_t* buffer= malloc(4096);
+	if(buffer) {	
+		ESP_ERROR_CHECK(esp_partition_read(DEVICE1, 0, buffer, sizeof(struct device_settings)));
+		ESP_ERROR_CHECK(esp_partition_erase_range(DEVICE,0,DEVICE->size));
+		ESP_ERROR_CHECK(esp_partition_write(DEVICE,0,buffer,DEVICE->size));
+	} 
+	free (buffer);		
+}
+
+
+void saveDeviceSettings(struct device_settings *settings) {
+	if (settings == NULL) { ESP_LOGE(TAG,"saveDeviceSetting fails");return;}
+	ESP_LOGD(TAG,"saveDeviceSettings");
+	xSemaphoreTake(muxDevice, portMAX_DELAY);
+	ESP_ERROR_CHECK(esp_partition_erase_range(DEVICE,0,DEVICE->size));
+	vTaskDelay(1);
+	ESP_ERROR_CHECK(esp_partition_write(DEVICE,0,settings,DEVICE->size));
+	xSemaphoreGive(muxDevice);
+	
+}
+void saveDeviceSettingsVolume(struct device_settings *settings) {
+	if (settings == NULL) { ESP_LOGE(TAG,"saveDeviceSetting fails");return;}
+	ESP_LOGD(TAG,"saveDeviceSettingsVolume");
+	if (xSemaphoreTake(muxDevice, 0) == pdFALSE) return; // not important. An other one in progress
+	ESP_ERROR_CHECK(esp_partition_erase_range(DEVICE,0,DEVICE->size));
+	ESP_ERROR_CHECK(esp_partition_write(DEVICE,0,settings,DEVICE->size));
+	xSemaphoreGive(muxDevice);
+	
+}
 
 struct device_settings* getDeviceSettingsSilent() {
 	uint16_t size = sizeof(struct device_settings);

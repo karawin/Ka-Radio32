@@ -784,6 +784,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			if (val){
 				// set current_ap to the first filled ssid
 				ESP_LOGD(TAG,"audio_output_mode: %d",device->audio_output_mode);
+				copyDeviceSettings();
 				vTaskDelay(50);	
 				esp_restart();			
 			}	
@@ -903,7 +904,8 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 					if (strlen(device->ssid2)!= 0) device->current_ap = STA2;
 					saveDeviceSettings(device);
 				}
-				ESP_LOGD(TAG,"currentAP: %d",device->current_ap);				
+				ESP_LOGD(TAG,"currentAP: %d",device->current_ap);
+				copyDeviceSettings();	// save the current one			
 				vTaskDelay(50);	
 				esp_restart();			
 			}	
@@ -1051,7 +1053,7 @@ static bool httpServerHandleConnection(int conn, char* buf, uint16_t buflen) {
 // Server child task to handle a request from a browser.
 void serverclientTask(void *pvParams) {
 	struct timeval timeout; 
-	char buf[2*RECLEN]; 
+	char buf[DRECLEN]; 
     timeout.tv_sec = 3; 
     timeout.tv_usec = 0;
 	int recbytes ,recb;
@@ -1066,8 +1068,8 @@ void serverclientTask(void *pvParams) {
 		if (setsockopt (client_sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0)
 			printf(strsSOCKET,"setsockopt",errno);
 
-		while (((recbytes = read(client_sock , buf, DRECLEN)) != 0)) 
-		{ // For now we assume max. DRECLEN bytes for request 
+		while (((recbytes = read(client_sock , buf, RECLEN)) != 0)) 
+		{ // For now we assume max. RECLEN bytes for request 
 			if (recbytes < 0) {
 				break;
 				if (errno != EAGAIN )
@@ -1090,20 +1092,13 @@ void serverclientTask(void *pvParams) {
 						if ((bend - buf +cl)> recbytes)
 						{	
 //printf ("Server: try receive more:%d bytes. , must be %d\n", recbytes,bend - buf +cl);
-							while(((recb = read(client_sock , buf+recbytes, cl))==0)){vTaskDelay(1);printf(".");}
+							while(((recb = read(client_sock , buf+recbytes, cl))==0)){vTaskDelay(1);}
 							buf[recbytes+recb] = 0;
 //printf ("Server: received more now: %d bytes, rec:\n%s\nEnd\n", recbytes+recb,buf);
 							if (recb < 0) {
 								ESP_LOGE(TAG,"read fails 0  errno:%d",errno);
 								respKo(client_sock);
-								break;
-/*								if (errno != EAGAIN )
-								{
-									printf(strsSOCKET,"read",errno);
-									vTaskDelay(10);	
-									break;
-								} else printf(strsSOCKET,tryagain,errno);
-*/								
+								break;								
 							}
 							recbytes += recb;
 						}
@@ -1137,8 +1132,8 @@ void serverclientTask(void *pvParams) {
 	if (result)
 	{
 		int err;
-		err = shutdown(client_sock,SHUT_RDWR);
-		vTaskDelay(20);
+//		err = shutdown(client_sock,SHUT_RDWR);
+//		vTaskDelay(20);
 		err = close(client_sock);
 		if (err != ERR_OK) 
 		{
@@ -1151,8 +1146,6 @@ void serverclientTask(void *pvParams) {
 	uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
 	ESP_LOGD(TAG,"watermark serverClientTask: %x  %d",uxHighWaterMark,uxHighWaterMark);	
 
-
-	ESP_LOGV(TAG,"Client exit socket:%d result %d \n",client_sock,result);
 	vTaskDelete( NULL );	
 }	
 

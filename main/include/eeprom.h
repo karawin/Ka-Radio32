@@ -67,6 +67,8 @@ struct shoutcast_info {
 };
 
 void partitions_init(void);
+void copyDeviceSettings();
+void restoreDeviceSettings();
 bool eeSetData(int address, void* buffer, int size);
 bool eeSetData1(int address, void* buffer, int size);
 void eeErasesettings(void);
@@ -76,5 +78,6 @@ void saveMultiStation(struct shoutcast_info *station, uint16_t position, uint8_t
 void eeEraseStations(void);
 struct shoutcast_info* getStation(uint8_t position);
 void saveDeviceSettings(struct device_settings *settings);
+void saveDeviceSettingsVolume(struct device_settings *settings);
 struct device_settings* getDeviceSettings();
 struct device_settings* getDeviceSettingsSilent();
