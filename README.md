@@ -82,7 +82,7 @@ python /home/yourhome/esp/esp-idf/components/esptool_py/esptool/esptool.py --chi
 ```
 #### Oled and lcd support
 The type of lcd can be set with the uart or telnet command sys.lcd("x")<BR/>
-Status: in progress. Not finished.<BR/>
+Status: Ready.<BR/>
 Other type and some color lcd added later.<BR/>
 ```
 #define LCD_I2C_SH1106	0
@@ -121,41 +121,4 @@ See the image at http://karadio.karawin.fr/karawin32Flash.jpg <br/>
 <img src="https://github.com/karawin/Ka-Radio32/blob/master/images/karawin32Flash.jpg" alt="screenshot" border=0> 
 
 <br/><br/>
-original code (w/o OLED) is<br/>
-https://github.com/MrBuddyCasino/ESP32_MP3_Decoder<br/>
-<br/>
-original readme:<br/>
-Modified for OLED display support by kodera2t<br/>
 
-Please use latest esp-idf environment (environment just before will make lots error)<br/>
-
-
-
-OLED display mode for WiFi Radio/Bluetooth speaker will be set by menuconfig (select BT speaker or Wifi radio)<br/>
-
-Bluetooth device name is defined in bt_config.h in include file folder. (default: "hogehoge_mont")<br/>
-
-----
-Wiring is same as original, as
-ESP pin   - I2S signal
-```
-----------------------
-GPIO25/DAC1   - LRCK
-GPIO26/DAC2   - BCLK
-GPIO22        - DATA
-```
-and GPIO25/26 are fixed but GPIO22 can be re-arranged as you wish.
-(defined in components/audio_renderer.c)
-
-I2C OLED is connected, as
-ESP pin   - I2C signal
-```
-----------------------
-GPIO14   - SCL
-GPIO13   - SDA
-```
-,which defined in app_main.c Please change as you wish...
-
-
-More details can be found in the original author's explanation at
-https://github.com/MrBuddyCasino/ESP32_MP3_Decoder
