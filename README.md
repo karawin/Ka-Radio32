@@ -112,6 +112,7 @@ Other type and some color lcd added later.<BR/>
 <br/>
 <br/>
 To flash your KaRadio32 you will need these files:<br/>
+The first one is no more used. You can remove it.<br/>
 http://karadio.karawin.fr/KaRadio32.bin <br/>
 and<br/>
 http://karadio.karawin.fr/KaRadio32sup.zip <br/>
