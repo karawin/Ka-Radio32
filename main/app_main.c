@@ -773,6 +773,8 @@ void app_main()
 	websocketinit();
 	// log level
 	setLogLevel(device->trace_level);
+    init_hardware(); 
+	ESP_LOGI(TAG, "Hardware init done...");
 	// output mode
 	//I2S, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053
 	audio_output_mode = device->audio_output_mode;
@@ -790,8 +792,6 @@ void app_main()
 	
 
 
-    init_hardware(); 
-	ESP_LOGI(TAG, "Hardware init done...");
 	
 	//uart speed
 	uspeed = device->uartspeed;	
