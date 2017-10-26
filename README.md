@@ -112,13 +112,14 @@ Other type and some color lcd added later.<BR/>
 <br/>
 <br/>
 To flash your KaRadio32 you will need these files:<br/>
-The first one is no more used. You can remove it.<br/>
+
 http://karadio.karawin.fr/KaRadio32.bin <br/>
 and<br/>
 http://karadio.karawin.fr/KaRadio32sup.zip <br/>
 The tool to use is here: http://espressif.com/en/support/download/other-tools <br/>
 (change the security of the installation directory to permit all)<br/>
 See the image at http://karadio.karawin.fr/karawin32Flash.jpg <br/>
+The first one is no more used. You can remove it.<br/>
 <img src="https://github.com/karawin/Ka-Radio32/blob/master/images/karawin32Flash.jpg" alt="screenshot" border=0> 
 
 <br/><br/>
