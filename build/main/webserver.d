@@ -29,6 +29,9 @@ webserver.o: C:/msys32/home/jp/esp/Ka-Radio32/main/webserver.c \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8x8.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/webserver.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h \
@@ -152,6 +155,7 @@ webserver.o: C:/msys32/home/jp/esp/Ka-Radio32/main/webserver.c \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/webclient.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/eeprom.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/api.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/netbuf.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/pbuf.h \
@@ -219,6 +223,12 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h:
 C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8x8.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/webserver.h:
 
@@ -465,6 +475,8 @@ C:/msys32/home/jp/esp/Ka-Radio32/main/include/webclient.h:
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/eeprom.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/api.h:
 

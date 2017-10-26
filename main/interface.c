@@ -499,7 +499,7 @@ void clientList(char *s)
 	} 
 	{	
 		kprintf(strilDINFO,0x0d);	
-		for (i=0 ;i <j;i++)
+		for ( ;i <j;i++)
 		{
 			vTaskDelay(1);
 			si = getStation(i);

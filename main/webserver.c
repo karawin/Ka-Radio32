@@ -20,6 +20,7 @@
 #include "vs1053.h"
 #include "eeprom.h"
 #include "interface.h"
+#include "addon.h"
 
 #include "lwip/opt.h"
 #include "lwip/arch.h"
@@ -223,11 +224,11 @@ void setVolume(char* vol) {
 	uvol += clientOvol;
 	if (uvol > 254) uvol = 254;
 	if (uvol <0) uvol = 1;
-	if(vol) {
+	if(vol!= NULL) {
 		if (get_audio_output_mode() == VS1053) VS1053_SetVolume(uvol);
 		if (uvol <3) uvol--;
 		renderer_volume(uvol+2); // max 256
-		kprintf(PSTR("##CLI.VOL#: %d\n"),getIvol());		
+		kprintf(PSTR("##CLI.VOL#: %d\n"),getIvol());	
 	}
 }
 // set the current volume with its offset
@@ -237,6 +238,7 @@ static void setOffsetVolume(void) {
 	if (uvol > 254) uvol = 254;
 	if (uvol <=0) uvol = 1;
 	ESP_LOGV(TAG,"setOffsetVol: %d",clientOvol);
+	kprintf(PSTR("##CLI.VOL#: %d\n"),getIvol());
 	setVolumei(uvol);
 }
 

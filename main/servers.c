@@ -15,7 +15,7 @@
 #include "webserver.h"
 #include "interface.h"
 
-#define stack  3900
+#define stack  4000
 #define TAG	"servers"
 
 #define  strsTELNET  "Servers Telnet Socket fails %s errno: %d"

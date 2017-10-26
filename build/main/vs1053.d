@@ -101,6 +101,9 @@ vs1053.o: C:/msys32/home/jp/esp/Ka-Radio32/main/vs1053.c \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8x8.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/timer.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_reg.h \
@@ -314,6 +317,12 @@ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h:
 C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8x8.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h:
 

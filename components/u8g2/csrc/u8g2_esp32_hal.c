@@ -98,7 +98,7 @@ uint8_t u8g2_esp32_msg_comms_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void
  */
 uint8_t u8g2_esp32_msg_i2c_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
 
-	ESP_LOGD(TAG, "msg_i2c_cb: Received a msg: %d %d", msg, arg_int);
+	ESP_LOGV(TAG, "msg_i2c_cb: Received a msg: %d %d", msg, arg_int);
 	//ESP_LOGD(tag, "msg_i2c_cb: Received a msg: %d: %s", msg, msgToString(msg, arg_int, arg_ptr));
 
 	switch(msg) {
@@ -147,22 +147,22 @@ uint8_t u8g2_esp32_msg_i2c_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *
 			i2c_cmd_handle_t cmd = i2c_cmd_link_create();
 			ESP_ERROR_CHECK(i2c_master_start(cmd));
 //			ESP_LOGI(TAG, "I2CAddress %02X", u8x8_GetI2CAddress(u8x8)>>1);
-			ESP_ERROR_CHECK(i2c_master_write_byte(cmd, u8x8_GetI2CAddress(u8x8) | I2C_MASTER_WRITE, ACK_CHECK_EN));
+			ESP_ERROR_CHECK(i2c_master_write_byte(cmd, u8x8_GetI2CAddress(u8x8) | I2C_MASTER_WRITE, ACK_CHECK_DIS));
 		    data = (uint8_t *)arg_ptr;
 			if (arg_int==1) {
 				cmddata=0;
-				ESP_ERROR_CHECK(i2c_master_write(cmd, &cmddata, 1, ACK_CHECK_EN));
+				ESP_ERROR_CHECK(i2c_master_write(cmd, &cmddata, 1, ACK_CHECK_DIS));
 //				   printf("0x%02X ",zerodata);
 			} else {
 				cmddata=0x40;
-				ESP_ERROR_CHECK(i2c_master_write(cmd, &cmddata, 1, ACK_CHECK_EN));
+				ESP_ERROR_CHECK(i2c_master_write(cmd, &cmddata, 1, ACK_CHECK_DIS));
 				//bzero(arg_ptr,arg_int);
 				//*data=0x40;
 			}
-			//ESP_ERROR_CHECK(i2c_master_write(cmd, arg_ptr, arg_int, ACK_CHECK_EN));
+			//ESP_ERROR_CHECK(i2c_master_write(cmd, arg_ptr, arg_int, ACK_CHECK_DIS));
 
 		    while( arg_int > 0 ) {
-			   ESP_ERROR_CHECK(i2c_master_write_byte(cmd, *data, ACK_CHECK_EN));
+			   ESP_ERROR_CHECK(i2c_master_write_byte(cmd, *data, ACK_CHECK_DIS));
 //			   printf("0x%02X ",*data);
 			   data++;
 			   arg_int--;
@@ -170,8 +170,10 @@ uint8_t u8g2_esp32_msg_i2c_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *
 //			printf("\n");
 
 			ESP_ERROR_CHECK(i2c_master_stop(cmd));
-//			ESP_LOGI(TAG, "i2c_master_cmd_begin %d", I2C_MASTER_NUM);
-			ESP_ERROR_CHECK(i2c_master_cmd_begin(I2C_MASTER_NUM, cmd, 1000 / portTICK_RATE_MS));
+			ESP_LOGV(TAG, "i2c_master_cmd_begin %d, cmd: %x", I2C_MASTER_NUM,(int)cmd);
+			//ESP_ERROR_CHECK(
+			i2c_master_cmd_begin(I2C_MASTER_NUM, cmd, 1000 / portTICK_RATE_MS);
+			//);
 			i2c_cmd_link_delete(cmd);
 			break;
 		}

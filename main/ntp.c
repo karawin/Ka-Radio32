@@ -4,7 +4,10 @@
 // jp@karawin.fr
 // See license.txt for license terms.
 //////////////////////////////////////////////////
-
+// esp32
+#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
+#define TAG "NTP"
+//
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
@@ -50,7 +53,7 @@ bool ntp_get_time(struct tm **dt) {
 	
 	msg = calloc(sizeof(ntp_t),1);
 	if (msg == NULL){
-		kprintf(PSTR("##SYS.DATE#: ntp fails on %s %d\n"),"msg",0);
+		ESP_LOGE(TAG,"##SYS.DATE#: ntp fails on calloc");
 		return false;
 	} 
 	// build the message to send
@@ -65,30 +68,30 @@ bool ntp_get_time(struct tm **dt) {
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_DGRAM; // Use UDP
 	if ((rv = getaddrinfo(node, service, &hints, &servinfo)) != 0) {
-		kprintf(PSTR("##SYS.DATE#: ntp fails on %s %d\n"),"getaddrinfo",rv);free (msg);
+		ESP_LOGE(TAG,"##SYS.DATE#: ntp fails on %s %d","getaddrinfo",rv);free (msg);
 		return false;
 	} 		
 // loop in result socket
 	for (p = servinfo; p != NULL; p = p->ai_next) {
 		if ((sockfd = socket(p->ai_family, p->ai_socktype,p->ai_protocol)) == -1) {
-			kprintf(PSTR("##SYS.DATE#: ntp fails on %s %d\n"),"sockfd",sockfd);
+			ESP_LOGE(TAG,"##SYS.DATE#: ntp fails on %s %d","sockfd",sockfd);
 			continue;
 		}
 		break;
 	}
 // set a timeout for recvfrom
 	if (setsockopt (sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0){
-		kprintf(PSTR("##SYS.DATE#: ntp fails on %s %d\n"),"setsockopt",0);	free (msg);freeaddrinfo(servinfo);	close(sockfd);
+		ESP_LOGE(TAG,"##SYS.DATE#: ntp fails on %s %d","setsockopt",0);	free (msg);freeaddrinfo(servinfo);	close(sockfd);
 		return false;
 	} 	
 //send the request	
 	if ((rv = sendto(sockfd, msg, sizeof(ntp_t), 0,p->ai_addr, p->ai_addrlen)) == -1) {
-		kprintf(PSTR("##SYS.DATE#: ntp fails on %s %d\n"),"sendto",rv); free (msg);freeaddrinfo(servinfo);	close(sockfd);
+		ESP_LOGE(TAG,"##SYS.DATE#: ntp fails on %s %d","sendto",rv); free (msg);freeaddrinfo(servinfo);	close(sockfd);
 		return false;					
 	}
 	freeaddrinfo(servinfo);	
  	if ((rv = recvfrom(sockfd, msg, sizeof(ntp_t) , 0,NULL, NULL)) <=0) {
-		kprintf(PSTR("##SYS.DATE#: ntp fails on %s %d\n"),"recvfrom",rv);free(msg);close(sockfd);
+		ESP_LOGE(TAG,"##SYS.DATE#: ntp fails on %s %d","recvfrom",rv);free(msg);close(sockfd);
 		return false;	
 	}	
 			

@@ -64,6 +64,7 @@ void startWake(uint32_t delay);
 void stopWake();
 void noInterrupt1Ms();
 void interrupt1Ms();
+char* getIp();
 
 
 

@@ -181,6 +181,7 @@ app_main.o: C:/msys32/home/jp/esp/Ka-Radio32/main/app_main.c \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/lldesc.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/queue.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/i2c.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/eeprom.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/bt_config.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/xi2c/include/xi2c.h \
@@ -195,9 +196,9 @@ app_main.o: C:/msys32/home/jp/esp/Ka-Radio32/main/app_main.c \
  C:/msys32/home/jp/esp/esp-idf/components/wpa_supplicant/include/crypto\sha1_i.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/ClickEncoder.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/ClickEncoder.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h:
 
@@ -563,6 +564,8 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/queue.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/i2c.h:
 
+C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h:
+
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/eeprom.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/bt_config.h:
@@ -591,9 +594,9 @@ C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h:
 
+C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h:
+
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/ClickEncoder.h:
-
-C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h:
 /home/jp/esp/Ka-Radio32/main/./app_main.c:

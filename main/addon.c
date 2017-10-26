@@ -21,6 +21,8 @@
 #include "u8g2_esp32_hal.h"
 #include <time.h>
 #include "ntp.h"
+#include "logo.h"
+#include "eeprom.h"
 
 
 #define TAG  "addon"
@@ -41,47 +43,56 @@
 
 
 u8g2_t u8g2; // a structure which will contain all the data for one display
-uint8_t lcd_type;
-uint8_t lcd_family;
-uint16_t y ;		//Height of a line
-uint16_t yy;		//Height of screen
-uint16_t x ;		//Width
-uint16_t z ;		// an internal offset for y
+static uint8_t lcd_type;
+static uint8_t lcd_family;
+static uint16_t y ;		//Height of a line
+static uint16_t yy;		//Height of screen
+static uint16_t x ;		//Width
+static uint16_t z ;		// an internal offset for y
 
 // list of screen
-typedef  enum typeScreen {smain,smain0,svolume,sstation,snumber,stime} typeScreen ;
-typeScreen stateScreen = smain;
+typedef  enum typeScreen {smain,svolume,sstation,snumber,stime} typeScreen ;
+//typeScreen stateScreen = smain0;
+static typeScreen stateScreen = smain;
 // state of the transient screen
-uint8_t mTscreen = 1; // 0 dont display, 1 display full, 2 display variable part
+static uint8_t mTscreen = 0; // 0 dont display, 1 display full, 2 display variable part
 
-uint8_t highlight=0;// index in sline of the highlighted station
-char sline[BUFLEN] ; // station 
-bool playable = true;
+//static uint8_t highlight=0;// index in sline of the highlighted station
 
-char* lline[LINES] ; // array of ptr of n lines 
-uint8_t  iline[LINES] ; //array of index for scrolling
-uint8_t  tline[LINES] ;
+static char sline[BUFLEN] ; // station 
+static char station[BUFLEN]; //received station
+static char title[BUFLEN];	// received title
+static char nameset[BUFLEN/2]; // the local name of the station
+static bool playable = true;
+static uint16_t volume;
+static char* lline[LINES] ; // array of ptr of n lines 
+static uint8_t  iline[LINES] ; //array of index for scrolling
+static uint8_t  tline[LINES] ;
 
-char nameNum[5] ; // the number of the current station
-char futurNum[5] = {"0"}; // the number of the wanted station
-char genre[BUFLEN/2]; // the local name of the station
+static char nameNum[5] ; // the number of the current station
+static int16_t futurNum = 0; // the number of the wanted station
+static char genre[BUFLEN/2]; // the local name of the station
 
-unsigned timerScreen = 0;
-unsigned timerScroll = 0;
-unsigned timer1s = 0;
+static unsigned timerScreen = 0;
+static unsigned timerScroll = 0;
+static unsigned timer1s = 0;
 
-unsigned timein = 0;
-struct tm *dt;
+static unsigned timein = 0;
+static struct tm *dt;
 time_t timestamp = 0;
 static bool syncTime = false;
 static bool itAskTime = true; // update time with ntp if true
 static bool itAskStime = false; // start the time display
+//static bool itAskSsecond = false; // start the time display
 static bool state = false; // start stop on Ok key
 
 // svolume: display the volume
-char aVolume[4] = {"0"}; 
+static char aVolume[4] = {"0"}; 
 // time string
-char strsec[30]; 
+static char strsec[30]; 
+
+static int16_t newValue = 0;
+  
 
 
  // ----------------------------------------------------------------------------
@@ -91,8 +102,11 @@ void (*serviceAddon)() = NULL;
 void ServiceAddon(void)
 {
 	timer1s++;
+	timerScroll++;
 	if (timer1s >=1000)
 	{
+		// Time compute
+        timestamp++;  // time update  
 		if (state) timein = 0; // only on stop state
          else timein++;
 		 
@@ -100,11 +114,35 @@ void ServiceAddon(void)
             if ((timein % (30*DTIDLE))==0){ itAskTime=true;timein = 0;} // synchronise with ntp every x*DTIDLE
             if (stateScreen != stime) {itAskStime=true;} // start the time display
         } 
+		//if (stateScreen == stime) {itAskSsecond=true;} // start the time display
+		if ((stateScreen == stime)||(stateScreen == smain)) { mTscreen = 1; } // display time
+		if (!syncTime) itAskTime=true; // first synchro if not done
 		
-		
-		timestamp++;  // time update  
 		timer1s = 0;
+		// Other slow timers        
+         timerScreen++;
+         
 	}
+}
+
+////////////////////////////////////////
+// Clear all buffers and indexes
+void clearAll()
+{
+      title[0] = 0;
+      station[0]=0;
+    for (int i=1;i<LINES;i++) {lline[i] = NULL;iline[i] = 0;tline[i] = 0;}
+}
+////////////////////////////////////////
+void cleartitle()
+{
+     title[0] = 0;
+     for (int i = 3;i<LINES;i++)  // clear lines
+     {
+       lline[i] = NULL;
+     iline[i] = 0;
+     tline[i] = 0; 
+     }  
 }
 
 ////////////////////////////////////////
@@ -121,14 +159,18 @@ unsigned len;
 	   } 
 	   else
 	   {
-       len = u8g2_GetStrWidth(&u8g2,lline[i]+iline[i]);
-		   if (i == 0)	 len += u8g2_GetStrWidth(&u8g2,nameNum) ;
-		   if (len > x) 
-		    {iline[i]++;}
-		   else 
-			  tline[i] = 6;
+		   if ((lline[i] != NULL))
+		   {
+				len = u8g2_GetUTF8Width(&u8g2,lline[i]+iline[i]);
+				if (i == 0)	 len += u8g2_GetUTF8Width(&u8g2,nameNum) ;
+				if (len >= x-20) 
+					iline[i]++;
+				else 
+					tline[i] = 6;
+		   }
 	   }
-	}	
+	}
+	mTscreen = 1;	
 }
 
 
@@ -146,14 +188,15 @@ void Screen(typeScreen st){
     irStr[0] = 0;
 #endif
   }
-  else
-    if (mTscreen == 0) mTscreen = 2;
+//  else
+//    if (mTscreen == 0) mTscreen = 2;
   stateScreen = st;  
   timein = 0;
   mTscreen = 1;
+  
 }
 
-/*
+
 // Bottom of screens
 void screenBottom()
 {
@@ -162,70 +205,82 @@ void screenBottom()
     u8g2_DrawHLine(&u8g2,0,yy-2,((uint16_t)(x*volume)/255));                         
 //TIME
 //  if ((lline[4] == NULL)||(x==84))
-    setFont(u8g_font_5x8);
-    u8g2_DrawStr(&u8g2,x/2-(u8g2.getStrWidth(strsec)/2),yy-y-4,strsec);   
+    u8g2_SetFont(&u8g2, u8g2_font_5x8_tf);
+    u8g2_DrawUTF8(&u8g2,x/2-(u8g2_GetUTF8Width(&u8g2,strsec)/2),yy-y-4,strsec);  
+	
 }
-*/
-/*
+
+uint8_t getFontLineSpacing()
+{
+	return (u8g2_GetAscent(&u8g2) - u8g2_GetDescent(&u8g2));
+}
+
 ////////////////////////////////////////
 // draw all lines
 void drawFrame()
 {
+if(mTscreen)
+{
+  u8g2_ClearBuffer(&u8g2);
   dt=gmtime(&timestamp);
   if (x==84)
   sprintf(strsec,"%02d-%02d  %02d:%02d:%02d",dt->tm_mon,dt->tm_mday, dt->tm_hour, dt->tm_min,dt->tm_sec);
   else
   sprintf(strsec,"%02d-%02d-%04d  %02d:%02d:%02d",dt->tm_mon,dt->tm_mday,dt->tm_year+1900, dt->tm_hour, dt->tm_min,dt->tm_sec);
-  if (u8g2.width() == 84)
-    setFont(u8g_font_5x8);
+  if (u8g2.width == 84)
+    u8g2_SetFont(&u8g2, u8g2_font_5x8_tf);
   else 
-    setFont(u8g_font_6x10);
-  u8g2.setColorIndex(1); 
+    u8g2_SetFont(&u8g2, u8g2_font_6x10_tf);
+  u8g2_SetDrawColor(&u8g2, 1);
 
-//    y = u8g2.getFontLineSpacing();
-//    u8g2.setFontRefHeightText(); 
+    y = getFontLineSpacing();
+    u8g2_SetFontRefHeightText(&u8g2); 
   
-  do {
-    u8g2.drawHLine(0,(4*y) - (y/2)-1,x);
-    u8g2.drawBox(0,0,x-1,y);
+//  do {
+    u8g2_DrawHLine(&u8g2,0,(4*y) - (y/2)-1,x);
+    u8g2_DrawBox(&u8g2,0,0,x-1,y);
     for (int i = 0;i < LINES;i++)
     {
-      if (i == 0)u8g2.setColorIndex(0);
-      else u8g2.setColorIndex(1);
+      if (i == 0)u8g2_SetDrawColor(&u8g2, 0);
+      else u8g2_SetDrawColor(&u8g2, 1);
       if (i >=3) z = y/2+2 ; else z = 1;
       if ((lline[i] != NULL))
       {
 //Serial.print("Liney: ");Serial.println(y);  
         if (i == 0) 
         {       
-          if (nameNum[0] ==0)  u8g2.drawStr(1,0,lline[i]+iline[i]);
+          if (nameNum[0] ==0)  u8g2_DrawUTF8(&u8g2,1,0,lline[i]+iline[i]);
           else 
           {
-            u8g2.drawStr(1,0,nameNum);
-            u8g2.drawStr(u8g2.getStrPixelWidth(nameNum)-2,0,lline[i]+iline[i]);
+            u8g2_DrawUTF8(&u8g2,1,0,nameNum);
+            u8g2_DrawUTF8(&u8g2,u8g2_GetUTF8Width(&u8g2,nameNum)-2,0,lline[i]+iline[i]);
           }
         }      
-        else u8g2.drawStr(0,y*i+z,lline[i]+iline[i]);
+        else u8g2_DrawUTF8(&u8g2,0,y*i+z,lline[i]+iline[i]);
       }
 
     }
     screenBottom();    
-  } while( u8g2_NextPage(&u8g2); );
+ // } while( u8g2_NextPage(&u8g2); );
+   u8g2_SendBuffer(&u8g2);
    mTscreen = 0;
+}   
 }
+
 
 //////////////////////////
 void drawTTitle(char* ttitle)
-{
-        setFont(u8g_font_9x15); 
-        uint16_t xxx = (x/2)-(u8g2.getStrWidth(ttitle)/2);
-        u8g2.setColorIndex(1);  
-        u8g2.drawBox(0,0,x,u8g2.getFontLineSpacing()+1); 
-        u8g2.setColorIndex(0);  
-        u8g2.drawStr(xxx,1,ttitle);
-        u8g2.setColorIndex(1);  
+{ 
+		u8g2_SetFont(&u8g2, u8g2_font_8x13B_tf);
+        uint16_t xxx = (x/2)-(u8g2_GetUTF8Width(&u8g2,ttitle)/2);
+        u8g2_SetDrawColor(&u8g2, 1);
+        u8g2_DrawBox(&u8g2,0,0,x,getFontLineSpacing()+1); 
+        u8g2_SetDrawColor(&u8g2, 0);
+        u8g2_DrawUTF8(&u8g2,xxx,1,ttitle);
+		u8g2_SetFont(&u8g2, u8g2_font_7x14_tf);
+        u8g2_SetDrawColor(&u8g2, 1);
 }
-#ifdef IR
+
 ////////////////////
 // draw the number entered from IR
 void drawNumber()
@@ -233,18 +288,18 @@ void drawNumber()
   char ststr[] = {"Number"};
   if(mTscreen)
   {
-     
-     do {  
-        drawTTitle(ststr);   
-        uint16_t xxx ;
-        xxx = (x/2)-(u8g2.getStrWidth(irStr)/2); 
-        u8g2.drawStr(xxx,yy/3, irStr);        
-        screenBottom();  
-     } 
-  }      
-  mTscreen = 0;    
+       u8g2_ClearBuffer(&u8g2);
+		drawTTitle(ststr);   
+ //       uint16_t xxx = (x/2)-(u8g2_GetUTF8Width(&u8g2,irStr)/2); 
+ //       u8g2_DrawUTF8(&u8g2,xxx,yy/3, irStr);        
+        screenBottom(); 
+		u8g2_SendBuffer(&u8g2);  		
+		mTscreen = 0;    
+  }   
+
 }
-#endif
+
+
 ////////////////////
 // draw the station screen
 void drawStation()
@@ -252,81 +307,88 @@ void drawStation()
   char ststr[] = {"Station"};
   char* ddot;
   int16_t len;
+  char* ptl ;
+  struct shoutcast_info* si;
   if (mTscreen)
   { 
-    ddot = strstr(sline,":");
+	u8g2_ClearBuffer(&u8g2);
+	
+	do {
+		si = getStation(futurNum);
+		sprintf(sline,"%d",futurNum);
+		ddot = si->name;    
+		ptl = ddot;
+		while ( *ptl == 0x20){ddot++;ptl++;}
+		if (strlen(ddot)==0) // don't start an undefined station
+		{
+			playable = false; 
+			free(si);
+			if (newValue < 0) {
+				futurNum--; 
+				if (futurNum <0) futurNum = 254;
+			}
+			else {
+				futurNum++;
+				if (futurNum > 254) futurNum = 0;
+			}
+		}	
+		else 
+			playable = true;                      
+    } while (playable == false); 
+	
+    drawTTitle(ststr);        
     if (ddot != NULL)
     {
-      *ddot=0; 
-      char* ptl = sline+1;
-Serial.print("Station: ");Serial.println(sline);        
-      while ( *ptl == 0x20){*ptl = '0';ptl++;}
-      ptl = ++ddot;
-      while ( *ptl == 0x20){ddot++;ptl++;}
-      if (strcmp(ddot,"not defined")==0) // don't start an undefined station
-          playable = false; 
-      else 
-        playable = true;             
-      strcpy (futurNum,sline+1);       
-    }      
-    
-    do {  
-        drawTTitle(ststr);        
-        if (ddot != NULL)
-        {
-          u8g2.drawStr((x/2)-(u8g2.getStrWidth(sline+1)/2),yy/3, sline+1);
-          len = (x/2)-(u8g2.getStrWidth(ddot)/2);
-          if (len <0) len = 0;
-          u8g2.drawStr(len,yy/3+y, ddot);
-        }
-        screenBottom();  
-     }  
-  }        
-  mTscreen = 0;    
+        u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,sline)/2),yy/3-2, sline);
+        len = (x/2)-(u8g2_GetUTF8Width(&u8g2,ddot)/2);
+        if (len <0) len = 0;
+        u8g2_DrawUTF8(&u8g2,len,yy/3+4+y, ddot);
+    }
+    screenBottom();  
+	free (si);
+	u8g2_SendBuffer(&u8g2);  	
+	mTscreen = 0;    
+  }  
 }
+
 ////////////////////
 // draw the volume screen
 void drawVolume()
 {
   char vlstr[] = {"Volume"}; 
    if (mTscreen){
-      
-      do { 
+        u8g2_ClearBuffer(&u8g2);
         drawTTitle(vlstr) ;  
-        uint16_t xxx;
-        xxx = (x/2)-(u8g2.getStrWidth(aVolume)/2);     
-        u8g2.drawStr(xxx,yy/3,aVolume);
-        screenBottom();   
-      }             
-    }      
-    mTscreen = 0; 
+		sprintf(aVolume,"%d",volume);
+        uint16_t xxx = (x/2)-(u8g2_GetUTF8Width(&u8g2,aVolume)/2);     
+        u8g2_DrawUTF8(&u8g2,xxx,yy/3,aVolume);
+        screenBottom(); 
+		u8g2_SendBuffer(&u8g2);  		   
+		mTscreen = 0; 
+    }  
 }
 
 void drawTime()
 {
   char strdate[23];
   char strtime[20];
-  char strsec[3]; 
-  unsigned len;
+//  char strsec[3]; 
+//  unsigned len;
   if (mTscreen)
-  {
-    
-    do {   
+  {  
+		u8g2_ClearBuffer(&u8g2);
         dt=gmtime(&timestamp);
         sprintf(strdate,"%02d-%02d-%04d", dt->tm_mon, dt->tm_mday, dt->tm_year+1900);
         sprintf(strtime,"%02d:%02d:%02d", dt->tm_hour, dt->tm_min,dt->tm_sec);
-        drawTTitle(strdate);            
-        setFont(u8g_font_9x15);  
-        u8g2.drawStr((x/2)-(u8g2.getStrWidth(strtime)/2),yy/3,strtime); 
+        drawTTitle(strdate); 
+		u8g2_SetFont(&u8g2, u8g2_font_9x15_tf);		
+        u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,strtime)/2),yy/3,strtime); 
         // draw ip
-        setFont(u8g_font_5x8);
-        eepromReadStr(EEaddrIp, strtime);
-        sprintf(strdate,"IP: %s",strtime);
-        len = u8g2.getStrWidth(strdate);
-        u8g2.drawStr(4,yy-u8g2.getFontLineSpacing(),strdate);
-    } 
-  }        
-  mTscreen = 0;       
+		u8g2_SetFont(&u8g2, u8g2_font_5x8_tf);
+        u8g2_DrawUTF8(&u8g2,4,yy-getFontLineSpacing(),getIp());
+		u8g2_SendBuffer(&u8g2);  
+		mTscreen = 0;       
+  }     
 }
 
 
@@ -334,12 +396,14 @@ void drawTime()
 // Display a screen on the lcd
 void drawScreen()
 {
+  if (mTscreen == 0) return;
+  ESP_LOGV(TAG,"stateScreen: %d",stateScreen);
   switch (stateScreen)
   {
-    case smain0:  // force the draw of the complete screen
+    case smain:  // force the draw of the complete screen
 //      u8g2.clearScreen();
       drawFrame();
-      stateScreen = smain;
+//      stateScreen = smain;
       break;
     case svolume:
       drawVolume();
@@ -351,16 +415,14 @@ void drawScreen()
       drawTime(); 
 //      drawSecond();
       break;     
-    case snumber:
-#ifdef IR    
-      drawNumber();
-#endif      
+    case snumber:   
+      drawNumber();     
       break;
     default: 
-      drawFrame();       
+		drawFrame();       
   }
 }
-*/
+
 
 void lcd_init(uint8_t Type)
 {
@@ -505,14 +567,29 @@ void lcd_init(uint8_t Type)
 }
 
 
+void stopStation()
+{
+//    irStr[0] = 0;
+	clientDisconnect("cli stop");
+}
+void startStation()
+{
+ //   irStr[0] = 0;
+    playStationInt(futurNum); ; 
+}
+void startStop()
+{   
+    state?stopStation():startStation();
+}  
+
+
 void task_addon(void *pvParams)
 {
 	
 // Encoder	init
   enum modeStateEncoder { encVolume, encStation } ;
   //static enum modeStateEncoder stateEncoder = encVolume;
-  int16_t newValue = 0;
-  Button newButton = Open;
+  Button newButton ;
   static int16_t oldValue = 0;
   ClickEncoderInit(PIN_ENC_A, PIN_ENC_B, PIN_ENC_BTN);
   serviceEncoder = &service;	; // connect the 1ms interruption
@@ -543,41 +620,202 @@ void task_addon(void *pvParams)
 			if (oldValue <0) oldValue++;
 			if (oldValue >0) oldValue--;
 		}
-    
-		if (getPinState() == getpinsActive())
+    		
+		if (newButton != Open)
 		{    
-			if (newValue > 0) wsStationNext();
-			else if (newValue < 0) wsStationPrev();
-
-		} else
-
+			ESP_LOGD(TAG,"Button: %d",newButton);
+			if (newButton == DoubleClicked) {startStop();}
+//			if (getPinState() == getpinsActive())
+			if ((newButton == Held)&&(getPinState() == getpinsActive()))
+			{    
+				Screen(sstation);
+				timerScreen = 0;  
+				if (newValue > 0) futurNum++;
+				if (futurNum > 254) futurNum = 0;
+				else if (newValue < 0) futurNum--;
+				if (futurNum <0) futurNum = 254;
+			} 
+		}	else
 		if (/*(stateScreen  != sstation)&&*/(newValue != 0))
 		{    
 			ESP_LOGD(TAG,"Enc value: %d, oldValue: %d,  incr volume: %d",newValue, oldValue,newValue+(oldValue*3));
 			setRelVolume(newValue+(oldValue*3));
-		} 		
+		} 
+		
 		oldValue += newValue;
 // end Encoder loop
 
 //lcd
+		drawScreen(); 
+		vTaskDelay(1);		
 		if (itAskTime) // time to ntp. Don't do that in interrupt.
 		{
 			if (ntp_get_time(&dt) )
 			{	
+				applyTZ(dt);
 				timestamp = mktime(dt); 
-				itAskTime = false;
-				
-			} else vTaskDelay(1000);
+				syncTime = true;				
+			} 
+			itAskTime = false;
 		}
 		if (itAskStime) // time start the time display. Don't do that in interrupt.
 		{    
-			//Screen(stime);
+			Screen(stime);
+			drawScreen();
 			itAskStime = false;
 		}
 
-		vTaskDelay(10);
+		if (timerScreen >= 3) // 3 sec timeout 
+		{
+			timerScreen = 0;
+			if ((stateScreen != smain)&&(stateScreen != stime))
+			{
+			Screen(smain);  //Back the the main screen
+			// Play the changed station on return to main screen
+			if (playable && ( futurNum!= atoi(nameNum))) playStationInt(futurNum);
+			}
+		}
+		vTaskDelay(1);
+		if ( timerScroll >= 500) //
+		{
+			if (stateScreen == smain) scroll();  
+			timerScroll = 0;
+		}    	
+		vTaskDelay(5);
 	}
-	
 	
 	vTaskDelete( NULL ); 
 }
+
+// interace funcion for the KaRadio32 events
+void dVolume(uint16_t vol)
+{ return;
+volume = vol; Screen(svolume); drawScreen(); timerScreen = 0;}
+
+
+////////////////////////////////////////
+void separator(char* from)
+{
+//    byte len;
+    char* interp;
+    while (from[strlen(from)-1] == ' ') from[strlen(from)-1] = 0; // avoid blank at end
+    while ((from[0] == ' ') ){ strcpy( from,from+1); }
+    interp=strstr(from," - ");
+  if (from == nameset) {lline[0] = nameset;lline[1] = NULL;lline[2] = NULL;return;}
+  if (interp != NULL)
+  {
+    from[interp-from]= 0;
+    lline[(from==station)?1:3] = from;
+    lline[(from==station)?2:4] = interp+3;
+  } else
+  {
+    lline[(from==station)?1:3] = from;
+  }
+
+}
+
+////////////////////////////////////////
+// parse the karadio received line and do the job
+void addonParse(const char *fmt, ...)
+{
+	char *line = NULL;
+//	char* lfmt;
+	int rlen;
+	line = (char *)malloc(1024);
+	if (line == NULL) return;
+	line[0] = 0;
+	strcpy(line,"ok\n");
+	
+	va_list ap;
+	va_start(ap, fmt);	
+	rlen = vsprintf(line,fmt, ap);		
+	va_end(ap);
+	line = realloc(line,rlen+1);
+	if (line == NULL) return;	
+	ESP_LOGV(TAG,"LINE: %s",line);
+	
+  static bool dvolume = true; // display volume screen
+  char* ici;
+ //  removeUtf8((byte*)line);
+ 
+ ////// Meta title  ##CLI.META#: 
+   if ((ici=strstr(line,"META#: ")) != NULL)
+   {     
+      cleartitle(); 
+      strcpy(title,ici+7);    
+      separator(title); 
+   } else 
+    ////// ICY4 Description  ##CLI.ICY4#:
+    if ((ici=strstr(line,"ICY4#: ")) != NULL)
+    {
+//      cleartitle();
+      strcpy(genre,ici+7);
+      lline[2] = genre;
+    } else 
+ ////// ICY0 station name   ##CLI.ICY0#:
+   if ((ici=strstr(line,"ICY0#: ")) != NULL)
+   {
+      clearAll();
+      if (strlen(ici+7) == 0) strcpy (station,nameset);
+      else strcpy(station,ici+7);
+      separator(station);
+   } else
+ ////// STOPPED  ##CLI.STOPPED#  
+   if ((ici=strstr(line,"STOPPED")) != NULL)
+   {
+      state = false;
+      cleartitle();
+      strcpy(title,"STOPPED");
+      lline[TITLE1] = title;
+	  mTscreen = 1;
+   }    
+   else  
+ //////Namesett    ##CLI.NAMESET#:
+   if ((ici=strstr(line,"MESET#: ")) != NULL)  
+   {
+      strcpy(nameset,ici+8);
+      ici = strstr(nameset," ");
+     if (ici != NULL)
+     {
+       clearAll();
+       strncpy(nameNum,nameset,ici-nameset+1);
+       nameNum[ici - nameset+1] = 0; 
+       futurNum = atoi(nameNum);     
+     }
+     strcpy(nameset,nameset+strlen(nameNum));
+     lline[STATIONNAME] = nameset;
+//     separator(nameset);            
+   } else
+ //////Playing    ##CLI.PLAYING#
+   if ((ici=strstr(line,"YING#")) != NULL)  
+   {
+      state = true;
+      if (stateScreen == stime) Screen(smain);      
+      if (strcmp(title,"STOPPED") == 0)
+      {
+        title[0] = 0;
+        separator(title);
+      }
+	  mTscreen = 1;
+   } else
+   //////Volume   ##CLI.VOL#:
+   if ((ici=strstr(line,"VOL#:")) != NULL)  
+   {
+      volume = atoi(ici+6);
+      strcpy(aVolume,ici+6); 
+      if (dvolume)
+         Screen(svolume); 
+      else 
+         dvolume = true;
+      timerScreen = 0;
+   } else
+  //////Volume offset    ##CLI.OVOLSET#:
+   if ((ici=strstr(line,"OVOLSET#:")) != NULL)  
+   {
+      dvolume = false; // don't show volume on start station
+   }
+   free (line);
+}
+
+
+

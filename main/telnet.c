@@ -116,23 +116,7 @@ void telnetWrite(uint32_t lenb,const char *fmt, ...)
 	va_list ap;
 	va_start(ap, fmt);	
 	rlen = 0;
-/*	if (fmt> (char*)0x40100000)  // in flash
-	{
-		len = strlen(fmt);
-		lfmt = (char *)malloc(len+16);
-		if (lfmt!=NULL)
-		{
-			flashRead( lfmt, fmt, len );
-			lfmt[len] = 0; // if aligned, trunkate
-//			printf("lfmt: %s\n",lfmt);
-			rlen = vsprintf(buf,lfmt, ap);
-			free (lfmt);
-		}
-	}	
-	else */
-	{
-		rlen = vsprintf(buf,fmt, ap);		
-	}
+	rlen = vsprintf(buf,fmt, ap);		
 	va_end(ap);
 	buf = realloc(buf,rlen+1);
 	if (buf == NULL) return;

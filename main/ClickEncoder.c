@@ -189,7 +189,7 @@ void service(void)
 }
   // handle button
   //
-  unsigned long currentMillis = xTaskGetTickCount();
+  unsigned long currentMillis = xTaskGetTickCount()* portTICK_PERIOD_MS;
   if (currentMillis < lastButtonCheck) lastButtonCheck = 0;        // Handle case when millis() wraps back around to zero
   if ((pinBTN > 0 || (pinBTN == 0 && buttonOnPinZeroEnabled))        // check button only, if a pin has been provided
       && ((currentMillis - lastButtonCheck) >= ENC_BUTTONINTERVAL))            // checking button is sufficient every 10-30ms

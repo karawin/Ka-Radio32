@@ -32,6 +32,7 @@
 #include "audio_player.h"
 #include <u8g2.h>
 #include "u8g2_esp32_hal.h"
+#include "addon.h"
 
 #ifdef CONFIG_BT_SPEAKER_MODE
 #include "bt_speaker.h"
@@ -92,7 +93,8 @@ bool ledStatus = true; // true: normal blink, false: led on when playing
 player_t *player_config;
 static output_mode_t audio_output_mode; 
 static uint8_t clientIvol = 0;
-
+//ip
+char localIp[20];
 // disable 1MS timer interrupt
 void noInterrupt1Ms()
 {
@@ -103,6 +105,7 @@ void interrupt1Ms()
 {
 	timer_enable_intr(TIMERGROUP1MS, msTimer);
 }
+char* getIp() { return (localIp);}
 
 IRAM_ATTR void   microsCallback(void *pArg) {
 	int timer_idx = (int) pArg;
@@ -854,10 +857,11 @@ void app_main()
 	else	
 		tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info);
  
+	strcpy(localIp , ip4addr_ntoa(&ip_info.ip));
 	printf("\nIP: %s\n\n",ip4addr_ntoa(&ip_info.ip));
 	
 	// LCD Display infos
-    lcd_welcome(ip4addr_ntoa(&ip_info.ip));
+    lcd_welcome(localIp);
 	lcd_state("Started");
 	
     ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
@@ -869,7 +873,7 @@ void app_main()
 	ESP_LOGI(TAG, "%s task: %x","clientTask",(unsigned int)pxCreatedTask);	
     xTaskCreate(serversTask, "serversTask", 2300, NULL, 3, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","serversTask",(unsigned int)pxCreatedTask);	
-	xTaskCreate(task_addon, "task_addon", 2100, NULL, 1, &pxCreatedTask); 
+	xTaskCreate(task_addon, "task_addon", 2300, NULL, 1, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","task_addon",(unsigned int)pxCreatedTask);
 	
 	printf("Init ");

@@ -58,15 +58,12 @@ typedef gpio_mode_t pinMode_t;
 
   typedef enum Button_e {
     Open = 0,
-    Closed,
-    
+    Closed,    
     Pressed,
     Held,
-    Released,
-    
+    Released,   
     Clicked,
-    DoubleClicked
-    
+    DoubleClicked   
   } Button;
 
   void ClickEncoderInit(int8_t A, int8_t B, int8_t BTN );

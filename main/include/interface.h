@@ -3,6 +3,7 @@
 #define INTERFACE_H
 #include "esp_log.h"
 #include "telnet.h"
+#include "addon.h"
 
 // need this for ported soft to esp32
 #define ESP32_IDF
@@ -11,8 +12,8 @@
 #define MAXDATAT	 256
 
 
-#define RELEASE "0.4"
-#define REVISION "1"
+#define RELEASE "0.5"
+#define REVISION "0"
 
 uint32_t checkUart(uint32_t speed);
 extern unsigned short adcdiv;	
@@ -31,11 +32,13 @@ void clientVol(char *s);
 #define kprintf(fmt, ...) do {    \
         printf(fmt, ##__VA_ARGS__);   \
 		telnetWrite(2*MAXDATAT,fmt, ##__VA_ARGS__); \
+		addonParse(fmt, ##__VA_ARGS__);\
 	} while (0)
 		
 #define kprintfl(fmt, ...) do {    \
         printf(fmt, ##__VA_ARGS__);   \
 		telnetWrite(1024,fmt, ##__VA_ARGS__); \
+		addonParse(fmt, ##__VA_ARGS__);\
 	} while (0)
 		
 #endif
