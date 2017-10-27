@@ -109,6 +109,10 @@ addon.o: C:/msys32/home/jp/esp/Ka-Radio32/main/addon.c \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8x8.h \
+ C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/rmt.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rmt_reg.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rmt_struct.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/ringbuf.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2_esp32_hal.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h \
@@ -119,7 +123,6 @@ addon.o: C:/msys32/home/jp/esp/Ka-Radio32/main/addon.c \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/queue.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/i2c.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h \
- C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/ringbuf.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/time.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/time.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/ntp.h \
@@ -346,6 +349,14 @@ C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8x8.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/rmt.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rmt_reg.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rmt_struct.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/ringbuf.h:
+
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2_esp32_hal.h:
@@ -365,8 +376,6 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/queue.h:
 C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/i2c.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/ringbuf.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/time.h:
 

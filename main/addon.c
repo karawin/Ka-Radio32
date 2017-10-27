@@ -17,6 +17,11 @@
 #include "interface.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+
+#include "driver/rmt.h"
+#include "driver/periph_ctrl.h"
+#include "soc/rmt_reg.h"
+
 #include "addon.h"
 #include "u8g2_esp32_hal.h"
 #include <time.h>
@@ -40,6 +45,29 @@
 #define DTIDLE  60
 #define BUFLEN  180
 #define LINES	5
+
+//IR
+#define RMT_RX_ACTIVE_LEVEL  0   /*!< If we connect with a IR receiver, the data is active low */
+#define RMT_RX_CHANNEL    0     /*!< RMT channel for receiver */
+#define RMT_RX_GPIO_NUM  PIN_IR_SIGNAL     /*!< GPIO number for receiver */
+#define RMT_CLK_DIV      100    /*!< RMT counter clock divider */
+#define RMT_TICK_10_US    (80000000/RMT_CLK_DIV/100000)   /*!< RMT counter value for 10 us.(Source clock is APB clock) */
+
+#define NEC_HEADER_HIGH_US    9000                         /*!< NEC protocol header: positive 9ms */
+#define NEC_HEADER_LOW_US     4500                         /*!< NEC protocol header: negative 4.5ms*/
+#define NEC_BIT_ONE_HIGH_US    560                         /*!< NEC protocol data bit 1: positive 0.56ms */
+#define NEC_BIT_ONE_LOW_US    (2250-NEC_BIT_ONE_HIGH_US)   /*!< NEC protocol data bit 1: negative 1.69ms */
+#define NEC_BIT_ZERO_HIGH_US   560                         /*!< NEC protocol data bit 0: positive 0.56ms */
+#define NEC_BIT_ZERO_LOW_US   (1120-NEC_BIT_ZERO_HIGH_US)  /*!< NEC protocol data bit 0: negative 0.56ms */
+#define NEC_BIT_END            560                         /*!< NEC protocol end: positive 0.56ms */
+#define NEC_BIT_MARGIN         20                          /*!< NEC parse margin time */
+
+#define NEC_ITEM_DURATION(d)  ((d & 0x7fff)*10/RMT_TICK_10_US)  /*!< Parse duration time from memory register value */
+#define NEC_DATA_ITEM_NUM   34  /*!< NEC code item number: header + 32bit data + end */
+#define rmt_item32_tIMEOUT_US  9500   /*!< RMT receiver timeout value(us) */
+
+
+
 
 
 u8g2_t u8g2; // a structure which will contain all the data for one display
@@ -581,6 +609,72 @@ void startStop()
 {   
     state?stopStation():startStation();
 }  
+
+
+// IR 
+/*
+ * @brief Parse NEC 32 bit waveform to address and command.
+ */
+static int nec_parse_items(rmt_item32_t* item, int item_num, uint16_t* addr, uint16_t* data)
+{
+    int w_len = item_num;
+    if(w_len < NEC_DATA_ITEM_NUM) {
+        return -1;
+    }
+    int i = 0, j = 0;
+    if(!nec_header_if(item++)) {
+        return -1;
+    }
+    uint16_t addr_t = 0;
+    for(j = 0; j < 16; j++) {
+        if(nec_bit_one_if(item)) {
+            addr_t |= (1 << j);
+        } else if(nec_bit_zero_if(item)) {
+            addr_t |= (0 << j);
+        } else {
+            return -1;
+        }
+        item++;
+        i++;
+    }
+    uint16_t data_t = 0;
+    for(j = 0; j < 16; j++) {
+        if(nec_bit_one_if(item)) {
+            data_t |= (1 << j);
+        } else if(nec_bit_zero_if(item)) {
+            data_t |= (0 << j);
+        } else {
+            return -1;
+        }
+        item++;
+        i++;
+    }
+    *addr = addr_t;
+    *data = data_t;
+    return i;
+}
+
+
+
+/*
+ * @brief RMT receiver initialization
+ */
+static void nec_rx_init()
+{
+    rmt_config_t rmt_rx;
+    rmt_rx.channel = RMT_RX_CHANNEL;
+    rmt_rx.gpio_num = RMT_RX_GPIO_NUM;
+    rmt_rx.clk_div = RMT_CLK_DIV;
+    rmt_rx.mem_block_num = 1;
+    rmt_rx.rmt_mode = RMT_MODE_RX;
+    rmt_rx.rx_config.filter_en = true;
+    rmt_rx.rx_config.filter_ticks_thresh = 100;
+    rmt_rx.rx_config.idle_threshold = rmt_item32_tIMEOUT_US / 10 * (RMT_TICK_10_US);
+    rmt_config(&rmt_rx);
+    rmt_driver_install(rmt_rx.channel, 1000, 0);
+}
+
+
 
 
 void task_addon(void *pvParams)

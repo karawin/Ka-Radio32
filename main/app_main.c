@@ -521,6 +521,9 @@ void start_network(){
 	}	
 	
 
+	IP_SET_TYPE(( ip_addr_t* )&ipAddr, IPADDR_TYPE_V4); 
+	IP_SET_TYPE(( ip_addr_t* )&gate, IPADDR_TYPE_V4); 
+	IP_SET_TYPE(( ip_addr_t* )&mask, IPADDR_TYPE_V4); 
 	IPADDR2_COPY(&info.ip,&ipAddr);
 	IPADDR2_COPY(&info.gw,&gate);
 	IPADDR2_COPY(&info.netmask,&mask);	
@@ -537,6 +540,7 @@ void start_network(){
 	}
 	else // mode STA
 	{	
+		vTaskDelay(1);
 		if ((!dhcpEn) ) // check if ip is valid without dhcp
 		{
 
@@ -550,8 +554,7 @@ void start_network(){
 			//printf("DNS: %s  \n",ip4addr_ntoa(( struct ip4_addr* ) &ipdns));
 		}
 		vTaskDelay(1);
-		// wait for ip
-						
+		// wait for ip						
 		if ( (xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT,false, true, 3000) & CONNECTED_BIT) ==0) //timeout	
 		{ // enable dhcp and restart
 			if (device->current_ap ==1)
@@ -574,8 +577,8 @@ void start_network(){
 		{
 			// if static ip	check dns
 			ip_addr_t ipdns0 = dns_getserver(0);
-			ip_addr_t ipdns1 = dns_getserver(1);
-			printf("\nDNS: %s   %s\n",ip4addr_ntoa(( struct ip4_addr* ) &ipdns0),ip4addr_ntoa(( struct ip4_addr* ) &ipdns1));
+//			ip_addr_t ipdns1 = dns_getserver(1);
+			printf("\nDNS: %s  \n",ip4addr_ntoa(( struct ip4_addr* ) &ipdns0));
 		}
 	}
 	
