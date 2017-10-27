@@ -1,24 +1,25 @@
 #### State
-KaraDio32 in dev state: use at your own risk<br/>
-Works on every esp32 board.<br/>
+KaraDio32 in dev state: Seems stable<br/>
+Works on any esp32 board.<br/>
 See the feature on https://hackaday.io/project/11570-wifi-webradio-with-esp8266-and-vs1053 <br/>
 The esp32 adds the output on the internal dac or with i2s to an external dac<br/>
 but only mp3 stations can be played.<br/>
 Adding a vs1053 board, all stations can be played.<br/>
+Compatible with esp8266 KaRadio addons.<br/>
 <br/>
 
 Based on KaraDio for esp8266 and https://github.com/kodera2t/ESP32_OLED_webradio<br/>
 <br/>
-Work with i2s or a vs1053<br/>
-Output mode in Setting panel on web page of KaraDio32:<br/>
-I2S for connection to a dac<br/>
-I2SMERU to connect a merus amplifier<br/>
+Work with i2s, internal DAC or a vs1053<br/>
+Output mode set in Setting panel on web page of KaraDio32:<br/>
+I2S for connection to ac external DAC<br/>
+I2SMERUS to connect a merus amplifier<br/>
 DAC to use the built in DAC of the esp32<br/>
 PDM to output a PDM (Pulse Density Modulation) stream<br/>
 VS1053 to connect to a vs1053 board.<br/>
 <br/>
 
-You must install the idf https://github.com/espressif/esp-idf and the toolchain.
+To build your own release, you must install the idf https://github.com/espressif/esp-idf and the toolchain.
 ```
 To flash all build output, run 'make flash' or:
 python /home/yourhome/esp/esp-idf/components/esptool_py/esptool/esptool.py --chip esp32 --port com5 --baud 460800 --before default_reset --after hard_reset write_flash -u --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 /home/yourhome/esp/Ka-Radio32/build/bootloader/bootloader.bin 0x10000 /home/yourhome/esp/Ka-Radio32/build/KaRadio32.bin 0x8000 /home/yourhome/esp/Ka-Radio32/build/partitions.bin
