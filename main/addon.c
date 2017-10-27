@@ -615,6 +615,7 @@ void startStop()
 /*
  * @brief Parse NEC 32 bit waveform to address and command.
  */
+ /*
 static int nec_parse_items(rmt_item32_t* item, int item_num, uint16_t* addr, uint16_t* data)
 {
     int w_len = item_num;
@@ -654,6 +655,7 @@ static int nec_parse_items(rmt_item32_t* item, int item_num, uint16_t* addr, uin
     return i;
 }
 
+*/
 
 
 /*
