@@ -63,6 +63,27 @@ vs1053b-patches.o: \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_config.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/projdefs.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portable.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/deprecated_definitions.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portmacro.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/tie/xt_core.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/specreg.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-state.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h \
+ C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h \
+ C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/mpu_wrappers.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/task.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/limits.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8x8.h
 
@@ -191,6 +212,48 @@ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_config.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/projdefs.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portable.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/deprecated_definitions.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portmacro.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/tie/xt_core.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/specreg.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-state.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/mpu_wrappers.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/task.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/limits.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h:
 

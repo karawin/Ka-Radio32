@@ -794,7 +794,7 @@ void app_main()
 	lcd_init(device->lcd_type);
 	
 
-
+	setCurrentStation( device->currentstation);
 	
 	//uart speed
 	uspeed = device->uartspeed;	
@@ -808,7 +808,7 @@ void app_main()
 	}	
 	
 	
-	// queur for events of the sleep / wake timers
+	// queue for events of the sleep / wake timers
 	event_queue = xQueueCreate(10, sizeof(queue_event_t));
 	// led blinks
 	xTaskCreate(timerTask, "timerTask",1800, NULL, 1, &pxCreatedTask); 
@@ -892,7 +892,7 @@ void app_main()
 	//autostart	
 	kprintf("autostart: playing:%d, currentstation:%d\n",device->autostart,device->currentstation);
 	setIvol( device->vol);
-	setCurrentStation( device->currentstation);
+	
 	
 	if (device->autostart ==1)
 	{	

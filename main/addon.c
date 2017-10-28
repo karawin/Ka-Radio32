@@ -15,12 +15,6 @@
 #include "webclient.h"
 #include "webserver.h"
 #include "interface.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
-#include "driver/rmt.h"
-#include "driver/periph_ctrl.h"
-#include "soc/rmt_reg.h"
 
 #include "addon.h"
 #include "u8g2_esp32_hal.h"
@@ -46,30 +40,8 @@
 #define BUFLEN  180
 #define LINES	5
 
-//IR
-#define RMT_RX_ACTIVE_LEVEL  0   /*!< If we connect with a IR receiver, the data is active low */
-#define RMT_RX_CHANNEL    0     /*!< RMT channel for receiver */
-#define RMT_RX_GPIO_NUM  PIN_IR_SIGNAL     /*!< GPIO number for receiver */
-#define RMT_CLK_DIV      100    /*!< RMT counter clock divider */
-#define RMT_TICK_10_US    (80000000/RMT_CLK_DIV/100000)   /*!< RMT counter value for 10 us.(Source clock is APB clock) */
-
-#define NEC_HEADER_HIGH_US    9000                         /*!< NEC protocol header: positive 9ms */
-#define NEC_HEADER_LOW_US     4500                         /*!< NEC protocol header: negative 4.5ms*/
-#define NEC_BIT_ONE_HIGH_US    560                         /*!< NEC protocol data bit 1: positive 0.56ms */
-#define NEC_BIT_ONE_LOW_US    (2250-NEC_BIT_ONE_HIGH_US)   /*!< NEC protocol data bit 1: negative 1.69ms */
-#define NEC_BIT_ZERO_HIGH_US   560                         /*!< NEC protocol data bit 0: positive 0.56ms */
-#define NEC_BIT_ZERO_LOW_US   (1120-NEC_BIT_ZERO_HIGH_US)  /*!< NEC protocol data bit 0: negative 0.56ms */
-#define NEC_BIT_END            560                         /*!< NEC protocol end: positive 0.56ms */
-#define NEC_BIT_MARGIN         20                          /*!< NEC parse margin time */
-
-#define NEC_ITEM_DURATION(d)  ((d & 0x7fff)*10/RMT_TICK_10_US)  /*!< Parse duration time from memory register value */
-#define NEC_DATA_ITEM_NUM   34  /*!< NEC code item number: header + 32bit data + end */
-#define rmt_item32_tIMEOUT_US  9500   /*!< RMT receiver timeout value(us) */
-
-
-
-
-
+char irStr[4];
+xQueueHandle event_ir;
 u8g2_t u8g2; // a structure which will contain all the data for one display
 static uint8_t lcd_type;
 static uint8_t lcd_family;
@@ -120,6 +92,7 @@ static char aVolume[4] = {"0"};
 static char strsec[30]; 
 
 static int16_t newValue = 0;
+static int16_t currentValue = 0;
   
 
 
@@ -208,13 +181,11 @@ unsigned len;
 void Screen(typeScreen st){
   if (stateScreen != st)
   {
-#ifdef IR
 // if a number is entered, play it.
     if (strlen(irStr) >0)
-       playStation(irStr);
+       playStationInt(atoi(irStr));
 // clear the number       
     irStr[0] = 0;
-#endif
   }
 //  else
 //    if (mTscreen == 0) mTscreen = 2;
@@ -318,8 +289,8 @@ void drawNumber()
   {
        u8g2_ClearBuffer(&u8g2);
 		drawTTitle(ststr);   
- //       uint16_t xxx = (x/2)-(u8g2_GetUTF8Width(&u8g2,irStr)/2); 
- //       u8g2_DrawUTF8(&u8g2,xxx,yy/3, irStr);        
+        uint16_t xxx = (x/2)-(u8g2_GetUTF8Width(&u8g2,irStr)/2); 
+        u8g2_DrawUTF8(&u8g2,xxx,yy/3, irStr);        
         screenBottom(); 
 		u8g2_SendBuffer(&u8g2);  		
 		mTscreen = 0;    
@@ -351,7 +322,7 @@ void drawStation()
 		{
 			playable = false; 
 			free(si);
-			if (newValue < 0) {
+			if (currentValue < 0) {
 				futurNum--; 
 				if (futurNum <0) futurNum = 254;
 			}
@@ -609,76 +580,44 @@ void startStop()
 {   
     state?stopStation():startStation();
 }  
-
-
+void stationOk()
+{
+       if (strlen(irStr) >0)
+	   {	   
+		  futurNum = atoi(irStr);
+          playStationInt(futurNum);
+	   }  
+        else
+        {
+ //         if (stateScreen == sstation) 
+            startStop();
+        }  
+        irStr[0] = 0;  
+}
+void changeStation(int16_t value)
+{
+	Screen(sstation);
+	timerScreen = 0;  
+	currentValue = value;
+	if (value > 0) futurNum++;
+	if (futurNum > 254) futurNum = 0;
+	else if (value < 0) futurNum--;
+	if (futurNum <0) futurNum = 254;
+}				
 // IR 
-/*
- * @brief Parse NEC 32 bit waveform to address and command.
- */
- /*
-static int nec_parse_items(rmt_item32_t* item, int item_num, uint16_t* addr, uint16_t* data)
+// a number of station in progress...
+void nbStation(char nb)
 {
-    int w_len = item_num;
-    if(w_len < NEC_DATA_ITEM_NUM) {
-        return -1;
-    }
-    int i = 0, j = 0;
-    if(!nec_header_if(item++)) {
-        return -1;
-    }
-    uint16_t addr_t = 0;
-    for(j = 0; j < 16; j++) {
-        if(nec_bit_one_if(item)) {
-            addr_t |= (1 << j);
-        } else if(nec_bit_zero_if(item)) {
-            addr_t |= (0 << j);
-        } else {
-            return -1;
-        }
-        item++;
-        i++;
-    }
-    uint16_t data_t = 0;
-    for(j = 0; j < 16; j++) {
-        if(nec_bit_one_if(item)) {
-            data_t |= (1 << j);
-        } else if(nec_bit_zero_if(item)) {
-            data_t |= (0 << j);
-        } else {
-            return -1;
-        }
-        item++;
-        i++;
-    }
-    *addr = addr_t;
-    *data = data_t;
-    return i;
+  Screen(snumber);
+  timerScreen = 0;
+  if (strlen(irStr)>=3) irStr[0] = 0;
+  uint8_t id = strlen(irStr);
+  irStr[id] = nb;
+  irStr[id+1] = 0;
 }
+ 
 
-*/
-
-
-/*
- * @brief RMT receiver initialization
- */
-static void nec_rx_init()
-{
-    rmt_config_t rmt_rx;
-    rmt_rx.channel = RMT_RX_CHANNEL;
-    rmt_rx.gpio_num = RMT_RX_GPIO_NUM;
-    rmt_rx.clk_div = RMT_CLK_DIV;
-    rmt_rx.mem_block_num = 1;
-    rmt_rx.rmt_mode = RMT_MODE_RX;
-    rmt_rx.rx_config.filter_en = true;
-    rmt_rx.rx_config.filter_ticks_thresh = 100;
-    rmt_rx.rx_config.idle_threshold = rmt_item32_tIMEOUT_US / 10 * (RMT_TICK_10_US);
-    rmt_config(&rmt_rx);
-    rmt_driver_install(rmt_rx.channel, 1000, 0);
-}
-
-
-
-
+extern void rmt_nec_rx_task();
 void task_addon(void *pvParams)
 {
 	
@@ -690,7 +629,13 @@ void task_addon(void *pvParams)
   ClickEncoderInit(PIN_ENC_A, PIN_ENC_B, PIN_ENC_BTN);
   serviceEncoder = &service;	; // connect the 1ms interruption
   serviceAddon = &ServiceAddon;	; // connect the 1ms interruption
-  
+  futurNum = getCurrentStation();
+  //ir
+  // queue for events of the IR nec rx
+  event_ir = xQueueCreate(10, sizeof(event_ir_t));
+  event_ir_t evt;
+  xTaskCreate(rmt_nec_rx_task, "rmt_nec_rx_task", 2048, NULL, 10, NULL);
+	
   //------
   // Init lcd
   // in app_main
@@ -723,13 +668,9 @@ void task_addon(void *pvParams)
 			if (newButton == DoubleClicked) {startStop();}
 //			if (getPinState() == getpinsActive())
 			if ((newButton == Held)&&(getPinState() == getpinsActive()))
-			{    
-				Screen(sstation);
-				timerScreen = 0;  
-				if (newValue > 0) futurNum++;
-				if (futurNum > 254) futurNum = 0;
-				else if (newValue < 0) futurNum--;
-				if (futurNum <0) futurNum = 254;
+			{   
+				currentValue = newValue;
+				changeStation(newValue);
 			} 
 		}	else
 		if (/*(stateScreen  != sstation)&&*/(newValue != 0))
@@ -740,6 +681,74 @@ void task_addon(void *pvParams)
 		
 		oldValue += newValue;
 // end Encoder loop
+
+// IR
+		while (xQueueReceive(event_ir, &evt, 0))
+		{
+			uint32_t evtir = ((evt.addr)<<8)|(evt.cmd&0xFF);
+			ESP_LOGD(TAG,"IR event: Channel: %x, ADDR: %x, CMD: %x = %X, REPEAT: %d",evt.channel,evt.addr,evt.cmd, evtir,evt.repeat_flag );
+	if (!evt.repeat_flag ) // avoid repetition
+    switch(evtir)
+    {
+      case 0xFF0046: 
+      case 0xF70812:  /*(" FORWARD");*/  changeStation(+1);  break;
+      case 0xFF0044:
+      case 0xF70842:
+      case 0xF70815: /*(" LEFT");*/  setRelVolume(-5);  break;
+      case 0xFF0040:
+      case 0xF7081E: /*(" -OK-");*/ stationOk();     break;
+      case 0xFF0043:
+      case 0xF70841:
+      case 0xF70814: /*(" RIGHT");*/ setRelVolume(+5);     break; // volume +
+      case 0xFF0015:
+      case 0xF70813: /*(" REVERSE");*/ changeStation(-1); break;
+      case 0xFF0016:
+      case 0xF70801: /*(" 1");*/ nbStation('1');   break;
+      case 0xFF0019:
+      case 0xF70802: /*(" 2");*/ nbStation('2');   break;
+      case 0xFF000D:
+      case 0xF70803: /*(" 3");*/ nbStation('3');   break;
+      case 0xFF000C:
+      case 0xF70804: /*(" 4");*/ nbStation('4');   break;
+      case 0xFF0018:
+      case 0xF70805: /*(" 5");*/ nbStation('5');   break;
+      case 0xFF005E:
+      case 0xF70806: /*(" 6");*/ nbStation('6');   break;
+      case 0xFF0008:
+      case 0xF70807: /*(" 7");*/ nbStation('7');   break;
+      case 0xFF001C:
+      case 0xF70808: /*(" 8");*/ nbStation('8');   break;
+      case 0xFF005A:
+      case 0xF70809: /*(" 9");*/ nbStation('9');   break;
+      case 0xFF0042:
+      case 0xF70817: /*(" *");*/   playStationInt(futurNum);   break;
+      case 0xFF0052:
+      case 0xF70800: /*(" 0");*/ nbStation('0');   break;
+      case 0xFF004A:
+      case 0xF7081D: /*(" #");*/  stopStation();    break;
+      default:;
+      /*SERIALX.println(F(" other button   "));*/
+    }// End Case
+
+    if (evt.repeat_flag ) // repetition
+    switch(evtir)
+    {
+      case 0xFF0046: 
+      case 0xF70812:  /*(" FORWARD");*/  changeStation(+1); break;
+      case 0xFF0015:
+      case 0xF70813:  /*(" REVERSE");*/ changeStation(-1); break;
+      case 0xFF0044:
+      case 0xF70842:
+      case 0xF70815: /*(" LEFT");*/  setRelVolume(-5);  break;
+      case 0xFF0043:
+      case 0xF70841:
+      case 0xF70814: /*(" RIGHT");*/ setRelVolume(+5);  break; // volume +
+      default:;
+    } 
+			
+			
+			
+		}
 
 //lcd
 		drawScreen(); 

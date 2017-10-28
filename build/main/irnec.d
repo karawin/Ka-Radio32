@@ -1,4 +1,4 @@
-addon.o: C:/msys32/home/jp/esp/Ka-Radio32/main/addon.c \
+irnec.o: C:/msys32/home/jp/esp/Ka-Radio32/main/irnec.c \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/string.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/_ansi.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/newlib.h \
@@ -110,21 +110,10 @@ addon.o: C:/msys32/home/jp/esp/Ka-Radio32/main/addon.c \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8x8.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h \
- C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2_esp32_hal.h \
- C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h \
- C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/spi_master.h \
- C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/spi_common.h \
- C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/spi_struct.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/lldesc.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/queue.h \
- C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/i2c.h \
- C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/ringbuf.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/time.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/time.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/ntp.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/logo.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/eeprom.h
+ C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/rmt.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rmt_reg.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rmt_struct.h \
+ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/ringbuf.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/string.h:
 
@@ -348,33 +337,11 @@ C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8x8.h:
 
-C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h:
+C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/rmt.h:
 
-C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2_esp32_hal.h:
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rmt_reg.h:
 
-C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/spi_master.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/spi_common.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/spi_struct.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/lldesc.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/queue.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/i2c.h:
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rmt_struct.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/ringbuf.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/time.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/time.h:
-
-C:/msys32/home/jp/esp/Ka-Radio32/main/include/ntp.h:
-
-C:/msys32/home/jp/esp/Ka-Radio32/main/logo.h:
-
-C:/msys32/home/jp/esp/Ka-Radio32/main/include/eeprom.h:
-/home/jp/esp/Ka-Radio32/main/./addon.c:
+/home/jp/esp/Ka-Radio32/main/./irnec.c:

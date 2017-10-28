@@ -2,6 +2,10 @@
 #ifndef __have__addon_h__
 #define __have__addon_h__
 
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/queue.h"
 #include <u8g2.h>
 
 // lcd_type
@@ -23,6 +27,16 @@
 #define LCD_SPI_SSD1607			0x45
 #define LCD_SPI_LS013B7DH03		0x46
 
+
+typedef struct {
+    int channel;             /*!< event type */
+    uint16_t addr;                /*!< nec addr */
+    uint16_t cmd;                 /*!< nec cmdr */
+	bool repeat_flag;
+} event_ir_t;
+
+
+extern xQueueHandle event_ir;
 extern u8g2_t u8g2;
 void task_addon(void *pvParams);
 void lcd_init(uint8_t Type);
