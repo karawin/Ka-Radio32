@@ -458,7 +458,7 @@ void lcd_init(uint8_t Type)
 			u8g2_esp32_msg_i2c_and_delay_cb);  // init u8g2 structure
 		break;
 	case LCD_I2C_SSD1306:
-		u8g2_Setup_ssd1306_i2c_128x64_noname_f(
+		u8g2_Setup_ssd1306_128x64_vcomh0_f(
 			&u8g2,
 			U8G2_R0,
 			u8g2_esp32_msg_i2c_cb,
