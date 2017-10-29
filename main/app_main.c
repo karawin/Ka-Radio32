@@ -396,7 +396,8 @@ static void initialise_wifi_and_network()
 {
 	wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
 	
-	tcpip_adapter_init();	
+	tcpip_adapter_init();
+	tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA); // Don't run a DHCP client	
 	wifi_event_group = xEventGroupCreate();
 	
     ESP_ERROR_CHECK( esp_event_loop_init(event_handler, wifi_event_group) );
@@ -544,7 +545,7 @@ void start_network(){
 		if ((!dhcpEn) ) // check if ip is valid without dhcp
 		{
 
-			tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA);  // stop dhcp client
+//			tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA);  // stop dhcp client
 			vTaskDelay(1);		
 			tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_STA, &info);
 			IP_SET_TYPE(( ip_addr_t* )&info.gw, IPADDR_TYPE_V4); // mandatory
@@ -552,8 +553,11 @@ void start_network(){
 			dns_setserver(1,( ip_addr_t* ) &info.gw);			
 			//ip_addr_t ipdns = dns_getserver(0);
 			//printf("DNS: %s  \n",ip4addr_ntoa(( struct ip4_addr* ) &ipdns));
-		}
+		} else
+			tcpip_adapter_dhcpc_start(TCPIP_ADAPTER_IF_STA); //  run a DHCP client
+		
 		vTaskDelay(1);
+		
 		// wait for ip						
 		if ( (xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT,false, true, 3000) & CONNECTED_BIT) ==0) //timeout	
 		{ // enable dhcp and restart
@@ -771,13 +775,19 @@ void app_main()
 	}	
 	
 	copyDeviceSettings(); // copy in the safe partion
+	
 	// init softwares
 	telnetinit();
 	websocketinit();
 	// log level
 	setLogLevel(device->trace_level);
+	
+	ESP_LOGI(TAG, "LCD Device type: %d",device->lcd_type);
+	lcd_init(device->lcd_type);
+	
     init_hardware(); 
 	ESP_LOGI(TAG, "Hardware init done...");
+	
 	// output mode
 	//I2S, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053
 	audio_output_mode = device->audio_output_mode;
@@ -790,8 +800,7 @@ void app_main()
 	}
 	ESP_LOGI(TAG, "audio_output_mode %d\nOne of I2S=0, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053",audio_output_mode);
 
-	ESP_LOGI(TAG, "LCD Device type: %d",device->lcd_type);
-	lcd_init(device->lcd_type);
+	
 	
 
 	setCurrentStation( device->currentstation);

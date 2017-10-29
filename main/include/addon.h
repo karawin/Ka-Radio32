@@ -15,7 +15,7 @@
 #define LCD_I2C			0
 #define LCD_NONE 0xFF
 #define LCD_I2C_SH1106	0
-#define LCD_I2C_SH1306	1
+#define LCD_I2C_SSD1306	1
 #define LCD_I2C_SSD1309	2
 #define LCD_I2C_SSD1325 3
 
