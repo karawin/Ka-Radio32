@@ -90,8 +90,9 @@ void renderer_volume(uint32_t vol)
 	// log volume (magic)
 	vol = 256  - vol;
 	uint32_t value = (log10(255/((float)vol+1)) * 105.54571334);	
-	if (value > 254) value = 256;
+	if (value >= 254) value = 256;
 	renderer_instance->volume = value<<8; // *256
+	ESP_LOGI(TAG, "Rendere volume: %X",renderer_instance->volume );
 }
 //-----------
 
@@ -118,18 +119,34 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 
     uint8_t buf_bytes_per_sample = (buf_desc->bit_depth / 8);
     uint32_t num_samples = buf_len / buf_bytes_per_sample / buf_desc->num_channels;
-	
 //KaraDio32 Volume control
 	register uint32_t mult = renderer_instance->volume;
-	if (mult!= 0x10000) // need volume?
+	
+	if ((mult!= 0x10000) && (renderer_instance->output_mode != DAC_BUILT_IN))// need volume?
 	{	
-		int16_t *psample;
-		psample = (int16_t*)buf;
-		for (int i = 0; i < num_samples*buf_desc->num_channels; i++) 
+		if (buf_bytes_per_sample ==2)
 		{
-			int temp = psample[i] * mult;
-			psample[i] = temp>>16 & 0xFFFF;		
-		}
+			int16_t *psample;
+			uint32_t pmax;
+			psample = (int16_t*)buf;
+			pmax = num_samples*buf_desc->num_channels;
+			for (int32_t i = 0; i < pmax; i++) 
+			{
+				int32_t temp = (int32_t)psample[i] * mult;
+				psample[i] = (temp>>16) & 0xFFFF;	
+			}
+		} else
+		{
+			int32_t *psample;
+			uint32_t pmax;
+			psample = (int32_t*)buf;
+			pmax = num_samples*buf_desc->num_channels;
+			for (int32_t i = 0; i < pmax; i++) 
+			{
+				int64_t temp = psample[i] * mult;
+				psample[i] = (temp>>16) & 0xFFFFFFFF;	
+			}
+		}			
 	}
 //-------------------------
 
@@ -140,7 +157,7 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
             && renderer_instance->output_mode != DAC_BUILT_IN) {
 
         // do not wait longer than the duration of the buffer
-        TickType_t max_wait = buf_desc->sample_rate / num_samples / 2;
+//        TickType_t max_wait = buf_desc->sample_rate / num_samples / 2;
 
         // don't block, rather retry
         int bytes_left = buf_len;
@@ -178,19 +195,40 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 
     int bytes_pushed = 0;
     TickType_t max_wait = 20 / portTICK_PERIOD_MS; // portMAX_DELAY = bad idea
+	//mult = mult>>12;  // for sample on 8 bits 0 to 16
     for (int i = 0; i < num_samples; i++) {
         if (renderer_status == STOPPED) break;
 
         if(renderer_instance->output_mode == DAC_BUILT_IN)
         {
             // assume 16 bit src bit_depth
-            short left = *(short *) ptr_l;
-            short right = *(short *) ptr_r;
-
+            int16_t left = *(int16_t *) ptr_l;
+            int16_t right = *(int16_t *) ptr_r;
+/*			//round the msb
+				if ((left&0xff) >0x80)
+				{
+					lleft  = (left < 0)?left-0x100:left+0x100;					
+				}
+				if ((right&0xff) >0x80)
+				{
+					lright = (right < 0)?right-0x100:right+0x100;					
+				}	
+*/			
+			//volume on msb
+			if (mult!= 0x10000){
+			
+				int32_t temp = (left )* mult;
+				left = ((temp >>16) & 0xFFFF);
+				
+				temp = (right )* mult;
+				right = ((temp>>16) & 0xFFFF);
+				
+			}	
+			
             // The built-in DAC wants unsigned samples, so we shift the range
             // from -32768-32767 to 0-65535.
-            left = left + 0x8000;
-            right = right + 0x8000;
+            left  = left  + 0x8000;
+            right = right + 0x8000;		
 
             uint32_t sample = (uint16_t) left;
             sample = (sample << 16 & 0xffff0000) | ((uint16_t) right);

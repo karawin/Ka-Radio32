@@ -260,6 +260,18 @@ void setRelVolume(int8_t vol) {
 	wsVol(Vol);
 }
 
+// send the rssi
+static void rssi(int socket) {
+	char answer[20];
+	int8_t rssi = -30;
+	wifi_ap_record_t wifidata;
+    esp_wifi_sta_get_ap_info(&wifidata);
+    if (wifidata.primary != 0) {
+        rssi = wifidata.rssi;
+    }
+	sprintf(answer,"{\"wsrssi\":\"%d\"}",rssi);
+	websocketwrite(socket,answer, strlen(answer));
+}
 // flip flop the theme indicator
 static void theme() {
 		struct device_settings *device;
@@ -308,6 +320,7 @@ void websockethandle(int socket, wsopcode_t opcode, uint8_t * payload, size_t le
 	else if (strstr((char*)payload,"monitor")!= NULL){wsMonitor();}
 	else if (strstr((char*)payload,"upgrade")!= NULL){update_firmware("KaRadio32");	}
 	else if (strstr((char*)payload,"theme")!= NULL){theme();}
+	else if (strstr((char*)payload,"wsrssi")!= NULL){rssi(socket);}
 }
 
 

@@ -82,9 +82,8 @@ app_main.o: C:/msys32/home/jp/esp/Ka-Radio32/main/app_main.c \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/event_groups.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/timers.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/task.h \
- C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos\queue.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_wifi.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_wifi.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/queue.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_wifi_types.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_interface.h \
@@ -193,7 +192,7 @@ app_main.o: C:/msys32/home/jp/esp/Ka-Radio32/main/app_main.c \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/webclient.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/webserver.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/websocket.h \
- C:/msys32/home/jp/esp/esp-idf/components/wpa_supplicant/include/crypto\sha1_i.h \
+ C:/msys32/home/jp/esp/esp-idf/components/wpa_supplicant/include/crypto/sha1_i.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h \
@@ -366,11 +365,9 @@ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/timers.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/task.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos\queue.h:
+C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_wifi.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/queue.h:
 
@@ -588,7 +585,7 @@ C:/msys32/home/jp/esp/Ka-Radio32/main/include/webserver.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/websocket.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/wpa_supplicant/include/crypto\sha1_i.h:
+C:/msys32/home/jp/esp/esp-idf/components/wpa_supplicant/include/crypto/sha1_i.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h:
 

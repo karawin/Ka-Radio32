@@ -221,11 +221,11 @@ void drawFrame()
 if(mTscreen)
 {
   u8g2_ClearBuffer(&u8g2);
-  dt=gmtime(&timestamp);
+  dt=localtime(&timestamp);
   if (x==84)
-  sprintf(strsec,"%02d-%02d  %02d:%02d:%02d",dt->tm_mon,dt->tm_mday, dt->tm_hour, dt->tm_min,dt->tm_sec);
+  sprintf(strsec,"%02d-%02d  %02d:%02d:%02d",dt->tm_mon+1,dt->tm_mday, dt->tm_hour, dt->tm_min,dt->tm_sec);
   else
-  sprintf(strsec,"%02d-%02d-%04d  %02d:%02d:%02d",dt->tm_mon,dt->tm_mday,dt->tm_year+1900, dt->tm_hour, dt->tm_min,dt->tm_sec);
+  sprintf(strsec,"%02d-%02d-%04d  %02d:%02d:%02d",dt->tm_mon+1,dt->tm_mday,dt->tm_year+1900, dt->tm_hour, dt->tm_min,dt->tm_sec);
   if (u8g2.width == 84)
     u8g2_SetFont(&u8g2, u8g2_font_5x8_tf);
   else 
@@ -376,15 +376,17 @@ void drawTime()
   if (mTscreen)
   {  
 		u8g2_ClearBuffer(&u8g2);
-        dt=gmtime(&timestamp);
-        sprintf(strdate,"%02d-%02d-%04d", dt->tm_mon, dt->tm_mday, dt->tm_year+1900);
+        dt=localtime(&timestamp);
+        sprintf(strdate,"%02d-%02d-%04d", dt->tm_mon+1, dt->tm_mday, dt->tm_year+1900);
         sprintf(strtime,"%02d:%02d:%02d", dt->tm_hour, dt->tm_min,dt->tm_sec);
         drawTTitle(strdate); 
-		u8g2_SetFont(&u8g2, u8g2_font_9x15_tf);		
+//		u8g2_SetFont(&u8g2, u8g2_font_9x15_tf);		
+		u8g2_SetFont(&u8g2, u8g2_font_ncenR18_tf );		
         u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,strtime)/2),yy/3,strtime); 
         // draw ip
 		u8g2_SetFont(&u8g2, u8g2_font_5x8_tf);
-        u8g2_DrawUTF8(&u8g2,4,yy-getFontLineSpacing(),getIp());
+		if (u8g2.width > 84) u8g2_DrawUTF8(&u8g2,4,yy-getFontLineSpacing(),"IP:");
+        u8g2_DrawUTF8(&u8g2,20,yy-getFontLineSpacing(),getIp());
 		u8g2_SendBuffer(&u8g2);  
 		mTscreen = 0;       
   }     
@@ -457,6 +459,13 @@ void lcd_init(uint8_t Type)
 			u8g2_esp32_msg_i2c_cb,
 			u8g2_esp32_msg_i2c_and_delay_cb);  // init u8g2 structure
 		break;
+	case LCD_I2C_SSD1306NN:
+		u8g2_Setup_ssd1306_128x64_noname_f(
+			&u8g2,
+			U8G2_R0,
+			u8g2_esp32_msg_i2c_cb,
+			u8g2_esp32_msg_i2c_and_delay_cb);  // init u8g2 structure	
+		break;		
 	case LCD_I2C_SSD1306:
 		u8g2_Setup_ssd1306_128x64_vcomh0_f(
 			&u8g2,
@@ -757,8 +766,10 @@ void task_addon(void *pvParams)
 		{
 			if (ntp_get_time(&dt) )
 			{	
+//printf("B Month %d\n",dt->tm_mon);
 				applyTZ(dt);
 				timestamp = mktime(dt); 
+//printf("A Month %d\n",dt->tm_mon);
 				syncTime = true;				
 			} 
 			itAskTime = false;

@@ -103,7 +103,7 @@ irnec.o: C:/msys32/home/jp/esp/Ka-Radio32/main/irnec.c \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/limits.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/websocket.h \
- C:/msys32/home/jp/esp/esp-idf/components/wpa_supplicant/include/crypto\sha1_i.h \
+ C:/msys32/home/jp/esp/esp-idf/components/wpa_supplicant/include/crypto/sha1_i.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h \
@@ -323,7 +323,7 @@ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/websocket.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/wpa_supplicant/include/crypto\sha1_i.h:
+C:/msys32/home/jp/esp/esp-idf/components/wpa_supplicant/include/crypto/sha1_i.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/interface.h:
 

@@ -8,7 +8,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
-#include "freertos\queue.h"
+#include "freertos/queue.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
 #include "esp_event_loop.h"
@@ -387,23 +387,9 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
     default:
         break;
     }
-
     return ESP_OK;
 }
 
-
-static void initialise_wifi_and_network()
-{
-	wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-	
-	tcpip_adapter_init();
-	tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA); // Don't run a DHCP client	
-	wifi_event_group = xEventGroupCreate();
-	
-    ESP_ERROR_CHECK( esp_event_loop_init(event_handler, wifi_event_group) );
-    ESP_ERROR_CHECK( esp_wifi_init(&cfg) );
-    ESP_ERROR_CHECK( esp_wifi_set_storage(WIFI_STORAGE_FLASH) );
-}
 
 static void start_wifi()
 {
@@ -411,13 +397,26 @@ static void start_wifi()
 	struct device_settings *device;	
 	char ssid[32]; 
 	char pass[64];
-	
-    /* FreeRTOS event group to signal when we are connected & ready to make a request */
-//    EventGroupHandle_t wifi_event_group = xEventGroupCreate();
-
-
-	
+	tcpip_adapter_ip_info_t info;
+		
 	device = getDeviceSettings();
+	
+	wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+	
+	tcpip_adapter_init();
+	tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA); // Don't run a DHCP client	
+    /* FreeRTOS event group to signal when we are connected & ready to make a request */
+	wifi_event_group = xEventGroupCreate();	
+    ESP_ERROR_CHECK( esp_event_loop_init(event_handler, wifi_event_group) );
+    ESP_ERROR_CHECK( esp_wifi_init(&cfg) );
+    ESP_ERROR_CHECK( esp_wifi_set_storage(WIFI_STORAGE_FLASH) );
+
+	IP4_ADDR(&info.ip, device->ipAddr1[0], device->ipAddr1[1],device->ipAddr1[2], device->ipAddr1[3]);
+	IP4_ADDR(&info.gw, device->gate1[0],device->gate1[1],device->gate1[2], device->gate1[3]);
+	IP4_ADDR(&info.netmask, device->mask1[0], device->mask1[1],device->mask1[2], device->mask1[3]);
+	tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_STA, &info); //default
+	
+	
 	while (1)
 	{
 		switch (device->current_ap)
@@ -437,9 +436,9 @@ static void start_wifi()
 				device->current_ap = 0;
 				esp_wifi_set_mode(WIFI_MODE_AP) ;
 		}
-	
-	
+		
 		ESP_ERROR_CHECK(esp_wifi_get_mode(&mode))	
+			
 		if (mode == WIFI_MODE_AP)
 		{
 			wifi_config_t wifi_config = {
@@ -454,6 +453,7 @@ static void start_wifi()
 			};
 			ESP_LOGE(TAG, "The default AP is  WifiKaRadio. Connect your wifi to it.\nThen connect a webbrowser to 192.168.4.1 and go to Setting\nMay be long to load the first time.Be patient.");
 			ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &wifi_config));
+			ESP_ERROR_CHECK( esp_wifi_start() );
 		}
 		else
 		{
@@ -467,10 +467,10 @@ static void start_wifi()
 			esp_wifi_disconnect();
 			ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
 			ESP_LOGI(TAG, "connecting");
-			esp_wifi_connect();				
+			ESP_ERROR_CHECK( esp_wifi_start() );
+//			esp_wifi_connect();				
 		}
 
-		ESP_ERROR_CHECK( esp_wifi_start() );
 		ESP_LOGI(TAG, "Initialised wifi");
 // 	   set_wifi_credentials();
  
@@ -499,7 +499,7 @@ void start_network(){
 	
 	device = getDeviceSettings();	
 	// Wifi ok .
-	
+
 	switch (device->current_ap)
 	{
 		case STA1: //ssid1 used
@@ -521,14 +521,11 @@ void start_network(){
 			IP4_ADDR(&mask,255,255,255,0);
 	}	
 	
-
-	IP_SET_TYPE(( ip_addr_t* )&ipAddr, IPADDR_TYPE_V4); 
-	IP_SET_TYPE(( ip_addr_t* )&gate, IPADDR_TYPE_V4); 
-	IP_SET_TYPE(( ip_addr_t* )&mask, IPADDR_TYPE_V4); 
 	IPADDR2_COPY(&info.ip,&ipAddr);
 	IPADDR2_COPY(&info.gw,&gate);
 	IPADDR2_COPY(&info.netmask,&mask);	
-
+	
+	
 	if (mode == WIFI_MODE_AP)
 	{
 			xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT,false, true, 3000);
@@ -541,22 +538,18 @@ void start_network(){
 	}
 	else // mode STA
 	{	
-		vTaskDelay(1);
-		if ((!dhcpEn) ) // check if ip is valid without dhcp
-		{
-
-//			tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA);  // stop dhcp client
-			vTaskDelay(1);		
-			tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_STA, &info);
-			IP_SET_TYPE(( ip_addr_t* )&info.gw, IPADDR_TYPE_V4); // mandatory
-			dns_setserver(0,( ip_addr_t* ) &info.gw);
-			dns_setserver(1,( ip_addr_t* ) &info.gw);			
-			//ip_addr_t ipdns = dns_getserver(0);
-			//printf("DNS: %s  \n",ip4addr_ntoa(( struct ip4_addr* ) &ipdns));
-		} else
+		if (dhcpEn ) // check if ip is valid without dhcp
 			tcpip_adapter_dhcpc_start(TCPIP_ADAPTER_IF_STA); //  run a DHCP client
-		
-		vTaskDelay(1);
+		else
+		{
+			ESP_ERROR_CHECK(tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_STA, &info));
+			dns_clear_servers(false);
+			IP_SET_TYPE(( ip_addr_t* )&info.gw, IPADDR_TYPE_V4); // mandatory
+			(( ip_addr_t* )&info.gw)->type = IPADDR_TYPE_V4;
+			dns_setserver(0,( ip_addr_t* ) &info.gw);
+			dns_setserver(1,( ip_addr_t* ) &info.gw);				// if static ip	check dns
+		}
+
 		
 		// wait for ip						
 		if ( (xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT,false, true, 3000) & CONNECTED_BIT) ==0) //timeout	
@@ -567,30 +560,42 @@ void start_network(){
 				device->dhcpEn2 = 1;
 			saveDeviceSettings(device);	
 			esp_restart();
-		}				
-		tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &info);
+		}
+		
+		vTaskDelay(1);	
+		// retrieve the current ip	
+		tcpip_adapter_ip_info_t ip_info;
+		ip_info.ip.addr =0;		
+		while (ip_info.ip.addr ==0)
+		{
+			if (mode == WIFI_MODE_AP)
+				tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_AP, &ip_info);
+			else	
+				tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info);
+		}		
+		ip_addr_t ipdns0 = dns_getserver(0);
+//		ip_addr_t ipdns1 = dns_getserver(1);
+		printf("\nDNS: %s  \n",ip4addr_ntoa(( struct ip4_addr* ) &ipdns0));
+		strcpy(localIp , ip4addr_ntoa(&ip_info.ip));
+		printf("IP: %s\n\n",ip4addr_ntoa(&ip_info.ip));
+
+
+
 		
 		if (dhcpEn) // if dhcp enabled update fields
 		{  
+			tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &info);
 			IPADDR2_COPY(&device->ipAddr1, &info.ip);
 			IPADDR2_COPY(&device->mask1, &info.netmask);
 			IPADDR2_COPY(&device->gate1, &info.gw);	
 			saveDeviceSettings(device);		
 		}
-		else
-		{
-			// if static ip	check dns
-			ip_addr_t ipdns0 = dns_getserver(0);
-//			ip_addr_t ipdns1 = dns_getserver(1);
-			printf("\nDNS: %s  \n",ip4addr_ntoa(( struct ip4_addr* ) &ipdns0));
-		}
 	}
-	
+	free(device);	
 	lcd_state("IP found");	
   /* start mDNS */
     // xTaskCreatePinnedToCore(&mdns_task, "mdns_task", 2048, wifi_event_group, 5, NULL, 0);
 
-	free(device);
 }
 
 
@@ -842,7 +847,6 @@ void app_main()
 // start the network
 //-----------------------------
     /* init wifi & network*/
-    initialise_wifi_and_network();
     start_wifi();
 	start_network();
 	
@@ -862,20 +866,11 @@ void app_main()
 	audio_player_init(player_config);	  
     renderer_init(create_renderer_config());	
 
-	// retrieve the current ip	
-	tcpip_adapter_ip_info_t ip_info;
-	if (mode == WIFI_MODE_AP)
-		tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_AP, &ip_info);
-	else	
-		tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info);
- 
-	strcpy(localIp , ip4addr_ntoa(&ip_info.ip));
-	printf("\nIP: %s\n\n",ip4addr_ntoa(&ip_info.ip));
 	
 	// LCD Display infos
     lcd_welcome(localIp);
 	lcd_state("Started");
-	
+	vTaskDelay(10);
     ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
 
 	//start tasks of KaRadio32

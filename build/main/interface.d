@@ -106,7 +106,7 @@ interface.o: C:/msys32/home/jp/esp/Ka-Radio32/main/interface.c \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/webclient.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/webserver.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/websocket.h \
- C:/msys32/home/jp/esp/esp-idf/components/wpa_supplicant/include/crypto\sha1_i.h \
+ C:/msys32/home/jp/esp/esp-idf/components/wpa_supplicant/include/crypto/sha1_i.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h \
@@ -361,7 +361,7 @@ C:/msys32/home/jp/esp/Ka-Radio32/main/include/webserver.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/websocket.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/wpa_supplicant/include/crypto\sha1_i.h:
+C:/msys32/home/jp/esp/esp-idf/components/wpa_supplicant/include/crypto/sha1_i.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h:
 

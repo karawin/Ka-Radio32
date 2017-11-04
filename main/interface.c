@@ -228,6 +228,19 @@ uint8_t startsWith(const char *pre, const char *str)
     return lenstr < lenpre ? false : strncmp(pre, str, lenpre) == 0;
 }
 
+void readRssi()
+{
+	int8_t rssi = -30;
+	wifi_ap_record_t wifidata;
+    esp_wifi_sta_get_ap_info(&wifidata);
+    if (wifidata.primary != 0) {
+        rssi = wifidata.rssi;
+ //       info.channel = wifidata.primary;
+    }
+//	rssi = wifi_station_get_rssi();
+	kprintf(PSTR("##RSSI: %d\n"),rssi);
+}
+
 void printInfo(char* s)
 {
 	kprintf(PSTR("#INFO:\"%s\"#\n"), s);
@@ -323,6 +336,7 @@ void wifiConnect(char* cmd)
 	}
 	
 	strncpy( devset->pass1, t, (t_end-t)) ;
+	devset->current_ap = 1;
 	devset->dhcpEn1 = 1;
 	saveDeviceSettings(devset);
 	kprintf("#WIFI.CON#\n");
@@ -853,6 +867,7 @@ void checkCommand(int size, char* s)
 		else if(strcmp(tmp+5, "scan") == 0) 	wifiScan();
 		else if(strcmp(tmp+5, "con") == 0) 	wifiConnectMem();
 		else if(startsWith ("con", tmp+5)) 	wifiConnect(tmp);
+		else if(strcmp(tmp+5, "rssi") == 0) 	readRssi();
 		else if(strcmp(tmp+5, "discon") == 0) wifiDisconnect();
 		else if(strcmp(tmp+5, "status") == 0) wifiStatus();
 		else if(strcmp(tmp+5, "station") == 0) wifiGetStation();

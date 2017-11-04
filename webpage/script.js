@@ -1,8 +1,8 @@
 var content = "Content-type",
 	ctype = "application/x-www-form-urlencoded",
 	cjson = "application/json";
-var auto,intervalid , timeid, websocket,urlmonitor , e, playing = false, curtab = "tab-content1",stchanged = false,maxStation = 255;
-const karadio = "Karadio";
+var auto,intervalid , intervalrssi  ,recrssi = 0, timeid, websocket,urlmonitor , e, playing = false, curtab = "tab-content1",stchanged = false,maxStation = 255;
+const karadio = "Karadio32";
 
 function openwebsocket(){	
 	autoplay(); //to force the server socket to accept and open the web server client.
@@ -25,6 +25,7 @@ function openwebsocket(){
 		if (arr["wssound"]) soundResp(arr["wssound"]); 
 		if (arr["monitor"]) playMonitor(arr["monitor"]); 
 		if (arr["wsstation"]) wsplayStation(arr["wsstation"]); 
+		if (arr["wsrssi"]) {document.getElementById('rssi').innerHTML = arr["wsrssi"]+' dBm';recrssi = 0};
 	} catch(e){ console.log("error"+e);}
 }
 
@@ -50,6 +51,15 @@ function openwebsocket(){
 		websocket.close();
 	}
 }
+
+// ask for the rssi and restart the timer
+function wsaskrssi(){
+	try{
+	if (recrssi ==0) websocket.send("wsrssi");	
+	recrssi = 1;
+	} catch(e){ console.log("error"+e);}
+}
+
 function wsplayStation($arr){
 	var i;
 	select = document.getElementById('stationsSelect');
@@ -1236,4 +1246,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	checkversion();
 	setMainHeight(curtab);
 	promptworking("");
-});
+   	if (intervalrssi != 0)  window.clearTimeout(intervalrssi);
+	intervalrssi = 0;
+	intervalrssi = window.setInterval(wsaskrssi,5000 );});

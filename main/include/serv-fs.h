@@ -27,14 +27,14 @@ const struct servFile faviconFile = {
 	"/favicon.png",
 	"image/png",
 	sizeof(favicon_png),
-	favicon_png,
+	(const char*)favicon_png,
 	(struct servFile*)NULL
 };
 const struct servFile logoFile = {
 	"/logo.png",
 	"image/png",
 	sizeof(logo_png),
-	logo_png,
+	(const char*)logo_png,
 	(struct servFile*)&faviconFile
 };
 
@@ -42,7 +42,7 @@ const struct servFile scriptFile = {
 	"/script.js",
 	"text/javascript",
 	sizeof(script_js),
-	script_js,
+	(const char*)script_js,
 	(struct servFile*)&logoFile
 };
 
@@ -50,7 +50,7 @@ const struct servFile styleFile = {
 	"/style.css",
 	"text/css",
 	sizeof(style_css),
-	style_css,
+	(const char*)style_css,
 	(struct servFile*)&scriptFile
 };
 
@@ -58,13 +58,13 @@ const struct servFile styleFile1 = {
 	"/style1.css",
 	"text/css",
 	sizeof(style1_css),
-	style1_css,
+	(const char*)style1_css,
 	(struct servFile*)&styleFile
 };
 const struct servFile indexFile = {
 	"/",
 	"text/html",
 	sizeof(index_html),
-	index_html,
+	(const char*)index_html,
 	(struct servFile*)&styleFile1
 };

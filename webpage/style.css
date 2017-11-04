@@ -45,6 +45,12 @@ div.RIGHT a,a:visited {
 	color:#f0f0ff;
 	text-decoration:none
 }
+div.RIGHT div{
+	font-size:10px;
+	line-height:15px;
+	color:#fff0f0;
+	text-decoration:none
+}
 div.LEFT {
 	float:left;
 	padding-top:10px;
@@ -440,5 +446,7 @@ a.page {
     from {top:-300px; opacity:0}
     to {top:0; opacity:1}
 }
-.modal-body {padding: 2px 16px;}
+.modal-body {
+	padding: 2px 16px
+}
 
