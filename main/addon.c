@@ -382,7 +382,7 @@ void drawTime()
         drawTTitle(strdate); 
 //		u8g2_SetFont(&u8g2, u8g2_font_9x15_tf);		
 		u8g2_SetFont(&u8g2, u8g2_font_ncenR18_tf );		
-        u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,strtime)/2),yy/3,strtime); 
+        u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,strtime)/2),(yy/3)+4,strtime); 
         // draw ip
 		u8g2_SetFont(&u8g2, u8g2_font_5x8_tf);
 		if (u8g2.width > 84) u8g2_DrawUTF8(&u8g2,4,yy-getFontLineSpacing(),"IP:");
