@@ -52,7 +52,7 @@ void partitions_init(void)
 	DEVICE = esp_partition_find_first(64,0,NULL);
 	if (DEVICE == NULL) ESP_LOGE(TAG, "DEVICE Partition not found");
 	DEVICE1 = esp_partition_find_first(66,0,NULL);
-	if (DEVICE == NULL) ESP_LOGE(TAG, "DEVICE Partition not found");
+	if (DEVICE1 == NULL) ESP_LOGE(TAG, "DEVICE1 Partition not found");
 	STATIONS = esp_partition_find_first(65,0,NULL);
 	if (STATIONS == NULL) ESP_LOGE(TAG, "STATIONS Partition not found");
 	muxDevice=xSemaphoreCreateMutex();
@@ -115,6 +115,7 @@ int i = 0;
 	{
 		for(i=0; i<4096; i++) buffer[i] = 0;	
 		ESP_ERROR_CHECK(esp_partition_write(DEVICE,0,buffer,4096));	 //clear device		
+		ESP_ERROR_CHECK(esp_partition_write(DEVICE1,0,buffer,4096));	 //clear device1		
 		for (i=0;i<16;i++)
 		{
 //			printf("erase from %x \n",4096*i);
@@ -124,14 +125,15 @@ int i = 0;
 		}
 //		printf("erase All done\n");
 		free(buffer);
-	}
+	} else	
+		printf("erase All fails\n");
 	
 }
 
 void eeErasesettings(void){
 	int i = 0;
 	uint8_t* buffer= malloc(4096);
-	for(; i<4096; i++) buffer[i] = 0;
+	for(i=0; i<4096; i++) buffer[i] = 0;
 	ESP_ERROR_CHECK(esp_partition_write(DEVICE,0,buffer,4096));	 //clear device	
 	free(buffer);
 }

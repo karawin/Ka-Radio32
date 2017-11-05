@@ -98,7 +98,7 @@ uint8_t u8g2_esp32_msg_comms_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void
  */
 uint8_t u8g2_esp32_msg_i2c_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
 
-	ESP_LOGV(TAG, "msg_i2c_cb: Received a msg: %d %d", msg, arg_int);
+	//ESP_LOGV(TAG, "msg_i2c_cb: Received a msg: %d %d", msg, arg_int);
 	//ESP_LOGD(tag, "msg_i2c_cb: Received a msg: %d: %s", msg, msgToString(msg, arg_int, arg_ptr));
 
 	switch(msg) {
@@ -170,7 +170,7 @@ uint8_t u8g2_esp32_msg_i2c_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *
 //			printf("\n");
 
 			ESP_ERROR_CHECK(i2c_master_stop(cmd));
-			ESP_LOGV(TAG, "i2c_master_cmd_begin %d, cmd: %x", I2C_MASTER_NUM,(int)cmd);
+			//ESP_LOGV(TAG, "i2c_master_cmd_begin %d, cmd: %x", I2C_MASTER_NUM,(int)cmd);
 			//ESP_ERROR_CHECK(
 			i2c_master_cmd_begin(I2C_MASTER_NUM, cmd, 1000 / portTICK_RATE_MS);
 			//);

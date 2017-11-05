@@ -239,7 +239,7 @@ static void lcd_state(char* State)
 	u8g2_SetDrawColor(&u8g2, 0);
 	u8g2_DrawBox(&u8g2, 2, 40, 128-30, 12);
 	u8g2_SetDrawColor(&u8g2, 1);
-	u8g2_SetFont(&u8g2, u8g2_font_timB08_tr);
+	u8g2_SetFont(&u8g2, u8g2_font_6x10_tf);
 	u8g2_DrawStr(&u8g2, 2,40,State);
 	u8g2_SendBuffer(&u8g2);
 }
@@ -249,11 +249,11 @@ static void lcd_welcome(char* ip)
     char *url = "Stopped";// get_url(); // play_url();	
 
 	u8g2_ClearBuffer(&u8g2);
-    u8g2_SetFont(&u8g2, u8g2_font_ncenB14_tr);
+    u8g2_SetFont(&u8g2, u8g2_font_helvR14_tf );
     u8g2_DrawStr(&u8g2, 10,2,"KaRadio32");
-	u8g2_SetFont(&u8g2, u8g2_font_timB08_tr);
+	u8g2_SetFont(&u8g2, u8g2_font_6x10_tf);
 	u8g2_DrawStr(&u8g2, 2,24,"WiFi Webradio");
-	u8g2_SetFont(&u8g2, u8g2_font_timB08_tr);
+	u8g2_SetFont(&u8g2, u8g2_font_6x10_tf);
 	u8g2_DrawStr(&u8g2, 2,40,url);
 	u8g2_DrawStr(&u8g2, u8g2_DrawStr(&u8g2, 2,53,"IP")+18,53,ip);
 	u8g2_SendBuffer(&u8g2);
@@ -756,8 +756,7 @@ void app_main()
 	ESP_LOGI(TAG, "Partition init done...");
 	
 	device = getDeviceSettings();
-	// device partition initialized?
-	//vTaskDelay(1000);eeErasesettings();copyDeviceSettings();
+
 	if (device->cleared != 0xAABB)
 	{	
 		free(device);
@@ -767,8 +766,9 @@ void app_main()
 		if (device->cleared != 0xAABB)
 		{
 			ESP_LOGE(TAG,"Device config not cleared. Clear it.");
-			eeErasesettings();
-			//else device->current_ap = 1;
+			free(device);
+			eeEraseAll();
+			device = getDeviceSettings();	
 			device->cleared = 0xAABB; //marker init done
 			device->uartspeed = 115200; // default
 			device->audio_output_mode = VS1053; // default

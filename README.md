@@ -93,8 +93,8 @@ Other type and some color lcd added later.<BR/>
 #define LCD_I2C_SSD1325 	3
 #define LCD_I2C_SSD1306NN	4
 //SPI
-#define LCD_SPI_SSD1306 		64
-#define LCD_SPI_SSD1309 		65
+#define LCD_SPI_SSD1306			64
+#define LCD_SPI_SSD1309			65
 #define LCD_SPI_ST7565_ZOLEN	66
 #define LCD_SPI_SSD1322_NHD		67
 #define LCD_SPI_IL3820_V2		68

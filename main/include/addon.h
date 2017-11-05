@@ -9,17 +9,17 @@
 #include <u8g2.h>
 
 // lcd_type
-// m>in 128x64
-#define LCD_COLOR		0x80	//128
-#define LCD_SPI			0x40
+// min 128x64
+#define LCD_COLOR		128	//0x80
+#define LCD_SPI			64 //0x40
 #define LCD_I2C			0
-#define LCD_NONE 0xFF
-#define LCD_I2C_SH1106	0
-#define LCD_I2C_SSD1306	1
-#define LCD_I2C_SSD1309	2
-#define LCD_I2C_SSD1325 3
+//I2C
+#define LCD_I2C_SH1106		0
+#define LCD_I2C_SSD1306		1
+#define LCD_I2C_SSD1309		2
+#define LCD_I2C_SSD1325 	3
 #define LCD_I2C_SSD1306NN	4
-
+//SPI
 #define LCD_SPI_SSD1306 		64
 #define LCD_SPI_SSD1309 		65
 #define LCD_SPI_ST7565_ZOLEN	66

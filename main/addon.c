@@ -385,8 +385,10 @@ void drawTime()
         u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,strtime)/2),(yy/3)+4,strtime); 
         // draw ip
 		u8g2_SetFont(&u8g2, u8g2_font_5x8_tf);
-		if (u8g2.width > 84) u8g2_DrawUTF8(&u8g2,4,yy-getFontLineSpacing(),"IP:");
-        u8g2_DrawUTF8(&u8g2,20,yy-getFontLineSpacing(),getIp());
+		sprintf(strdate,"IP: %s", getIp());
+		u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,strdate)/2),yy-getFontLineSpacing(),strdate);
+//		if (u8g2.width > 84) u8g2_DrawUTF8(&u8g2,4,yy-getFontLineSpacing(),"IP:");
+//        u8g2_DrawUTF8(&u8g2,20,yy-getFontLineSpacing(),getIp());
 		u8g2_SendBuffer(&u8g2);  
 		mTscreen = 0;       
   }     
@@ -398,7 +400,7 @@ void drawTime()
 void drawScreen()
 {
   if (mTscreen == 0) return;
-  ESP_LOGV(TAG,"stateScreen: %d",stateScreen);
+  //ESP_LOGV(TAG,"stateScreen: %d",stateScreen);
   switch (stateScreen)
   {
     case smain:  // force the draw of the complete screen
@@ -695,45 +697,62 @@ void task_addon(void *pvParams)
 		while (xQueueReceive(event_ir, &evt, 0))
 		{
 			uint32_t evtir = ((evt.addr)<<8)|(evt.cmd&0xFF);
-			ESP_LOGD(TAG,"IR event: Channel: %x, ADDR: %x, CMD: %x = %X, REPEAT: %d",evt.channel,evt.addr,evt.cmd, evtir,evt.repeat_flag );
+			ESP_LOGI(TAG,"IR event: Channel: %x, ADDR: %x, CMD: %x = %X, REPEAT: %d",evt.channel,evt.addr,evt.cmd, evtir,evt.repeat_flag );
 	if (!evt.repeat_flag ) // avoid repetition
     switch(evtir)
     {
       case 0xFF0046: 
+	  case 0xFF18E7:
       case 0xF70812:  /*(" FORWARD");*/  changeStation(+1);  break;
       case 0xFF0044:
+	  case 0XFF10EF:
       case 0xF70842:
       case 0xF70815: /*(" LEFT");*/  setRelVolume(-5);  break;
       case 0xFF0040:
+	  case 0XFF38C7:
       case 0xF7081E: /*(" -OK-");*/ stationOk();     break;
       case 0xFF0043:
+	  case 0XFF5AA5:
       case 0xF70841:
       case 0xF70814: /*(" RIGHT");*/ setRelVolume(+5);     break; // volume +
       case 0xFF0015:
+	  case 0XFF4AB5:
       case 0xF70813: /*(" REVERSE");*/ changeStation(-1); break;
       case 0xFF0016:
+	  case 0XFFA25D:
       case 0xF70801: /*(" 1");*/ nbStation('1');   break;
       case 0xFF0019:
+	  case 0XFF629D:
       case 0xF70802: /*(" 2");*/ nbStation('2');   break;
       case 0xFF000D:
+	  case 0XFFE21D:
       case 0xF70803: /*(" 3");*/ nbStation('3');   break;
       case 0xFF000C:
+	  case 0XFF22DD:
       case 0xF70804: /*(" 4");*/ nbStation('4');   break;
       case 0xFF0018:
+	  case 0XFF02FD:
       case 0xF70805: /*(" 5");*/ nbStation('5');   break;
       case 0xFF005E:
+	  case 0XFFC23D:
       case 0xF70806: /*(" 6");*/ nbStation('6');   break;
       case 0xFF0008:
+	  case 0XFFE01F:
       case 0xF70807: /*(" 7");*/ nbStation('7');   break;
       case 0xFF001C:
+	  case 0XFFA857:
       case 0xF70808: /*(" 8");*/ nbStation('8');   break;
       case 0xFF005A:
+	  case 0XFF906F:
       case 0xF70809: /*(" 9");*/ nbStation('9');   break;
       case 0xFF0042:
+	  case 0XFF6897:
       case 0xF70817: /*(" *");*/   playStationInt(futurNum);   break;
       case 0xFF0052:
+	  case 0XFF9867:
       case 0xF70800: /*(" 0");*/ nbStation('0');   break;
       case 0xFF004A:
+	  case 0XFFB04F:
       case 0xF7081D: /*(" #");*/  stopStation();    break;
       default:;
       /*SERIALX.println(F(" other button   "));*/
