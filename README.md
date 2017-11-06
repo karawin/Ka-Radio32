@@ -128,8 +128,9 @@ See the image at http://karadio.karawin.fr/karawin32Flash.jpg <br/>
 The scheme from tomasf71</br>
 <img src="https://github.com/karawin/Ka-Radio32/blob/master/images/schemekaradio32.jpg" alt="scheme" border=0> 
 <br/><br/>
-#### List of sources and components adapted for KaRadio32
 
+#### List of sources and components adapted for KaRadio32
+<br/>
 https://github.com/espressif/esp-idf  the espressif IDF<br/>
 https://hackaday.io/project/11570-wifi-webradio-with-esp8266-and-vs1053  The esp8266 KaRadio<br/>
 https://github.com/karawin/karadio-addons  The KaRadio addons<br/>
