@@ -787,6 +787,10 @@ void app_main()
 	// log level
 	setLogLevel(device->trace_level);
 	
+	//SPI init for the vs1053 and lcd if spi.
+	VS1053_spi_init(HSPI_HOST);
+	
+	
 	ESP_LOGI(TAG, "LCD Device type: %d",device->lcd_type);
 	lcd_init(device->lcd_type);
 	

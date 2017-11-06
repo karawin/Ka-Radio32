@@ -69,11 +69,10 @@ void VS1053_spi_init(uint8_t spi_no){
         .mosi_io_num=PIN_NUM_MOSI,
         .sclk_io_num=PIN_NUM_CLK,
         .quadwp_io_num=-1,
-        .quadhd_io_num=-1,
-		.max_transfer_sz = 64
-		
+        .quadhd_io_num=-1
+//		.max_transfer_sz = 1024		
 	};		
-	ret=spi_bus_initialize(HSPI_HOST, &buscfg, 0);	 // no dma	
+	ret=spi_bus_initialize(HSPI_HOST, &buscfg, 1);	 //  dma	
 	assert(ret==ESP_OK);	
 }
 
@@ -97,7 +96,7 @@ void VS1053_HW_init(){
 		.post_cb = NULL
 	};	
 	
- 	VS1053_spi_init(HSPI_HOST);
+ 	//VS1053_spi_init(HSPI_HOST);
 	
 	//slow speed
 	ESP_ERROR_CHECK(spi_bus_add_device(HSPI_HOST, &devcfg, &vsspi));

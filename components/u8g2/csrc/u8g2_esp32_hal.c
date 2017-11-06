@@ -45,15 +45,16 @@ uint8_t u8g2_esp32_msg_comms_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void
 				break;
 			}
 
-		  spi_bus_config_t bus_config;
+/*		  spi_bus_config_t bus_config;
 		  bus_config.sclk_io_num   = u8g2_esp32_hal.clk; // CLK
 		  bus_config.mosi_io_num   = u8g2_esp32_hal.mosi; // MOSI
 		  bus_config.miso_io_num   = -1; // MISO
 		  bus_config.quadwp_io_num = -1; // Not used
 		  bus_config.quadhd_io_num = -1; // Not used
 		  //ESP_LOGI(tag, "... Initializing bus.");
+//done for vs1053
 		  ESP_ERROR_CHECK(spi_bus_initialize(HSPI_HOST, &bus_config, 1));
-
+*/
 		  spi_device_interface_config_t dev_config;
 		  dev_config.address_bits     = 0;
 		  dev_config.command_bits     = 0;
