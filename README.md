@@ -84,19 +84,20 @@ Status: Ready.<BR/>
 Other type and some color lcd added later.<BR/>
 ```
 //I2C
-#define LCD_I2C_SH1106		0
-#define LCD_I2C_SSD1306		1
-#define LCD_I2C_SSD1309		2
-#define LCD_I2C_SSD1325 	3
-#define LCD_I2C_SSD1306NN	4
+#define LCD_I2C_SH1106		0 //128X64
+#define LCD_I2C_SSD1306		1 //128X64
+#define LCD_I2C_SSD1309		2 //128X64
+#define LCD_I2C_SSD1325 	3 //128X64
+#define LCD_I2C_SSD1306NN	4 //128X64
 //SPI
-#define LCD_SPI_SSD1306			64
-#define LCD_SPI_SSD1309			65
-#define LCD_SPI_ST7565_ZOLEN	66
-#define LCD_SPI_SSD1322_NHD		67
-#define LCD_SPI_IL3820_V2		68
-#define LCD_SPI_SSD1607			69
-#define LCD_SPI_LS013B7DH03		70
+#define LCD_SPI_SSD1306 		64 //128X32
+#define LCD_SPI_SSD1309 		65 //128X64
+#define LCD_SPI_ST7565_ZOLEN	66 //128X64
+#define LCD_SPI_SSD1322_NHD		67 //256X64
+#define LCD_SPI_IL3820_V2		68 //296X128
+#define LCD_SPI_SSD1607			69 //200X200
+#define LCD_SPI_LS013B7DH03		70 //128X128
+#define LCD_SPI_SSD1306NN 		71 //128X64
 ```
 
 #### First use
