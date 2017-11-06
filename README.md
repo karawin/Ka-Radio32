@@ -7,9 +7,6 @@ but only mp3 stations can be played.<br/>
 Adding a vs1053 board, all stations can be played.<br/>
 Compatible with esp8266 KaRadio addons.<br/>
 <br/>
-
-Based on KaraDio for esp8266 and https://github.com/kodera2t/ESP32_OLED_webradio<br/>
-<br/>
 Work with i2s, internal DAC or a vs1053<br/>
 Output mode set in Setting panel on web page of KaraDio32:<br/>
 I2S for connection to ac external DAC<br/>
@@ -127,7 +124,7 @@ See the image at http://karadio.karawin.fr/karawin32Flash.jpg <br/>
 <br/><br/>
 The scheme from tomasf71</br>
 <img src="https://github.com/karawin/Ka-Radio32/blob/master/images/schemekaradio32.jpg" alt="scheme" border=0> 
-<br/><br/>
+<br/>
 
 #### List of sources and components adapted for KaRadio32
 <br/>
