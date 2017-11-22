@@ -43,10 +43,6 @@ ClickEncoder.o: C:/msys32/home/jp/esp/Ka-Radio32/main/ClickEncoder.c \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_attr.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_intr_alloc.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h \
- C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/timer.h \
- C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h \
- C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_reg.h \
- C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_struct.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/audio_renderer/include/audio_renderer.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h \
@@ -61,6 +57,7 @@ ClickEncoder.o: C:/msys32/home/jp/esp/Ka-Radio32/main/ClickEncoder.c \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/corebits.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-frames.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/projdefs.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portable.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/deprecated_definitions.h \
@@ -94,6 +91,9 @@ ClickEncoder.o: C:/msys32/home/jp/esp/Ka-Radio32/main/ClickEncoder.c \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/semphr.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/common/include/common_component.h \
+ C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/timer.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_reg.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_struct.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/webclient.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
@@ -109,7 +109,8 @@ ClickEncoder.o: C:/msys32/home/jp/esp/Ka-Radio32/main/ClickEncoder.c \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h \
- C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8x8.h
+ C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8x8.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/ucglib/csrc/ucg.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/string.h:
 
@@ -199,14 +200,6 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_intr_alloc.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/timer.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_reg.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_struct.h:
-
 C:/msys32/home/jp/esp/Ka-Radio32/components/audio_renderer/include/audio_renderer.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h:
@@ -234,6 +227,8 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/corebits.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-frames.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/projdefs.h:
 
@@ -301,6 +296,12 @@ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/common/include/common_component.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/timer.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_reg.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_struct.h:
+
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/webclient.h:
@@ -332,4 +333,6 @@ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h:
 C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8x8.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/components/ucglib/csrc/ucg.h:
 /home/jp/esp/Ka-Radio32/main/./ClickEncoder.c:

@@ -49,7 +49,7 @@ xSemaphoreHandle sSPI = NULL;
 
 uint8_t spi_take_semaphore() {
 	if(sSPI) if(xSemaphoreTake(sSPI, portMAX_DELAY)) return 1;
-	return 0;
+	return 1;
 }
 
 void spi_give_semaphore() {
@@ -58,11 +58,10 @@ void spi_give_semaphore() {
 
 void VS1053_spi_init(uint8_t spi_no){
 	esp_err_t ret;
-	
 	if(!sSPI) vSemaphoreCreateBinary(sSPI);
-	spi_give_semaphore();	
-
-	if(spi_no > 1) return; //Only SPI and HSPI are valid spi modules. 
+	spi_give_semaphore(); 
+	
+	if(spi_no > 1) return; //Only SPI and HSPI are valid spi modules. 	
 	
 	spi_bus_config_t buscfg={
         .miso_io_num=PIN_NUM_MISO,
@@ -72,8 +71,8 @@ void VS1053_spi_init(uint8_t spi_no){
         .quadhd_io_num=-1
 //		.max_transfer_sz = 1024		
 	};		
-	ret=spi_bus_initialize(HSPI_HOST, &buscfg, 1);	 //  dma	
-	assert(ret==ESP_OK);	
+	ret=spi_bus_initialize(HSPI_HOST, &buscfg, 1);	 // dma	
+	assert(ret==ESP_OK);
 }
 
 int getVsVersion() { return vsVersion;}
@@ -87,10 +86,10 @@ void VS1053_HW_init(){
 		.duty_cycle_pos = 0,
 		.cs_ena_pretrans = 0,
 		.cs_ena_posttrans = 0,
-		//.flags = SPI_DEVICE_HALFDUPLEX,	
+		.flags = 0,	
         .mode=0,                         //SPI mode 
         .spics_io_num= PIN_NUM_XCS,               //XCS pin
-        .queue_size=4,                          //We want to be able to queue x transactions at a time
+        .queue_size=10,                          //We want to be able to queue x transactions at a time
         //.pre_cb=lcd_spi_pre_transfer_callback,  //Specify pre-transfer callback to handle D/C line
         .pre_cb=NULL,  //Specify pre-transfer callback to handle D/C line
 		.post_cb = NULL
@@ -110,14 +109,14 @@ void VS1053_HW_init(){
 	
 	//Initialize non-SPI GPIOs
 	gpio_config_t gpio_conf;
-	
 	gpio_conf.mode = GPIO_MODE_OUTPUT;
 	gpio_conf.pull_up_en =  GPIO_PULLUP_DISABLE;
-	gpio_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
+	gpio_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
 	gpio_conf.intr_type = GPIO_INTR_DISABLE;	
 	gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<PIN_NUM_RST));
 	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
 	
+	ControlReset(RESET);
     //gpio_set_direction(PIN_NUM_RST, GPIO_MODE_OUTPUT);
 		
 	gpio_conf.mode = GPIO_MODE_INPUT;
@@ -186,7 +185,7 @@ void VS1053_WriteRegister16(uint8_t addressbyte, uint16_t value)
 	t.flags |= SPI_TRANS_USE_TXDATA;
 	t.cmd = VS_WRITE_COMMAND;
 	t.addr = addressbyte;
-	t.tx_data[0] = (value>>8)&0xff;	;
+	t.tx_data[0] = (value>>8)&0xff;	
 	t.tx_data[1] = value&0xff;		
     t.length= 16;
 	spi_take_semaphore();
@@ -205,7 +204,8 @@ uint16_t VS1053_ReadRegister(uint8_t addressbyte){
 	t.cmd = VS_READ_COMMAND;
 	t.addr = addressbyte;
     t.rx_buffer=&data;
-	spi_take_semaphore();    ESP_ERROR_CHECK(spi_device_transmit(vsspi, &t));  //Transmit!
+	spi_take_semaphore();    
+	ESP_ERROR_CHECK(spi_device_transmit(vsspi, &t));  //Transmit!
 	while(VS1053_checkDREQ() == 0)taskYIELD ();
 	result =  (((data&0xFF)<<8) | ((data>>8)&0xFF)) ;  	
 	while(VS1053_checkDREQ() == 0);
@@ -282,9 +282,9 @@ void VS1053_Start(){
 	struct device_settings *device;
 	
 	ControlReset(SET);
-	vTaskDelay(100);
+	vTaskDelay(50);
 	ControlReset(RESET);
-	vTaskDelay(200);	
+	vTaskDelay(100);	
 	//Check DREQ
 	if (VS1053_checkDREQ() == 0)
 	{
@@ -305,7 +305,7 @@ void VS1053_Start(){
 	vsVersion = (MP3Status >> 4) & 0x000F; //Mask out only the four version bits
 //0 for VS1001, 1 for VS1011, 2 for VS1002, 3 for VS1003, 4 for VS1053 and VS8053,
 //5 for VS1033, 7 for VS1103, and 6 for VS1063	
-	ESP_LOGE(TAG,"VS1053/VS1003 detected. Version: %d",vsVersion);
+	ESP_LOGE(TAG,"VS1053/VS1003 detected. MP3Status: %x, Version: %x",MP3Status,vsVersion);
    if (vsVersion == 4) // only 1053b  	
 //		VS1053_WriteRegister(SPI_CLOCKF,0x78,0x00); // SC_MULT = x3, SC_ADD= x2
 		VS1053_WriteRegister16(SPI_CLOCKF,0xB800); // SC_MULT = x1, SC_ADD= x1
@@ -338,7 +338,7 @@ void VS1053_Start(){
 			}
 		}
 		vTaskDelay(10);
-		printf(PSTR("volume: %d\n"),device->vol);
+		printf("volume: %d\n",device->vol);
 		setIvol( device->vol);
 		VS1053_SetVolume( device->vol);	
 		VS1053_SetTreble(device->treble);

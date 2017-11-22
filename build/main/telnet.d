@@ -114,7 +114,8 @@ telnet.o: C:/msys32/home/jp/esp/Ka-Radio32/main/telnet.c \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h \
- C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8x8.h
+ C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8x8.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/ucglib/csrc/ucg.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h:
 
@@ -347,4 +348,6 @@ C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h:
 C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8x8.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/components/ucglib/csrc/ucg.h:
 /home/jp/esp/Ka-Radio32/main/./telnet.c:

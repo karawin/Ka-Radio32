@@ -77,6 +77,7 @@ audio_renderer.o: \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/i2s.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/i2s_struct.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/i2s_reg.h \
@@ -246,6 +247,8 @@ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/touch_channel.h:
 C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/i2s.h:
 

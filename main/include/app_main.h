@@ -6,11 +6,11 @@
  *  Modified on 15.09.2017 for KaraDio32
  *		jp Cocatrix
  */
-#include "driver/timer.h"
 
 #ifndef MAIN_INCLUDE_APP_MAIN_H_
 #define MAIN_INCLUDE_APP_MAIN_H_
 #include "audio_renderer.h"
+#include "driver/timer.h"
 
 //TIMER_BASE_CLK = APB_CLK_FREQ
 //#define  APB_CLK_FREQ                                ( 80*1000000 )       //unit: Hz

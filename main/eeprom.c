@@ -166,10 +166,10 @@ void saveStation(struct shoutcast_info *station, uint16_t position) {
 	if (position > NBSTATIONS-1) {ESP_LOGE(TAG,"saveStation fails pos=%d",position);return;}
 	while (!eeSetData((position+1)*256, station, 256)) 
 	{
-		kprintf(PSTR("Retrying %d on saveStation\n"),i+1);
+		kprintf("Retrying %d on saveStation\n",i+1);
 		vTaskDelay ((i+1)*20+200) ;
 		i++; 
-//		if (i == 2) {clientDisconnect(PSTR("saveStation low Memory")); vTaskDelay (300) ;} // stop the player
+//		if (i == 2) {clientDisconnect("saveStation low Memory"); vTaskDelay (300) ;} // stop the player
 		if (i == 10) return;
 	}
 }
@@ -179,17 +179,17 @@ void saveMultiStation(struct shoutcast_info *station, uint16_t position, uint8_t
 	if (number <= 0) return;
 	while (!eeSetData((position)*256, station, number*256))
 	{		
-		kprintf(PSTR("Retrying %d on SaveMultiStation for %d stations\n"),i+1,number);
+		kprintf("Retrying %d on SaveMultiStation for %d stations\n",i+1,number);
 		vTaskDelay ((i+1)*20+300) ;
 		i++; 
-//		if (i == 3) {clientDisconnect(PSTR("saveMultiStation low Memory")); vTaskDelay (300) ;}
+//		if (i == 3) {clientDisconnect("saveMultiStation low Memory"); vTaskDelay (300) ;}
 		if (i == 10) return;
 	}
 }
 
 
 struct shoutcast_info* getStation(uint8_t position) {
-	if (position > NBSTATIONS-1) {printf(PSTR("getStation fails pos=%d\n"),position); return NULL;}
+	if (position > NBSTATIONS-1) {kprintf("getStation fails pos=%d\n",position); return NULL;}
 	uint8_t* buffer = malloc(256);
 	uint8_t i = 0;
 	

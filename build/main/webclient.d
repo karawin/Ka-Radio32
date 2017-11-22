@@ -135,6 +135,7 @@ webclient.o: C:/msys32/home/jp/esp/Ka-Radio32/main/webclient.c \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8x8.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/ucglib/csrc/ucg.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/audio_player/include/audio_player.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/fifo/include/spiram_fifo.h \
@@ -414,6 +415,8 @@ C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h:
 C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8x8.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/components/ucglib/csrc/ucg.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio.h:
 

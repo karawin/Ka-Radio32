@@ -184,7 +184,7 @@ static char* getParameter(char* sep,char* param, char* data, uint16_t data_lengt
 		if(p_end != NULL ) {
 			if (p_end==p) return NULL;
 			char* t = inmalloc(p_end-p + 1);
-			if (t == NULL) { printf(PSTR("getParameterF fails%c"),0x0d); return NULL;}
+			if (t == NULL) { printf("getParameterF fails\n"); return NULL;}
 			ESP_LOGV(TAG,"getParameter malloc of %d  for %s",p_end-p + 1,param);
 			int i;
 			for(i=0; i<(p_end-p + 1); i++) t[i] = 0;
@@ -205,7 +205,7 @@ static char* getParameterFromComment(char* param, char* data, uint16_t data_leng
 static void clientSetOvol(int8_t ovol)
 {
 	clientOvol = ovol;
-	kprintf(PSTR("##CLI.OVOLSET#: %d\n"),ovol);
+	kprintf("##CLI.OVOLSET#: %d\n",ovol);
 	vTaskDelay(10);
 }
 
@@ -228,7 +228,7 @@ void setVolume(char* vol) {
 		if (get_audio_output_mode() == VS1053) VS1053_SetVolume(uvol);
 		if (uvol <3) uvol--;
 		renderer_volume(uvol+2); // max 256
-		kprintf(PSTR("##CLI.VOL#: %d\n"),getIvol());	
+		kprintf("##CLI.VOL#: %d\n",getIvol());	
 	}
 }
 // set the current volume with its offset
@@ -238,7 +238,7 @@ static void setOffsetVolume(void) {
 	if (uvol > 254) uvol = 254;
 	if (uvol <=0) uvol = 1;
 	ESP_LOGV(TAG,"setOffsetVol: %d",clientOvol);
-	kprintf(PSTR("##CLI.VOL#: %d\n"),getIvol());
+	kprintf("##CLI.VOL#: %d\n",getIvol());
 	setVolumei(uvol);
 }
 
@@ -364,6 +364,7 @@ void playStationInt(int sid) {
 		if (device->currentstation != sid)
 		{
 			device->currentstation = sid;
+			setCurrentStation( sid);
 			saveDeviceSettings(device);
 		}
 		infree(device);
@@ -414,7 +415,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			pathParse(path);
 			char* port = getParameterFromResponse("port=", data, data_size);
 			if(url != NULL && path != NULL && port != NULL) {
-				clientDisconnect(PSTR("Post instant_play"));
+				clientDisconnect("Post instant_play");
 				for (i = 0;i<100;i++)
 				{
 					if(!clientIsConnected())break;
@@ -680,7 +681,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 	} else if(strcmp(name, "/stop") == 0) {
 		if (clientIsConnected())
 		{	
-			clientDisconnect(PSTR("Post Stop"));
+			clientDisconnect("Post Stop");
 			for (i = 0;i<100;i++)
 			{
 				if (!clientIsConnected()) break;
@@ -983,11 +984,11 @@ static bool httpServerHandleConnection(int conn, char* buf, uint16_t buflen) {
 				if (param != NULL) {playStationInt(getCurrentStation());}
 // stop command				
 				param = strstr(c,"stop") ;
-				if (param != NULL) {clientDisconnect(PSTR("Web stop"));}
+				if (param != NULL) {clientDisconnect("Web stop");}
 // instantplay command				
 				param = getParameterFromComment("instant=", c, strlen(c)) ;
 				if (param != NULL) {
-					clientDisconnect(PSTR("Web Instant"));
+					clientDisconnect("Web Instant");
 					pathParse(param);
 //					printf("Instant param:%s\n",param);
 					clientParsePlaylist(param);clientConnectOnce();

@@ -12,8 +12,8 @@
 #define MAXDATAT	 256
 
 
-#define RELEASE "0.7"
-#define REVISION "3"
+#define RELEASE "0.8"
+#define REVISION "0"
 
 uint32_t checkUart(uint32_t speed);
 extern unsigned short adcdiv;	

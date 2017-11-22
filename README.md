@@ -21,7 +21,7 @@ To build your own release, you must install the idf https://github.com/espressif
 To flash all build output, run 'make flash' or:
 python /home/yourhome/esp/esp-idf/components/esptool_py/esptool/esptool.py --chip esp32 --port com5 --baud 460800 --before default_reset --after hard_reset write_flash -u --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 /home/yourhome/esp/Ka-Radio32/build/bootloader/bootloader.bin 0x10000 /home/yourhome/esp/Ka-Radio32/build/KaRadio32.bin 0x8000 /home/yourhome/esp/Ka-Radio32/build/partitions.bin
 ```
-#### GPIO Definition
+#### GPIO Definition Version 0.8
 ```
 //-------------------------------//
 // Define GPIO used in KaRadio32 //
@@ -83,6 +83,11 @@ The type of lcd can be set with the uart or telnet command sys.lcd("x")<BR/>
 Status: Ready.<BR/>
 Other type and some color lcd added later.<BR/>
 ```
+// min 128x64
+#define LCD_I2C			0
+#define LCD_NONE		255
+
+// Black&White
 //I2C
 #define LCD_I2C_SH1106		0 //128X64
 #define LCD_I2C_SSD1306		1 //128X64
@@ -90,7 +95,7 @@ Other type and some color lcd added later.<BR/>
 #define LCD_I2C_SSD1325 	3 //128X64
 #define LCD_I2C_SSD1306NN	4 //128X64
 //SPI
-#define LCD_SPI_SSD1306 		64 //128X32
+#define LCD_SPI_SSD1306 		64 //128X32 (LCD_SPI =0x40)
 #define LCD_SPI_SSD1309 		65 //128X64
 #define LCD_SPI_ST7565_ZOLEN	66 //128X64
 #define LCD_SPI_SSD1322_NHD		67 //256X64
@@ -98,6 +103,16 @@ Other type and some color lcd added later.<BR/>
 #define LCD_SPI_SSD1607			69 //200X200
 #define LCD_SPI_LS013B7DH03		70 //128X128
 #define LCD_SPI_SSD1306NN 		71 //128X64
+
+// Colors
+#define LCD_SPI_ST7735			192 // 128x160  (LCD_COLOR|LCD_SPI =0xC0)
+#define LCD_SPI_SSD1351			193 // 128x128
+#define LCD_SPI_ILI9341			194 // 240x320
+#define LCD_SPI_ILI9163			195 // 128x128
+#define LCD_SPI_PCF8833			196 // 132x132
+#define LCD_SPI_SSD1331			197 // 96x64
+#define LCD_SPI_SEPS225			198 // 96x64
+
 ```
 
 #### First use

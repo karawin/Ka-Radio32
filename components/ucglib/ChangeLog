@@ -1,0 +1,46 @@
+
+Changelog Ucglib (http://code.google.com/p/ucglib/)
+
+2014-02-01	v0.01   Oliver Kraus <olikraus@gmail.com>
+  * first beta release for Arduino IDE 
+2014-03-01	v0.02   Oliver Kraus <olikraus@gmail.com>
+  * Speedup for SSD1351
+  * Fixed text output problems with ILI9325
+  * Fixed controller timing problem with the ILI9341 (rot180/rot270)
+  * Fixed GraphicsDemo for larger screen sizes
+  * Added Profont and Logisoso fonts
+  * Support for PCF8833 and ST7735
+2014-04-19	v0.03   Oliver Kraus <olikraus@gmail.com>
+  * Support for Freetronics OLED with SSD1351 (Ucglib_SSD1351_18x128x128_FT_SWSPI)
+  * Added ucg_int_t getStrWidth(const char *s) to the C++ interface
+2014-04-21	v0.04   Oliver Kraus <olikraus@gmail.com>
+  * void drawLine(ucg_int_t x1, ucg_int_t y1, ucg_int_t x2, ucg_int_t y2)
+2014-04-27	v0.05   Oliver Kraus <olikraus@gmail.com>
+  * Issue 9: Scale2x2 verified
+  * Issue 11: Low level proc for solid text is closed
+  * Issue 14: Speed improvement for 8 bit SW SPI
+2014-04-29	v1.00   Oliver Kraus <olikraus@gmail.com>
+  * Small change to GraphicsTest.ino
+2014-08-24	v1.01   Oliver Kraus <olikraus@gmail.com>
+  * Fixed problem with rot180/rot270 and solid font mode (issue 30)
+  * drawString, drawGlyph, setFontRefXXX procedures
+2015-06-18	v1.2   Oliver Kraus <olikraus@gmail.com>
+  * Fixed problem with slow SW SPI on Arduino Due
+  * bdf2ucg replaced by bdfconv
+  * Complete new font rendering subsystem
+  * New font: Inconsolata
+  * New font nameing convention, monospace fonts are clearly marked
+  * Support for ILI9163 128x128 display
+  * Initial support for LD50T6160
+  * Power down mode for most controller types
+2015-07-26	v1.3   Oliver Kraus <olikraus@gmail.com>
+  * bdfconv.exe available on google drive
+  * Support for SEPS225 OLEDs
+  * Support for SSD1331 OLEDs  
+2016-01-07	v1.4.0	Oliver Kraus <olikraus@gmail.com>
+  * Support for ESP8266 (issue 61)
+
+  
+  
+  
+  

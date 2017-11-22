@@ -1,6 +1,7 @@
 /* User application code loading tables for VS10xx */
 
-
+#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
+#define TAG  "VS1053 Patches"
 #include "vs1053.h"
 #include "stdio.h"
 #include "stdlib.h"
@@ -472,15 +473,15 @@ void  LoadUserCode( const unsigned short* plugin,uint16_t size) {
   iplugin = (unsigned short*)malloc(size+16);
   if (iplugin == NULL) 
   {
-	   printf(PSTR("malloc fails for plugin%c"),0x0d);
+	   ESP_LOGE(TAG,"malloc fails for plugin%c",0x0d);
 	   return ;
   }
-  printf(PSTR("plugin size %d %d \n"),size,ssize);
+  ESP_LOGI(TAG,"plugin size %d %d",size,ssize);
   
   //flashRead( iplugin,(uint32_t) plugin, size );
   iplugin = plugin;
   
-  printf(PSTR("plugin start: %x %x %x %x\n"),*iplugin,*(iplugin+1),*(iplugin+2),*(iplugin+3));
+  ESP_LOGI(TAG,"plugin start: %x %x %x %x\n",*iplugin,*(iplugin+1),*(iplugin+2),*(iplugin+3));
   while (i<ssize) {
     unsigned short addr, n, val;
     addr = iplugin[i++];

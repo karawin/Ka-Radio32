@@ -124,6 +124,7 @@ app_main.o: C:/msys32/home/jp/esp/Ka-Radio32/main/app_main.c \
  C:/msys32/home/jp/esp/esp-idf/components/spi_flash/include/esp_partition.h \
  C:/msys32/home/jp/esp/esp-idf/components/spi_flash/include/esp_spi_flash.h \
  C:/msys32/home/jp/esp/esp-idf/components/spi_flash/include/esp_spi_flash.h \
+ C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_trace.h \
  C:/msys32/home/jp/esp/esp-idf/components/nvs_flash/include/nvs_flash.h \
  C:/msys32/home/jp/esp/esp-idf/components/nvs_flash/include/nvs.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/i2s.h \
@@ -162,11 +163,11 @@ app_main.o: C:/msys32/home/jp/esp/Ka-Radio32/main/app_main.c \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/icmp6.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/dns.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/audio_renderer/include/audio_renderer.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/common/include/common_component.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/timer.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_reg.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_struct.h \
- C:/msys32/home/jp/esp/Ka-Radio32/components/audio_renderer/include/audio_renderer.h \
- C:/msys32/home/jp/esp/Ka-Radio32/components/common/include/common_component.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/fifo/include/spiram_fifo.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/mdns_task/include/mdns_task.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/audio_player/include/audio_player.h \
@@ -181,6 +182,7 @@ app_main.o: C:/msys32/home/jp/esp/Ka-Radio32/main/app_main.c \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/queue.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/i2c.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/ucglib/csrc/ucg.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/eeprom.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/bt_config.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/xi2c/include/xi2c.h \
@@ -449,6 +451,8 @@ C:/msys32/home/jp/esp/esp-idf/components/spi_flash/include/esp_spi_flash.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/spi_flash/include/esp_spi_flash.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_trace.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/nvs_flash/include/nvs_flash.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/nvs_flash/include/nvs.h:
@@ -525,15 +529,15 @@ C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/dns.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/app_main.h:
 
+C:/msys32/home/jp/esp/Ka-Radio32/components/audio_renderer/include/audio_renderer.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/components/common/include/common_component.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/timer.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_reg.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_struct.h:
-
-C:/msys32/home/jp/esp/Ka-Radio32/components/audio_renderer/include/audio_renderer.h:
-
-C:/msys32/home/jp/esp/Ka-Radio32/components/common/include/common_component.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/fifo/include/spiram_fifo.h:
 
@@ -562,6 +566,8 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/queue.h:
 C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/i2c.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/components/ucglib/csrc/ucg.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/eeprom.h:
 

@@ -14,6 +14,7 @@
 #include "esp_event_loop.h"
 #include "esp_log.h"
 #include "esp_ota_ops.h"
+#include "esp_heap_trace.h"
 #include "nvs_flash.h"
 #include "driver/i2s.h"
 #include "driver/uart.h"
@@ -234,38 +235,6 @@ timer_config_t config;
 output_mode_t get_audio_output_mode() 
 { return audio_output_mode;}
 
-static void lcd_state(char* State)
-{
-	u8g2_SetDrawColor(&u8g2, 0);
-	u8g2_DrawBox(&u8g2, 2, 40, 128-30, 12);
-	u8g2_SetDrawColor(&u8g2, 1);
-	u8g2_SetFont(&u8g2, u8g2_font_6x10_tf);
-	u8g2_DrawStr(&u8g2, 2,40,State);
-	u8g2_SendBuffer(&u8g2);
-}
-
-static void lcd_welcome(char* ip)
-{
-    char *url = "Stopped";// get_url(); // play_url();	
-
-	u8g2_ClearBuffer(&u8g2);
-    u8g2_SetFont(&u8g2, u8g2_font_helvR14_tf );
-    u8g2_DrawStr(&u8g2, 10,2,"KaRadio32");
-	u8g2_SetFont(&u8g2, u8g2_font_6x10_tf);
-	u8g2_DrawStr(&u8g2, 2,24,"WiFi Webradio");
-	u8g2_SetFont(&u8g2, u8g2_font_6x10_tf);
-	u8g2_DrawStr(&u8g2, 2,40,url);
-	u8g2_DrawStr(&u8g2, u8g2_DrawStr(&u8g2, 2,53,"IP")+18,53,ip);
-	u8g2_SendBuffer(&u8g2);
-
-   
-/* for class-D amplifier system. Dim OLED to avoid noise from panel*/
-/* PLEASE comment out next three lines for ESP32-ADB system*/  
- //   vTaskDelay(500);
-//    SSD1306_Fill(SSD1306_COLOR_BLACK);
-//    SSD1306_UpdateScreen();  
-/* The above part is for class-D webradio system*/  
-}
 
 
 //////////////////////////////////////////////////////////////////
@@ -750,7 +719,7 @@ void app_main()
         err = nvs_flash_init();
     }
     ESP_ERROR_CHECK( err );
-
+	
 	//init hardware	
 	partitions_init();
 	ESP_LOGI(TAG, "Partition init done...");
@@ -780,26 +749,30 @@ void app_main()
 	}	
 	
 	copyDeviceSettings(); // copy in the safe partion
+
 	
 	// init softwares
 	telnetinit();
 	websocketinit();
+
+
 	// log level
 	setLogLevel(device->trace_level);
 	
 	//SPI init for the vs1053 and lcd if spi.
 	VS1053_spi_init(HSPI_HOST);
-	
-	
-	ESP_LOGI(TAG, "LCD Device type: %d",device->lcd_type);
-	lcd_init(device->lcd_type);
-	
+
     init_hardware(); 
 	ESP_LOGI(TAG, "Hardware init done...");
+	//ESP_LOGE(TAG,"Corrupt1 %d",heap_caps_check_integrity(MALLOC_CAP_DMA,1));
+	
+	ESP_LOGE(TAG,"LCD Type %d",device->lcd_type);
+	lcd_init(device->lcd_type);
 	
 	// output mode
 	//I2S, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053
 	audio_output_mode = device->audio_output_mode;
+	
 	if ((audio_output_mode == VS1053) && (getVsVersion() < 3))
 	{
 		audio_output_mode = I2S	;
@@ -807,13 +780,12 @@ void app_main()
 		ESP_LOGE(TAG," No vs1053 detected. Fall back to I2S mode");
 		saveDeviceSettings(device);
 	}
+	
+
 	ESP_LOGI(TAG, "audio_output_mode %d\nOne of I2S=0, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053",audio_output_mode);
 
-	
-	
-
 	setCurrentStation( device->currentstation);
-	
+
 	//uart speed
 	uspeed = device->uartspeed;	
 	uspeed = checkUart(uspeed);	
@@ -825,14 +797,6 @@ void app_main()
 		saveDeviceSettings(device);
 	}	
 	
-	
-	// queue for events of the sleep / wake timers
-	event_queue = xQueueCreate(10, sizeof(queue_event_t));
-	// led blinks
-	xTaskCreate(timerTask, "timerTask",1800, NULL, 1, &pxCreatedTask); 
-	ESP_LOGI(TAG, "%s task: %x","t0",(unsigned int)pxCreatedTask);	
-	
-	
 	// volume
 	setIvol( device->vol);
 	
@@ -841,12 +805,15 @@ void app_main()
 	ESP_LOGI(TAG, "SDK %s",esp_get_idf_version());
 	ESP_LOGI(TAG, "Heap size: %d",xPortGetFreeHeapSize( ));
 
-	//Display if any	
-	//i2c_example_master_init();
-	//SSD1306_Init();
 	lcd_welcome("");
 	
-
+// queue for events of the sleep / wake timers
+	event_queue = xQueueCreate(10, sizeof(queue_event_t));
+	// led blinks
+	xTaskCreate(timerTask, "timerTask",1900, NULL, 1, &pxCreatedTask); 
+	ESP_LOGI(TAG, "%s task: %x","t0",(unsigned int)pxCreatedTask);		
+	
+	
 //-----------------------------
 // start the network
 //-----------------------------
@@ -884,7 +851,7 @@ void app_main()
 	ESP_LOGI(TAG, "%s task: %x","clientTask",(unsigned int)pxCreatedTask);	
     xTaskCreate(serversTask, "serversTask", 2300, NULL, 3, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","serversTask",(unsigned int)pxCreatedTask);	
-	xTaskCreate(task_addon, "task_addon", 2300, NULL, 1, &pxCreatedTask); 
+	xTaskCreate(task_addon, "task_addon", 2500, NULL, 5, &pxCreatedTask);  //high priority for the spi else too slow due to ucglib
 	ESP_LOGI(TAG, "%s task: %x","task_addon",(unsigned int)pxCreatedTask);
 	
 	printf("Init ");

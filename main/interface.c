@@ -151,76 +151,6 @@ void setCurrentStation( uint16_t cst)
 
 unsigned short adcdiv;	
 
-/*
-void readAdc()
-{
-	int adc;
-	adc1_config_width(ADC_WIDTH_12Bit);
-	adc1_config_channel_atten(ADC1_CHANNEL_0,ADC_ATTEN_0db);
-	adc = adc1_get_raw(ADC1_CHANNEL_0);
-	kprintf(PSTR("##ADC: %d * %d = %d\n"),adc,adcdiv,adc*adcdiv);
-}
-*/
-// Read the command panel
-/*void switchCommand() {
-	int adc;
-//remove	int i = 0;
-	char Vol[22];
-	if (adcdiv == 0) return; // no panel
-	adc1_config_width(ADC_WIDTH_12Bit);
-	adc1_config_channel_atten(ADC1_CHANNEL_0,ADC_ATTEN_0db);
-	adc =  adc1_get_raw(ADC1_CHANNEL_0);
-	adc *= adcdiv;
-	
-//	if (adc < 930) 
-//		printf("adc: %d  div: %d\n",adc,adcdiv);
-
-	if (inside&&(adc > 930)) 
-	{
-		inside = false;
-		return;
-	}	
-	
-	vTaskDelay(1);
-	adc = adc1_get_raw(ADC1_CHANNEL_0);
-	adc *= adcdiv;
-		
-	if ((adc >400) && (adc < 580)) // volume +
-	{
-		setVolumePlus();
-	}
-	else if ((adc >730) && (adc < 830)) // volume -
-	{
-		setVolumeMinus();
-	}		
-	if (!inside)
-	{	
-		if (adc < 220) // stop
-		{
-			inside = true;
-			clientDisconnect(PSTR("Adc Stop"));
-		}
-		else if ((adc >278) && (adc < 380)) //start
-		{
-			inside = true;
-			sprintf(Vol,"%d",currentStation);
-			playStation	(Vol);
-		}
-		else if ((adc >830) && (adc < 920)) // station+
-		{
-			inside = true;
-			wsStationNext();
-		}
-		else if ((adc >590) && (adc < 710)) // station-
-		{
-			inside = true;
-		wsStationPrev();
-		}
-	}
-}
-
-*/
-
 uint8_t startsWith(const char *pre, const char *str)
 {
     size_t lenpre = strlen(pre),
@@ -238,12 +168,12 @@ void readRssi()
  //       info.channel = wifidata.primary;
     }
 //	rssi = wifi_station_get_rssi();
-	kprintf(PSTR("##RSSI: %d\n"),rssi);
+	kprintf("##RSSI: %d\n",rssi);
 }
 
 void printInfo(char* s)
 {
-	kprintf(PSTR("#INFO:\"%s\"#\n"), s);
+	kprintf("#INFO:\"%s\"#\n", s);
 }
 
 void wifiScan()
@@ -358,8 +288,8 @@ void wifiConnectMem()
 
 void wifiDisconnect()
 {
-	if(esp_wifi_disconnect()!= ESP_OK) kprintf(PSTR("\n##WIFI.NOT_CONNECTED#"));
-	else kprintf(PSTR("\n##WIFI.DISCONNECT_FAILED#"));
+	if(esp_wifi_disconnect()!= ESP_OK) kprintf("\n##WIFI.NOT_CONNECTED#");
+	else kprintf("\n##WIFI.DISCONNECT_FAILED#");
 }
 
 void wifiStatus()
@@ -412,7 +342,7 @@ void clientParsePath(char* s)
 		kprintf(stritCMDERROR);
 		return;
 	}
-//	kprintf(PSTR("cli.path: %s\n"),t);
+//	kprintf("cli.path: %s\n",t);
 	char *t_end  = strstr(t, parquoteslash)-2;
     if(t_end <= (char*)0)
     {
@@ -425,7 +355,7 @@ void clientParsePath(char* s)
         uint8_t tmp;
         for(tmp=0; tmp<(t_end-t+1); tmp++) path[tmp] = 0;
         strncpy(path, t+2, (t_end-t));
-	kprintf(PSTR("cli.path: %s\n"),path);
+	kprintf("cli.path: %s\n",path);
         clientSetPath(path);
         free(path);
     }
@@ -595,7 +525,7 @@ void sysI2S(char* s)
 	device = getDeviceSettings();
 	if(t == NULL)
 	{
-		kprintf(PSTR("\n##I2S speed: %d, 0=48kHz, 1=96kHz, 2=192kHz#\n"),device->i2sspeed);
+		kprintf("\n##I2S speed: %d, 0=48kHz, 1=96kHz, 2=192kHz#\n",device->i2sspeed);
 		free(device);
 		return;
 	}
@@ -611,7 +541,7 @@ void sysI2S(char* s)
 
 	device->i2sspeed = speed;
 	saveDeviceSettings(device);	
-	kprintf(PSTR("\n##I2S speed: %d, 0=48kHz, 1=96kHz, 2=192kHz#\n"),speed);
+	kprintf("\n##I2S speed: %d, 0=48kHz, 1=96kHz, 2=192kHz#\n",speed);
 	free(device);
 }
 void sysUart(char* s)
@@ -645,7 +575,7 @@ void sysUart(char* s)
 		saveDeviceSettings(device);	
 		kprintf("Speed: %d\n",speed);
 	}
-	kprintf(PSTR("\n%sUART= %d# on next reset\n"),msgsys,device->uartspeed);	
+	kprintf("\n%sUART= %d# on next reset\n",msgsys,device->uartspeed);	
 	free(device);
 }
 void clientVol(char *s)
@@ -654,7 +584,7 @@ void clientVol(char *s)
 	if(t == 0)
 	{
 		// no argument, return the current volume
-		kprintf(PSTR("%sVOL#: %d\n"),msgcli,getVolume());
+		kprintf("%sVOL#: %d\n",msgcli,getVolume());
 		return;
 	}
 	char *t_end  = strstr(t, parquoteslash)-2;
@@ -686,9 +616,9 @@ void syspatch(char* s)
 	if(t == NULL)
 	{
 		if ((device->options & T_PATCH)!= 0)
-			kprintf(PSTR("\n##VS1053 Patch is not loaded#%c"),0x0d);
+			kprintf("\n##VS1053 Patch is not loaded#%c",0x0d);
 		else
-			kprintf(PSTR("\n##VS1053 Patch is loaded#%c"),0x0d);
+			kprintf("\n##VS1053 Patch is loaded#%c",0x0d);
 		free(device);
 		return;
 	}
@@ -774,7 +704,7 @@ void tzoffset(char* s)
 	device = getDeviceSettings();
 	if(t == NULL)
 	{
-		kprintf(PSTR("##SYS.TZO#: %d\n"),device->tzoffset);
+		kprintf("##SYS.TZO#: %d\n",device->tzoffset);
 		free(device);
 		return;
 	}
@@ -788,14 +718,15 @@ void tzoffset(char* s)
 	uint8_t value = atoi(t+2);
 	device->tzoffset = value;	
 	saveDeviceSettings(device);	
-	kprintf(PSTR("##SYS.TZO#: %d\n"),device->tzoffset);
-	free(device);		
+	kprintf("##SYS.TZO#: %d\n",device->tzoffset);
+	free(device);	
+	addonDt(); // for addon, force the dt fetch
 }
 
 void heapSize()
 {
 	int hps = xPortGetFreeHeapSize( );
-	kprintf(PSTR("%sHEAP: %d #\n"),msgsys,hps);
+	kprintf("%sHEAP: %d #\n",msgsys,hps);
 }
 
 
@@ -852,7 +783,7 @@ void checkCommand(int size, char* s)
 	int i;
 	for(i=0;i<size;i++) tmp[i] = s[i];
 	tmp[size] = 0;
-//	kprintf(PSTR("size: %d, cmd=%s\n"),size,tmp);
+//	kprintf("size: %d, cmd=%s\n",size,tmp);
 
 		if(startsWith ("dbg.", tmp))
 	{
@@ -878,9 +809,9 @@ void checkCommand(int size, char* s)
 		if     (startsWith (  "url", tmp+4)) 	clientParseUrl(tmp);
 		else if(startsWith (  "path", tmp+4))	clientParsePath(tmp);
 		else if(startsWith (  "port", tmp+4)) 	clientParsePort(tmp);
-		else if(strcmp(tmp+4, "instant") == 0) {clientDisconnect(PSTR("cli instantplay"));clientConnectOnce();}
+		else if(strcmp(tmp+4, "instant") == 0) {clientDisconnect("cli instantplay");clientConnectOnce();}
 		else if(strcmp(tmp+4, "start") == 0) 	clientPlay("(\"255\")"); // outside value to play the current station
-		else if(strcmp(tmp+4, "stop") == 0) 	clientDisconnect(PSTR("cli stop"));
+		else if(strcmp(tmp+4, "stop") == 0) 	clientDisconnect("cli stop");
 		else if(startsWith (  "list", tmp+4)) 	clientList(tmp);
 		else if(strcmp(tmp+4, "next") == 0) 	wsStationNext();
 		else if(strncmp(tmp+4,"previous",4) == 0) wsStationPrev();
@@ -904,7 +835,7 @@ void checkCommand(int size, char* s)
 		else if(startsWith (  "patch",tmp+4)) 	syspatch(tmp);
 		else if(startsWith (  "led",tmp+4)) 	sysled(tmp);
 		else if(strcmp(tmp+4, "date") == 0) 	ntp_print_time();
-		else if(strncmp(tmp+4, "version",4) == 0) 	kprintf(PSTR("Release: %s, Revision: %s\n"),RELEASE,REVISION);
+		else if(strncmp(tmp+4, "version",4) == 0) 	kprintf("Release: %s, Revision: %s\n",RELEASE,REVISION);
 		else if(startsWith(   "tzo",tmp+4)) 	tzoffset(tmp);
 		else if(strcmp(tmp+4, "logn") == 0) 	setLogLevel(ESP_LOG_NONE);
 		else if(strcmp(tmp+4, "loge") == 0) 	setLogLevel(ESP_LOG_ERROR); 

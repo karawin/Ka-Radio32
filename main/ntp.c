@@ -122,9 +122,9 @@ void ntp_print_time() {
 //	ISO-8601 local time   https://www.w3.org/TR/NOTE-datetime
 //  YYYY-MM-DDThh:mm:ssTZD (eg 1997-07-16T19:20:30+01:00)
 		if (tz >=0)
-			kprintf(PSTR("##SYS.DATE#: %s+%02d:00\n"),msg,tz);
+			kprintf("##SYS.DATE#: %s+%02d:00\n",msg,tz);
 		else
-			kprintf(PSTR("##SYS.DATE#: %s%03d:00\n"),msg,tz);
+			kprintf("##SYS.DATE#: %s%03d:00\n",msg,tz);
 	}
 		
 }

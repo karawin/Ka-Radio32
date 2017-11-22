@@ -32,12 +32,24 @@ static bool inIac = false; // if in negociation
 static char *obrec;
 static uint16_t irec;
 static uint8_t iiac;
+xSemaphoreHandle sTELNET = NULL;
+
+static uint8_t telnet_take_semaphore() {
+	if(sTELNET) if(xSemaphoreTake(sTELNET, portMAX_DELAY)) return 1;
+	return 0;
+}
+
+static void telnet_give_semaphore() {
+	if(sTELNET) xSemaphoreGive(sTELNET);
+}
 
 ///////////////////////
 // init some data
 void telnetinit(void)
 {
 	int i;
+	vSemaphoreCreateBinary(sTELNET);
+	
 	for (i = 0;i<NBCLIENTT;i++) 
 	{
 		telnetclients[i] = -1;
@@ -121,12 +133,13 @@ void telnetWrite(uint32_t lenb,const char *fmt, ...)
 	buf = realloc(buf,rlen+1);
 	if (buf == NULL) return;
 	// write to all clients
+	telnet_take_semaphore();
 	for (i = 0;i<NBCLIENTT;i++)	
 		if (istelnet( telnetclients[i]))
 		{
 			write( telnetclients[i],  buf, strlen(buf));
 		}	
-		
+	telnet_give_semaphore();		
 	free (buf);
 
 }
@@ -149,7 +162,7 @@ void telnetNego(int tsocket)
 void telnetCommand(int tsocket)
 {
 	if (irec == 0) return;
-//printf(PSTR("%sHEAPd0: %d #\n"),"##SYS.",xPortGetFreeHeapSize( ));	
+//printf("%sHEAPd0: %d #\n","##SYS.",xPortGetFreeHeapSize( ));	
 	brec[irec] = 0x0;
 	write(tsocket,"\n> ",1);
 //	printf("%s\n",brec);
@@ -189,7 +202,7 @@ int telnetRead(int tsocket)
 		}	
 
 		buf = realloc(buf,recbytes+2);
-//		printf(PSTR("%sHEAPdi1: %d #\nrecbytes: %d\n"),"##SYS.",xPortGetFreeHeapSize(),recbytes);	
+//		printf("%sHEAPdi1: %d #\nrecbytes: %d\n","##SYS.",xPortGetFreeHeapSize(),recbytes);	
 		if (buf != NULL)
 		{
 			for (i = 0;i< recbytes;i++)

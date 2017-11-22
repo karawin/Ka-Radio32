@@ -14,6 +14,7 @@
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 #include "esp_log.h"
 #include "driver/gpio.h"
+#include "gpio.h"
 #include "driver/i2s.h"
 #include "MerusAudio.h"
 
@@ -60,17 +61,23 @@ static void init_i2s(renderer_config_t *config)
             .communication_format = comm_fmt,
             .dma_buf_count = 32,                            // number of buffers, 128 max.
             .dma_buf_len = 64,                          // size of each buffer
-            .intr_alloc_flags = ESP_INTR_FLAG_LEVEL2        // Interrupt level 1
+            .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1        // Interrupt level 1
     };
 
     i2s_pin_config_t pin_config = {
-            .bck_io_num = GPIO_NUM_26,
-            .ws_io_num = GPIO_NUM_25,
-            .data_out_num = GPIO_NUM_22,
+            .bck_io_num = PIN_I2S_BCLK,
+            .ws_io_num = PIN_I2S_LRCK,
+            .data_out_num = PIN_I2S_DATA,
             .data_in_num = I2S_PIN_NO_CHANGE
     };
 
-    i2s_driver_install(config->i2s_num, &i2s_config, 1, &i2s_event_queue);
+    if (i2s_driver_install(config->i2s_num, &i2s_config, 1, &i2s_event_queue) != ESP_OK)
+	{
+		i2s_config.intr_alloc_flags = ESP_INTR_FLAG_LEVEL2;
+		if (i2s_driver_install(config->i2s_num, &i2s_config, 1, &i2s_event_queue) != ESP_OK)
+		ESP_LOGE(TAG,"i2s Error");
+		return;
+	}
 
     if((mode & I2S_MODE_DAC_BUILT_IN) || (mode & I2S_MODE_PDM))
     {

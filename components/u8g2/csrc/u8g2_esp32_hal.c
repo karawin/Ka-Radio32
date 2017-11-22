@@ -63,10 +63,10 @@ uint8_t u8g2_esp32_msg_comms_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void
 		  dev_config.duty_cycle_pos   = 0;
 		  dev_config.cs_ena_posttrans = 0;
 		  dev_config.cs_ena_pretrans  = 0;
-		  dev_config.clock_speed_hz   = 10000;
+		  dev_config.clock_speed_hz   = 500000; //spi
 		  dev_config.spics_io_num     = u8g2_esp32_hal.cs;
 		  dev_config.flags            = 0;
-		  dev_config.queue_size       = 200;
+		  dev_config.queue_size       = 1;
 		  dev_config.pre_cb           = NULL;
 		  dev_config.post_cb          = NULL;
 		  //ESP_LOGI(tag, "... Adding device bus.");
@@ -117,17 +117,17 @@ uint8_t u8g2_esp32_msg_i2c_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *
 
 		    i2c_config_t conf;
 		    conf.mode = I2C_MODE_MASTER;
-			ESP_LOGI(TAG, "sda_io_num %d", u8g2_esp32_hal.sda);
+			ESP_LOGD(TAG, "sda_io_num %d", u8g2_esp32_hal.sda);
 		    conf.sda_io_num = u8g2_esp32_hal.sda;
 		    conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
-			ESP_LOGI(TAG, "scl_io_num %d", u8g2_esp32_hal.scl);
+			ESP_LOGD(TAG, "scl_io_num %d", u8g2_esp32_hal.scl);
 		    conf.scl_io_num = u8g2_esp32_hal.scl;
 		    conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
-			ESP_LOGI(TAG, "clk_speed %d", I2C_MASTER_FREQ_HZ);
+			ESP_LOGD(TAG, "clk_speed %d", I2C_MASTER_FREQ_HZ);
 		    conf.master.clk_speed = I2C_MASTER_FREQ_HZ;
-			ESP_LOGI(TAG, "i2c_param_config %d", conf.mode);
+			ESP_LOGD(TAG, "i2c_param_config %d", conf.mode);
 		    ESP_ERROR_CHECK(i2c_param_config(I2C_MASTER_NUM, &conf));
-			ESP_LOGI(TAG, "i2c_driver_install %d", I2C_MASTER_NUM);
+			ESP_LOGD(TAG, "i2c_driver_install %d", I2C_MASTER_NUM);
 		    ESP_ERROR_CHECK(i2c_driver_install(I2C_MASTER_NUM, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0));
 /*
 			i2c_cmd_handle_t cmd = i2c_cmd_link_create(); // dummy write
@@ -147,28 +147,23 @@ uint8_t u8g2_esp32_msg_i2c_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *
 			uint8_t cmddata;
 			i2c_cmd_handle_t cmd = i2c_cmd_link_create();
 			ESP_ERROR_CHECK(i2c_master_start(cmd));
-//			ESP_LOGI(TAG, "I2CAddress %02X", u8x8_GetI2CAddress(u8x8)>>1);
+			ESP_LOGD(TAG, "I2CAddress %02X", u8x8_GetI2CAddress(u8x8)>>1);
 			ESP_ERROR_CHECK(i2c_master_write_byte(cmd, u8x8_GetI2CAddress(u8x8) | I2C_MASTER_WRITE, ACK_CHECK_DIS));
 		    data = (uint8_t *)arg_ptr;
 			if (arg_int==1) {
 				cmddata=0;
 				ESP_ERROR_CHECK(i2c_master_write(cmd, &cmddata, 1, ACK_CHECK_DIS));
-//				   printf("0x%02X ",zerodata);
 			} else {
 				cmddata=0x40;
 				ESP_ERROR_CHECK(i2c_master_write(cmd, &cmddata, 1, ACK_CHECK_DIS));
-				//bzero(arg_ptr,arg_int);
-				//*data=0x40;
 			}
 			//ESP_ERROR_CHECK(i2c_master_write(cmd, arg_ptr, arg_int, ACK_CHECK_DIS));
 
 		    while( arg_int > 0 ) {
 			   ESP_ERROR_CHECK(i2c_master_write_byte(cmd, *data, ACK_CHECK_DIS));
-//			   printf("0x%02X ",*data);
 			   data++;
 			   arg_int--;
 		    }
-//			printf("\n");
 
 			ESP_ERROR_CHECK(i2c_master_stop(cmd));
 			//ESP_LOGV(TAG, "i2c_master_cmd_begin %d, cmd: %x", I2C_MASTER_NUM,(int)cmd);

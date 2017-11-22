@@ -210,8 +210,8 @@ static char* stringify(char* str,int len)
 {
 //		if ((strchr(str,'"') == NULL)&&(strchr(str,'/') == NULL)) return str;
         if (len == 0) return str;
-		char* new = incmalloc(len+10);
-		int nlen = len+10;
+		char* new = incmalloc(len+20);
+		int nlen = len+20;
 		if (new != NULL)
 		{
 			ESP_LOGV(TAG,"stringify: enter: len:%d  \"%s\"",len,str);
@@ -239,9 +239,9 @@ static char* stringify(char* str,int len)
 				} 
 				else new[j++] =(str)[i] ;
 				
-				if ( j+10> nlen) 
+				if ( j+20> nlen) 
 				{
-					nlen +=10;
+					nlen +=20;
 					new = realloc(new,nlen); // some room
 				}
 			}
@@ -260,9 +260,9 @@ static char* stringify(char* str,int len)
 bool clientPrintMeta()
 {
 	if (header.members.mArr[METADATA] != NULL)
-		kprintf(PSTR("##CLI.META#: %s\n"),header.members.mArr[METADATA]);
+		kprintf("##CLI.META#: %s\n",header.members.mArr[METADATA]);
 	else
-		kprintf(PSTR("##CLI.META#:%c"), 0x0D);
+		kprintf("##CLI.META#:%c", 0x0D);
 	return true;
 }
 
@@ -521,7 +521,7 @@ static void clearHeaders()
 bool clientPrintOneHeader(uint8_t header_num)
 {
 	if (header.members.mArr[header_num] != NULL)
-	kprintf(PSTR("##CLI.ICY%d#: %s\n"),header_num,header.members.mArr[header_num]);
+	kprintf("##CLI.ICY%d#: %s\n",header_num,header.members.mArr[header_num]);
 return true;
 }
 
@@ -531,7 +531,7 @@ bool clientPrintHeaders()
 	for(header_num=0; header_num<ICY_HEADER_COUNT; header_num++) {
 		if((header_num != METAINT) && (header_num != METADATA))
 			if(header.members.mArr[header_num] != NULL) {
-				kprintf(PSTR("##CLI.ICY%d#: %s\n"),header_num,header.members.mArr[header_num]);
+				kprintf("##CLI.ICY%d#: %s\n",header_num,header.members.mArr[header_num]);
 			}	
 	}
 	clientPrintMeta();	
@@ -636,7 +636,7 @@ bool clientParseHeader(char* s)
 
 void clientSetName(char* name,uint16_t index)
 {
-	kprintf(PSTR("##CLI.NAMESET#: %d %s\n"),index,name);
+	kprintf("##CLI.NAMESET#: %d %s\n",index,name);
 }
 
 void clientSetURL(char* url)
@@ -644,7 +644,7 @@ void clientSetURL(char* url)
 //remove	int l = strlen(url)+1;
 	if (url[0] == 0xff) return; // wrong url
 	strcpy(clientURL, url);
-	kprintf(PSTR("##CLI.URLSET#: %s\n"),clientURL);
+	kprintf("##CLI.URLSET#: %s\n",clientURL);
 }
 
 void clientSetPath(char* path)
@@ -652,13 +652,13 @@ void clientSetPath(char* path)
 //remove	int l = strlen(path)+1;
 	if (path[0] == 0xff) return; // wrong path
 	strcpy(clientPath, path);
-	kprintf(PSTR("##CLI.PATHSET#: %s\n"),clientPath);
+	kprintf("##CLI.PATHSET#: %s\n",clientPath);
 }
 
 void clientSetPort(uint16_t port)
 {
 	clientPort = port;
-	kprintf(PSTR("##CLI.PORTSET#: %d\n"),port);
+	kprintf("##CLI.PORTSET#: %d\n",port);
 }
 
 
@@ -669,7 +669,7 @@ void clientConnect()
 	if((server = (struct hostent*)gethostbyname(clientURL))) {
 		xSemaphoreGive(sConnect);
 	} else {
-		clientDisconnect(PSTR("clientConnect"));
+		clientDisconnect("clientConnect");
 	}
 }
 void clientConnectOnce()
@@ -679,7 +679,7 @@ void clientConnectOnce()
 	if((server = (struct hostent*)gethostbyname(clientURL))) {
 		xSemaphoreGive(sConnect);
 	} else {
-		clientDisconnect(PSTR("clientConnectOnce"));
+		clientDisconnect("clientConnectOnce");
 	}
 }
 void clientSilentConnect()
@@ -731,11 +731,11 @@ IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
 		if (t1 != NULL) t1 = strstr(pdata, notfound); 
 		if (t1 != NULL) { // 
 			kprintf(CLIPLAY,0x0d,0x0a);
-			kprintf(PSTR("%c"),0x0d);
+			kprintf("\n");
 			clientSaveOneHeader(notfound, 13,METANAME);
 			wsHeaders();
 			vTaskDelay(150);
-			clientDisconnect(PSTR("C_DATA"));
+			clientDisconnect("C_DATA");
 			cstatus = C_HEADER;
 			return;
 		}	
@@ -745,10 +745,10 @@ IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
 	case C_PLAYLIST:
          if (!clientParsePlaylist(pdata)) //need more
 		  cstatus = C_PLAYLIST1;
-		else {clientDisconnect(PSTR("C_PLIST"));  }
+		else {clientDisconnect("C_PLIST");  }
     break;
 	case C_PLAYLIST1:
-       clientDisconnect(PSTR("C_PLIST1"));	   
+       clientDisconnect("C_PLIST1");	   
         clientParsePlaylist(pdata) ;//more?
 		cstatus = C_PLAYLIST;
 	break;
@@ -762,8 +762,8 @@ IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
 			if( strcmp(t1,"Found")||strcmp(t1,"Temporarily")||strcmp(t1,"Moved"))
 			{
 				ESP_LOGV(TAG,"Header Len=%d,\n %s",len,pdata);
-				kprintf(PSTR("Header: Moved%c"),0x0d);
-				clientDisconnect(PSTR("C_HDER"));
+				kprintf("Header: Moved\n");
+				clientDisconnect("C_HDER");
 				clientParsePlaylist(pdata);
 				cstatus = C_PLAYLIST;				
 			}	
@@ -781,8 +781,8 @@ IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
 						t2 = strstr(pdata, "Internal Server Error"); 
 						if (t2 != NULL)
 						{
-							printf(PSTR("Internal Server Error%c"),0x0d);
-							clientDisconnect(PSTR("Internal Server Error"));
+							printf("Internal Server Error%c",0x0d);
+							clientDisconnect("Internal Server Error");
 							cstatus = C_HEADER;
 							
 						}
@@ -1157,7 +1157,7 @@ void clientTask(void *pvParams) {
 				clientSaveOneHeader("Invalid address",15,METANAME);	
 				wsHeaders();
 				vTaskDelay(1);
-				clientDisconnect(PSTR("Invalid")); 
+				clientDisconnect("Invalid"); 
 				close(sockfd);
 				continue;
 			}	
@@ -1166,7 +1166,7 @@ void clientTask(void *pvParams) {
 			{				
 					if ((playing)&&(once == 0))  // try restart
 					{
-						clientDisconnect(PSTR("try restart")); 
+						clientDisconnect("try restart"); 
 						clientConnect();
 						playing=1; // force
 //						printf(CLIPLAY,0x0d,0x0a);
@@ -1181,7 +1181,7 @@ void clientTask(void *pvParams) {
 							while (spiRamFifoFill()) vTaskDelay(100);							
 							vTaskDelay(150);
 							playing=0;
-							clientDisconnect(PSTR("data not played")); 
+							clientDisconnect("data not played"); 
 						}
 					}						
 						//						
@@ -1189,7 +1189,7 @@ void clientTask(void *pvParams) {
 							clientSaveOneHeader(notfound, 9,METANAME);
 							wsHeaders();
 							vTaskDelay(1);
-							clientDisconnect(PSTR("not found")); 
+							clientDisconnect("not found"); 
 							
 					}	
 					else{  //playing & once=1 and no more received stream

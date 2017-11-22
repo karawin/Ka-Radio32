@@ -1,0 +1,15 @@
+
+UCGLIB
+http://code.google.com/p/ucglib/
+
+Install instructions for the Arduino environment.
+
+  1. Start Arduino IDE
+  2. In the Arduino IDE, import the library from the "Add Library" Menu.
+
+Alternative install instructions for the Arduino environment.
+
+  1. Unzip ucglib_arduino_vX.XX.zip into the "libraries" folder of the
+      Arduino install directory
+  2. Start Arduino IDE
+
