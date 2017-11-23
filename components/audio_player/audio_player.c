@@ -15,7 +15,7 @@
 #include "esp_system.h"
 #include "esp_log.h"
 
-#include "fdk_aac_decoder.h"
+//#include "fdk_aac_decoder.h"
 //#include "libfaad_decoder.h"
 #include "mp3_decoder.h"
 //#include "controls.h"

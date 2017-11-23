@@ -29,7 +29,7 @@
 
 #include "spiram_fifo.h"
 #include "audio_renderer.h"
-#include "mdns_task.h"
+//#include "mdns_task.h"
 #include "audio_player.h"
 #include <u8g2.h>
 #include "u8g2_esp32_hal.h"
@@ -48,9 +48,9 @@
 #include "driver/gpio.h"
 #include "driver/i2c.h"
 //#include "esp_wifi.h"
-#include "xi2c.h"
-#include "fonts.h"
-#include "ssd1306.h"
+//#include "xi2c.h"
+//#include "fonts.h"
+//#include "ssd1306.h"
 #include "nvs_flash.h"
 #include "gpio.h"
 #include "servers.h"
@@ -856,10 +856,10 @@ void app_main()
 	
 	printf("Init ");
 	vTaskDelay(1);
-	for (int i=0;i<20;i++)
+	for (int i=0;i<15;i++)
 	{
-		vTaskDelay(10);// wait tasks init
 		printf(".");
+		vTaskDelay(10);// wait tasks init
 	}
 	printf(" Done\n");
 	

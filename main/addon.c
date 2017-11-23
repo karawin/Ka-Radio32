@@ -170,12 +170,11 @@ void ServiceAddon(void)
         timestamp++;  // time update  
 /*		if (state) timein = 0; // only on stop state
          else */
-			 timein++;
+		timein++;
+		if ((timestamp % (10*DTIDLE))==0){ itAskTime=true;} // synchronise with ntp every x*DTIDLE
 		 
-		if (((timein % DTIDLE)==0)&&(!state)  ) {
-            if ((timein % (10*DTIDLE))==0){ itAskTime=true;timein = 0;} // synchronise with ntp every x*DTIDLE
-            
-			{itAskStime=true;} // start the time display
+		if (((timein % DTIDLE)==0)&&(!state)  ) {           
+			{itAskStime=true;timein = 0;} // start the time display
         } 
 		//if (stateScreen == stime) {itAskSsecond=true;} // start the time display
 		if ((stateScreen == stime)||(stateScreen == smain)) { mTscreen = MTREFRESH; } // display time
@@ -631,7 +630,7 @@ void task_addon(void *pvParams)
 		vTaskDelay(10);		
 
 		if (itAskTime) // time to ntp. Don't do that in interrupt.
-		{
+		{			
 			if (ntp_get_time(&dt) )
 			{	
 				applyTZ(dt);

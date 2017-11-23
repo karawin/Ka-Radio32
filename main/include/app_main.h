@@ -22,7 +22,7 @@
 #define TIMERMS_FINE_ADJ   (1.4*(TIMER_BASE_CLK / TIMER_DIVIDER1MS)/1000000) /*!< used to compensate alarm value */
 #define TIMERmS_FINE_ADJ   (1.4*(TIMER_BASE_CLK / TIMER_DIVIDER1mS)/1000000) /*!< used to compensate alarm value (14) */
 #define TIMERVALUE(x) (x*5000000 - TIMER_FINE_ADJ)
-#define TIMERVALUE1MS(x) (x*10) //x in ms
+#define TIMERVALUE1MS(x) (x*10) - TIMERMS_FINE_ADJ//x in ms
 #define TIMERVALUE1mS(x) (x*10000 - TIMERmS_FINE_ADJ) //x in µs
 #define TIMERGROUP TIMER_GROUP_0 
 #define TIMERGROUP1MS TIMER_GROUP_1

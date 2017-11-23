@@ -8,6 +8,9 @@
 #ifndef UCG_ESP32_HAL_H_
 #define UCG_ESP32_HAL_H_
 
+//my adaptation. Comment for a generic product
+#define KaRadio32 
+
 #define UCG_ESP32_HAL_UNDEFINED (-1)
 
 typedef struct {

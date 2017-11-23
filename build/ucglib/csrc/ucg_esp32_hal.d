@@ -92,9 +92,9 @@ csrc/ucg_esp32_hal.o: \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/i2c.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/ringbuf.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/ucglib/csrc/ucg_esp32_hal.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h \
- C:/msys32/home/jp/esp/Ka-Radio32/components/ucglib/csrc/ucg_esp32_hal.h
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h:
 
@@ -280,9 +280,9 @@ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/ringbuf.h:
 
+C:/msys32/home/jp/esp/Ka-Radio32/components/ucglib/csrc/ucg_esp32_hal.h:
+
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h:
-
-C:/msys32/home/jp/esp/Ka-Radio32/components/ucglib/csrc/ucg_esp32_hal.h:
 /home/jp/esp/Ka-Radio32/components/ucglib/csrc/ucg_esp32_hal.c:

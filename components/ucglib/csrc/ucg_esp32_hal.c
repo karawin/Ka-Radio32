@@ -14,9 +14,12 @@
 #include "driver/gpio.h"
 #include "driver/spi_master.h"
 #include "driver/i2c.h"
+#include "ucg_esp32_hal.h"
+
+#ifdef KaRadio32
 #include "gpio.h"
 #include "vs1053.h"
-#include "ucg_esp32_hal.h"
+#endif
 
 #define TAG  "ucg_hal"
 
@@ -25,6 +28,16 @@ static ucg_esp32_hal_t ucg_esp32_hal; // HAL state data.
 static ucg_esp32_oneByte oneByte;
 
 /* to init call
+//init hal
+ucg_esp32_hal_t ucg_esp32_hal = UCG_ESP32_HAL_DEFAULT;
+			ucg_esp32_hal.clk   = PIN_NUM_CLK;
+			ucg_esp32_hal.mosi  = PIN_NUM_MOSI;
+			ucg_esp32_hal.cs    = PIN_LCD_CS;
+			ucg_esp32_hal.dc    = PIN_LCD_A0;
+			ucg_esp32_hal.reset = PIN_LCD_RST;	
+ucg_esp32_hal_init(ucg_esp32_hal);	
+		
+//init the lcd
 ucg_int_t ucg_Init(ucg_t *ucg, ucg_dev_fnptr device_cb, ucg_dev_fnptr ext_cb, ucg_com_fnptr com_cb);
 example
 //setup ucglib, see ucg.h for a list of ucg_dev and ucg_ext objects 
@@ -98,10 +111,19 @@ IRAM_ATTR int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *da
 		if (ucg_esp32_hal.reset != UCG_ESP32_HAL_UNDEFINED) {
 			bitmask = bitmask | (1<<ucg_esp32_hal.reset);
 		}
-/*		if (ucg_esp32_hal.cs != UCG_ESP32_HAL_UNDEFINED) {
-			bitmask = bitmask | (1<<ucg_esp32_hal.cs);
-		}
-*/
+
+#ifndef KaRadio32
+// init the spi master if not done elsewhere
+ 		  spi_bus_config_t bus_config;
+		  bus_config.sclk_io_num   = u8g2_esp32_hal.clk; // CLK
+		  bus_config.mosi_io_num   = u8g2_esp32_hal.mosi; // MOSI
+		  bus_config.miso_io_num   = -1; // MISO
+		  bus_config.quadwp_io_num = -1; // Not used
+		  bus_config.quadhd_io_num = -1; // Not used
+//done for vs1053
+		  ESP_ERROR_CHECK(spi_bus_initialize(HSPI_HOST, &bus_config, 1));
+#endif		
+		
 		gpio_config_t gpioConfig;
 		gpioConfig.pin_bit_mask = bitmask;
 		gpioConfig.mode         = GPIO_MODE_OUTPUT;

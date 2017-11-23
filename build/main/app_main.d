@@ -169,7 +169,6 @@ app_main.o: C:/msys32/home/jp/esp/Ka-Radio32/main/app_main.c \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_reg.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_struct.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/fifo/include/spiram_fifo.h \
- C:/msys32/home/jp/esp/Ka-Radio32/components/mdns_task/include/mdns_task.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/audio_player/include/audio_player.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8x8.h \
@@ -185,10 +184,6 @@ app_main.o: C:/msys32/home/jp/esp/Ka-Radio32/main/app_main.c \
  C:/msys32/home/jp/esp/Ka-Radio32/components/ucglib/csrc/ucg.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/eeprom.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/bt_config.h \
- C:/msys32/home/jp/esp/Ka-Radio32/components/xi2c/include/xi2c.h \
- C:/msys32/home/jp/esp/Ka-Radio32/components/ssd/include/fonts.h \
- C:/msys32/home/jp/esp/Ka-Radio32/components/ssd/include/ssd1306.h \
- C:/msys32/home/jp/esp/Ka-Radio32/components/ssd/include/fonts.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/servers.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/webclient.h \
@@ -541,8 +536,6 @@ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_struc
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/fifo/include/spiram_fifo.h:
 
-C:/msys32/home/jp/esp/Ka-Radio32/components/mdns_task/include/mdns_task.h:
-
 C:/msys32/home/jp/esp/Ka-Radio32/components/audio_player/include/audio_player.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/u8g2/csrc/u8g2.h:
@@ -572,14 +565,6 @@ C:/msys32/home/jp/esp/Ka-Radio32/components/ucglib/csrc/ucg.h:
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/eeprom.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/bt_config.h:
-
-C:/msys32/home/jp/esp/Ka-Radio32/components/xi2c/include/xi2c.h:
-
-C:/msys32/home/jp/esp/Ka-Radio32/components/ssd/include/fonts.h:
-
-C:/msys32/home/jp/esp/Ka-Radio32/components/ssd/include/ssd1306.h:
-
-C:/msys32/home/jp/esp/Ka-Radio32/components/ssd/include/fonts.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio.h:
 
