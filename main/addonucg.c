@@ -53,6 +53,7 @@ static uint16_t y ;		//Height of a line
 static uint16_t yy;		//Height of screen
 static uint16_t x ;		//Width
 static uint16_t z ;		// an internal offset for y
+static uint16_t HHeader= 40;
 
 //static struct tm *dt;
 static char strsec[30]; 
@@ -72,6 +73,86 @@ static char genre[BUFLEN/2]; // the local name of the station
 
 static char TTitleStr[15];
 static char TTimeStr[15];
+
+
+////////////////////////////////////////
+typedef enum sizefont  {small, text,middle,large} sizefont;
+void setfont(sizefont size)
+{
+//	printf("setfont size: %d, x: %d\n",size,x);
+	switch(size)
+	{
+		case small:
+		switch(x)
+		{
+			case 320:
+			ucg_SetFont(&ucg,ucg_font_6x13_mf);
+			break;
+			case 128:
+			case 96:
+			ucg_SetFont(&ucg,ucg_font_4x6_mf);
+			break;
+			case 132:
+			default: // 160
+			ucg_SetFont(&ucg,ucg_font_5x8_mf);
+			;
+		}
+		break;
+		case text:
+		switch(x)
+		{
+			case 320:
+			ucg_SetFont(&ucg,ucg_font_inr16_mf );
+			break;
+			case 128:
+			case 96:
+			ucg_SetFont(&ucg,ucg_font_5x7_mf);
+			break;
+			case 132:
+			default: // 160
+			//ucg_SetFont(&ucg,ucg_font_6x13_tf);
+			ucg_SetFont(&ucg,ucg_font_6x13_mf);
+			;
+		}
+		break;
+		case middle:
+		switch(x)
+		{
+			case 320:
+			ucg_SetFont(&ucg,ucg_font_inr33_mf);
+			break;
+			case 128:
+			case 96:
+			ucg_SetFont(&ucg,ucg_font_7x14_mf);
+			break;
+			case 132:
+			default: // 160
+			ucg_SetFont(&ucg,ucg_font_fur14_tf);
+			
+			;
+		}
+		break;
+		case large:
+		switch(x)
+		{
+			case 320:
+			ucg_SetFont(&ucg,ucg_font_inr53_mf); 
+			break;
+			case 128:
+			case 96:
+			ucg_SetFont(&ucg,ucg_font_helvR12_hf); 
+			break;
+			case 132:
+			default: // 160
+			ucg_SetFont(&ucg,ucg_font_inr38_mr); 
+			//ucg_SetFont(&ucg, ucg_font_helvB18_tf);
+			;
+		}
+		break;
+		default:
+		printf("Default for size %d\n",size);
+	}
+}
 
 
 ////////////////////////////////////////
@@ -132,7 +213,7 @@ void markDrawUcg(int i)
 void scrollUcg()
 {
 int16_t len;
-
+setfont(text);
 	for (int i = 0;i < LINES;i++)
 	{  
 		if (lline[i] != NULL)
@@ -154,7 +235,7 @@ int16_t len;
 					len = ucg_GetStrWidth(&ucg,lline[i]+iline[i]);
 				if (len > x)
 				{      
-					iline[i] += x/6;
+					iline[i] += x/ucg_GetStrWidth(&ucg,"8");//x/6;
 					len = iline[i];
 					while ((*(lline[i]+iline[i])!=' ')&&(*(lline[i]+iline[i])!='-')&&(iline[i]!= 0))iline[i]--;
 					if (iline[i]==0) iline[i]=len;     
@@ -195,9 +276,9 @@ void draw(int i)
     if (i >=3) z = y/2 ; else z = 0;
     switch (i) {
         case STATIONNAME:
-		ucg_SetFont(&ucg,ucg_font_6x13_tf);
+		setfont(text);
         ucg_SetColori(&ucg,255,255,255);  
-        ucg_DrawBox(&ucg,0,0,x,13-ucg_GetFontDescent(&ucg));  
+        ucg_DrawBox(&ucg,0,0,x,y-1/*-ucg_GetFontDescent(&ucg)*/);  
         ucg_SetColori(&ucg,0,0,0);  
 		if (lline[i] != NULL)
 		{
@@ -216,7 +297,7 @@ void draw(int i)
           ucg_DrawBox(&ucg,1,yy-9,((uint16_t)(x/2*volume)/255),6);                  
         break;
         case TIME:
-          ucg_SetFont(&ucg,ucg_font_5x8_mf);
+          setfont(small);
           len = ucg_GetStrWidth(&ucg,strsec);
           xpos = (3*x/4)-(len/2);
           yyy = yy -10;
@@ -228,7 +309,7 @@ void draw(int i)
         break;
         default:
           ucg_SetColori(&ucg,0,0,0); 
-          ucg_DrawBox(&ucg,0,y*i+z,x,13-ucg_GetFontDescent(&ucg)); 
+          ucg_DrawBox(&ucg,0,y*i+z,x,y/*-ucg_GetFontDescent(&ucg)*/); 
           setColor(i);
           if (lline[i] != NULL) ucg_DrawString(&ucg,0,y*i+z+1,0,lline[i]+iline[i]);                
    }      
@@ -239,7 +320,7 @@ void draw(int i)
 // draw the full screen
 void drawLinesUcg()
 {
-	ucg_SetFont(&ucg,ucg_font_6x13_tf);
+	setfont(text);
     for (int i=0;i<LINES;i++)
     {
         if (mline[i]) draw(i); 
@@ -258,7 +339,7 @@ int i;
     case 1: 
 		ucg_ClearScreen(&ucg);
 		TTitleStr[0] = 0;   
-		ucg_SetFont(&ucg,ucg_font_6x13_tf);
+		setfont(text);
 		ucg_SetColor(&ucg,0,255,255,0);  
 		ucg_SetColor(&ucg,1,0,255,255);  
 		ucg_DrawGradientLine(&ucg,0,(4*y) - (y/2)-5,x,0);
@@ -284,12 +365,13 @@ void drawTTitleUcg(char* ttitle)
 
 	if (strcmp(ttitle,TTitleStr) != 0)
 	{
-		ucg_SetFont(&ucg, ucg_font_helvB18_tf);
+		setfont(middle);
+		//ucg_SetFont(&ucg, ucg_font_helvB18_tf);
 		uint16_t xxx = (x/2)-(ucg_GetStrWidth(&ucg,ttitle)/2);
 		ucg_SetColor(&ucg,0,CTBACK);  
-		ucg_DrawBox(&ucg,0,0,x,41); 
+		ucg_DrawBox(&ucg,0,0,x,HHeader); 
 		ucg_SetColor(&ucg,0,CTTFONT);  
-		ucg_DrawString(&ucg,xxx,(40-ucg_GetFontAscent(&ucg))>>1,0,ttitle);
+		ucg_DrawString(&ucg,xxx,(HHeader-ucg_GetFontAscent(&ucg))>>1,0,ttitle);
 		strcpy(TTitleStr,ttitle);
 	}
 }
@@ -306,10 +388,10 @@ void drawNumberUcg(uint8_t mTscreen,char* irStr)
       case 2:  
         xxx = (x/2)-(ucg_GetStrWidth(&ucg,irStr)/2); 
         ucg_SetColor(&ucg,0,CBLACK);  
-        ucg_DrawBox(&ucg,0,40,x,yy);     
-        ucg_SetFont(&ucg,ucg_font_inr38_tf); 
+        ucg_DrawBox(&ucg,0,HHeader,x,yy);     
+        setfont(large);
         ucg_SetColor(&ucg,0,CBODY);  
-        ucg_DrawString(&ucg,xxx,60,0, irStr);
+        ucg_DrawString(&ucg,xxx,yy/3,0, irStr);
         break;
       default:; 
     }  
@@ -329,16 +411,16 @@ void drawStationUcg(uint8_t mTscreen,char* snum,char* ddot)
       // no break
       case 2:   
         ucg_SetColor(&ucg,0,CBLACK); 
-        ucg_DrawBox(&ucg,0,40,x,yy);     
-        ucg_SetFont(&ucg,ucg_font_fur14_tf);
+        ucg_DrawBox(&ucg,0,HHeader,x,yy);     
+        setfont(middle);
         ucg_SetColor(&ucg,0,CBODY);
 //        ddot = strstr(sline,":");
         if (ddot != NULL)
         {
-          ucg_DrawString(&ucg,(x/2)-(ucg_GetStrWidth(&ucg,snum)/2),55,0,snum);
+          ucg_DrawString(&ucg,(x/2)-(ucg_GetStrWidth(&ucg,snum)/2),yy/3,0,snum);
           len = (x/2)-(ucg_GetStrWidth(&ucg,ddot)/2);
           if (len <0) len = 0;
-          ucg_DrawString(&ucg,len,90,0, ddot);
+          ucg_DrawString(&ucg,len,yy/3 + ucg_GetFontAscent(&ucg)+y,0, ddot);
         }
         break;
       default:; 
@@ -354,19 +436,24 @@ void drawVolumeUcg(uint8_t mTscreen,char* aVolume)
   volume = atoi(aVolume);
     switch (mTscreen){
       case 1: 
-//		ucg_ClearScreen(&ucg);
+		ucg_ClearScreen(&ucg);
 		TTitleStr[0] = 0;
         drawTTitleUcg(vlstr) ;		
-      // no break
+/*        ucg_SetColor(&ucg,0,CBLACK);  
+        ucg_DrawBox(&ucg,0,HHeader,x,yy);     
+        ucg_SetColor(&ucg,0,CBODY);   */     // no break
       case 2:
 //        ucg_SetFont(&ucg,ucg_font_inr49_tf);
-        ucg_SetFont(&ucg,ucg_font_inr38_mf);  
+        setfont(large); 
         uint16_t xxx;
         xxx = (x/2)-(ucg_GetStrWidth(&ucg,aVolume)/2);
         ucg_SetColor(&ucg,0,CBLACK);  
-        ucg_DrawBox(&ucg,0,40,x,yy);     
+		//ucg_SetFontMode(&ucg,UCG_FONT_MODE_SOLID); 
+//        ucg_DrawBox(&ucg,0,HHeader,x,yy);     
+        ucg_DrawBox(&ucg,0,yy/3,x,ucg_GetFontAscent(&ucg)+2);     
         ucg_SetColor(&ucg,0,CBODY);  
-        ucg_DrawString(&ucg,xxx,60,0,aVolume); 
+        ucg_DrawString(&ucg,xxx,yy/3,0,aVolume); 
+		//ucg_SetFontMode(&ucg,UCG_FONT_MODE_TRANSPARENT);
         break;
       default:; 
     }
@@ -382,8 +469,8 @@ static void drawSecond(struct tm *dt,unsigned timein)
   char strseco[3]; 
   uint16_t len;
   sprintf(strseco,":%02d",dt->tm_sec);
-//  ucg_SetFont(&ucg,ucg_font_5x8_mf);
-  ucg_SetFont(&ucg,ucg_font_6x13_mf);
+  setfont(text);
+  //ucg_SetFont(&ucg,ucg_font_6x13_mf);
   len = ucg_GetStrWidth(&ucg,strseco);
 //  ucg_SetColor(&ucg,0,0,0,0);  
 //  ucg_DrawBox(&ucg,x-len-8,yy-18,x,yy);  
@@ -406,25 +493,27 @@ void drawTimeUcg(uint8_t mTscreen,struct tm *dt,unsigned timein)
     sprintf(strtime,"%02d:%02d", dt->tm_hour, dt->tm_min);
     switch (mTscreen){
       case 1:
-//		ucg_ClearScreen(&ucg);
-		TTitleStr[0] = 0;
-		TTimeStr[0] = 0;
-        ucg_SetColor(&ucg,0,CBLACK);  
-        ucg_DrawBox(&ucg,0,40,x,yy);     		
-        // draw ip
-        ucg_SetFont(&ucg,ucg_font_6x13_tf);		
+		setfont(text);
 		sprintf(strdate,"IP: %s", getIp());
         ucg_SetColor(&ucg,0,255,128,255);  
+		ucg_ClearScreen(&ucg);
+		TTitleStr[0] = 0;
+		TTimeStr[0] = 0;
+//        ucg_SetColor(&ucg,0,CBLACK);  
+//        ucg_DrawBox(&ucg,0,HHeader,x,yy);     		
+        // draw ip
+        //ucg_SetFont(&ucg,ucg_font_6x13_tf);
         ucg_DrawString(&ucg,4,yy-18,0,strdate);		
       case 2:
 	    sprintf(strdate,"%02d-%02d-%04d", dt->tm_mon+1, dt->tm_mday, dt->tm_year+1900);
 		drawTTitleUcg(strdate);
 		if (strcmp(TTimeStr,strtime)!= 0)
 		{	
-			ucg_SetFont(&ucg,ucg_font_inr38_mf); 
+			//ucg_SetFont(&ucg,ucg_font_inr38_mf); 
+			setfont(large);
 			ucg_SetColor(&ucg,0,CBODY);		
 			ucg_SetFontMode(&ucg,UCG_FONT_MODE_SOLID); 
-			ucg_DrawString(&ucg,(x/2)-(ucg_GetStrWidth(&ucg,strtime)/2),55,0,strtime); 
+			ucg_DrawString(&ucg,(x/2)-(ucg_GetStrWidth(&ucg,strtime)/2),yy/3,0,strtime); 
 			strcpy(TTimeStr,strtime);
 			ucg_SetFontMode(&ucg,UCG_FONT_MODE_TRANSPARENT);
 		}
@@ -441,7 +530,8 @@ void separatorUcg(char* from)
 {
     char* interp;
 //    len = strlen(from);
-    ucg_SetFont(&ucg,ucg_font_6x13_tf);
+    //ucg_SetFont(&ucg,ucg_font_6x13_tf);
+	setfont(text);
     while (from[strlen(from)-1] == ' ') from[strlen(from)-1] = 0; // avoid blank at end
     while ((from[0] == ' ') ){ strcpy( from,from+1); }
     interp=strstr(from," - ");
@@ -551,6 +641,8 @@ void playingUcg()
     }
 }
 
+
+
 void lcd_initUcg(uint8_t *lcd_type)
 {
 	ESP_LOGI(TAG,"lcd init  type: %d",*lcd_type);
@@ -604,12 +696,23 @@ void lcd_initUcg(uint8_t *lcd_type)
 		// define prefered font rendering method (no text will be visibile, if this is missing 
 		ucg_SetFontMode(&ucg, UCG_FONT_MODE_TRANSPARENT); 
 		ucg_ClearScreen(&ucg);		
-		ucg_SetRotate90(&ucg);
-		ucg_SetFont(&ucg,ucg_font_6x13_tf);
+		
+		if (*lcd_type == LCD_SPI_ILI9341)
+			ucg_SetRotate270(&ucg);
+		else
+			ucg_SetRotate90(&ucg);
+		
+		//ucg_SetFont(&ucg,ucg_font_6x13_tf);
 		ucg_SetFontPosTop(&ucg);
+		x  = ucg_GetWidth(&ucg);
+		
+		setfont(text);
 		y = - ucg_GetFontDescent(&ucg)+ ucg_GetFontAscent(&ucg) +4; //interline
 		yy = ucg_GetHeight(&ucg);
-		x  = ucg_GetWidth(&ucg);
+		HHeader = yy/5;
+		//x  = ucg_GetWidth(&ucg);
+		//setfont(text);
+		printf("X: %d\n",x);
 		z = 0; 
 }
 

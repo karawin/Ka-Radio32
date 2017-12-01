@@ -436,16 +436,18 @@ void encoderLoop()
 			} 
 			
 		}	else
-		if ((stateScreen  != sstation)&&(newValue != 0))
-		{    
-			ESP_LOGD(TAG,"Enc value: %d, oldValue: %d,  incr volume: %d",newValue, oldValue,newValue+(oldValue*3));
-			setRelVolume(newValue+(oldValue*3));
-		} 
-		if ((stateScreen  == sstation)&&(newValue != 0))
-		{    
-			currentValue += newValue;
-			changeStation(newValue);
-		} 		
+		{
+			if ((stateScreen  != sstation)&&(newValue != 0))
+			{    
+				ESP_LOGD(TAG,"Enc value: %d, oldValue: %d,  incr volume: %d",newValue, oldValue,newValue+(oldValue*3));
+				setRelVolume(newValue+(oldValue*3));
+			} 
+			if ((stateScreen  == sstation)&&(newValue != 0))
+			{    
+				currentValue += newValue;
+				changeStation(newValue);
+			} 	
+		}		
 		oldValue += newValue;
 // end Encoder loop
 

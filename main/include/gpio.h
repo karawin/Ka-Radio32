@@ -16,7 +16,9 @@
 
 // status led if any.
 //------------------- 
+//Set the right one with command sys.led
 #define GPIO_LED	GPIO_NUM_4		// Flashing led or Playing led
+#define GPIO_LED1	GPIO_NUM_2		// Flashing led or Playing led
 
 // gpio of the vs1053
 //-------------------
@@ -52,8 +54,8 @@
 
 // I2S DAC or PDM output
 //-----------------------
-#define PIN_I2S_LRCK GPIO_NUM_25
-#define PIN_I2S_BCLK GPIO_NUM_26
+#define PIN_I2S_LRCK GPIO_NUM_25	// or Channel1
+#define PIN_I2S_BCLK GPIO_NUM_26	// or channel2
 #define PIN_I2S_DATA GPIO_NUM_22
 
 

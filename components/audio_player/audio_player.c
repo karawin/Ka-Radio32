@@ -24,7 +24,8 @@
 #include "app_main.h"
 
 #define TAG "audio_player"
-#define PRIO_MAD configMAX_PRIORITIES - 4
+//#define PRIO_MAD configMAX_PRIORITIES - 4
+#define PRIO_MAD 4
 
 static player_t *player_instance = NULL;
 static component_status_t player_status = UNINITIALIZED;
@@ -40,7 +41,7 @@ static int start_decoder_task(player_t *player)
 	{
 		task_func = vsTask;
         task_name = "vsTask";
-        stack_depth = 2800;
+        stack_depth = 3000;
 	} else
     switch (player->media_stream->content_type)
     {

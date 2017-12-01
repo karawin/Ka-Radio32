@@ -1,3 +1,23 @@
+/*
+  KaRadio 32
+  A WiFi webradio player
+
+Copyright (C) 2017  KaraWin
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 
 #include <stdio.h>
@@ -847,7 +867,7 @@ void app_main()
 	//start tasks of KaRadio32
 	xTaskCreate(uartInterfaceTask, "uartInterfaceTask", 2200, NULL, 2, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","uartInterfaceTask",(unsigned int)pxCreatedTask);
-	xTaskCreate(clientTask, "clientTask", 2300, NULL, 4, &pxCreatedTask); 
+	xTaskCreate(clientTask, "clientTask", 2300, NULL, 6, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","clientTask",(unsigned int)pxCreatedTask);	
     xTaskCreate(serversTask, "serversTask", 2300, NULL, 3, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","serversTask",(unsigned int)pxCreatedTask);	

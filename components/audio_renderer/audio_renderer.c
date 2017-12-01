@@ -32,7 +32,11 @@ static void init_i2s(renderer_config_t *config)
 {
     i2s_mode_t mode = I2S_MODE_MASTER | I2S_MODE_TX;
     i2s_comm_format_t comm_fmt = I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_MSB;
-
+	int use_apll = 0;
+	esp_chip_info_t out_info;
+	esp_chip_info(&out_info);
+	ESP_LOGI(TAG, "chip revision %d", out_info.revision);
+	
     if(config->output_mode == DAC_BUILT_IN)
     {
         mode = mode | I2S_MODE_DAC_BUILT_IN;
@@ -44,6 +48,16 @@ static void init_i2s(renderer_config_t *config)
         mode = mode | I2S_MODE_PDM;
     }
 
+	if ((config->output_mode == I2S))
+	{
+	/* don't use audio pll on buggy rev0 chips */
+
+		if(out_info.revision > 0) {
+			use_apll = 1;
+			ESP_LOGI(TAG, "chip revision %d, enabling APLL", out_info.revision);
+		} else
+			ESP_LOGI(TAG, "chip revision %d, cannot enable APLL", out_info.revision);
+	}
     /*
      * Allocate just enough to decode AAC+, which has huge frame sizes.
      *
@@ -61,7 +75,8 @@ static void init_i2s(renderer_config_t *config)
             .communication_format = comm_fmt,
             .dma_buf_count = 32,                            // number of buffers, 128 max.
             .dma_buf_len = 64,                          // size of each buffer
-            .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1        // Interrupt level 1
+            .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,        // Interrupt level 1
+			.use_apll = use_apll			
     };
 
     i2s_pin_config_t pin_config = {
@@ -95,11 +110,19 @@ static void init_i2s(renderer_config_t *config)
 void renderer_volume(uint32_t vol)
 {
 	// log volume (magic)
+//	ESP_LOGI(TAG, "Renderer vol: %d %X",vol,vol );
+	if (vol >= 255) 
+	{
+		renderer_instance->volume = 0x10000;
+//		ESP_LOGI(TAG, "Renderer volume max:  %d  %X",renderer_instance->volume,renderer_instance->volume );
+		return;
+	}
 	vol = 256  - vol;
 	uint32_t value = (log10(255/((float)vol+1)) * 105.54571334);	
+//	ESP_LOGI(TAG, "Renderer value: %X",value );
 	if (value >= 254) value = 256;
 	renderer_instance->volume = value<<8; // *256
-	ESP_LOGI(TAG, "Rendere volume: %X",renderer_instance->volume );
+	ESP_LOGI(TAG, "Renderer volume:  %X",renderer_instance->volume );
 }
 //-----------
 
@@ -129,7 +152,7 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 //KaraDio32 Volume control
 	register uint32_t mult = renderer_instance->volume;
 	
-	if ((mult!= 0x10000) && (renderer_instance->output_mode != DAC_BUILT_IN))// need volume?
+	if ((mult!= 0x10000) && (renderer_instance->output_mode != DAC_BUILT_IN) && (renderer_instance->output_mode != PDM))// need volume?
 	{	
 		if (buf_bytes_per_sample ==2)
 		{
@@ -211,31 +234,32 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
             // assume 16 bit src bit_depth
             int16_t left = *(int16_t *) ptr_l;
             int16_t right = *(int16_t *) ptr_r;
-/*			//round the msb
-				if ((left&0xff) >0x80)
-				{
-					lleft  = (left < 0)?left-0x100:left+0x100;					
-				}
-				if ((right&0xff) >0x80)
-				{
-					lright = (right < 0)?right-0x100:right+0x100;					
-				}	
-*/			
+			
 			//volume on msb
 			if (mult!= 0x10000){
 			
+
 				int32_t temp = (left )* mult;
 				left = ((temp >>16) & 0xFFFF);
 				
-				temp = (right )* mult;
+				temp = (right)* mult;
 				right = ((temp>>16) & 0xFFFF);
+
 				
-			}	
-			
+				if ((left>0) && (left < 0x80) ) {left *=2;}
+				if ((left<0) && (left > -0x80) ) left *=2;
+				if ((right>0) && (right < 0x80) ) right *=2;
+				if ((right<0) && (right > -0x80) ) right *=2;
+				
+				
+			}			
             // The built-in DAC wants unsigned samples, so we shift the range
             // from -32768-32767 to 0-65535.
             left  = left  + 0x8000;
             right = right + 0x8000;		
+			
+
+				
 
             uint32_t sample = (uint16_t) left;
             sample = (sample << 16 & 0xffff0000) | ((uint16_t) right);
@@ -313,6 +337,8 @@ void renderer_init(renderer_config_t *config)
     if(config->output_mode == I2S_MERUS) {
         init_ma120(0x50); // setup ma120x0p and initial volume
     }
+	
+	//free (config);
 }
 
 

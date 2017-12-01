@@ -219,8 +219,8 @@ void setVolumei(int16_t vol) {
 	renderer_volume(vol+2); // max 256
 }
 void setVolume(char* vol) {
-	setIvol(atoi(vol));
 	int16_t uvol = atoi(vol);
+	setIvol(uvol);
 	uvol += clientOvol;
 	if (uvol > 254) uvol = 254;
 	if (uvol <0) uvol = 1;
@@ -228,7 +228,7 @@ void setVolume(char* vol) {
 		if (get_audio_output_mode() == VS1053) VS1053_SetVolume(uvol);
 		if (uvol <3) uvol--;
 		renderer_volume(uvol+2); // max 256
-		kprintf("##CLI.VOL#: %d\n",getIvol());	
+		kprintf("##CLI.VOL#: %d\n",getIvol());		
 	}
 }
 // set the current volume with its offset

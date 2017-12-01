@@ -79,13 +79,13 @@ int getVsVersion() { return vsVersion;}
 
 void VS1053_HW_init(){
 	spi_device_interface_config_t devcfg={
-        .clock_speed_hz=2*1000*1000,               //Clock out at 2 MHz
+        .clock_speed_hz=2*1000*1000,               //Clock out at x MHz
 		.command_bits = 8,
 		.address_bits = 8,
 		.dummy_bits = 0,
 		.duty_cycle_pos = 0,
 		.cs_ena_pretrans = 0,
-		.cs_ena_posttrans = 0,
+		.cs_ena_posttrans = 1,
 		.flags = 0,	
         .mode=0,                         //SPI mode 
         .spics_io_num= PIN_NUM_XCS,               //XCS pin

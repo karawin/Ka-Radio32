@@ -142,7 +142,7 @@ IRAM_ATTR int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *da
 		dev_config.dummy_bits       = 0;
 		dev_config.mode             = 0;
 		dev_config.duty_cycle_pos   = 0;
-		dev_config.cs_ena_posttrans = 0;
+		dev_config.cs_ena_posttrans = 1;
 		dev_config.cs_ena_pretrans  = 0;
 		dev_config.clock_speed_hz   = (1000000000/((ucg_com_info_t *)data)->serial_clk_speed) ;
 		dev_config.spics_io_num     = ucg_esp32_hal.cs;
