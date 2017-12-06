@@ -46,6 +46,10 @@ src/diskio_sdmmc.o: \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_attr.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_intr_alloc.h \
  C:/msys32/home/jp/esp/esp-idf/components/fatfs/src/ffconf.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/param.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/syslimits.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/endian.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/param.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_config.h \
@@ -69,6 +73,7 @@ src/diskio_sdmmc.o: \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/specreg.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-state.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h \
  C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h \
  C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h \
@@ -179,6 +184,14 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_intr_alloc.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/fatfs/src/ffconf.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/param.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/syslimits.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/endian.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/param.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOS.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/FreeRTOSConfig.h:
@@ -224,6 +237,8 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/specreg.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-state.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h:
 

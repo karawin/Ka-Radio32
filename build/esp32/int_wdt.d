@@ -49,6 +49,8 @@ int_wdt.o: C:/msys32/home/jp/esp/esp-idf/components/esp32/int_wdt.c \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/specreg.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-state.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h \
  C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h \
  C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h \
@@ -56,7 +58,6 @@ int_wdt.o: C:/msys32/home/jp/esp/esp-idf/components/esp32/int_wdt.c \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/mpu_wrappers.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_system.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_sleep.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/gpio.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_types.h \
@@ -80,6 +81,10 @@ int_wdt.o: C:/msys32/home/jp/esp/esp-idf/components/esp32/int_wdt.c \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_struct.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_reg.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/timer.h \
+ C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/periph_ctrl.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_reg.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_access.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_dport_access.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_int_wdt.h
 
 C:/msys32/home/jp/esp/Ka-Radio32/build/include/sdkconfig.h:
@@ -182,6 +187,10 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-sta
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h:
@@ -195,8 +204,6 @@ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/mpu_wrappers.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_system.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_sleep.h:
 
@@ -243,6 +250,14 @@ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_struc
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/timer_group_reg.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/timer.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/periph_ctrl.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_reg.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_access.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_dport_access.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_int_wdt.h:
 /home/jp/esp/esp-idf/components/esp32/./int_wdt.c:

@@ -4,4 +4,4 @@ COMPONENT_LDFLAGS += -L$(BUILD_DIR_BASE)/xtensa-debug-module -lxtensa-debug-modu
 COMPONENT_LINKER_DEPS += 
 COMPONENT_SUBMODULES += 
 COMPONENT_LIBRARIES += xtensa-debug-module
-xtensa-debug-module-build: 
+component-xtensa-debug-module-build: 

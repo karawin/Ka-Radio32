@@ -69,6 +69,7 @@ crosscore_int.o: \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/specreg.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-state.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h \
  C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h \
  C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h \
@@ -229,6 +230,8 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/specreg.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-state.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h:
 

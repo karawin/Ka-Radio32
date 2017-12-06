@@ -12,8 +12,8 @@
 #define MAXDATAT	 256
 
 
-#define RELEASE "0.8"
-#define REVISION "1"
+#define RELEASE "0.9"
+#define REVISION "0"
 
 uint32_t checkUart(uint32_t speed);
 extern unsigned short adcdiv;	
@@ -27,7 +27,8 @@ char* webList(int id);
 uint16_t getCurrentStation();
 void setCurrentStation( uint16_t vol);
 void clientVol(char *s);
-
+uint8_t getLedGpio();
+uint32_t getLcdOut();
 
 #define kprintf(fmt, ...) do {    \
         printf(fmt, ##__VA_ARGS__);   \

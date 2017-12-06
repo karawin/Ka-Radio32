@@ -15,7 +15,7 @@
 #include "esp_system.h"
 #include "esp_log.h"
 
-//#include "fdk_aac_decoder.h"
+//#include "helix_aac_decoder.h"
 //#include "libfaad_decoder.h"
 #include "mp3_decoder.h"
 //#include "controls.h"
@@ -57,13 +57,13 @@ static int start_decoder_task(player_t *player)
             stack_depth = 54000; //55000
             break;
 
-        case AUDIO_AAC:
+		case AUDIO_AAC:
         case OCTET_STREAM: // probably .aac
-            task_func = fdkaac_decoder_task;
-            task_name = "fdkaac_decoder_task";
-            stack_depth = 6144; //6144
+            task_func = helixaac_decoder_task;
+            task_name = "helixaac_decoder_task";
+            stack_depth = 3000; //6144; //6144
             break;
-*/
+*/			
         default:
             ESP_LOGW(TAG, "unknown mime type: %d", player->media_stream->content_type);
 			spiRamFifoReset();

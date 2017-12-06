@@ -19,7 +19,7 @@
 #include "gpio.h"
 #include "ota.h"
 #include "spiram_fifo.h"
-
+#include "addon.h"
 
 #include "lwip/sockets.h"
 #include "lwip/dns.h"
@@ -105,8 +105,12 @@ sys.version: Display the release and Revision of KaraDio\n\
 sys.dlog: Display the current log level\n\
 sys.logx: Set log level to x with x=n for none, v for verbose, d for debug, i for info, w for warning, e for error\n\
 sys.log: do nothing apart a trace on uart (debug use)\n\
+sys.lcdout: Display the timer to switch off the lcd. 0= no timer\n\
+sys.lcdout(\"x\"): Timer in seconds to switch off the lcd. 0= no timer\n\
 sys.lcd: Display the current lcd type\n\
 sys.lcd(\"x\"): Change the lcd type to x on next reset\n\
+sys.ledgpio: Display the default Led GPIO\n\
+sys.ledgpio(\"x\"): Change the default Led GPIO (4) to x\n\
 ///////////\n\
   Other\n\
 ///////////\n\
@@ -118,6 +122,8 @@ A command error display:\n\
 ##CMD_ERROR#\n\r"}; 
 
 uint16_t currentStation = 0;
+static uint8_t led_gpio = 255;
+static uint32_t lcd_out = 255;
 static esp_log_level_t s_log_default_level = CONFIG_LOG_BOOTLOADER_LEVEL;
 extern void wsVol(char* vol);
 extern void playStation(char* id);
@@ -640,6 +646,35 @@ void syspatch(char* s)
 	free(device);	
 }
 
+
+void sysledgpio(char* s)
+{
+    char *t = strstr(s, parslashquote);
+	struct device_settings *device;
+	device = getDeviceSettings();
+	if(t == NULL)
+	{
+		kprintf("##Led GPIO is %d#\n",device->led_gpio);
+		free(device);
+		return;
+	}
+	char *t_end  = strstr(t, parquoteslash);
+	uint8_t value = atoi(t+2);
+    if ((t_end == NULL)||(value >= GPIO_NUM_MAX))
+    {
+		kprintf(stritCMDERROR);
+		free(device);
+		return;
+    }	
+	device->led_gpio = value; 
+	led_gpio = value;
+	gpio_output_conf(value);
+	saveDeviceSettings(device);	
+	kprintf("##Led GPIO is now %d\n",value);
+	free(device);	
+}
+
+
 void syslcd(char* s)
 {
     char *t = strstr(s, parslashquote);
@@ -663,8 +698,37 @@ void syslcd(char* s)
 	saveDeviceSettings(device);	
 	kprintf("##LCD is in %d on next reset#\n",value);
 	free(device);	
-	
+
 }
+
+void syslcdout(char* s)
+{
+    char *t = strstr(s, parslashquote);
+	struct device_settings *device;
+	device = getDeviceSettings();
+	if(t == NULL)
+	{
+		kprintf("##LCD out is %d#\n",device->lcd_out);
+		free(device);
+		return;
+	}
+	char *t_end  = strstr(t, parquoteslash);
+    if(t_end == NULL)
+    {
+		kprintf(stritCMDERROR);
+		free(device);
+		return;
+    }	
+	uint8_t value = atoi(t+2);
+	device->lcd_out = value; 
+	lcd_out = value;
+	saveDeviceSettings(device);	
+	kprintf("##LCD out is in %d#\n",value);
+	wakeLcd();
+	free(device);	
+
+}
+
 void sysled(char* s)
 {
     char *t = strstr(s, parslashquote);
@@ -686,7 +750,7 @@ void sysled(char* s)
     }	
 	uint8_t value = atoi(t+2);
 	if (value ==0) 
-	{device->options |= T_LED; ledStatus = false; if (getState()) gpio_set_level(GPIO_LED,0);}
+	{device->options |= T_LED; ledStatus = false; if (getState()) gpio_set_level(getLedGpio(),0);}
 	else 
 	{device->options &= NT_LED; ledStatus =true;} // options:0 = ledStatus true = Blink mode
 	
@@ -694,6 +758,36 @@ void sysled(char* s)
 	kprintf("##LED is in %s mode#\n",((device->options & T_LED)== 0)?"Blink":"Play");
 	free(device);
 	
+}
+uint8_t getLedGpio()
+{
+	struct device_settings *device;
+	if (led_gpio == 255)
+	{
+		device = getDeviceSettings();
+		uint8_t ledgpio = device->led_gpio;
+		if (ledgpio == 0) {
+			ledgpio = 4;
+			device->led_gpio = ledgpio;
+			led_gpio = ledgpio;
+			saveDeviceSettings(device);
+		}
+		free (device);
+		return ledgpio;	
+	} 
+	return led_gpio;	
+}
+
+uint32_t getLcdOut()
+{
+	struct device_settings *device;
+	if (lcd_out == 255)
+	{
+		device = getDeviceSettings();
+		lcd_out = device->lcd_out;
+		free (device);
+	} 
+	return lcd_out;	
 }
 
 void tzoffset(char* s)
@@ -833,9 +927,10 @@ void checkCommand(int size, char* s)
 		else if(strcmp(tmp+4, "update") == 0) 	update_firmware("KaRadio32");
 //bouchon		else if(strcmp(tmp+4, "prerelease") == 0) 	update_firmware("prv");
 		else if(startsWith (  "patch",tmp+4)) 	syspatch(tmp);
+		else if(startsWith (  "ledg",tmp+4)) 	sysledgpio(tmp); //ledgpio
 		else if(startsWith (  "led",tmp+4)) 	sysled(tmp);
 		else if(strcmp(tmp+4, "date") == 0) 	ntp_print_time();
-		else if(strncmp(tmp+4, "version",4) == 0) 	kprintf("Release: %s, Revision: %s\n",RELEASE,REVISION);
+		else if(strncmp(tmp+4, "vers",4) == 0) 	kprintf("Release: %s, Revision: %s\n",RELEASE,REVISION);
 		else if(startsWith(   "tzo",tmp+4)) 	tzoffset(tmp);
 		else if(strcmp(tmp+4, "logn") == 0) 	setLogLevel(ESP_LOG_NONE);
 		else if(strcmp(tmp+4, "loge") == 0) 	setLogLevel(ESP_LOG_ERROR); 
@@ -845,6 +940,7 @@ void checkCommand(int size, char* s)
 		else if(strcmp(tmp+4, "logv") == 0) 	setLogLevel(ESP_LOG_VERBOSE); 
 		else if(strcmp(tmp+4, "dlog") == 0) 	displayLogLevel();
 		else if(startsWith(   "log",tmp+4)) 	; // do nothing
+		else if(startsWith (  "lcdo",tmp+4)) 	syslcdout(tmp); // lcdout timer to switch off the lcd
 		else if(startsWith (  "lcd",tmp+4)) 	syslcd(tmp);
 		else printInfo(tmp);
 	}

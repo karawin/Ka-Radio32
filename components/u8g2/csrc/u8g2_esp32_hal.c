@@ -147,7 +147,7 @@ uint8_t u8g2_esp32_msg_i2c_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *
 			uint8_t cmddata;
 			i2c_cmd_handle_t cmd = i2c_cmd_link_create();
 			ESP_ERROR_CHECK(i2c_master_start(cmd));
-			ESP_LOGD(TAG, "I2CAddress %02X", u8x8_GetI2CAddress(u8x8)>>1);
+			//ESP_LOGD(TAG, "I2CAddress %02X", u8x8_GetI2CAddress(u8x8)>>1);
 			ESP_ERROR_CHECK(i2c_master_write_byte(cmd, u8x8_GetI2CAddress(u8x8) | I2C_MASTER_WRITE, ACK_CHECK_DIS));
 		    data = (uint8_t *)arg_ptr;
 			if (arg_int==1) {

@@ -704,7 +704,7 @@ void clientDisconnect(const char* from)
 	kprintf(CLISTOP,from);
 	xSemaphoreGive(sDisconnect);
 	audio_player_stop();
-	if (!ledStatus) gpio_set_level(GPIO_LED,0);
+	if (!ledStatus) gpio_set_level(getLedGpio(),0);
 	vTaskDelay(10);
 }
 
@@ -864,7 +864,7 @@ IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
 						{
 							clen = recvfrom(sockfd, pdata+len, 9, 0,NULL,NULL); 
 							lc+=clen;len+=clen;
-							ESP_LOGD(TAG,"more:%d, lc:%d\n",clen,lc);
+							ESP_LOGV(TAG,"more:%d, lc:%d\n",clen,lc);
 						} //security to be sure to receive the new length
 						
 //	printf("leni0:%d, inpdata:%x, chunked:%d  cchunk:%d, lc:%d, \n",len,inpdata,chunked,cchunk, lc );
@@ -1038,7 +1038,7 @@ ESP_LOGD(TAG,"mt2 len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,cle
 			if (once == 0)vTaskDelay(20);
 			setVolumei(getVolume());
 			kprintf(CLIPLAY,0x0d,0x0a);
-			if (!ledStatus) gpio_set_level(GPIO_LED,1);
+			if (!ledStatus) gpio_set_level(getLedGpio(),1);
 		}
 	}
 }

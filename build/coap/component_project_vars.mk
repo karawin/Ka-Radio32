@@ -4,4 +4,4 @@ COMPONENT_LDFLAGS += -L$(BUILD_DIR_BASE)/coap -lcoap
 COMPONENT_LINKER_DEPS += 
 COMPONENT_SUBMODULES += $(IDF_PATH)/components/coap/libcoap
 COMPONENT_LIBRARIES += coap
-coap-build: 
+component-coap-build: 

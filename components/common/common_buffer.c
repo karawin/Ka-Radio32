@@ -61,7 +61,7 @@ size_t buf_free_capacity(buffer_t *buf)
     return buf_data_stale(buf) + unused_capacity;
 }
 
-/* amount of bytes unread */
+/* amount of bytes read */
 size_t buf_data_total(buffer_t *buf)
 {
     if(buf == NULL) return -1;
@@ -95,6 +95,7 @@ void buf_move_remaining_bytes_to_front(buffer_t *buf)
     buf->fill_pos = buf->base + unread_data;
 }
 
+// move unread data to front and fill the free space
 size_t fill_read_buffer(buffer_t *buf)
 {
     buf_move_remaining_bytes_to_front(buf);
@@ -133,6 +134,15 @@ int buf_seek_rel(buffer_t *buf, uint32_t offset)
     return 0;
 }
 
+int buf_clear(buffer_t *buf)
+{
+    if (buf == NULL) return -1;
+	buf->read_pos = buf->base;
+    buf->fill_pos = buf->base;
+    buf->bytes_consumed = 0;
+
+    return 0;
+}
 int buf_seek_abs(buffer_t *buf, uint32_t pos)
 {
     if (buf == NULL) return -1;
@@ -144,7 +154,7 @@ int buf_seek_abs(buffer_t *buf, uint32_t pos)
 
     size_t delta = pos - (uint32_t) buf->read_pos;
     buf->bytes_consumed += delta;
-    buf->read_pos = (uint8_t*)pos;
+    buf->read_pos = buf->base + pos;
 
     return 0;
 }

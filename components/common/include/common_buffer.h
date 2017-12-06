@@ -40,6 +40,8 @@ int buf_seek_rel(buffer_t *buf, uint32_t pos);
 
 int buf_seek_abs(buffer_t *buf, uint32_t pos);
 
+int buf_clear(buffer_t *buf);
+
 /* available unused capacity */
 size_t buf_free_capacity(buffer_t *buf);
 

@@ -516,11 +516,21 @@ function wifi(valid) {
 			chkip(document.getElementById('mask'));
 			document.getElementById('gw').value = arr["gw"];
 			chkip(document.getElementById('gw'));
+			document.getElementById('ip2').value = arr["ip2"];
+			chkip(document.getElementById('ip2'));
+			document.getElementById('mask2').value = arr["msk2"];
+			chkip(document.getElementById('mask2'));
+			document.getElementById('gw2').value = arr["gw2"];
+			chkip(document.getElementById('gw2'));
 			document.getElementById('ua').value = arr["ua"];
 			if (arr["dhcp"] == "1")
 				document.getElementById("dhcp").setAttribute("checked","");
 			else
 				document.getElementById("dhcp").removeAttribute("checked") ;
+			if (arr["dhcp2"] == "1")
+				document.getElementById("dhcp2").setAttribute("checked","");
+			else
+				document.getElementById("dhcp2").removeAttribute("checked") ;
 			document.getElementById('Mac').innerHTML = arr["mac"];
 			clickdhcp();
 		}
@@ -535,8 +545,12 @@ function wifi(valid) {
 	+"&ip=" + document.getElementById('ip').value
 	+"&msk=" + document.getElementById('mask').value
 	+"&gw=" + document.getElementById('gw').value
+	+"&ip2=" + document.getElementById('ip2').value
+	+"&msk2=" + document.getElementById('mask2').value
+	+"&gw2=" + document.getElementById('gw2').value
 	+"&ua=" + encodeURIComponent(document.getElementById('ua').value) 
-	+"&dhcp=" + document.getElementById('dhcp').checked+"&");
+	+"&dhcp=" + document.getElementById('dhcp').checked
+	+"&dhcp2=" + document.getElementById('dhcp2').checked+"&");
 }
 function hardware(valid) {
 	var i,coutput;
@@ -545,8 +559,15 @@ function hardware(valid) {
 		if (xhr.readyState == 4 && xhr.status == 200) {	
 			var arr = JSON.parse(xhr.responseText);
 			document.getElementById("output"+arr['coutput']).checked = true;
-			if (arr['coutput'] != "4") document.getElementById("vs1052Only").style.display = "none";
-			else document.getElementById("vs1052Only").style.display = "run-in";
+			if (arr['coutput'] != "4") 
+			{
+				document.getElementById("vs1052Only").style.display = "none";
+//				document.getElementById("vs1052Only0").style.display = "none";
+			}
+			else {
+				document.getElementById("vs1052Only").style.display = "run-in";
+//				document.getElementById("vs1052Only0").style.display = "run-in";
+			}
 		}
 	}
 	xhr.open("POST","hardware",false);

@@ -54,6 +54,8 @@ struct device_settings {
 	output_mode_t audio_output_mode; // 
 	uint8_t trace_level;
 	uint8_t lcd_type; // the lcd in use
+	uint8_t led_gpio; // the gpio of the led
+	uint32_t lcd_out;	// timeout in seconds to switch off the lcd. 0 = no timeout
 	char filler[32]; 
 
 };

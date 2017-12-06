@@ -17,8 +17,8 @@
 // status led if any.
 //------------------- 
 //Set the right one with command sys.led
+// GPIO can be changed with command sys.ledgpio("x")
 #define GPIO_LED	GPIO_NUM_4		// Flashing led or Playing led
-#define GPIO_LED1	GPIO_NUM_2		// Flashing led or Playing led
 
 // gpio of the vs1053
 //-------------------

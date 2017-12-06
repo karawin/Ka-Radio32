@@ -4,4 +4,4 @@ COMPONENT_LDFLAGS += -L$(BUILD_DIR_BASE)/MerusAudio -lMerusAudio
 COMPONENT_LINKER_DEPS += 
 COMPONENT_SUBMODULES += 
 COMPONENT_LIBRARIES += MerusAudio
-MerusAudio-build: 
+component-MerusAudio-build: 

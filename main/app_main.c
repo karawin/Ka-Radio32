@@ -386,8 +386,6 @@ static void start_wifi()
 	struct device_settings *device;	
 	char ssid[32]; 
 	char pass[64];
-	tcpip_adapter_ip_info_t info;
-		
 	device = getDeviceSettings();
 	
 	wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
@@ -399,26 +397,36 @@ static void start_wifi()
     ESP_ERROR_CHECK( esp_event_loop_init(event_handler, wifi_event_group) );
     ESP_ERROR_CHECK( esp_wifi_init(&cfg) );
     ESP_ERROR_CHECK( esp_wifi_set_storage(WIFI_STORAGE_FLASH) );
-
-	IP4_ADDR(&info.ip, device->ipAddr1[0], device->ipAddr1[1],device->ipAddr1[2], device->ipAddr1[3]);
-	IP4_ADDR(&info.gw, device->gate1[0],device->gate1[1],device->gate1[2], device->gate1[3]);
-	IP4_ADDR(&info.netmask, device->mask1[0], device->mask1[1],device->mask1[2], device->mask1[3]);
-	tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_STA, &info); //default
 	
+	if (device->current_ap == APMODE) 
+	{
+		if (strlen(device->ssid1) !=0)
+		{device->current_ap = STA1;}
+		else 
+		{	if (strlen(device->ssid2) !=0)
+			{device->current_ap = STA2;}
+			else device->current_ap = APMODE;
+		}	
+		saveDeviceSettings(device);
+	}
 	
 	while (1)
 	{
+		if (device->current_ap == APMODE)
+			printf("WIFI GO TO AP MODE\n");
+		else printf("WIFI TRYING TO CONNECT TO SSID %d\n",device->current_ap);
+		ESP_ERROR_CHECK( esp_wifi_stop() );
 		switch (device->current_ap)
 		{
 			case STA1: //ssid1 used
 				strcpy(ssid,device->ssid1);
 				strcpy(pass,device->pass1);
 				esp_wifi_set_mode(WIFI_MODE_STA) ;
-			break;
+				break;
 			case STA2: //ssid2 used
 				strcpy(ssid,device->ssid2);
 				strcpy(pass,device->pass2);	
-				esp_wifi_set_mode(WIFI_MODE_STA) ;			
+				esp_wifi_set_mode(WIFI_MODE_STA) ;	
 			break;
 
 			default: // other: AP mode
@@ -487,8 +495,7 @@ void start_network(){
 	uint8_t dhcpEn = 0;
 	
 	device = getDeviceSettings();	
-	// Wifi ok .
-
+	
 	switch (device->current_ap)
 	{
 		case STA1: //ssid1 used
@@ -568,17 +575,25 @@ void start_network(){
 		strcpy(localIp , ip4addr_ntoa(&ip_info.ip));
 		printf("IP: %s\n\n",ip4addr_ntoa(&ip_info.ip));
 
-
-
 		
 		if (dhcpEn) // if dhcp enabled update fields
 		{  
 			tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &info);
-			IPADDR2_COPY(&device->ipAddr1, &info.ip);
-			IPADDR2_COPY(&device->mask1, &info.netmask);
-			IPADDR2_COPY(&device->gate1, &info.gw);	
-			saveDeviceSettings(device);		
+			switch (device->current_ap)
+			{
+			case STA1: //ssid1 used			
+				IPADDR2_COPY(&device->ipAddr1, &info.ip);
+				IPADDR2_COPY(&device->mask1, &info.netmask);
+				IPADDR2_COPY(&device->gate1, &info.gw);	
+			break;
+			case STA2: //ssid1 used			
+				IPADDR2_COPY(&device->ipAddr2, &info.ip);
+				IPADDR2_COPY(&device->mask2, &info.netmask);
+				IPADDR2_COPY(&device->gate2, &info.gw);	
+			break;
+			}
 		}
+		saveDeviceSettings(device);		
 	}
 	free(device);	
 	lcd_state("IP found");	
@@ -598,8 +613,8 @@ void timerTask(void* p) {
 	
 	initTimers();
 	
-	gpio_output_conf(GPIO_LED);
-	gpio_set_level(GPIO_LED,0);	
+	gpio_output_conf(getLedGpio());
+	gpio_set_level(getLedGpio(),0);	
 	cCur = FlashOff*10;
 	
 	while(1) {
@@ -635,12 +650,12 @@ void timerTask(void* p) {
 				taskYIELD();
 				if (stateLed)
 				{
-					gpio_set_level(GPIO_LED,0);	
+					gpio_set_level(getLedGpio(),0);	
 					stateLed = false;
 					cCur = FlashOff*10;
 				} else
 				{
-					gpio_set_level(GPIO_LED,1);	
+					gpio_set_level(getLedGpio(),1);	
 					stateLed = true;
 					cCur = FlashOn*10;
 					device = getDeviceSettings();
@@ -869,7 +884,7 @@ void app_main()
 	ESP_LOGI(TAG, "%s task: %x","uartInterfaceTask",(unsigned int)pxCreatedTask);
 	xTaskCreate(clientTask, "clientTask", 2300, NULL, 6, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","clientTask",(unsigned int)pxCreatedTask);	
-    xTaskCreate(serversTask, "serversTask", 2300, NULL, 3, &pxCreatedTask); 
+    xTaskCreate(serversTask, "serversTask", 2400, NULL, 3, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","serversTask",(unsigned int)pxCreatedTask);	
 	xTaskCreate(task_addon, "task_addon", 2500, NULL, 5, &pxCreatedTask);  //high priority for the spi else too slow due to ucglib
 	ESP_LOGI(TAG, "%s task: %x","task_addon",(unsigned int)pxCreatedTask);
@@ -897,5 +912,5 @@ void app_main()
 	
 //
 	free(device);
-	vTaskDelete( NULL ); 
+//	vTaskDelete( NULL ); 
 }

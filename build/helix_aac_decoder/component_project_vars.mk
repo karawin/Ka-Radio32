@@ -4,4 +4,4 @@ COMPONENT_LDFLAGS += -L$(BUILD_DIR_BASE)/helix_aac_decoder -lhelix_aac_decoder
 COMPONENT_LINKER_DEPS += 
 COMPONENT_SUBMODULES += 
 COMPONENT_LIBRARIES += helix_aac_decoder
-helix_aac_decoder-build: 
+component-helix_aac_decoder-build: 

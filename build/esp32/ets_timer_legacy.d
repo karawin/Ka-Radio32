@@ -60,6 +60,7 @@ ets_timer_legacy.o: \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/specreg.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-state.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h \
  C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h \
  C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h \
@@ -84,7 +85,6 @@ ets_timer_legacy.o: \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/semphr.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/esp_timer_impl.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/string.h:
@@ -207,6 +207,8 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-sta
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h:
@@ -254,8 +256,6 @@ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/list.h:
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/semphr.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/esp_timer_impl.h:
 /home/jp/esp/esp-idf/components/esp32/./ets_timer_legacy.c:

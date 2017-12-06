@@ -4,4 +4,4 @@ COMPONENT_LDFLAGS += -L$(BUILD_DIR_BASE)/mp3_decoder -lmp3_decoder
 COMPONENT_LINKER_DEPS += 
 COMPONENT_SUBMODULES += 
 COMPONENT_LIBRARIES += mp3_decoder
-mp3_decoder-build: 
+component-mp3_decoder-build: 

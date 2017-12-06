@@ -4,4 +4,4 @@ COMPONENT_LDFLAGS += -L$(BUILD_DIR_BASE)/nghttp -lnghttp
 COMPONENT_LINKER_DEPS += 
 COMPONENT_SUBMODULES += $(IDF_PATH)/components/nghttp/nghttp2
 COMPONENT_LIBRARIES += nghttp
-nghttp-build: 
+component-nghttp-build: 

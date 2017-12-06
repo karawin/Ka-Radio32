@@ -45,7 +45,7 @@
 			<div class="LEFT"><img title="Click on the logo to change the theme" onClick= "theme()" src="logo.png"></div>
 			<div class="RIGHT">
 			<a href="https://github.com/karawin/Ka-Radio32" target="_blank">KaraDio32</a><br/>
-			<a href="https://github.com/karawin/Ka-Radio32" target="_blank">V0.8 R1</a><br/>
+			<a href="https://github.com/karawin/Ka-Radio32" target="_blank">V0.9 R0</a><br/>
 			<div id="rssi" >0 dBm</div><br/>
 <!--			<a href="https://github.com/PiotrSperka/ESP8266-WebRadio" style="font-size:8px" target="_blank">From PiotrSperka</a> -->
 			</div>
@@ -169,7 +169,7 @@
 					<input type="radio" name="tabs" id="tab3" />
 					<label for="tab3">Setting</label>
 					<div id="tab-content3" class="tab-content">
-					<h1>Sound Setting &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="Reset" onClick="resetEQ()"/></h1>
+					<h1>Sound Setting </h1>
 						<p><span class="bold">Output: </span>
 						<span class="coutput">
 						<input type="radio" name="output" id="output0"   /><label for="output0">I2S</label>
@@ -177,16 +177,16 @@
 						<input type="radio" name="output" id="output2"   /><label for="output2">DAC</label>
 						<input type="radio" name="output" id="output3"   /><label for="output3">PDM</label>
 						<input type="radio" name="output" id="output4" 	 /><label for="output4">VS1053</label>
-						<input type="button" value="Validate" onclick="validOutput()" />
+						<br/><span class="bold"> </span><input type="button" value="Validate" onclick="validOutput()" />
 						</span><br>
 						<span id="vs1052Only">
 						<span class="bold">Treble control: </span><input type="range" id="treble_range" name="treble"  onChange="onRangeChange('treble_range', 'treble_span', 1.5, false)" min=-8 max=7 > <span id="treble_span"></span><br>
 						<span class="bold">Treble frequency: </span><input type="range" id="treblefreq_range" name="treblefreq"  onChange="onRangeChangeFreqTreble('treblefreq_range', 'treblefreq_span', 1, false)" min=1 max=15 > <span id="treblefreq_span"></span><br>
 						<span class="bold">  Bass enhance: </span><input type="range"  id="bass_range" name="bass"  onChange="onRangeChange('bass_range', 'bass_span', 1, false)" min=0 max=15 > <span id="bass_span"></span><br>
 						<span class="bold">  Bass frequency: </span><input type="range"  id="bassfreq_range" name="bassfreq"  onChange="onRangeChangeFreqBass('bassfreq_range', 'bassfreq_span', 10, false)" min=2 max=15 > <span id="bassfreq_span"></span><br>
-						<span class="bold">  Spacialization: </span><input type="range"  id="spacial_range" name="spacial"  onChange="onRangeChangeSpatial('spacial_range', 'spacial_span')" min=0 max=3 > <span id="spacial_span"></span><br>
-						<br/>
-						</span>
+						<span class="bold">  Spacialization: </span><input type="range"  id="spacial_range" name="spacial"  onChange="onRangeChangeSpatial('spacial_range', 'spacial_span')" min=0 max=3 > <span id="spacial_span"></span><br/>
+						<span class="bold"> </span><input type="button" value="Reset" onClick="resetEQ()"/><br/>			
+						</span><br/>
 						<span class="bold">Volume: </span><input type="range" id="vol_range" name="vol"  onChange="onRangeVolChange(this.value,true)" value=100 min=0 max=254 > <span id="vol_span"></span><br>
 						</p>
 					<h1>Stations Save & Restore</h1>
@@ -213,14 +213,17 @@
 						</p>
 						<p>
 						<span class="bold"> Mac Address:</span><span id="Mac"></span><br/>
-						<span class="bold"> Use DHCP:</span><input id="dhcp" type=checkbox onclick="clickdhcp()" /><br/>
+						<span class="bold"> Use DHCP:</span>
+						1:<input id="dhcp" type=checkbox onclick="clickdhcp()" />
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						2:<input id="dhcp2" type=checkbox onclick="clickdhcp()" /><br/>
 						<span class="bold">Ip:</span>
-						<input  id="ip" type="text" oninput="chkip(this)" />
+						<input  id="ip" type="text" oninput="chkip(this)" /><input  id="ip2" type="text" oninput="chkip(this)" />
 						<br/>
 						<span class="bold">Mask:</span>
-						<input id="mask" type="text" oninput="chkip(this)" value="255.255.255.0" /><br/>
+						<input id="mask" type="text" oninput="chkip(this)" value="255.255.255.0" /><input id="mask2" type="text" oninput="chkip(this)" value="255.255.255.0" /><br/>
 						<span class="bold">Gateway:</span>
-						<input id="gw" type="text" oninput="chkip(this)" />
+						<input id="gw" type="text" oninput="chkip(this)" /><input id="gw2" type="text" oninput="chkip(this)" />
 							</p>						
 					<h1>HTML Option &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="Validate" onclick="wifi(0)" /></h1>
 						<p>						

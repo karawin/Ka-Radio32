@@ -31,11 +31,13 @@ spiram_psram.o: \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/alloca.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_types.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/spiram_psram.h \
- C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/spi_reg.h \
+ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_assert.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h \
+ C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/spiram_psram.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/spi_reg.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/spi_flash.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/gpio.h \
@@ -47,6 +49,7 @@ spiram_psram.o: \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_reg.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_access.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/gpio_sig_map.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/efuse_reg.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/gpio.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/gpio_struct.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc_io_reg.h \
@@ -118,15 +121,19 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/assert.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_types.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/esp32/spiram_psram.h:
+C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/spi_reg.h:
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_assert.h:
 
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/ets_sys.h:
+C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/spiram_psram.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/spi_reg.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/soc.h:
 
@@ -149,6 +156,8 @@ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_reg.h:
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_access.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/gpio_sig_map.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/efuse_reg.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/gpio.h:
 

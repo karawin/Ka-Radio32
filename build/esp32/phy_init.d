@@ -72,7 +72,8 @@ phy_init.o: C:/msys32/home/jp/esp/esp-idf/components/esp32/phy_init.c \
  C:/msys32/home/jp/esp/esp-idf/components/nvs_flash/include/nvs.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/phy.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/phy_init_data.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_coexist.h
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_coexist.h \
+ C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/periph_ctrl.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdlib.h:
 
@@ -221,4 +222,6 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/phy.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/phy_init_data.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_coexist.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/periph_ctrl.h:
 /home/jp/esp/esp-idf/components/esp32/./phy_init.c:

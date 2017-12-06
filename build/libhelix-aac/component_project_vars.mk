@@ -4,4 +4,4 @@ COMPONENT_LDFLAGS += -L$(BUILD_DIR_BASE)/libhelix-aac -llibhelix-aac
 COMPONENT_LINKER_DEPS += 
 COMPONENT_SUBMODULES += 
 COMPONENT_LIBRARIES += libhelix-aac
-libhelix-aac-build: 
+component-libhelix-aac-build: 

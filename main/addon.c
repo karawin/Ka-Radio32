@@ -57,6 +57,7 @@ static int16_t futurNum = 0; // the number of the wanted station
 
 static unsigned timerScreen = 0;
 static unsigned timerScroll = 0;
+static unsigned timerLcdOut = 0;
 static unsigned timer1s = 0;
 
 static unsigned timein = 0;
@@ -65,6 +66,7 @@ time_t timestamp = 0;
 static bool syncTime = false;
 static bool itAskTime = true; // update time with ntp if true
 static bool itAskStime = false; // start the time display
+static bool itLcdOut = false;
 //static bool itAskSsecond = false; // start the time display
 static bool state = false; // start stop on Ok key
 
@@ -109,6 +111,12 @@ static void DrawBox(ucg_int_t x, ucg_int_t y, ucg_int_t w, ucg_int_t h)
 	u8g2_DrawBox(&u8g2, x,y,w,h);
 }
 
+void wakeLcd()
+{
+	timerLcdOut = getLcdOut();
+	if((isColor) && (itLcdOut))  mTscreen = MTNEW;
+	itLcdOut = false;
+}
 
 void lcd_init(uint8_t Type)
 {	
@@ -168,6 +176,7 @@ void ServiceAddon(void)
 	{
 		// Time compute
         timestamp++;  // time update  
+		if (timerLcdOut >0) timerLcdOut--; // 
 /*		if (state) timein = 0; // only on stop state
          else */
 		timein++;
@@ -176,6 +185,7 @@ void ServiceAddon(void)
 		if (((timein % DTIDLE)==0)&&(!state)  ) {           
 			{itAskStime=true;timein = 0;} // start the time display
         } 
+		if (timerLcdOut == 1) itLcdOut = true;
 		//if (stateScreen == stime) {itAskSsecond=true;} // start the time display
 		if ((stateScreen == stime)||(stateScreen == smain)) { mTscreen = MTREFRESH; } // display time
 		if (!syncTime) itAskTime=true; // first synchro if not done
@@ -312,7 +322,7 @@ void drawScreen()
 {
   if (lcd_type == LCD_NONE) return;
   //ESP_LOGV(TAG,"stateScreen: %d",stateScreen);
-  if (mTscreen != MTNODISPLAY)
+  if ((mTscreen != MTNODISPLAY)&&(!itLcdOut))
   {
 //	  printf("drawScreenenter mTscreen:%d\n",mTscreen);
 //printf("drawScreen %d, mTscreen: %d\n",stateScreen,mTscreen);	
@@ -411,6 +421,7 @@ void encoderLoop()
 			// reset our accelerator
 			if ((newValue >0)&&(oldValue<0)) oldValue = 0;
 			if ((newValue <0)&&(oldValue>0)) oldValue = 0;
+			wakeLcd();
 		}
 		else
 		{
@@ -421,7 +432,7 @@ void encoderLoop()
     		
 		if (newButton != Open)
 		{ 
-			
+			wakeLcd();
 			ESP_LOGD(TAG,"Button: %d",newButton);
 			if (newButton == Clicked) {startStop();}
 			if (newButton == DoubleClicked) {
@@ -462,6 +473,7 @@ void encoderLoop()
 event_ir_t evt;
 	while (xQueueReceive(event_ir, &evt, 0))
 	{
+		wakeLcd();
 		uint32_t evtir = ((evt.addr)<<8)|(evt.cmd&0xFF);
 		ESP_LOGI(TAG,"IR event: Channel: %x, ADDR: %x, CMD: %x = %X, REPEAT: %d",evt.channel,evt.addr,evt.cmd, evtir,evt.repeat_flag );
 		if (!evt.repeat_flag ) // avoid repetition
@@ -568,6 +580,7 @@ void task_addon(void *pvParams)
 	
 	xTaskCreate(rmt_nec_rx_task, "rmt_nec_rx_task", 2048, NULL, 10, NULL);
 	vTaskDelay(1);
+	wakeLcd();
 
 	while (1)
 	{
@@ -579,6 +592,7 @@ void task_addon(void *pvParams)
 //lcd
 		while (xQueueReceive(event_lcd, &evt, 0))
 		{ 
+			wakeLcd();
 			switch(evt.lcmd)
 			{
 				case lmeta:
@@ -648,6 +662,11 @@ void task_addon(void *pvParams)
 			itAskStime = false;
 		}
 
+		if (itLcdOut) // switch off the lcd
+		{
+			isColor?ucg_ClearScreen(&ucg):u8g2_ClearDisplay(&u8g2);
+		}
+		
 		if (timerScreen >= 2) // 2 sec timeout 
 		{
 			timerScreen = 0;

@@ -42,7 +42,8 @@ const char strsSOCKET[]  = {"WebServer Socket fails %s errno: %d\n"};
 const char strsID[]  = {"getstation, no id or Wrong id %d\n"};
 const char strsRAUTO[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:13\r\n\r\n{\"rauto\":\"%c\"}"};
 const char strsICY[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:%d\r\n\r\n{\"curst\":\"%s\",\"descr\":\"%s\",\"name\":\"%s\",\"bitr\":\"%s\",\"url1\":\"%s\",\"not1\":\"%s\",\"not2\":\"%s\",\"genre\":\"%s\",\"meta\":\"%s\",\"vol\":\"%s\",\"treb\":\"%s\",\"bass\":\"%s\",\"tfreq\":\"%s\",\"bfreq\":\"%s\",\"spac\":\"%s\",\"auto\":\"%c\"}"};
-const char strsWIFI[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:%d\r\n\r\n{\"ssid\":\"%s\",\"pasw\":\"%s\",\"ssid2\":\"%s\",\"pasw2\":\"%s\",\"ip\":\"%s\",\"msk\":\"%s\",\"gw\":\"%s\",\"ua\":\"%s\",\"dhcp\":\"%s\",\"mac\":\"%s\"}"};
+const char strsWIFI[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:%d\r\n\r\n{\"ssid\":\"%s\",\"pasw\":\"%s\",\"ssid2\":\"%s\",\"pasw2\":\"%s\",\
+\"ip\":\"%s\",\"msk\":\"%s\",\"gw\":\"%s\",\"ip2\":\"%s\",\"msk2\":\"%s\",\"gw2\":\"%s\",\"ua\":\"%s\",\"dhcp\":\"%s\",\"dhcp2\":\"%s\",\"mac\":\"%s\"}"};
 const char strsGSTAT[]  = {"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %d\r\n\r\n{\"Name\":\"%s\",\"URL\":\"%s\",\"File\":\"%s\",\"Port\":\"%d\",\"ovol\":\"%d\"}"};
 
 static int8_t clientOvol = 0;
@@ -810,6 +811,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 	{
 		bool val = false;
 		char tmpip[16],tmpmsk[16],tmpgw[16];
+		char tmpip2[16],tmpmsk2[16],tmpgw2[16];
 		struct device_settings *device;
 		changed = false;		
 		if(data_size > 0) {
@@ -833,9 +835,13 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			char* aip = getParameterFromResponse("ip=", data, data_size);
 			char* amsk = getParameterFromResponse("msk=", data, data_size);
 			char* agw = getParameterFromResponse("gw=", data, data_size);
+			char* aip2 = getParameterFromResponse("ip2=", data, data_size);
+			char* amsk2 = getParameterFromResponse("msk2=", data, data_size);
+			char* agw2 = getParameterFromResponse("gw2=", data, data_size);
 			char* aua = getParameterFromResponse("ua=", data, data_size);
 			pathParse(aua);
 			char* adhcp = getParameterFromResponse("dhcp=", data, data_size);
+			char* adhcp2 = getParameterFromResponse("dhcp2=", data, data_size);
 			if (val) {
 				ESP_LOGV(TAG,"wifi received  valid:%s,val:%d, ssid:%s, pasw:%s, aip:%s, amsk:%s, agw:%s, adhcp:%s, aua:%s",valid,val,ssid,pasw,aip,amsk,agw,adhcp,aua);
 				changed = true;
@@ -846,13 +852,23 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 				memcpy(device->mask1,&valu,sizeof(uint32_t));
 				ipaddr_aton(agw, &valu);
 				memcpy(device->gate1,&valu,sizeof(uint32_t));
+				
+				ipaddr_aton(aip2, &valu);
+				memcpy(device->ipAddr2,&valu,sizeof(uint32_t));
+				ipaddr_aton(amsk2, &valu);
+				memcpy(device->mask2,&valu,sizeof(uint32_t));
+				ipaddr_aton(agw2, &valu);
+				memcpy(device->gate2,&valu,sizeof(uint32_t));
+				
 				if (adhcp!= NULL)
-				{ 
 					if (strlen(adhcp)!=0) 
-					{
-						if (strcmp(adhcp,"true")==0)device->dhcpEn1 = 1; else device->dhcpEn1 = 0;
-					}
-				}
+					{if (strcmp(adhcp,"true")==0) 
+					device->dhcpEn1 = 1; else device->dhcpEn1 = 0;}
+				if (adhcp2!= NULL)
+					if (strlen(adhcp2)!=0) 
+					{if (strcmp(adhcp2,"true")==0) 
+					device->dhcpEn2 = 1; else device->dhcpEn2 = 0;}
+						
 				strcpy(device->ssid1,(ssid==NULL)?"":ssid);
 				strcpy(device->pass1,(pasw==NULL)?"":pasw);
 				strcpy(device->ssid2,(ssid2==NULL)?"":ssid2);
@@ -880,7 +896,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			//wifi_get_macaddr ( 0, macaddr );	
 			esp_wifi_get_mac(WIFI_IF_STA,macaddr);		
 			int json_length ;
-			json_length =95+ //64 //86 95
+			json_length =95+ 39+//64 //86 95
 			strlen(device->ssid1) +
 			strlen(device->pass1) +
 			strlen(device->ssid2) +
@@ -890,9 +906,13 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			sprintf(tmpmsk,"%d.%d.%d.%d",device->mask1[0], device->mask1[1],device->mask1[2], device->mask1[3])+
 			sprintf(tmpgw,"%d.%d.%d.%d",device->gate1[0], device->gate1[1],device->gate1[2], device->gate1[3])+
 			sprintf(adhcp,"%d",device->dhcpEn1)+
+			sprintf(tmpip2,"%d.%d.%d.%d",device->ipAddr2[0], device->ipAddr2[1],device->ipAddr2[2], device->ipAddr2[3])+
+			sprintf(tmpmsk2,"%d.%d.%d.%d",device->mask2[0], device->mask2[1],device->mask2[2], device->mask2[3])+
+			sprintf(tmpgw2,"%d.%d.%d.%d",device->gate2[0], device->gate2[1],device->gate2[2], device->gate2[3])+
+			sprintf(adhcp2,"%d",device->dhcpEn2)+
 			sprintf(macstr,MACSTR,MAC2STR(macaddr));
 
-			char *buf = inmalloc( json_length + 95);
+			char *buf = inmalloc( json_length + 95+39);
 			if (buf == NULL) 
 			{	
 				ESP_LOGE(TAG," %s malloc fails","post wifi");
@@ -901,14 +921,16 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			else {			
 				sprintf(buf, strsWIFI,
 				json_length,
-				device->ssid1,device->pass1,device->ssid2,device->pass2,tmpip,tmpmsk,tmpgw,device->ua,adhcp,macstr);
+				device->ssid1,device->pass1,device->ssid2,device->pass2,tmpip,tmpmsk,tmpgw,tmpip2,tmpmsk2,tmpgw2,device->ua,adhcp,adhcp2,macstr);
 				ESP_LOGV(TAG,"wifi Buf len:%d\n%s",strlen(buf),buf);
 				write(conn, buf, strlen(buf));
 				infree(buf);
 			}
 			infree(ssid); infree(pasw);infree(ssid2); infree(pasw2);  
-			infree(aip);infree(amsk);infree(agw);infree(aua);
-			infree(valid); infree(adhcp); infree(macaddr); 
+			infree(aip);infree(amsk);infree(agw);
+			infree(aip2);infree(amsk2);infree(agw2);
+			infree(aua);
+			infree(valid); infree(adhcp); infree(adhcp2); infree(macaddr); 
 			infree(macstr);
 			if (val){
 				// set current_ap to the first filled ssid

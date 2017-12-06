@@ -49,6 +49,13 @@ interface.o: C:/msys32/home/jp/esp/Ka-Radio32/main/interface.c \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/specreg.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-state.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/types.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/types.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/sched.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stdio.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h \
  C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h \
  C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h \
@@ -56,12 +63,6 @@ interface.o: C:/msys32/home/jp/esp/Ka-Radio32/main/interface.c \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/mpu_wrappers.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_system.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/types.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/types.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/sched.h \
- C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stdio.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_sleep.h \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/gpio.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_types.h \
@@ -112,6 +113,7 @@ interface.o: C:/msys32/home/jp/esp/Ka-Radio32/main/interface.c \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/gpio.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h \
  C:/msys32/home/jp/esp/Ka-Radio32/components/fifo/include/spiram_fifo.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/sockets.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/opt.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/port/lwipopts.h \
@@ -121,6 +123,7 @@ interface.o: C:/msys32/home/jp/esp/Ka-Radio32/main/interface.c \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/fcntl.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_default_fcntl.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stat.h \
+ C:/msys32/home/jp/esp/esp-idf/components/vfs/include/sys/ioctl.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_task.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/debug.h \
  C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/arch.h \
@@ -248,6 +251,20 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-sta
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/types.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/types.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/sched.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stdio.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h:
@@ -261,18 +278,6 @@ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/mpu_wrappers.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_system.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/types.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/types.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/sched.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stdio.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_sleep.h:
 
@@ -374,6 +379,8 @@ C:/msys32/home/jp/esp/Ka-Radio32/main/include/ota.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/components/fifo/include/spiram_fifo.h:
 
+C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/sockets.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/lwip/include/lwip/lwip/opt.h:
@@ -391,6 +398,8 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/fcntl.h:
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/_default_fcntl.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stat.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/vfs/include/sys/ioctl.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_task.h:
 

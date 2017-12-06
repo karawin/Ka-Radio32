@@ -62,6 +62,7 @@ pm_esp32.o: C:/msys32/home/jp/esp/esp-idf/components/esp32/pm_esp32.c \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/specreg.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-state.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h \
  C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h \
  C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/include/soc/soc_memory_layout.h \
@@ -90,7 +91,6 @@ pm_esp32.o: C:/msys32/home/jp/esp/esp-idf/components/esp32/pm_esp32.c \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_timer.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/core-macros.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/pm_impl.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/pm_trace.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/esp_timer_impl.h
 
@@ -220,6 +220,8 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/specreg.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-state.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/heap/include/esp_heap_caps.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/heap/include/multi_heap.h:
@@ -275,8 +277,6 @@ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/xtensa_timer.
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/core-macros.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/pm_impl.h:
-
-C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/pm_trace.h:
 

@@ -4,4 +4,4 @@ COMPONENT_LDFLAGS += -L$(BUILD_DIR_BASE)/libsodium -llibsodium
 COMPONENT_LINKER_DEPS += 
 COMPONENT_SUBMODULES += $(IDF_PATH)/components/libsodium/libsodium
 COMPONENT_LIBRARIES += libsodium
-libsodium-build: 
+component-libsodium-build: 

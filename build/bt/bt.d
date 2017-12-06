@@ -57,6 +57,7 @@ bt.o: C:/msys32/home/jp/esp/esp-idf/components/bt/bt.c \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/specreg.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-state.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/mpu_wrappers.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_system.h \
@@ -83,6 +84,7 @@ bt.o: C:/msys32/home/jp/esp/esp-idf/components/bt/bt.c \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/semphr.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h \
  C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portmacro.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/core-macros.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_task.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_phy_init.h \
  C:/msys32/home/jp/esp/esp-idf/components/bt/include/bt.h \
@@ -90,7 +92,12 @@ bt.o: C:/msys32/home/jp/esp/esp-idf/components/bt/bt.c \
  C:/msys32/home/jp/esp/esp-idf/components/log/include/esp_log_internal.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_pm.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp32/pm.h \
- C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc.h
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_ipc.h \
+ C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/periph_ctrl.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_reg.h \
+ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_access.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_dport_access.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdlib.h:
 
@@ -208,6 +215,8 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/xtruntime-core-sta
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_crosscore_int.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_timer.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portbenchmark.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/mpu_wrappers.h:
@@ -260,6 +269,8 @@ C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/queue.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/freertos/include/freertos/portmacro.h:
 
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/core-macros.h:
+
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_task.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_phy_init.h:
@@ -275,4 +286,14 @@ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_pm.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp32/pm.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/rtc.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_ipc.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/periph_ctrl.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_reg.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_access.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_dport_access.h:
 /home/jp/esp/esp-idf/components/bt/./bt.c:

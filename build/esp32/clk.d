@@ -48,6 +48,10 @@ clk.o: C:/msys32/home/jp/esp/esp-idf/components/esp32/clk.c \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_access.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_dport_access.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/i2s_reg.h \
+ C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/periph_ctrl.h \
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stdio.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/core-macros.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/config/core.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/hal.h \
@@ -152,6 +156,14 @@ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/dport_access.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_dport_access.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/i2s_reg.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/periph_ctrl.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_err.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stdio.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/xtensa/core-macros.h:
 

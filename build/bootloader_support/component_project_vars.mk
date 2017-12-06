@@ -4,4 +4,4 @@ COMPONENT_LDFLAGS += -L$(BUILD_DIR_BASE)/bootloader_support -lbootloader_support
 COMPONENT_LINKER_DEPS += 
 COMPONENT_SUBMODULES += 
 COMPONENT_LIBRARIES += bootloader_support
-bootloader_support-build: 
+component-bootloader_support-build: 

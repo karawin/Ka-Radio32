@@ -46,6 +46,7 @@ static void init_i2s(renderer_config_t *config)
     if(config->output_mode == PDM)
     {
         mode = mode | I2S_MODE_PDM;
+		comm_fmt |= I2S_COMM_FORMAT_PCM | I2S_COMM_FORMAT_PCM_SHORT;
     }
 
 	if ((config->output_mode == I2S))
