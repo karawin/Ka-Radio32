@@ -94,6 +94,7 @@ Other type and some color lcd added later.<BR/>
 #define LCD_I2C_SSD1309		2 //128X64
 #define LCD_I2C_SSD1325 	3 //128X64
 #define LCD_I2C_SSD1306NN	4 //128X64
+#define LCD_I2C_SSD1309NN	5 //128X64
 //SPI
 #define LCD_SPI_SSD1306 		64 //128X32 (LCD_SPI =0x40)
 #define LCD_SPI_SSD1309 		65 //128X64
