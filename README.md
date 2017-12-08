@@ -103,6 +103,7 @@ Other type and some color lcd added later.<BR/>
 #define LCD_SPI_SSD1607			69 //200X200
 #define LCD_SPI_LS013B7DH03		70 //128X128
 #define LCD_SPI_SSD1306NN 		71 //128X64
+#define LCD_SPI_SSD1309NN 		72 //128X64
 
 // Colors
 #define LCD_SPI_ST7735			192 // 128x160  (LCD_COLOR|LCD_SPI =0xC0)
