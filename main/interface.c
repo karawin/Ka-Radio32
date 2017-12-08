@@ -123,7 +123,7 @@ A command error display:\n\
 
 uint16_t currentStation = 0;
 static uint8_t led_gpio = 255;
-static uint32_t lcd_out = 255;
+static uint32_t lcd_out = 0xFFFFFFFF;
 static esp_log_level_t s_log_default_level = CONFIG_LOG_BOOTLOADER_LEVEL;
 extern void wsVol(char* vol);
 extern void playStation(char* id);
@@ -781,7 +781,7 @@ uint8_t getLedGpio()
 uint32_t getLcdOut()
 {
 	struct device_settings *device;
-	if (lcd_out == 255)
+	if (lcd_out == 0xFFFFFFFF)
 	{
 		device = getDeviceSettings();
 		lcd_out = device->lcd_out;

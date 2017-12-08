@@ -26,7 +26,7 @@
 
 static renderer_config_t *renderer_instance = NULL;
 static component_status_t renderer_status = UNINITIALIZED;
-static QueueHandle_t i2s_event_queue;
+//static QueueHandle_t i2s_event_queue;
 
 static void init_i2s(renderer_config_t *config)
 {
@@ -46,7 +46,7 @@ static void init_i2s(renderer_config_t *config)
     if(config->output_mode == PDM)
     {
         mode = mode | I2S_MODE_PDM;
-		comm_fmt |= I2S_COMM_FORMAT_PCM | I2S_COMM_FORMAT_PCM_SHORT;
+		comm_fmt = I2S_COMM_FORMAT_PCM | I2S_COMM_FORMAT_PCM_SHORT;
     }
 
 	if ((config->output_mode == I2S))
@@ -76,7 +76,8 @@ static void init_i2s(renderer_config_t *config)
             .communication_format = comm_fmt,
             .dma_buf_count = 32,                            // number of buffers, 128 max.
             .dma_buf_len = 64,                          // size of each buffer
-            .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,        // Interrupt level 1
+//            .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,        // lowest level 1
+            .intr_alloc_flags = 0,        // default
 			.use_apll = use_apll			
     };
 
@@ -87,14 +88,16 @@ static void init_i2s(renderer_config_t *config)
             .data_in_num = I2S_PIN_NO_CHANGE
     };
 
-    if (i2s_driver_install(config->i2s_num, &i2s_config, 1, &i2s_event_queue) != ESP_OK)
+    if (i2s_driver_install(config->i2s_num, &i2s_config, 0, NULL) != ESP_OK)
 	{
-		i2s_config.intr_alloc_flags = ESP_INTR_FLAG_LEVEL2;
-		if (i2s_driver_install(config->i2s_num, &i2s_config, 1, &i2s_event_queue) != ESP_OK)
-		ESP_LOGE(TAG,"i2s Error");
+		i2s_config.intr_alloc_flags = ESP_INTR_FLAG_LEVEL1;
+		if (i2s_driver_install(config->i2s_num, &i2s_config, 0, NULL) != ESP_OK)
+			i2s_config.intr_alloc_flags = ESP_INTR_FLAG_LEVEL2;
+			if (i2s_driver_install(config->i2s_num, &i2s_config, 0, NULL) != ESP_OK)
+				ESP_LOGE(TAG,"i2s Error");
 		return;
-	}
-
+	}	
+	ESP_LOGI(TAG,"i2s intr:%d", i2s_config.intr_alloc_flags);	
     if((mode & I2S_MODE_DAC_BUILT_IN) || (mode & I2S_MODE_PDM))
     {
         i2s_set_pin(config->i2s_num, NULL);
@@ -238,29 +241,20 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 			
 			//volume on msb
 			if (mult!= 0x10000){
-			
-
-				int32_t temp = (left )* mult;
+			// volume on msb only.
+				int32_t temp = (left>>8 )* mult;
 				left = ((temp >>16) & 0xFFFF);
+				left = left <<8;
 				
-				temp = (right)* mult;
+				temp = (right>>8)* mult;
 				right = ((temp>>16) & 0xFFFF);
-
-				
-				if ((left>0) && (left < 0x80) ) {left *=2;}
-				if ((left<0) && (left > -0x80) ) left *=2;
-				if ((right>0) && (right < 0x80) ) right *=2;
-				if ((right<0) && (right > -0x80) ) right *=2;
-				
+				right = right <<8;		
 				
 			}			
             // The built-in DAC wants unsigned samples, so we shift the range
             // from -32768-32767 to 0-65535.
             left  = left  + 0x8000;
-            right = right + 0x8000;		
-			
-
-				
+            right = right + 0x8000;					
 
             uint32_t sample = (uint16_t) left;
             sample = (sample << 16 & 0xffff0000) | ((uint16_t) right);

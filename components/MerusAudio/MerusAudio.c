@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include "esp_log.h"
 #include "driver/i2c.h"
+#include "gpio.h"
 
 #include "MerusAudio.h"                 // Provides i2c read/write to audio amplifier
 #include "ma120x0.h"                    // Register map and macros
@@ -27,8 +28,8 @@
         }
 
 
-#define I2C_MASTER_SCL_IO    27   /*!< gpio number for I2C master clock */
-#define I2C_MASTER_SDA_IO    14
+#define I2C_MASTER_SCL_IO    PIN_I2C_SCL   /*!< gpio number for I2C master clock */
+#define I2C_MASTER_SDA_IO    PIN_I2C_SDA
     /*!< gpio number for I2C master data  */
 #define I2C_MASTER_NUM I2C_NUM_0   /*!< I2C port number for master dev */
 #define I2C_MASTER_TX_BUF_DISABLE   0   /*!< I2C master do not need buffer */

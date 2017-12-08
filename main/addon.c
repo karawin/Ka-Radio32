@@ -113,6 +113,7 @@ static void DrawBox(ucg_int_t x, ucg_int_t y, ucg_int_t w, ucg_int_t h)
 
 void wakeLcd()
 {
+	if (lcd_type == LCD_NONE) return;
 	timerLcdOut = getLcdOut();
 	if((isColor) && (itLcdOut))  mTscreen = MTNEW;
 	itLcdOut = false;
@@ -168,7 +169,7 @@ void lcd_welcome(char* ip)
 // call this every 1 millisecond via timer ISR
 //
 void (*serviceAddon)() = NULL;
-void ServiceAddon(void)
+IRAM_ATTR void ServiceAddon(void)
 {
 	timer1s++;
 	timerScroll++;
