@@ -34,7 +34,7 @@
 #define I2C_MASTER_NUM I2C_NUM_0   /*!< I2C port number for master dev */
 #define I2C_MASTER_TX_BUF_DISABLE   0   /*!< I2C master do not need buffer */
 #define I2C_MASTER_RX_BUF_DISABLE   0   /*!< I2C master do not need buffer */
-#define I2C_MASTER_FREQ_HZ    100000     /*!< I2C master clock frequency */
+#define I2C_MASTER_FREQ_HZ    80000     /*!< I2C master clock frequency */
 
 #define MA12040_ADDR  0x20   /*!< slave address for MA12040 amplifier */
 
@@ -47,7 +47,9 @@
 
 
 void i2c_master_init()
-{   int i2c_master_port = I2C_MASTER_NUM;
+{   
+// KaRadio32, I2C may be already configured.
+	int i2c_master_port = I2C_MASTER_NUM;
     i2c_config_t conf;
     conf.mode = I2C_MODE_MASTER;
     conf.sda_io_num = I2C_MASTER_SDA_IO;
@@ -58,7 +60,8 @@ void i2c_master_init()
     esp_err_t res = i2c_param_config(i2c_master_port, &conf);
     printf("Driver param setup : %d\n",res);
 	res = i2c_driver_install(i2c_master_port, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0);
-    printf("Driver installed   : %d\n",res);
+	if (res != 0) printf("Driver already installed. No problem \n");
+	else printf("Driver installed   : %d\n",res);
     //i2c_set_period(i2c_master_port,100,99);
 }
 

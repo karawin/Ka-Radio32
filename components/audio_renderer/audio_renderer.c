@@ -295,15 +295,6 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
             ptr_l += stride;
         }
     }
-
-    /* takes too long
-    i2s_event_t evt = {0};
-    if(xQueueReceive(i2s_event_queue, &evt, 0)) {
-        if(evt.type == I2S_EVENT_TX_DONE) {
-            ESP_LOGE(TAG, "DMA Buffer Underflow");
-        }
-    }
-    */
 }
 
 
