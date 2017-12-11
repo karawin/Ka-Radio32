@@ -31,6 +31,7 @@
 #include "esp_avrc_api.h"
 #include "../bt_speaker/bt_app_av.h"
 #include "../bt_speaker/bt_app_core.h"
+#include "../../main/include/bt_config.h"
 
 #include "audio_renderer.h"
 
@@ -84,8 +85,8 @@ static void bt_av_hdl_stack_evt(uint16_t event, void *p_param)
     switch (event) {
     case BT_APP_EVT_STACK_UP: {
         /* set up device name */
-        esp_bt_dev_set_device_name(CONFIG_BT_NAME);
-	
+        //char *dev_name = "ESP_SPEAKER";
+        esp_bt_dev_set_device_name(dev_name);
 
         /* initialize A2DP sink */
         esp_a2d_register_callback(&bt_app_a2d_cb);

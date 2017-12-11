@@ -111,6 +111,14 @@ static void DrawBox(ucg_int_t x, ucg_int_t y, ucg_int_t w, ucg_int_t h)
 	u8g2_DrawBox(&u8g2, x,y,w,h);
 }
 
+uint16_t GetWidth()
+{
+  if (isColor)
+	  return ucg_GetWidth(&ucg);
+
+  return u8g2.width;
+}
+
 void wakeLcd()
 {
 	if (lcd_type == LCD_NONE) return;
@@ -151,9 +159,12 @@ void lcd_welcome(char* ip)
 	if (lcd_type == LCD_NONE) return;
     char *url = "Stopped";// get_url(); // play_url();	
 	if (strlen(ip)==0) ClearBuffer();
-    if (isColor) ucg_SetFont(&ucg,ucg_font_helvR14_tf );
+    if (isColor) 
+		ucg_SetFont(&ucg,ucg_font_helvR14_tf );
 	else  u8g2_SetFont(&u8g2,u8g2_font_helvR14_tf );
-    DrawString(10,2,"KaRadio32");
+	if (GetWidth() <=64)
+		DrawString(2,2,"KaRadio32");
+    else DrawString(10,2,"KaRadio32");
 	if (isColor) ucg_SetFont(&ucg,ucg_font_6x10_tf);
 	else u8g2_SetFont(&u8g2,u8g2_font_6x10_tf);
 	DrawString(2,24,"WiFi Webradio");

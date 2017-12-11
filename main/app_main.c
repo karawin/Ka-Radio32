@@ -20,6 +20,8 @@ Copyright (C) 2017  KaraWin
 
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -49,15 +51,15 @@ Copyright (C) 2017  KaraWin
 
 #include "spiram_fifo.h"
 #include "audio_renderer.h"
+//#include "bt_speaker.h"
+#include "bt_config.h"
 //#include "mdns_task.h"
 #include "audio_player.h"
 #include <u8g2.h>
 #include "u8g2_esp32_hal.h"
 #include "addon.h"
 
-#ifdef CONFIG_BT_SPEAKER_MODE
-#include "bt_speaker.h"
-#endif
+
 
 
 #include "eeprom.h"
@@ -870,8 +872,11 @@ void app_main()
     player_config->media_stream = calloc(1, sizeof(media_stream_t));
 
 	audio_player_init(player_config);	  
-    renderer_init(create_renderer_config());	
-
+	
+	//if (audio_output_mode != BTOOTH)
+		renderer_init(create_renderer_config());
+	//else
+	//	bt_speaker_start(create_renderer_config());
 	
 	// LCD Display infos
     lcd_welcome(localIp);
@@ -882,8 +887,10 @@ void app_main()
 	//start tasks of KaRadio32
 	xTaskCreate(uartInterfaceTask, "uartInterfaceTask", 2200, NULL, 2, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","uartInterfaceTask",(unsigned int)pxCreatedTask);
+	
 	xTaskCreate(clientTask, "clientTask", 2300, NULL, 6, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","clientTask",(unsigned int)pxCreatedTask);	
+	
     xTaskCreate(serversTask, "serversTask", 2400, NULL, 3, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","serversTask",(unsigned int)pxCreatedTask);	
 	xTaskCreate(task_addon, "task_addon", 2500, NULL, 5, &pxCreatedTask);  //high priority for the spi else too slow due to ucglib
@@ -902,6 +909,7 @@ void app_main()
 	//autostart	
 	kprintf("autostart: playing:%d, currentstation:%d\n",device->autostart,device->currentstation);
 	setIvol( device->vol);
+	kprintf("READY. Type help for a list of commands\n");
 	
 	
 	if (device->autostart ==1)
