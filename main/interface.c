@@ -20,6 +20,8 @@
 #include "ota.h"
 #include "spiram_fifo.h"
 #include "addon.h"
+#include "app_main.h"
+#include "rda5807Task.c"
 
 #include "lwip/sockets.h"
 #include "lwip/dns.h"
@@ -45,6 +47,7 @@ Commands:\n\
 //////////////////\n\
 wifi.lis or wifi.scan: give the list of received SSID\n\
 wifi.con: Display the AP1 and AP2 SSID\n\
+wifi.recon: Reconnect wifi if disconnected by wifi.discon\n\
 wifi.con(\"ssid\",\"password\"): Record the given AP ssid with password in AP1 for next reboot\n\
 wifi.discon: disconnect the current ssid\n\
 wifi.station: the current ssid and password\n\
@@ -131,6 +134,10 @@ void clientVol(char *s);
 
 #define MAX_WIFI_STATIONS 50
 bool inside = false;
+
+static bool autoWifi = true; // auto reconnect wifi if disconnected
+bool getAutoWifi(void)
+{ return autoWifi;}
 
 void setVolumePlus()
 {
@@ -292,10 +299,19 @@ void wifiConnectMem()
 	free(devset);
 }
 
+void wifiReConnect()
+{
+	if (autoWifi == false) esp_wifi_connect();
+	autoWifi = true;
+}
+
 void wifiDisconnect()
 {
-	if(esp_wifi_disconnect()!= ESP_OK) kprintf("\n##WIFI.NOT_CONNECTED#");
-	else kprintf("\n##WIFI.DISCONNECT_FAILED#");
+	esp_err_t err;
+	autoWifi = false;
+	err=esp_wifi_disconnect();
+	if(err== ESP_OK) kprintf("\n##WIFI.NOT_CONNECTED#");
+	else kprintf("\n##WIFI.DISCONNECT_FAILED %d#",err);
 }
 
 void wifiStatus()
@@ -609,6 +625,7 @@ void clientVol(char *s)
 		if ((atoi(vol)>=0)&&(atoi(vol)<=254))
 		{	
 			setVolumew(vol);
+			if (RDA5807M_detection()) RDA5807M_setVolume(atoi(vol)/16);
 		}	
 		free(vol);
     }	
@@ -870,6 +887,17 @@ void setLogLevel(esp_log_level_t level)
 	}	
 	displayLogLevel();
 } 
+void fmSeekUp()
+{seekUp();seekingComplete(); kprintf("##FM.FREQ#: %3.2f MHz\n",getFrequency());}
+void fmSeekDown()
+{seekDown();seekingComplete(); kprintf("##FM.FREQ#: %3.2f MHz\n",getFrequency());}
+void fmVol(char* tmp)
+{clientVol(tmp);}
+void fmMute()
+{RDA5807M_unmute(RDA5807M_FALSE); }
+void fmUnmute()
+{RDA5807M_unmute(RDA5807M_TRUE);}
+
 
 void checkCommand(int size, char* s)
 {
@@ -878,12 +906,21 @@ void checkCommand(int size, char* s)
 	for(i=0;i<size;i++) tmp[i] = s[i];
 	tmp[size] = 0;
 //	kprintf("size: %d, cmd=%s\n",size,tmp);
-
-		if(startsWith ("dbg.", tmp))
+	if(startsWith ("fm.", tmp))
+	{
+		if(strcmp(tmp+3, "up") == 0) 	fmSeekUp();
+		else if(strcmp(tmp+3, "down") == 0) 	fmSeekDown();
+		else if(strcmp(tmp+3, "stop") == 0) 	fmMute(); 
+		else if(strcmp(tmp+3, "start") == 0) 	fmUnmute(); 
+		else if(startsWith (  "vol",tmp+3)) 	clientVol(tmp);	
+		else printInfo(tmp);
+	} else
+	if(startsWith ("dbg.", tmp))
 	{
 		if     (strcmp(tmp+4, "fifo") == 0) 	kprintf( "Buffer fill %u%%, %d bytes, OverRun: %ld, UnderRun: %ld\n",
 												(spiRamFifoFill() * 100) / spiRamFifoLen(), spiRamFifoFill(),spiRamGetOverrunCt(),spiRamGetUnderrunCt());
 		else if(strcmp(tmp+4, "clear") == 0) 	spiRamFifoReset();
+		
 		else printInfo(tmp);
 	} else
 	if(startsWith ("wifi.", tmp))
@@ -891,6 +928,7 @@ void checkCommand(int size, char* s)
 		if     (strcmp(tmp+5, "list") == 0) 	wifiScan();
 		else if(strcmp(tmp+5, "scan") == 0) 	wifiScan();
 		else if(strcmp(tmp+5, "con") == 0) 	wifiConnectMem();
+		else if(strcmp(tmp+5, "recon") == 0) 	wifiReConnect();
 		else if(startsWith ("con", tmp+5)) 	wifiConnect(tmp);
 		else if(strcmp(tmp+5, "rssi") == 0) 	readRssi();
 		else if(strcmp(tmp+5, "discon") == 0) wifiDisconnect();

@@ -13,7 +13,7 @@
 
 
 #define RELEASE "0.9"
-#define REVISION "0"
+#define REVISION "1"
 
 uint32_t checkUart(uint32_t speed);
 extern unsigned short adcdiv;	
@@ -29,6 +29,12 @@ void setCurrentStation( uint16_t vol);
 void clientVol(char *s);
 uint8_t getLedGpio();
 uint32_t getLcdOut();
+bool getAutoWifi(void);
+void fmSeekUp();
+void fmSeekDown();
+void fmVol(char* tmp);
+void fmMute();
+void fmUnmute();
 
 #define kprintf(fmt, ...) do {    \
         printf(fmt, ##__VA_ARGS__);   \

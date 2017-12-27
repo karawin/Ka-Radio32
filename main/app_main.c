@@ -82,6 +82,7 @@ Copyright (C) 2017  KaraWin
 #include "vs1053.h"
 #include "ClickEncoder.h"
 #include "addon.h"
+#include "rda5807Task.h"
 
 /* The event group allows multiple bits for each event*/
 //   are we connected  to the AP with an IP? */
@@ -117,7 +118,9 @@ player_t *player_config;
 static output_mode_t audio_output_mode; 
 static uint8_t clientIvol = 0;
 //ip
-char localIp[20];
+static char localIp[20];
+
+
 // disable 1MS timer interrupt
 void noInterrupt1Ms()
 {
@@ -348,6 +351,7 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
 		
 	case SYSTEM_EVENT_STA_CONNECTED:
 		xEventGroupSetBits(wifi_event, CONNECTED_AP);
+		ESP_LOGE(TAG, "\nWifi connected");
 		
 		break;
 
@@ -361,9 +365,14 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
            auto-reassociate. */
 		FlashOn = FlashOff = 100;
 		xEventGroupClearBits(wifi_event, CONNECTED_AP);
-        esp_wifi_connect();
         xEventGroupClearBits(wifi_event, CONNECTED_BIT);
-		
+		ESP_LOGE(TAG, "\nWifi Disconnected. Connection tried again");
+        if (getAutoWifi()) 
+		{
+			ESP_LOGE(TAG, "\nWifi Disconnected. Connection tried again");
+			esp_wifi_connect();
+		} else
+			ESP_LOGE(TAG, "\nWifi Disconnected.");
         break;
 
 	case SYSTEM_EVENT_AP_START:
@@ -742,7 +751,7 @@ void app_main()
 	xTaskHandle pxCreatedTask;
 	ESP_LOGI(TAG, "starting app_main()");
     ESP_LOGI(TAG, "RAM left: %u", esp_get_free_heap_size());
-	//initArduino();
+
 	const esp_partition_t *running = esp_ota_get_running_partition();
 	ESP_LOGE(TAG, "Running partition type %d subtype %d (offset 0x%08x)",
              running->type, running->subtype, running->address);
@@ -805,6 +814,22 @@ void app_main()
 	
 	ESP_LOGE(TAG,"LCD Type %d",device->lcd_type);
 	lcd_init(device->lcd_type);
+	// Init i2c if lcd doesn't not (spi)
+	if (device->lcd_type >= LCD_SPI)
+	{
+		i2c_config_t conf;
+	    conf.mode = I2C_MODE_MASTER;
+	    conf.sda_io_num = (device->lcd_type == LCD_NONE)?PIN_I2C_SDA:PIN_SI2C_SDA;
+		conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
+	    conf.scl_io_num = (device->lcd_type == LCD_NONE)?PIN_I2C_SCL:PIN_SI2C_SCL;
+	    conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
+	    conf.master.clk_speed = I2C_MASTER_RFREQ_HZ;
+		//ESP_ERROR_CHECK
+		(i2c_param_config(I2C_MASTER_NUM, &conf));
+		ESP_LOGD(TAG, "i2c_driver_install %d", I2C_MASTER_NUM);
+		//ESP_ERROR_CHECK
+		(i2c_driver_install(I2C_MASTER_NUM, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0));			
+	}
 	
 	// output mode
 	//I2S, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053
@@ -843,6 +868,8 @@ void app_main()
 	ESP_LOGI(TAG, "Heap size: %d",xPortGetFreeHeapSize( ));
 
 	lcd_welcome("");
+	
+	
 	
 // queue for events of the sleep / wake timers
 	event_queue = xQueueCreate(10, sizeof(queue_event_t));
@@ -893,11 +920,17 @@ void app_main()
 	
     xTaskCreate(serversTask, "serversTask", 2400, NULL, 3, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","serversTask",(unsigned int)pxCreatedTask);	
+	
 	xTaskCreate(task_addon, "task_addon", 2500, NULL, 5, &pxCreatedTask);  //high priority for the spi else too slow due to ucglib
 	ESP_LOGI(TAG, "%s task: %x","task_addon",(unsigned int)pxCreatedTask);
 	
+	if (RDA5807M_detection())
+	{
+		xTaskCreate(rda5807Task, "rda5807Task", 2500, NULL, 3, &pxCreatedTask);  //
+		ESP_LOGI(TAG, "%s task: %x","rda5807Task",(unsigned int)pxCreatedTask);
+	}
+	
 	printf("Init ");
-	vTaskDelay(1);
 	for (int i=0;i<15;i++)
 	{
 		printf(".");

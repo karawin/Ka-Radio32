@@ -899,7 +899,7 @@ function downloadStations()
 		reader.onload = function(e){
 			function fillInfo(ind,arri){
 				if (!arri["ovol"]) arri["ovol"]= "0";
-				tosend = tosend+"&id="+ind + "&url="+arri["URL"] +"&name="+ arri["Name"]+ "&file="+arri["File"] + "&port=" + arri["Port"]+"&ovol=" + arri["ovol"]+"&";
+				tosend = tosend+"&id="+ind + "&url="+arri["URL"] +"&name="+ arri["Name"]+ "&file="+fixedEncodeURIComponent (arri["File"]) + "&port=" + arri["Port"]+"&ovol=" + arri["ovol"]+"&";
 				localStorage.setItem(ind,"{\"Name\":\""+arri["Name"]+"\",\"URL\":\""+arri["URL"] +"\",\"File\":\""+arri["File"]+"\",\"Port\":\""+arri["Port"] +"\",\"ovol\":\""+arri["ovol"]  +"\"}");
 			}	
 			// Entire file

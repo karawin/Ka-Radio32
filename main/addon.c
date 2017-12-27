@@ -423,6 +423,7 @@ void encoderLoop()
 {
 	Button newButton ;
 	static int16_t oldValue = 0;
+	event_lcd_t evt;
 
 // Encoder loop		
 		newValue = - getValue();
@@ -463,12 +464,16 @@ void encoderLoop()
 			if ((stateScreen  != sstation)&&(newValue != 0))
 			{    
 				ESP_LOGD(TAG,"Enc value: %d, oldValue: %d,  incr volume: %d",newValue, oldValue,newValue+(oldValue*3));
-				setRelVolume(newValue+(oldValue*3));
+				evt.lcmd = evol;
+				evt.lline = (char*)((uint32_t)newValue+(oldValue*3));
+				xQueueSend(event_lcd,&evt, 0);
 			} 
 			if ((stateScreen  == sstation)&&(newValue != 0))
 			{    
 				currentValue += newValue;
-				changeStation(newValue);
+				evt.lcmd = estation;
+				evt.lline = (char*)((uint32_t)newValue);
+				xQueueSend(event_lcd,&evt, 0);				
 			} 	
 		}		
 		oldValue += newValue;
@@ -566,7 +571,17 @@ event_ir_t evt;
 	}
 }
  
- 
+ // IO task
+ void task_addonio(void *pvParams)
+ {
+	 while (1)
+	 {
+		encoderLoop(); // compute the encoder		
+		irLoop();
+		vTaskDelay(20);
+	}
+	vTaskDelete( NULL ); 
+ }
 //------------------- 
 // Main task of addon
 //------------------- 
@@ -591,6 +606,7 @@ void task_addon(void *pvParams)
 	ESP_LOGI(TAG,"event_lcd: %x",(int)event_lcd);
 	
 	xTaskCreate(rmt_nec_rx_task, "rmt_nec_rx_task", 2048, NULL, 10, NULL);
+	xTaskCreate(task_addonio, "rmt_nec_rx_task", 2048, NULL, 4, NULL);
 	vTaskDelay(1);
 	wakeLcd();
 
@@ -601,7 +617,6 @@ void task_addon(void *pvParams)
 		
 		irLoop();
 
-//lcd
 		while (xQueueReceive(event_lcd, &evt, 0))
 		{ 
 			wakeLcd();
@@ -609,15 +624,12 @@ void task_addon(void *pvParams)
 			{
 				case lmeta:
 					isColor?metaUcg(evt.lline):metaU8g2(evt.lline);
-					if (evt.lline != NULL) free(evt.lline);
 					break;
 				case licy4:
 					isColor?icy4Ucg(evt.lline):icy4U8g2(evt.lline);
-					if (evt.lline != NULL) free(evt.lline);
 					break;
 				case licy0:
 					isColor?icy0Ucg(evt.lline):icy0U8g2(evt.lline);
-					if (evt.lline != NULL) free(evt.lline);
 					break;
 				case lstop:
 					isColor?statusUcg("STOPPED"):statusU8g2("STOPPED");
@@ -630,7 +642,6 @@ void task_addon(void *pvParams)
 					break;
 				case lnameset:
 					isColor?namesetUcg(evt.lline):namesetU8g2(evt.lline);
-					if (evt.lline != NULL) free(evt.lline);
 					Screen(smain);
 					mTscreen= MTNEW;
 					stateScreen =  smain; 
@@ -650,12 +661,21 @@ void task_addon(void *pvParams)
 				case lovol:
 					dvolume = false; // don't show volume on start station
 					break;
+				case evol:
+					setRelVolume((uint32_t)evt.lline);
+					evt.lline = NULL;
+					break;
+				case estation:
+					changeStation((uint32_t)evt.lline);				
+					evt.lline = NULL;
+					break;
 				default:;
 			}
+			if (evt.lline != NULL) free(evt.lline);
+
 		}
 		
-		
-		vTaskDelay(10);		
+//		vTaskDelay(1);		
 
 		if (itAskTime) // time to ntp. Don't do that in interrupt.
 		{			
@@ -704,7 +724,7 @@ void task_addon(void *pvParams)
 				}				
 			}
 		}
-		vTaskDelay(1);
+//		vTaskDelay(1);
 		if ( timerScroll >= 300) //
 		{
 			if (lcd_type != LCD_NONE) 
@@ -715,7 +735,7 @@ void task_addon(void *pvParams)
 			timerScroll = 0;
 		}  
 	
-		vTaskDelay(20);
+		vTaskDelay(30);
 	}
 	
 	vTaskDelete( NULL ); 

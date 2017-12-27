@@ -54,7 +54,7 @@ typedef struct {
 	bool repeat_flag;
 } event_ir_t;
 
-typedef  enum typelcmd {lstop,lplay,lmeta,licy0,licy4,lnameset,lvol,lovol} typelcmd;
+typedef  enum typelcmd {lstop,lplay,lmeta,licy0,licy4,lnameset,lvol,lovol,evol,estation} typelcmd;
 typedef struct {
     typelcmd lcmd;             /*!< For what ?*/
     char*  lline;              /*!< string of command */

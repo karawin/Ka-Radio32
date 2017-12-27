@@ -196,7 +196,12 @@ app_main.o: C:/msys32/home/jp/esp/Ka-Radio32/main/app_main.c \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/telnet.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h \
  C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h \
- C:/msys32/home/jp/esp/Ka-Radio32/main/include/ClickEncoder.h
+ C:/msys32/home/jp/esp/Ka-Radio32/main/include/ClickEncoder.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/RDA5807/rda5807Task.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/RDA5807/rda5807m.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/RDA5807/common.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/RDA5807/rda5807m_reg.h \
+ C:/msys32/home/jp/esp/Ka-Radio32/components/RDA5807/rda5807m_data.h
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/stdio.h:
 
@@ -593,4 +598,14 @@ C:/msys32/home/jp/esp/Ka-Radio32/main/include/addon.h:
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/vs1053.h:
 
 C:/msys32/home/jp/esp/Ka-Radio32/main/include/ClickEncoder.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/components/RDA5807/rda5807Task.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/components/RDA5807/rda5807m.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/components/RDA5807/common.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/components/RDA5807/rda5807m_reg.h:
+
+C:/msys32/home/jp/esp/Ka-Radio32/components/RDA5807/rda5807m_data.h:
 /home/jp/esp/Ka-Radio32/main/./app_main.c:

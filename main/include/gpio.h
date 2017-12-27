@@ -34,11 +34,16 @@
 #define PIN_ENC_B   GPIO_NUM_17		// DT
 #define PIN_ENC_BTN GPIO_NUM_5		// SW
 
-// I2C lcd
-//----------
+// I2C lcd (and rda5807 if lcd is i2c or LCD_NONE)
+//------------------------------------------------
 #define PIN_I2C_SCL GPIO_NUM_14
 #define PIN_I2C_SDA GPIO_NUM_13
 #define PIN_I2C_RST	GPIO_NUM_2		// or not used
+
+// I2C rda5807 (if lcd is spi)
+//----------------------------
+#define PIN_SI2C_SCL GPIO_NUM_15
+#define PIN_SI2C_SDA GPIO_NUM_27
 
 // SPI lcd
 //---------

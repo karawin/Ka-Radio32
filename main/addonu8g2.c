@@ -213,6 +213,7 @@ void drawNumberU8g2(uint8_t mTscreen,char* irStr)
   char ststr[] = {"Number"};
   u8g2_ClearBuffer(&u8g2);
   drawTTitleU8g2(ststr);   
+  u8g2_SetFont(&u8g2, u8g2_font_ncenR18_tf );
   uint16_t xxx = (x/2)-(u8g2_GetUTF8Width(&u8g2,irStr)/2); 
   u8g2_DrawUTF8(&u8g2,xxx,yy/3, irStr);        
   screenBottomU8g2();  
@@ -241,6 +242,7 @@ void drawVolumeU8g2(uint8_t mTscreen,char* aVolume)
   volume = atoi(aVolume);
   u8g2_ClearBuffer(&u8g2);
   drawTTitleU8g2(vlstr) ;  
+  u8g2_SetFont(&u8g2, u8g2_font_ncenR18_tf );	
   uint16_t xxx = (x/2)-(u8g2_GetUTF8Width(&u8g2,aVolume)/2);     
   u8g2_DrawUTF8(&u8g2,xxx,yy/3,aVolume);
   screenBottomU8g2(); 

@@ -347,6 +347,9 @@ void playStationInt(int sid) {
 			clientSetPath(si->file);
 			clientSetPort(si->port);
 			clientSetOvol(si->ovol);
+			
+//printf("Name: %s, url: %s, path: %s\n",	si->name,	si->domain, si->file);	
+			
 			clientConnect();
 			setOffsetVolume();
 			for (i = 0;i<100;i++)
@@ -598,6 +601,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 				port = getParameterFromResponse("port=", data, data_size);
 				ovol = getParameterFromResponse("ovol=", data, data_size);
 				ESP_LOGV(TAG,"nb:%d,si:%x,nsi:%x,id:%s,url:%s,file:%s",i,(int)si,(int)nsi,id,url,file);
+//printf("nb:%d,si:%x,nsi:%x,id:%s,url:%s,file:%s,sizeof file:%d\n",i,(int)si,(int)nsi,id,url,file,sizeof(nsi->file));				
 				if(id ) {
 					if (i == 0) uid = atoi(id);
 					if ((atoi(id) >=0) && (atoi(id) < 255))

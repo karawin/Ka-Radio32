@@ -118,15 +118,15 @@ void renderer_volume(uint32_t vol)
 	if (vol >= 255) 
 	{
 		renderer_instance->volume = 0x10000;
-//		ESP_LOGI(TAG, "Renderer volume max:  %d  %X",renderer_instance->volume,renderer_instance->volume );
+		ESP_LOGD(TAG, "Renderer volume max:  %d  %X",renderer_instance->volume,renderer_instance->volume );
 		return;
 	}
-	vol = 256  - vol;
+	vol = 255  - vol;
 	uint32_t value = (log10(255/((float)vol+1)) * 105.54571334);	
 //	ESP_LOGI(TAG, "Renderer value: %X",value );
 	if (value >= 254) value = 256;
 	renderer_instance->volume = value<<8; // *256
-	ESP_LOGI(TAG, "Renderer volume:  %X",renderer_instance->volume );
+	ESP_LOGD(TAG, "Renderer volume:  %X",renderer_instance->volume );
 }
 //-----------
 
