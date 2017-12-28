@@ -7,13 +7,6 @@ but only mp3 stations can be played.<br/>
 Adding a vs1053 board, all stations can be played.<br/>
 Compatible with esp8266 KaRadio addons.<br/>
 <br/>
-Work with i2s, internal DAC or a vs1053<br/>
-Output mode set in Setting panel on web page of KaraDio32:<br/>
-I2S for connection to ac external DAC<br/>
-I2SMERUS to connect a merus amplifier<br/>
-DAC to use the built in DAC of the esp32<br/>
-PDM to output a PDM (Pulse Density Modulation) stream<br/>
-VS1053 to connect to a vs1053 board.<br/>
 ### Added features
 Work with i2s, internal DAC or a vs1053<br/>
 Output mode set in Setting panel on web page of KaraDio32:<br/>
