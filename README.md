@@ -1,4 +1,4 @@
-#### State
+### State
 KaraDio32 in dev state: Stable<br/>
 Works on any esp32 board.<br/>
 See the feature on https://hackaday.io/project/11570-wifi-webradio-with-esp8266-and-vs1053 <br/>
@@ -14,7 +14,7 @@ I2SMERUS to connect a merus amplifier<br/>
 DAC to use the built in DAC of the esp32<br/>
 PDM to output a PDM (Pulse Density Modulation) stream<br/>
 VS1053 to connect to a vs1053 board.<br/>
-## Added features
+### Added features
 Work with i2s, internal DAC or a vs1053<br/>
 Output mode set in Setting panel on web page of KaraDio32:<br/>
 I2S for connection to ac external DAC<br/>
@@ -23,11 +23,12 @@ DAC to use the built in DAC of the esp32<br/>
 PDM to output a PDM (Pulse Density Modulation) stream<br/>
 VS1053 to connect to a vs1053 board.<br/>
 <br/>
-LCD or Oled suppor integrated: mot common b/w or color oled and lcd can be used.<br/>
+LCD or Oled support integrated: most common b/w or color oled and lcd can be used.<br/>
 IR support integrated. Nec protocol only.<br/>
 Rotary encoder support integrated. Common functions: play/stop, volume, station change, date time display.</br/>
 <br/>
 
+### Build your own
 To build your own release, you must install the idf https://github.com/espressif/esp-idf and the toolchain.
 ```
 To flash all build output, run 'make flash' or:
