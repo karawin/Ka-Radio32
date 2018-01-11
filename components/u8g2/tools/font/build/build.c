@@ -368,6 +368,7 @@ Greek Extended	1F00–1FFF
   { 0, "cu12.bdf", 			"cu12", 			3, 0, BM_T|BM_H, FM_C, MM_C, "32-255,$20a0-$20bf,$2103,$2109,$2126,$2190-$21bb,$21d0-$21d9,$21e6-$21e9,$23e9-$23fa,$2580-$261f,$2654-$2667,$2680-$2685,$2713-$2718,$274f-$2752", "_symbols" },
   { 0, "cu12.bdf", 			"cu12", 			3, 0, BM_T, FM_C, MM_C, "32-128,$370-$3ff", "_greek" },
   { 0, "cu12.bdf", 			"cu12", 			3, 0, BM_T, FM_C, MM_C, "32-128,$400-$52f", "_cyrillic" },
+  { 0, "cu12.bdf", 			"cu12", 			3, 0, BM_T, FM_C, MM_C, "32-128,$f00-$fff", "_tibetan" },
   { 0, "cu12.bdf", 			"cu12", 			3, 0, BM_T, FM_C, MM_C, "32-128,$590-$5ff,$fb1d-$fb4f", "_hebrew" },
   { 0, "cu12.bdf", 			"cu12", 			3, 35, BM_T, FM_C, MM_C, "32-128,$600-$6ff,$FB50-$FBB1,$FE70-$FEFF,x32-64,x91-96,x123-191,x247,x697-879,x32-$5ff", "_arabic" },
   
@@ -377,6 +378,7 @@ Greek Extended	1F00–1FFF
   { 0, "unifont.bdf", 		"unifont", 		6, 0, BM_T, FM_C, MM_C, "32-128,$400-$52f", "_cyrillic" },
   { 0, "unifont.bdf", 		"unifont", 		6, 0, BM_T, FM_C, MM_C, "32-128,$590-$5ff,$fb1d-$fb4f", "_hebrew" },
   { 0, "unifont.bdf", 		"unifont", 		6, 0, BM_T, FM_C, MM_C, "32-128,$980-$9ff", "_bengali" },
+  { 0, "unifont.bdf", 		"unifont", 		6, 0, BM_T, FM_C, MM_C, "32-128,$f00-$fff", "_tibetan" },
   { 0, "unifont.bdf", 		"unifont", 		6, 0, BM_T, FM_C, MM_C, "32-128,$600-$6ff,$750-$77f,$fb50-$fdff,$fe70-$feff", "_urdu" },
   { 0, "unifont.bdf", 		"unifont", 		6, 0, BM_T, FM_C, MM_C, "32-127,$104-$107,$118-$119,$141-$144,$15a-$15b,$179-$17c,$d3,$f3", "_polish" },
   
@@ -556,6 +558,16 @@ Greek Extended	1F00–1FFF
   { "-a -r 72 -p 58", "FreeUniversal-Bold.ttf",	"fub42",			8, 0, BM_T, FM_C, MM_F|MM_R|MM_N, "", "" },
   { "-a -r 72 -p 68", "FreeUniversal-Bold.ttf",	"fub49",			8, 0, BM_T, FM_C, MM_N, "", "" },
 
+  { "-a -r 72 -p 16", "FreeUniversal-Bold.ttf", 	"fub11", 			8, 0, BM_T, FM_C, MM_C, "32,35-57,$300-$3ff,$2030-$3000", "_symbol" },
+  { "-a -r 72 -p 20", "FreeUniversal-Bold.ttf", 	"fub14", 			8, 0, BM_T, FM_C, MM_C, "32,35-57,$300-$3ff,$2030-$3000", "_symbol" },
+  { "-a -r 72 -p 23", "FreeUniversal-Bold.ttf", 	"fub17", 			8, 0, BM_T, FM_C, MM_C, "32,35-57,$300-$3ff,$2030-$3000", "_symbol" },
+  { "-a -r 72 -p 27", "FreeUniversal-Bold.ttf", 	"fub20", 			8, 0, BM_T, FM_C, MM_C, "32,35-57,$300-$3ff,$2030-$3000", "_symbol" },
+  { "-a -r 72 -p 34", "FreeUniversal-Bold.ttf", 	"fub25", 			8, 0, BM_T, FM_C, MM_C, "32,35-57,$300-$3ff,$2030-$3000", "_symbol" },
+  { "-a -r 72 -p 40", "FreeUniversal-Bold.ttf", 	"fub30", 			8, 0, BM_T, FM_C, MM_C, "32,35-57,$300-$3ff,$2030-$3000", "_symbol" },
+  { "-a -r 72 -p 49", "FreeUniversal-Bold.ttf", 	"fub35", 			8, 0, BM_T, FM_C, MM_C, "32,35-57,$300-$3ff,$2030-$3000", "_symbol" },
+  { "-a -r 72 -p 58", "FreeUniversal-Bold.ttf", 	"fub42", 			8, 0, BM_T, FM_C, MM_C, "32,35-57,$300-$3ff,$2030-$3000", "_symbol" },
+  { "-a -r 72 -p 68", "FreeUniversal-Bold.ttf", 	"fub49", 			8, 0, BM_T, FM_C, MM_C, "32,35-57,$300-$3ff,$2031-$3000", "_symbol" },  // per mill sign does not fit
+
   
 /*  
   Free Universal Regular
@@ -580,6 +592,16 @@ Greek Extended	1F00–1FFF
   { "-a -r 72 -p 48", "FreeUniversal-Regular.ttf",	"fur35",			8, 0, BM_T, FM_C, MM_F|MM_R|MM_N, "", "" },
   { "-a -r 72 -p 58", "FreeUniversal-Regular.ttf",	"fur42",			8, 0, BM_T, FM_C, MM_F|MM_R|MM_N, "", "" },
   { "-a -r 72 -p 68", "FreeUniversal-Regular.ttf",	"fur49",			8, 0, BM_T, FM_C, MM_N, "", "" },
+
+  { "-a -r 72 -p 16", "FreeUniversal-Bold.ttf", 	"fub11", 			8, 0, BM_T, FM_C, MM_C, "32,35-57,$300-$3ff,$2030-$3000", "_symbol" },
+  { "-a -r 72 -p 19", "FreeUniversal-Bold.ttf", 	"fub14", 			8, 0, BM_T, FM_C, MM_C, "32,35-57,$300-$3ff,$2030-$3000", "_symbol" },
+  { "-a -r 72 -p 23", "FreeUniversal-Bold.ttf", 	"fub17", 			8, 0, BM_T, FM_C, MM_C, "32,35-57,$300-$3ff,$2030-$3000", "_symbol" },
+  { "-a -r 72 -p 28", "FreeUniversal-Bold.ttf", 	"fub20", 			8, 0, BM_T, FM_C, MM_C, "32,35-57,$300-$3ff,$2030-$3000", "_symbol" },
+  { "-a -r 72 -p 34", "FreeUniversal-Bold.ttf", 	"fub25", 			8, 0, BM_T, FM_C, MM_C, "32,35-57,$300-$3ff,$2030-$3000", "_symbol" },
+  { "-a -r 72 -p 40", "FreeUniversal-Bold.ttf", 	"fub30", 			8, 0, BM_T, FM_C, MM_C, "32,35-57,$300-$3ff,$2030-$3000", "_symbol" },
+  { "-a -r 72 -p 48", "FreeUniversal-Bold.ttf", 	"fub35", 			8, 0, BM_T, FM_C, MM_C, "32,35-57,$300-$3ff,$2030-$3000", "_symbol" },
+  { "-a -r 72 -p 58", "FreeUniversal-Bold.ttf", 	"fub42", 			8, 0, BM_T, FM_C, MM_C, "32,35-57,$300-$3ff,$2030-$3000", "_symbol" },
+  { "-a -r 72 -p 68", "FreeUniversal-Bold.ttf", 	"fub49", 			8, 0, BM_T, FM_C, MM_C, "32,35-57,$300-$3ff,$2031-$3000", "_symbol" },  // per mill sign does not fit
   
 /*
 ./do_fontsize_a_v2.sh 25 ../ttf/os/OldStandard-Bold.ttf osb18
@@ -769,6 +791,7 @@ char *bdfconv_path = "../bdfconv/bdfconv";
 char *otf2bdf_path = "../otf2bdf/otf2bdf";
 FILE *u8g2_font_list_fp;
 FILE *u8x8_font_list_fp;
+FILE *keywords_fp;
 char *u8g2_prototypes = NULL;
 char *u8x8_prototypes = NULL;
 char *u8g2_fonts_filename = "../../../csrc/u8g2_fonts.c";
@@ -1257,6 +1280,9 @@ void fontlist_name(int i, int fm, char *fms, int bm, char *bms, int mm, char *mm
   {
     fprintf(u8x8_font_list_fp, "  \"%s\",\n", target_font_identifier);
   }
+
+  fprintf(keywords_fp, "%s\tLITERAL1\n", target_font_identifier);
+  
   
 }
 
@@ -1415,12 +1441,15 @@ int main(void)
     return 0;
   if ( file_copy("u8g2_fonts.pre", u8g2_fonts_filename) == 0 )
     return 0;
+  if ( file_copy("keywords.pre", "keywords.txt") == 0 )
+    return 0;
   
   
   do_font_loop(bdfconv);
   
   u8g2_font_list_fp = fopen("u8g2_font_list.c", "w");
   u8x8_font_list_fp  = fopen("u8x8_font_list.c", "w");
+  keywords_fp  = fopen("keywords.txt", "a");
   fprintf(u8g2_font_list_fp, "/* u8g2_font_list.c */\n");
   fprintf(u8x8_font_list_fp, "/* u8x8_font_list.c */\n");
   fprintf(u8g2_font_list_fp, "#include \"u8g2.h\"\n");
@@ -1439,6 +1468,7 @@ int main(void)
   
   fclose(u8g2_font_list_fp);
   fclose(u8x8_font_list_fp);
+  fclose(keywords_fp);
 
   printf("update u8g2.h\n");
   insert_into_file("../../../csrc/u8g2.h", u8g2_prototypes, "/* start font list */", "/* end font list */");

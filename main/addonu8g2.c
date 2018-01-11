@@ -54,6 +54,94 @@ static char nameNum[5] ; // the number of the current station
 static char genre[BUFLEN/2]; // the local name of the station
 
 ////////////////////////////////////////
+typedef enum sizefont  {small, text,middle,large} sizefont;
+void setfont8(sizefont size)
+{
+//	printf("setfont8 size: %d, yy: %d\n",size,yy);
+	switch(size)
+	{
+		case small:
+		switch(yy)
+		{
+			case 200:
+			u8g2_SetFont(&u8g2,u8g2_font_6x12_tf);
+			break;
+			case 128:
+			u8g2_SetFont(&u8g2,u8g2_font_6x12_tf);
+			break;
+			case 32:
+			u8g2_SetFont(&u8g2,u8g2_font_u8glib_4_tr);
+			break;
+			case 64:
+			default: // 
+			u8g2_SetFont(&u8g2, u8g2_font_5x8_tr);
+			;
+		}
+		break;
+		case text:
+		switch(yy)
+		{
+			case 200:
+			u8g2_SetFont(&u8g2,u8g2_font_7x14_tf);
+			break;
+			case 128:
+			u8g2_SetFont(&u8g2, u8g2_font_7x14_tf);
+			break;
+			case 32:
+			u8g2_SetFont(&u8g2,u8g2_font_5x7_tf);
+			break;
+			case 64:
+			default: // 
+			u8g2_SetFont(&u8g2, u8g2_font_6x12_tf);
+			;
+		}
+		break;
+		case middle:
+		switch(yy)
+		{
+			case 200:
+			u8g2_SetFont(&u8g2, u8g2_font_9x18_tf);
+			break;
+			case 128:
+			u8g2_SetFont(&u8g2, u8g2_font_9x18_tf);
+			break;
+			case 32:
+			u8g2_SetFont(&u8g2, u8g2_font_5x8_tf);
+			break;
+			case 64:
+			default: // 
+			u8g2_SetFont(&u8g2, u8g2_font_7x14_tf);
+			;			
+
+		}
+		break;
+		case large:
+		switch(yy)
+		{
+			case 200:
+			u8g2_SetFont(&u8g2, u8g2_font_helvR24_tf);
+			break;
+			case 128:
+			u8g2_SetFont(&u8g2, u8g2_font_helvR24_tf);
+			break;
+			case 32:
+			u8g2_SetFont(&u8g2,  u8g2_font_7x14_tf);
+			break;
+			case 64:
+			default: // 
+			u8g2_SetFont(&u8g2, u8g2_font_ncenR18_tf);
+			;		
+		}
+		break;
+		default:
+		printf("Default for size %d\n",size);
+	}
+}
+
+
+
+
+////////////////////////////////////////
 char* getNameNumU8g2()
 {
 	return nameNum;
@@ -127,9 +215,11 @@ static void screenBottomU8g2()
     u8g2_DrawFrame(&u8g2,0,yy-3,x-1,3);
     u8g2_DrawHLine(&u8g2,0,yy-2,((uint16_t)(x*volume)/255));                         
 //TIME
-//  if ((lline[4] == NULL)||(x==84))
-    u8g2_SetFont(&u8g2, u8g2_font_5x8_tf);
-    u8g2_DrawUTF8(&u8g2,x/2-(u8g2_GetUTF8Width(&u8g2,strsec)/2),yy-y-4,strsec);  	
+	if (yy != 32) // not enough room
+	{
+		setfont8(small);
+		u8g2_DrawUTF8(&u8g2,x/2-(u8g2_GetUTF8Width(&u8g2,strsec)/2),yy-y-4,strsec);  
+	}	
 }
 
 // draw the screen from buffer
@@ -141,38 +231,35 @@ u8g2_SendBuffer(&u8g2);
 // draw all lines
 void drawFrameU8g2(uint8_t mTscreen,struct tm *dt)
 {
-//  if (mTscreen == MTNEW) 
 	  u8g2_ClearBuffer(&u8g2);
   if (x==84)
 	sprintf(strsec,"%02d-%02d  %02d:%02d:%02d",dt->tm_mon+1,dt->tm_mday,dt->tm_hour, dt->tm_min,dt->tm_sec);
   else
 	sprintf(strsec,"%02d-%02d-%04d  %02d:%02d:%02d",dt->tm_mon+1,dt->tm_mday,dt->tm_year+1900, dt->tm_hour, dt->tm_min,dt->tm_sec);
-  if (u8g2.width == 84)
-    u8g2_SetFont(&u8g2, u8g2_font_5x8_tf);
-  else 
-    u8g2_SetFont(&u8g2, u8g2_font_6x10_tf);
-  
+
+    setfont8(text);
     u8g2_SetDrawColor(&u8g2, 1);
     y = getFontLineSpacing();
     u8g2_SetFontRefHeightText(&u8g2); 
-//    if (mTscreen == MTNEW) 
 	{
-		u8g2_DrawHLine(&u8g2,0,(4*y) - (y/2)-1,x);
+		u8g2_DrawHLine(&u8g2,0,((yy==32)?3:4*y) - (y/2)-1,x);
 		u8g2_DrawBox(&u8g2,0,0,x-1,y);
 	}
     for (int i = 0;i < LINES;i++)
     {
-//	  if (mline[i])
-	  {	  
 		if (i == 0){
-//			u8g2_DrawBox(&u8g2,0,0,x,y+1);
 			u8g2_SetDrawColor(&u8g2, 0);
 		}
 		else {
-//			u8g2_SetDrawColor(&u8g2, 0);
 			if (i >=3) z = y/2+2 ; else z = 1;
-//			u8g2_DrawBox(&u8g2,0,y*i+z,x,y*i+z+y);
 			u8g2_SetDrawColor(&u8g2, 1);
+		}
+		
+		int zz = y*i;
+		if (yy==32)
+		{
+			if ((i==STATION2)||(i==TITLE2)) continue;
+			if (i==TITLE1) zz = y*GENRE;
 		}
 		
 		if (lline[i] != NULL)
@@ -186,9 +273,8 @@ void drawFrameU8g2(uint8_t mTscreen,struct tm *dt)
 					u8g2_DrawUTF8(&u8g2,u8g2_GetUTF8Width(&u8g2,nameNum)-2,0,lline[i]+iline[i]);
 				}
 			}      
-			else u8g2_DrawUTF8(&u8g2,0,y*i+z,lline[i]+iline[i]);
+			else u8g2_DrawUTF8(&u8g2,0,zz+z,lline[i]+iline[i]);
 		}
-	  }
 
     }
     screenBottomU8g2();    
@@ -198,13 +284,14 @@ void drawFrameU8g2(uint8_t mTscreen,struct tm *dt)
 //////////////////////////
 void drawTTitleU8g2(char* ttitle)
 { 
-	u8g2_SetFont(&u8g2, u8g2_font_8x13B_tf);
+//	u8g2_SetFont(&u8g2, u8g2_font_8x13B_tf);
+	setfont8(middle);
     uint16_t xxx = (x/2)-(u8g2_GetUTF8Width(&u8g2,ttitle)/2);
     u8g2_SetDrawColor(&u8g2, 1);
     u8g2_DrawBox(&u8g2,0,0,x,getFontLineSpacing()+1); 
     u8g2_SetDrawColor(&u8g2, 0);
     u8g2_DrawUTF8(&u8g2,xxx,1,ttitle);
-	u8g2_SetFont(&u8g2, u8g2_font_7x14_tf);
+	
     u8g2_SetDrawColor(&u8g2, 1);
 }
 //////////////////////////
@@ -213,7 +300,7 @@ void drawNumberU8g2(uint8_t mTscreen,char* irStr)
   char ststr[] = {"Number"};
   u8g2_ClearBuffer(&u8g2);
   drawTTitleU8g2(ststr);   
-  u8g2_SetFont(&u8g2, u8g2_font_ncenR18_tf );
+  setfont8(large);
   uint16_t xxx = (x/2)-(u8g2_GetUTF8Width(&u8g2,irStr)/2); 
   u8g2_DrawUTF8(&u8g2,xxx,yy/3, irStr);        
   screenBottomU8g2();  
@@ -242,7 +329,7 @@ void drawVolumeU8g2(uint8_t mTscreen,char* aVolume)
   volume = atoi(aVolume);
   u8g2_ClearBuffer(&u8g2);
   drawTTitleU8g2(vlstr) ;  
-  u8g2_SetFont(&u8g2, u8g2_font_ncenR18_tf );	
+  setfont8(large);  
   uint16_t xxx = (x/2)-(u8g2_GetUTF8Width(&u8g2,aVolume)/2);     
   u8g2_DrawUTF8(&u8g2,xxx,yy/3,aVolume);
   screenBottomU8g2(); 
@@ -253,17 +340,16 @@ void drawTimeU8g2(uint8_t mTscreen,struct tm *dt,unsigned timein)
   char strdate[23];
   char strtime[20];
 	u8g2_ClearBuffer(&u8g2);
- //   dt=localtime(&timestamp);
     sprintf(strdate,"%02d-%02d-%04d", dt->tm_mon+1, dt->tm_mday, dt->tm_year+1900);
     sprintf(strtime,"%02d:%02d:%02d", dt->tm_hour, dt->tm_min,dt->tm_sec);
     drawTTitleU8g2(strdate); 
-//u8g2_SetFont(&u8g2, u8g2_font_9x15_tf);		
-	u8g2_SetFont(&u8g2, u8g2_font_ncenR18_tf );		
+    setfont8(large);	
     u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,strtime)/2),(yy/3)+4,strtime); 
     // draw ip
-	u8g2_SetFont(&u8g2, u8g2_font_5x8_tf);
+	setfont8(small);
 	sprintf(strdate,"IP: %s", getIp());
 	u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,strdate)/2),yy-getFontLineSpacing(),strdate);   
+	
 }
 
 
@@ -275,7 +361,7 @@ void separatorU8g2(char* from)
     while ((from[0] == ' ') ){ strcpy( from,from+1); }
     interp=strstr(from," - ");
   if (from == nameset) {lline[0] = nameset;lline[1] = NULL;lline[2] = NULL;return;}
-  if (interp != NULL)
+  if ((interp != NULL) &&  (yy != 32)) 
   {
     from[interp-from]= 0;
     lline[(from==station)?1:3] = from;
@@ -363,111 +449,118 @@ void lcd_initU8g2(uint8_t *lcd_type)
 	
 	switch (*lcd_type){
 	case LCD_I2C_SH1106:
-		u8g2_Setup_sh1106_128x64_noname_f(
+		u8g2_Setup_sh1106_i2c_128x64_noname_f(
 			&u8g2,
 			U8G2_R0,
-			u8g2_esp32_msg_i2c_cb,
-			u8g2_esp32_msg_i2c_and_delay_cb);  // init u8g2 structure
+			u8g2_esp32_i2c_byte_cb,
+			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
 		break;
 	case LCD_I2C_SSD1306NN:
-		u8g2_Setup_ssd1306_128x64_noname_f(
+		u8g2_Setup_ssd1306_i2c_128x64_noname_f(
 			&u8g2,
 			U8G2_R0,
-			u8g2_esp32_msg_i2c_cb,
-			u8g2_esp32_msg_i2c_and_delay_cb);  // init u8g2 structure	
+			u8g2_esp32_i2c_byte_cb,
+			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
 		break;		
 	case LCD_I2C_SSD1306:
-		u8g2_Setup_ssd1306_128x64_vcomh0_f(
+		u8g2_Setup_ssd1306_i2c_128x64_vcomh0_f(
 			&u8g2,
 			U8G2_R0,
-			u8g2_esp32_msg_i2c_cb,
-			u8g2_esp32_msg_i2c_and_delay_cb);  // init u8g2 structure	
+			u8g2_esp32_i2c_byte_cb,
+			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
 		break;		
 	case LCD_I2C_SSD1309:	
 		u8g2_Setup_ssd1309_i2c_128x64_noname2_f(
 			&u8g2,
 			U8G2_R0,
-			u8g2_esp32_msg_i2c_cb,
-			u8g2_esp32_msg_i2c_and_delay_cb);  // init u8g2 structure	
+			u8g2_esp32_i2c_byte_cb,
+			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
 		break;	
 	case LCD_I2C_SSD1325:	
-		u8g2_Setup_ssd1325_nhd_128x64_f(
+		u8g2_Setup_ssd1325_i2c_nhd_128x64_f(
 			&u8g2,
 			U8G2_R0,
-			u8g2_esp32_msg_i2c_cb,
-			u8g2_esp32_msg_i2c_and_delay_cb);  // init u8g2 structure	
+			u8g2_esp32_i2c_byte_cb,
+			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
+
 		break;	
 	case LCD_I2C_SSD1309NN:	
 		u8g2_Setup_ssd1309_i2c_128x64_noname0_f(
 			&u8g2,
 			U8G2_R0,
-			u8g2_esp32_msg_i2c_cb,
-			u8g2_esp32_msg_i2c_and_delay_cb);  // init u8g2 structure	
-		break;			
-
+			u8g2_esp32_i2c_byte_cb,
+			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
+		break;		
+	case LCD_I2C_SSD1306UN:
+		u8g2_Setup_ssd1306_i2c_128x32_univision_f(
+			&u8g2,
+			U8G2_R0,
+			u8g2_esp32_i2c_byte_cb,
+			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
+		break;
 //B/W spi
 	case LCD_SPI_SSD1306NN:	
 		u8g2_Setup_ssd1306_128x64_noname_f(
 			&u8g2,
 			U8G2_R0,
-			u8g2_esp32_msg_comms_cb,
-			u8g2_esp32_msg_gpio_and_delay_cb);  // init u8g2 structure	
+			u8g2_esp32_spi_byte_cb,
+			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;			
 	case LCD_SPI_SSD1306:	
 		u8g2_Setup_ssd1306_128x32_univision_f(
 			&u8g2,
 			U8G2_R0,
-			u8g2_esp32_msg_comms_cb,
-			u8g2_esp32_msg_gpio_and_delay_cb);  // init u8g2 structure	
+			u8g2_esp32_spi_byte_cb,
+			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;	
 	case LCD_SPI_SSD1309:	
 		u8g2_Setup_ssd1309_128x64_noname2_f(
 			&u8g2,
 			U8G2_R0,
-			u8g2_esp32_msg_comms_cb,
-			u8g2_esp32_msg_gpio_and_delay_cb);  // init u8g2 structure	
+			u8g2_esp32_spi_byte_cb,
+			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;	
 	case LCD_SPI_SSD1309NN:
 		u8g2_Setup_ssd1309_128x64_noname0_f(
 			&u8g2,
 			U8G2_R0,
-			u8g2_esp32_msg_comms_cb,
-			u8g2_esp32_msg_gpio_and_delay_cb);  // init u8g2 structure	
+			u8g2_esp32_spi_byte_cb,
+			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;		
 	case LCD_SPI_ST7565_ZOLEN:	
 		u8g2_Setup_st7565_zolen_128x64_f(
 			&u8g2,
 			U8G2_R0,
-			u8g2_esp32_msg_comms_cb,
-			u8g2_esp32_msg_gpio_and_delay_cb);  // init u8g2 structure	
+			u8g2_esp32_spi_byte_cb,
+			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;		
 	case LCD_SPI_SSD1322_NHD:	
 		u8g2_Setup_ssd1322_nhd_256x64_f(
 			&u8g2,
 			U8G2_R0,
-			u8g2_esp32_msg_comms_cb,
-			u8g2_esp32_msg_gpio_and_delay_cb);  // init u8g2 structure	
+			u8g2_esp32_spi_byte_cb,
+			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;	
 	case LCD_SPI_IL3820_V2:	//E Paper
 		u8g2_Setup_il3820_v2_296x128_f(
 			&u8g2,
 			U8G2_R0,
-			u8g2_esp32_msg_comms_cb,
-			u8g2_esp32_msg_gpio_and_delay_cb);  // init u8g2 structure	
+			u8g2_esp32_spi_byte_cb,
+			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;	
 	case LCD_SPI_SSD1607:	//E Paper
 		u8g2_Setup_ssd1607_200x200_f(
 			&u8g2,
 			U8G2_R0,
-			u8g2_esp32_msg_comms_cb,
-			u8g2_esp32_msg_gpio_and_delay_cb);  // init u8g2 structure	
+			u8g2_esp32_spi_byte_cb,
+			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;	
 	case LCD_SPI_LS013B7DH03:	
 		u8g2_Setup_ls013b7dh03_128x128_f(
 			&u8g2,
 			U8G2_R0,
-			u8g2_esp32_msg_comms_cb,
-			u8g2_esp32_msg_gpio_and_delay_cb);  // init u8g2 structure	
+			u8g2_esp32_spi_byte_cb,
+			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;	
 	default:
 		ESP_LOGE(TAG,"Unknown lcd lcd_type %d. Fall back to type 0",*lcd_type);
@@ -479,8 +572,8 @@ void lcd_initU8g2(uint8_t *lcd_type)
 		u8g2_Setup_sh1106_128x64_noname_f(
 			&u8g2,
 			U8G2_R0,
-			u8g2_esp32_msg_i2c_cb,
-			u8g2_esp32_msg_i2c_and_delay_cb);  // init u8g2 structure	
+			u8g2_esp32_i2c_byte_cb,
+			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
 	}
 	
 		ESP_LOGD(TAG,"lcd init BW type: %d",*lcd_type);
@@ -493,11 +586,13 @@ void lcd_initU8g2(uint8_t *lcd_type)
 		x  = u8g2.width;
 		z = 0;
 		u8g2_SetFontPosTop(&u8g2);
-		if (x == 84) u8g2_SetFont(&u8g2, u8g2_font_5x8_tf);
-		else u8g2_SetFont(&u8g2, u8g2_font_6x10_tf);
+		setfont8(text);
 		y = getFontLineSpacing();
-		u8g2_DrawXBM( &u8g2,x/2-logo_width/2, yy/2-logo_height/2, logo_width, logo_height, logo_bits);
+		if (yy>= logo_height)
+			 u8g2_DrawXBM( &u8g2,x/2-logo_width/2, yy/2-logo_height/2, logo_width, logo_height, logo_bits);
+		else u8g2_DrawXBM( &u8g2,x/2-logo_width/2, 0, logo_width, logo_height, logo_bits);
 		u8g2_SendBuffer(&u8g2);
+		printf("X: %d, YY: %d, Y: %d\n",x,yy,y);
 		vTaskDelay(100);
 		z = 0; 	
 	

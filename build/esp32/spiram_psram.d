@@ -57,7 +57,8 @@ spiram_psram.o: \
  C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/spi_common.h \
  C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/spi_struct.h \
  C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/lldesc.h \
- C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/queue.h
+ C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/queue.h \
+ C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/periph_ctrl.h
 
 C:/msys32/home/jp/esp/Ka-Radio32/build/include/sdkconfig.h:
 
@@ -174,4 +175,6 @@ C:/msys32/home/jp/esp/esp-idf/components/soc/esp32/include/soc/spi_struct.h:
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/lldesc.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/rom/queue.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/driver/include/driver/periph_ctrl.h:
 /home/jp/esp/esp-idf/components/esp32/./spiram_psram.c:

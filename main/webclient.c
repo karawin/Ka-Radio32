@@ -156,21 +156,34 @@ bool clientParsePlaylist(char* s)
   }
   str = strstr(s,"<location>http://");  //for xspf
   if (str != NULL) remove = 17;
-  str = strstr(s,"<REF href = \"http://");  //for asx
-  if (str != NULL) remove = 20;
   
+  if (str ==NULL) 
+  {	
+	str = strstr(s,"<REF href = \"http://");  //for asx
+	if (str != NULL) remove = 20;
+  }
   if (str ==NULL) 
   {	  
 	str = strstr(s,"http://");
 	if (str != NULL) remove = 7;
+	else
+	{
+		str = strstr(s,"HTTP://");
+		if (str != NULL) remove = 7;
+	}
   }
   if (str ==NULL) 
   {	  
 	str = strstr(s,"https://");
 	if (str != NULL) remove = 8;
+	else
+	{
+		str = strstr(s,"HTTPS://");
+		if (str != NULL) remove = 8;
+	}
   } 
-  if (str != NULL) 
   
+  if (str != NULL)   
   {
 	str += remove; //skip http://	
 	ESP_LOGV(TAG,"parse str %s",str);
@@ -728,14 +741,18 @@ IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
 	if (cstatus != C_DATA)
 	{
 		t1 = strstr(pdata, "404"); 
-		if (t1 != NULL) t1 = strstr(pdata, notfound); 
+		if (t1 != NULL)
+		{
+			t1 = strstr(pdata, notfound); 
+			if (t1 == NULL) t1 = strstr(pdata,"not be found");
+		}
 		if (t1 != NULL) { // 
 			kprintf(CLIPLAY,0x0d,0x0a);
-			kprintf("\n");
+//			kprintf("\n");
 			clientSaveOneHeader(notfound, 13,METANAME);
 			wsHeaders();
-			vTaskDelay(150);
-			clientDisconnect("C_DATA");
+//			vTaskDelay(200);
+//			clientDisconnect("C_DATA");
 			cstatus = C_HEADER;
 			return;
 		}	
@@ -765,7 +782,8 @@ IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
 				kprintf("Header: Moved\n");
 				clientDisconnect("C_HDER");
 				clientParsePlaylist(pdata);
-				cstatus = C_PLAYLIST;				
+				cstatus = C_PLAYLIST;	
+				 
 			}	
 			break;
 		}

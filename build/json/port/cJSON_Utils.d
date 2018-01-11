@@ -24,6 +24,7 @@ port/cJSON_Utils.o: \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/types.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/sched.h \
  C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stdio.h \
+ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/limits.h \
  C:/msys32/home/jp/esp/esp-idf/components/json/port/include/cJSON_Utils.h \
  C:/msys32/home/jp/esp/esp-idf/components/json/include/cJSON.h
 
@@ -74,6 +75,8 @@ C:/msys32/home/jp/esp/esp-idf/components/newlib/include/machine/types.h:
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/sched.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/newlib/include/sys/stdio.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/newlib/include/limits.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/json/port/include/cJSON_Utils.h:
 

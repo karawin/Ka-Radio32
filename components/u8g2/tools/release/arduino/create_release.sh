@@ -121,7 +121,7 @@ cp ../../../sys/arduino/u8x8/ArduboyTest/*.ino ../../../../U8g2_Arduino/examples
 # copy other files
 cp ../../../ChangeLog ./../../../../U8g2_Arduino/extras/.
 
-
+cp ../../font/build/keywords.txt ./../../../../U8g2_Arduino/.
 
 pushd .
 # goto the release project
@@ -144,6 +144,8 @@ cd ..
 ver=`../u8g2/tools/release/print_release.sh`
 
 sed -i -e "s/version=.*/version=${ver}/" library.properties
+
+sed -i -e "s/Download (.*)/Download (${ver})/" README.md
 
 # git commit -a -m `../u8g2/tools/release/print_release.sh`
 # git push

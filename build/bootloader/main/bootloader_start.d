@@ -44,6 +44,7 @@ bootloader_start.o: \
  C:/msys32/home/jp/esp/esp-idf/components/bootloader_support/include_priv/bootloader_flash.h \
  C:/msys32/home/jp/esp/esp-idf/components/bootloader_support/include_priv/bootloader_random.h \
  C:/msys32/home/jp/esp/esp-idf/components/bootloader/subproject/main/bootloader_config.h \
+ C:/msys32/home/jp/esp/esp-idf/components/bootloader_support/include/bootloader_clock.h \
  C:/msys32/home/jp/esp/esp-idf/components/bootloader/subproject/main/flash_qio_mode.h
 
 C:/msys32/home/jp/esp/esp-idf/components/esp32/include/esp_attr.h:
@@ -133,6 +134,8 @@ C:/msys32/home/jp/esp/esp-idf/components/bootloader_support/include_priv/bootloa
 C:/msys32/home/jp/esp/esp-idf/components/bootloader_support/include_priv/bootloader_random.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/bootloader/subproject/main/bootloader_config.h:
+
+C:/msys32/home/jp/esp/esp-idf/components/bootloader_support/include/bootloader_clock.h:
 
 C:/msys32/home/jp/esp/esp-idf/components/bootloader/subproject/main/flash_qio_mode.h:
 /home/jp/esp/esp-idf/components/bootloader/subproject/main/./bootloader_start.c:

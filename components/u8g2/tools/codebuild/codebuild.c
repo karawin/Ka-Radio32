@@ -92,6 +92,7 @@ struct controller controller_list[] =
     {
       { "128x64_noname" },
       { "128x64_vcomh0" },
+      { "128x64_alt0" },
       { NULL }
     }
   },
@@ -101,6 +102,7 @@ struct controller controller_list[] =
     {
       { "128x64_noname" },
       { "128x64_vcomh0" },
+      { "128x64_alt0" },
       { NULL }
     }
   },
@@ -111,6 +113,7 @@ struct controller controller_list[] =
     {
       { "128x64_noname" },
       { "128x64_vcomh0" },
+      { "128x64_winstar" },
       { NULL }
     }
   },
@@ -120,9 +123,45 @@ struct controller controller_list[] =
     {
       { "128x64_noname" },
       { "128x64_vcomh0" },
+      { "128x64_winstar" },
       { NULL }
     }
   },
+  
+   {
+    "sh1107", 	16, 	8, 	"u8g2_ll_hvline_vertical_top_lsb", "u8x8_cad_001", "", COM_4WSPI|COM_3WSPI|COM_6800|COM_8080|COM_8080,
+    "Not tested", /* is_generate_u8g2_class= */ 1,
+    {
+      { "128x64" },
+      { NULL }
+    }
+  },
+  {
+    "sh1107", 	16, 	8, 	"u8g2_ll_hvline_vertical_top_lsb", "u8x8_cad_ssd13xx_i2c", "i2c", COM_I2C,
+    "Not tested", /* is_generate_u8g2_class= */ 1,
+    {
+      { "128x64" },
+      { NULL }
+    }
+  },
+  
+   {
+    "sh1107", 	12, 	12, 	"u8g2_ll_hvline_vertical_top_lsb", "u8x8_cad_001", "", COM_4WSPI|COM_3WSPI|COM_6800|COM_8080|COM_8080,
+    "Not tested", /* is_generate_u8g2_class= */ 1,
+    {
+      { "seeed_96x96" },
+      { NULL }
+    }
+  },
+  {
+    "sh1107", 	12, 	12, 	"u8g2_ll_hvline_vertical_top_lsb", "u8x8_cad_ssd13xx_i2c", "i2c", COM_I2C,
+    "Not tested", /* is_generate_u8g2_class= */ 1,
+    {
+      { "seeed_96x96" },
+      { NULL }
+    }
+  },
+  
 
   {
     "ssd1306", 	16, 	4, 	"u8g2_ll_hvline_vertical_top_lsb", "u8x8_cad_001", "", COM_4WSPI|COM_3WSPI|COM_6800|COM_8080|COM_8080,
@@ -247,6 +286,23 @@ struct controller controller_list[] =
     }
   },  
 
+  {
+    "ssd1326", 	32, 	4, 	"u8g2_ll_hvline_vertical_top_lsb", "u8x8_cad_001", "", COM_4WSPI|COM_3WSPI|COM_6800|COM_8080,
+    "", /* is_generate_u8g2_class= */ 1,
+    {
+      { "er_256x32" },
+      { NULL }
+    }
+  },
+  {
+    "ssd1326", 	32, 	4, 	"u8g2_ll_hvline_vertical_top_lsb", "u8x8_cad_ssd13xx_i2c", "i2c", COM_I2C,
+    "", /* is_generate_u8g2_class= */ 1,
+    {
+      { "er_256x32" },
+      { NULL }
+    }
+  },  
+  
 
   {
     "ssd1327", 	12, 	12, 	"u8g2_ll_hvline_vertical_top_lsb", "u8x8_cad_001", "", COM_4WSPI|COM_3WSPI|COM_6800|COM_8080,
@@ -261,6 +317,23 @@ struct controller controller_list[] =
     "", /* is_generate_u8g2_class= */ 1,
     {
       { "seeed_96x96" },
+      { NULL }
+    }
+  },  
+
+  {
+    "ssd1327", 	16, 	16, 	"u8g2_ll_hvline_vertical_top_lsb", "u8x8_cad_001", "", COM_4WSPI|COM_3WSPI|COM_6800|COM_8080,
+    "", /* is_generate_u8g2_class= */ 1,
+    {
+      { "midas_128x128" },
+      { NULL }
+    }
+  },
+  {
+    "ssd1327", 	16, 	16, 	"u8g2_ll_hvline_vertical_top_lsb", "u8x8_cad_ssd13xx_i2c", "i2c", COM_I2C,
+    "", /* is_generate_u8g2_class= */ 1,
+    {
+      { "midas_128x128" },
       { NULL }
     }
   },  
@@ -638,16 +711,32 @@ struct controller controller_list[] =
   },
   /* the ST75256 has the same I2C protocol as the SSD13xx, BUT: for arguments have the data bit set!!!! */
   /* this means, we need to implement a u8x8_cad_ssd13xx_i2c procedure with cad 011 functionality */
-#ifdef I2C_PROC_WITH_011_MISSING
+  /* done: u8x8_cad_st75256_i2c */
   {  
-    "st75256", 	32, 	16, 	"u8g2_ll_hvline_vertical_top_lsb", "u8x8_cad_ssd13xx_i2c", "i2c", COM_I2C,
+    "st75256", 	32, 	16, 	"u8g2_ll_hvline_vertical_top_lsb", "u8x8_cad_st75256_i2c", "i2c", COM_I2C,
     "", /* is_generate_u8g2_class= */ 1,
     {
       { "jlx256128" },
       { NULL }
     }
   },  
-#endif
+
+  {
+    "st75256", 		32, 	8, 	"u8g2_ll_hvline_vertical_top_lsb", "u8x8_cad_011", "", COM_4WSPI|COM_3WSPI|COM_6800|COM_8080,
+    "", /* is_generate_u8g2_class= */ 1,
+    {
+      { "jlx25664" },
+      { NULL }
+    },
+  },
+  {  
+    "st75256", 	32, 	8, 	"u8g2_ll_hvline_vertical_top_lsb", "u8x8_cad_st75256_i2c", "i2c", COM_I2C,
+    "", /* is_generate_u8g2_class= */ 1,
+    {
+      { "jlx25664" },
+      { NULL }
+    }
+  },  
   
   {
     "st75256", 		22, 	13, 	"u8g2_ll_hvline_vertical_top_lsb", "u8x8_cad_011", "", COM_4WSPI|COM_3WSPI|COM_6800|COM_8080,
@@ -658,16 +747,14 @@ struct controller controller_list[] =
     },
   },
   
-#ifdef I2C_PROC_WITH_011_MISSING
   {
-    "st75256", 		22, 	13, 	"u8g2_ll_hvline_vertical_top_lsb", "u8x8_cad_ssd13xx_i2c", "i2c", COM_I2C,
+    "st75256", 		22, 	13, 	"u8g2_ll_hvline_vertical_top_lsb", "u8x8_cad_st75256_i2c", "i2c", COM_I2C,
     "", /* is_generate_u8g2_class= */ 1,
     {
       { "jlx172104" },
       { NULL }
     },
   },
-#endif
 
   {
     "nt7534", 		16, 	8, 	"u8g2_ll_hvline_vertical_top_lsb", "u8x8_cad_001", "", COM_4WSPI|COM_6800|COM_8080,
@@ -781,6 +868,14 @@ struct controller controller_list[] =
     "Requires U8G2_16BIT (see u8g2.h)", /* is_generate_u8g2_class= */ 1,
     {
       { "nhd_256x64" },
+      { NULL }
+    }
+  },
+  {
+    "ssd1322", 	16, 	8, 	"u8g2_ll_hvline_vertical_top_lsb", "u8x8_cad_011", "", COM_4WSPI|COM_3WSPI|COM_6800|COM_8080,
+    "", /* is_generate_u8g2_class= */ 1,
+    {
+      { "nhd_128x64" },
       { NULL }
     }
   },
