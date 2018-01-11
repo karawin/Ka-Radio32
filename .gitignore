@@ -47,4 +47,4 @@ Temporary Items
 .apdisk
 
 # do not save build directory
-build
+/build
