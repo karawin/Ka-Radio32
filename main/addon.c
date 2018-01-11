@@ -605,8 +605,8 @@ void task_addon(void *pvParams)
 	event_lcd = xQueueCreate(40, sizeof(event_lcd_t));
 	ESP_LOGI(TAG,"event_lcd: %x",(int)event_lcd);
 	
-	xTaskCreate(rmt_nec_rx_task, "rmt_nec_rx_task", 2048, NULL, 10, NULL);
-	xTaskCreate(task_addonio, "rmt_nec_rx_task", 2048, NULL, 4, NULL);
+	xTaskCreate(rmt_nec_rx_task, "rmt_nec_rx_task", 2148, NULL, 10, NULL);
+//	xTaskCreate(task_addonio, "task_addonio", 2350, NULL, 4, NULL);
 	vTaskDelay(1);
 	wakeLcd();
 

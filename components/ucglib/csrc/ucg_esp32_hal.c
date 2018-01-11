@@ -59,7 +59,10 @@ void ucg_esp32_hal_init(ucg_esp32_hal_t ucg_esp32_hal_param) {
 
 IRAM_ATTR void sendOneByte()
 {
-	if (oneByte.nb != 0)
+	int nb = oneByte.nb;
+	oneByte.nb = 0;	
+
+	if (nb != 0)
 	{
 		spi_transaction_t trans_desc;
 		trans_desc.addr      = 0;
@@ -67,13 +70,12 @@ IRAM_ATTR void sendOneByte()
 		trans_desc.rx_buffer = NULL;
 		trans_desc.rxlength  = 0;
 		trans_desc.flags     =  SPI_TRANS_USE_TXDATA;
-		trans_desc.length    = 8*oneByte.nb;  // Number of bits NOT number of bytes.
+		trans_desc.length    = 8*nb;  // Number of bits NOT number of bytes.
 		trans_desc.tx_data[0] = oneByte.data[0];// data;
 		trans_desc.tx_data[1] = oneByte.data[1];// data;
 		trans_desc.tx_data[2] = oneByte.data[2];// data;
 		trans_desc.tx_data[3] = oneByte.data[3];//			
 		ESP_ERROR_CHECK(spi_device_transmit(handle, &trans_desc));	
-		oneByte.nb = 0;	
 //		printf("O");
 	}
 }
@@ -81,7 +83,7 @@ IRAM_ATTR void sendOneByte()
 IRAM_ATTR void addOneByte(uint8_t bt)
 {
 	oneByte.data[oneByte.nb++] = bt;
-	if (bt >3) sendOneByte(); //security, but ucglib send a max of 4 bytes alone.
+	if (oneByte.nb >3) sendOneByte(); //security, but ucglib send a max of 4 bytes alone.
 }
 
 
