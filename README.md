@@ -27,7 +27,7 @@ To build your own release, you must install the idf https://github.com/espressif
 To flash all build output, run 'make flash' or:
 python /home/yourhome/esp/esp-idf/components/esptool_py/esptool/esptool.py --chip esp32 --port com5 --baud 460800 --before default_reset --after hard_reset write_flash -u --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 /home/yourhome/esp/Ka-Radio32/build/bootloader/bootloader.bin 0x10000 /home/yourhome/esp/Ka-Radio32/build/KaRadio32.bin 0x8000 /home/yourhome/esp/Ka-Radio32/build/partitions.bin
 ```
-#### GPIO Definition Version 0.8
+### GPIO Definition Version 0.9
 ```
 //-------------------------------//
 // Define GPIO used in KaRadio32 //
@@ -84,7 +84,7 @@ python /home/yourhome/esp/esp-idf/components/esptool_py/esptool/esptool.py --chi
 #define PIN_I2S_DATA GPIO_NUM_22
 
 ```
-#### Oled and lcd support
+### Oled and lcd support
 The type of lcd can be set with the uart or telnet command sys.lcd("x")<BR/>
 Status: Ready.<BR/>
 Other type and some color lcd added later.<BR/>
@@ -124,8 +124,56 @@ Other type and some color lcd added later.<BR/>
 #define LCD_SPI_SEPS225			198 // 96x64
 
 ```
+### Audio output
 
-#### First use
+In the Setting panel on the webpage of KaraDio32 you can set the desired output method for audio.
+
+For output on a simple speaker or a general analog amplifier
+- DAC to use the built in DAC of the esp32
+- PDM to output a PDM (Pulse Density Modulation) stream. Wiki on PDM : https://en.wikipedia.org/wiki/Pulse-density_modulation
+
+For output via addional I2S or VS1053 hardware
+- I2S for connection to ac external DAC
+- I2SMERUS to connect a merus amplifier
+- VS1053 to connect to a vs1053 board.
+
+#### Connecting a speaker, earphone or amplifier with DAC or PDM setting
+You can connect the GPIO25 (left audio channel), GPIO26 (right audio channel) and Ground directly to a small loudspeaker, a simple earphone (like from an mp3 player) or the input of an analog amplifier. The quality is less perfect than using an I2S or VS1053 board, bit it is very simple hardware-wise.
+
+Connect like this
+```
+                         +------------------------------------+
+ESP32-GPIO25 (left) -----+speaker/earphone/analog-amp (left)   +-----+
+                         +------------------------------------+      |
+                                                                     |
+                         +------------------------------------+      |
+ESP32-GPIO26 (right) ----+speaker/earphone/analog-amp (right  +------+
+                         +------------------------------------+      |
+                                                                     |
+ESP32-GROUND --------------------------------------------------------+
+```
+
+#### Reducing the analog output level
+If the audio signal level is too high for your speaker, earphone or amplifier you can add a potentiometer to decrease the level. Connect the potentiometer like this (only pictured for 1 audio channel, for stereo you need 2 potentiometers or a stereo-potmeter.
+
+```
+                                     +--------------------------------------+
+ESP32-GPIO25 (left) -------+   +-----+speaker/earphone/analog-amp (left)    +------+
+                          +-+  |     +--------------------------------------+      |
+                          +P+  |                                                   |
+                          +o+--+                                                   |
+                          +t+                                                      |
+                          +++                                                      |
+                           |                                                       |
+ESP32-GROUND --------------+-------------------------------------------------------+
+```
+#### Improving the audio quality with a filter
+An analog DAC signal always has some noise that may cause some distortion on the audio output, especially on low volume passages in the sound. This noise can be decreased with a low-pass filter. The digital PDM signal needs allways low pass filter to convert the digital signal to an analog signal. Fortunately the speaker and earphone acts as a low pass filter, although not in a perfect way.
+
+You can improve the analog signal with an external low-pass filter. A simple low-pass RC filter can be find on the internet, f.i. here : http://www.pavouk.org/hw/usbdac/en_index.html.
+
+
+### First use
 - If the acces point of your router is not known, the webradio inits itself as an AP. Connect the wifi of your computer to the ssid "WifiKaRadio",  
 - Browse to 192.168.4.1 to display the page, got to "setting" "Wifi" and configure your ssid ap, the password if any, the wanted IP or use dhcp if you know how to retrieve the dhcp given ip (terminal or scan of the network).
 - In the gateway field, enter the ip address of your router.
@@ -152,7 +200,7 @@ The scheme from tomasf71</br>
 <img src="https://github.com/karawin/Ka-Radio32/blob/master/images/schemekaradio32.jpg" alt="scheme" border=0> 
 <br/>
 
-#### List of sources and components adapted for KaRadio32
+### List of sources and components adapted for KaRadio32
 <br/>
 https://github.com/espressif/esp-idf  the espressif IDF<br/>
 https://hackaday.io/project/11570-wifi-webradio-with-esp8266-and-vs1053  The esp8266 KaRadio<br/>
