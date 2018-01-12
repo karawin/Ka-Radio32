@@ -155,7 +155,7 @@ uint8_t u8g2_esp32_i2c_byte_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void 
 		case U8X8_MSG_BYTE_END_TRANSFER: {
 			ESP_LOGD(TAG, "End I2C transfer.");
 			ESP_ERROR_CHECK(i2c_master_stop(handle_i2c));
-			ESP_ERROR_CHECK(i2c_master_cmd_begin(I2C_MASTER_NUM, handle_i2c, I2C_TIMEOUT_MS / portTICK_RATE_MS));
+			i2c_master_cmd_begin(I2C_MASTER_NUM, handle_i2c, I2C_TIMEOUT_MS / portTICK_RATE_MS);
 			i2c_cmd_link_delete(handle_i2c);
 			break;
 		}
