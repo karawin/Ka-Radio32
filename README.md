@@ -1,4 +1,4 @@
-### State
+## STATE
 KaraDio32 in dev state: Stable<br/>
 Works on any esp32 board.<br/>
 See the feature on https://hackaday.io/project/11570-wifi-webradio-with-esp8266-and-vs1053 <br/>
@@ -7,7 +7,7 @@ but only mp3 stations can be played.<br/>
 Adding a vs1053 board, all stations can be played.<br/>
 Compatible with esp8266 KaRadio addons.<br/>
 <br/>
-### Added features
+## Added features
 Work with i2s, internal DAC or a vs1053<br/>
 Output mode set in Setting panel on web page of KaraDio32:<br/>
 I2S for connection to ac external DAC<br/>
@@ -18,10 +18,10 @@ VS1053 to connect to a vs1053 board.<br/>
 <br/>
 LCD or Oled support integrated: most common b/w or color oled and lcd can be used.<br/>
 IR support integrated. Nec protocol only.<br/>
-Rotary encoder support integrated. Common functions: play/stop, volume, station change, date time display.</br/>
-<br/>
+Rotary encoder support integrated. Common functions: play/stop, volume, station change, date time display.<br/>
 
-### Build your own
+
+## Build your own
 To build your own release, you must install the idf https://github.com/espressif/esp-idf and the toolchain.
 ```
 To flash all build output, run 'make flash' or:
@@ -29,6 +29,7 @@ python /home/yourhome/esp/esp-idf/components/esptool_py/esptool/esptool.py --chi
 ```
 ### GPIO Definition Version 0.9
 ```
+//file gpio.h
 //-------------------------------//
 // Define GPIO used in KaRadio32 //
 //-------------------------------//
@@ -124,7 +125,7 @@ Other type and some color lcd added later.<BR/>
 #define LCD_SPI_SEPS225			198 // 96x64
 
 ```
-### Audio output
+## Audio output
 
 In the Setting panel on the webpage of KaraDio32 you can set the desired output method for audio.
 
@@ -137,7 +138,7 @@ For output via addional I2S or VS1053 hardware
 - I2SMERUS to connect a merus amplifier
 - VS1053 to connect to a vs1053 board.
 
-#### Connecting a speaker, earphone or amplifier with DAC or PDM setting
+### Connecting a speaker, earphone or amplifier with DAC or PDM setting
 You can connect the GPIO25 (left audio channel), GPIO26 (right audio channel) and Ground directly to a small loudspeaker, a simple earphone (like from an mp3 player) or the input of an analog amplifier. The quality is less perfect than using an I2S or VS1053 board, bit it is very simple hardware-wise.
 
 Connect like this
@@ -153,7 +154,7 @@ ESP32-GPIO26 (right) ----+speaker/earphone/analog-amp (right  +------+
 ESP32-GROUND --------------------------------------------------------+
 ```
 
-#### Reducing the analog output level
+### Reducing the analog output level
 If the audio signal level is too high for your speaker, earphone or amplifier you can add a potentiometer to decrease the level. Connect the potentiometer like this (only pictured for 1 audio channel, for stereo you need 2 potentiometers or a stereo-potmeter.
 
 ```
@@ -167,13 +168,30 @@ ESP32-GPIO25 (left) -------+   +-----+speaker/earphone/analog-amp (left)    +---
                            |                                                       |
 ESP32-GROUND --------------+-------------------------------------------------------+
 ```
-#### Improving the audio quality with a filter
+### Improving the audio quality with a filter
 An analog DAC signal always has some noise that may cause some distortion on the audio output, especially on low volume passages in the sound. This noise can be decreased with a low-pass filter. The digital PDM signal needs allways low pass filter to convert the digital signal to an analog signal. Fortunately the speaker and earphone acts as a low pass filter, although not in a perfect way.
 
 You can improve the analog signal with an external low-pass filter. A simple low-pass RC filter can be find on the internet, f.i. here : http://www.pavouk.org/hw/usbdac/en_index.html.
 
+## Radio streams
+If Karadio32 is configured to use ADC, PDM or I2S output (to an external dac) it can play audio streams in mp3 format. Other formats like AAC and WMV require too much dynamic memories and can not be played this way.
 
-### First use
+When you want to play other formats you add an external VS1053 decoder to Karadio. Details on the features of this decoder can be found here : http://www.vlsi.fi/en/products/vs1053.html
+
+
+Many boards can be found at https://www.aliexpress.com/wholesale?catId=0&initiative_id=SB_20180113141636&SearchText=vs1053b
+
+## Handling streaming errors
+
+Normally a radio station is played without interruption.
+
+But when a connection to the server of the radio station is (temporarily) disrupted (due to internet problems or server problems) Karadio behaves as follows:
+- Playing of the radio stream stops, after a short while Karadio retries to relaunch the connection to the radio stream.
+- If the relaunch of the connection fails again, the webpage of Karadio then shows “invalid address” and goes into the stop state. If you have a display connected to Karadio it will then show the Date, Time and IP address.
+- You can try to relaunch the connection manually by pressing “play” on the Karadio webpage, or resetting the ESP32.
+- If the wifi is disconnected, the esp is rebooted.
+
+## First use
 - If the acces point of your router is not known, the webradio inits itself as an AP. Connect the wifi of your computer to the ssid "WifiKaRadio",  
 - Browse to 192.168.4.1 to display the page, got to "setting" "Wifi" and configure your ssid ap, the password if any, the wanted IP or use dhcp if you know how to retrieve the dhcp given ip (terminal or scan of the network).
 - In the gateway field, enter the ip address of your router.
@@ -200,7 +218,7 @@ The scheme from tomasf71</br>
 <img src="https://github.com/karawin/Ka-Radio32/blob/master/images/schemekaradio32.jpg" alt="scheme" border=0> 
 <br/>
 
-### List of sources and components adapted for KaRadio32
+## List of sources and components adapted for KaRadio32
 <br/>
 https://github.com/espressif/esp-idf  the espressif IDF<br/>
 https://hackaday.io/project/11570-wifi-webradio-with-esp8266-and-vs1053  The esp8266 KaRadio<br/>
