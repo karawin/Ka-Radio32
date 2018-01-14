@@ -117,8 +117,8 @@ IRAM_ATTR int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *da
 #ifndef KaRadio32
 // init the spi master if not done elsewhere
  		  spi_bus_config_t bus_config;
-		  bus_config.sclk_io_num   = u8g2_esp32_hal.clk; // CLK
-		  bus_config.mosi_io_num   = u8g2_esp32_hal.mosi; // MOSI
+		  bus_config.sclk_io_num   = ucg_esp32_hal.clk; // CLK
+		  bus_config.mosi_io_num   = ucg_esp32_hal.mosi; // MOSI
 		  bus_config.miso_io_num   = -1; // MISO
 		  bus_config.quadwp_io_num = -1; // Not used
 		  bus_config.quadhd_io_num = -1; // Not used

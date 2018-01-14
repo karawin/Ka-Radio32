@@ -15,7 +15,7 @@
 #include <time.h>
 #include "esp_log.h"
 #include "logo.h"
-
+#include "interface.h"
 #define TAG  "addonu8g2"
 
 // nams <--> num of line
@@ -231,11 +231,11 @@ u8g2_SendBuffer(&u8g2);
 // draw all lines
 void drawFrameU8g2(uint8_t mTscreen,struct tm *dt)
 {
-	  u8g2_ClearBuffer(&u8g2);
-  if (x==84)
-	sprintf(strsec,"%02d-%02d  %02d:%02d:%02d",dt->tm_mon+1,dt->tm_mday,dt->tm_hour, dt->tm_min,dt->tm_sec);
-  else
-	sprintf(strsec,"%02d-%02d-%04d  %02d:%02d:%02d",dt->tm_mon+1,dt->tm_mday,dt->tm_year+1900, dt->tm_hour, dt->tm_min,dt->tm_sec);
+	u8g2_ClearBuffer(&u8g2);
+	if (getDdmm())
+		sprintf(strsec,"%02d-%02d-%04d  %02d:%02d:%02d",dt->tm_mday,dt->tm_mon+1,dt->tm_year+1900, dt->tm_hour, dt->tm_min,dt->tm_sec);
+	else 
+		sprintf(strsec,"%02d-%02d-%04d  %02d:%02d:%02d",dt->tm_mon+1,dt->tm_mday,dt->tm_year+1900, dt->tm_hour, dt->tm_min,dt->tm_sec);
 
     setfont8(text);
     u8g2_SetDrawColor(&u8g2, 1);
@@ -340,7 +340,10 @@ void drawTimeU8g2(uint8_t mTscreen,struct tm *dt,unsigned timein)
   char strdate[23];
   char strtime[20];
 	u8g2_ClearBuffer(&u8g2);
-    sprintf(strdate,"%02d-%02d-%04d", dt->tm_mon+1, dt->tm_mday, dt->tm_year+1900);
+	if (getDdmm())
+		sprintf(strdate,"%02d-%02d-%04d", dt->tm_mday, dt->tm_mon+1,  dt->tm_year+1900);
+    else
+		sprintf(strdate,"%02d-%02d-%04d", dt->tm_mon+1, dt->tm_mday, dt->tm_year+1900);
     sprintf(strtime,"%02d:%02d:%02d", dt->tm_hour, dt->tm_min,dt->tm_sec);
     drawTTitleU8g2(strdate); 
     setfont8(large);	
@@ -442,7 +445,7 @@ void lcd_initU8g2(uint8_t *lcd_type)
 		{
 			u8g2_esp32_hal.sda  = PIN_I2C_SDA;
 			u8g2_esp32_hal.scl  = PIN_I2C_SCL;
-			u8g2_esp32_hal.reset = PIN_LCD_RST;
+			u8g2_esp32_hal.reset = PIN_I2C_RST;
 		}
 		u8g2_esp32_hal_init(u8g2_esp32_hal);		
 	

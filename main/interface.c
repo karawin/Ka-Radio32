@@ -40,7 +40,7 @@ const char stritWIFISTATUS[]  = {"#WIFI.STATUS#\nIP: %d.%d.%d.%d\nMask: %d.%d.%d
 const char stritWIFISTATION[]  = {"#WIFI.STATION#\nSSID: %s\nPASSWORD: %s\n##WIFI.STATION#\n"};
 const char stritPATCH[]  = {"#WIFI.PATCH#\nVS1053 Patch will be %s after power Off and On#\n##WIFI.PATCH#\n"};
 const char stritCMDERROR[]  = {"##CMD_ERROR#\n"};
-const char stritHELP0[]  = {" \
+const char stritHELP0[]  = {"\
 Commands:\n\
 ---------\n\
  Wifi related commands\n\
@@ -64,7 +64,7 @@ cli.play(\"xxx\"): play the xxx recorded station in the list (0 = stop)\n\
 cli.prev (or cli.previous): select the previous station in the list and play it\n\
 cli.next: select the next station in the list and play it"};
 
-const char stritHELP1[]  = {" \
+const char stritHELP1[]  = {"\
 cli.stop: stop the playing station or instant\n\
 cli.list: list all recorded stations\n\
 cli.list(\"x\"): list only one of the recorded stations. Answer with #CLI.LISTINFO#: followed by infos\n\
@@ -81,7 +81,7 @@ sys.uart(\"x\"): Change the baudrate of the uart on the next reset.\n\
  Valid x are: 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 76880, 115200, 230400\n\
 sys.i2s: Display the current I2S speed"};
 
-const char stritHELP2[]  = {" \
+const char stritHELP2[]  = {"\
 sys.i2s(\"x\"): Change and record the I2S clock speed of the vs1053 GPIO5 MCLK for the i2s interface to external dac.\n\
 : 0=48kHz, 1=96kHz, 2=192kHz, other equal 0\n\
 sys.erase: erase all recorded configuration and stations.\n\
@@ -93,13 +93,13 @@ sys.patch(\"x\"): Change the status of the vs1053 patch at power on.\n\
 0 = Patch will not be loaded, 1 or up = Patch will be loaded (default) at power On \n\
 sys.patch: Display the vs1053 patch status\n\
 sys.led(\"x\"): Change the led indication:\n\
-0 = Led is in Play mode (lighted when a station is playing), 1 or up = Led is in Blink mode (default)\n\
+1 = Led is in Play mode (lighted when a station is playing), 0 = Led is in Blink mode (default)\n\
 sys.led: Display the led indication status\n\
 sys.version: Display the Release and Revision numbers\n\
 sys.tzo(\"xx\"): Set the timezone offset of your country.\n\
 "};
 
-const char stritHELP3[]  = {" \
+const char stritHELP3[]  = {"\
 sys.tzo: Display the timezone offset\n\
 sys.date: Send a ntp request and Display the current locale time\n\
 :   Format ISO-8601 local time   https://www.w3.org/TR/NOTE-datetime\n\
@@ -114,6 +114,10 @@ sys.lcd: Display the current lcd type\n\
 sys.lcd(\"x\"): Change the lcd type to x on next reset\n\
 sys.ledgpio: Display the default Led GPIO\n\
 sys.ledgpio(\"x\"): Change the default Led GPIO (4) to x\n\
+"};
+const char stritHELP4[]  = {"\
+sys.ddmm: display the date format\n\
+sys.ddmm(\"x\"): Change the date format. 0:MMDD, 1:DDMM\n\
 ///////////\n\
   Other\n\
 ///////////\n\
@@ -134,6 +138,15 @@ void clientVol(char *s);
 
 #define MAX_WIFI_STATIONS 50
 bool inside = false;
+static uint8_t ddmm;
+uint8_t getDdmm()
+{
+	return ddmm;
+}
+void setDdmm(uint8_t dm)
+{
+	ddmm = dm;
+}
 
 static bool autoWifi = true; // auto reconnect wifi if disconnected
 bool getAutoWifi(void)
@@ -718,6 +731,40 @@ void syslcd(char* s)
 
 }
 
+void sysddmm(char* s)
+{
+    char *t = strstr(s, parslashquote);
+	struct device_settings *device;
+
+	if(t == NULL)
+	{
+		if (ddmm)
+			kprintf("##Time is DDMM#\n");
+		else
+			kprintf("##Time is MMDD#\n");
+		
+		return;
+	}
+	char *t_end  = strstr(t, parquoteslash);
+    if(t_end == NULL)
+    {
+		kprintf(stritCMDERROR);
+		return;
+    }	
+	uint8_t value = atoi(t+2);
+	device = getDeviceSettings();
+	device->ddmm = value;
+	ddmm = value;
+	saveDeviceSettings(device);	
+	if (ddmm)
+		kprintf("##Time is DDMM#\n");
+	else
+		kprintf("##Time is MMDD#\n");
+	free(device);	
+
+}
+
+
 void syslcdout(char* s)
 {
     char *t = strstr(s, parslashquote);
@@ -766,13 +813,13 @@ void sysled(char* s)
 		return;
     }	
 	uint8_t value = atoi(t+2);
-	if (value ==0) 
+	if (value !=0) 
 	{device->options |= T_LED; ledStatus = false; if (getState()) gpio_set_level(getLedGpio(),0);}
 	else 
 	{device->options &= NT_LED; ledStatus =true;} // options:0 = ledStatus true = Blink mode
 	
 	saveDeviceSettings(device);	
-	kprintf("##LED is in %s mode#\n",((device->options & T_LED)== 0)?"Blink":"Play");
+	kprintf("##LED is in %s mode#\n",(ledStatus)?"Blink":"Play");
 	free(device);
 	
 }
@@ -980,6 +1027,7 @@ void checkCommand(int size, char* s)
 		else if(startsWith(   "log",tmp+4)) 	; // do nothing
 		else if(startsWith (  "lcdo",tmp+4)) 	syslcdout(tmp); // lcdout timer to switch off the lcd
 		else if(startsWith (  "lcd",tmp+4)) 	syslcd(tmp);
+		else if(startsWith (  "ddmm",tmp+4)) 	sysddmm(tmp);
 		else printInfo(tmp);
 	}
 	else 
@@ -993,7 +1041,8 @@ void checkCommand(int size, char* s)
 			kprintfl(stritHELP2);
 			vTaskDelay(1);
 			kprintfl(stritHELP3);
-		}
+			vTaskDelay(1);
+			kprintfl(stritHELP4);		}
 		else printInfo(tmp);
 	}	
 	free(tmp);

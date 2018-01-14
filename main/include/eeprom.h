@@ -56,6 +56,7 @@ struct device_settings {
 	uint8_t lcd_type; // the lcd in use
 	uint8_t led_gpio; // the gpio of the led
 	uint32_t lcd_out;	// timeout in seconds to switch off the lcd. 0 = no timeout
+	uint8_t ddmm;		// 0 = MMDD, 1 = DDMM  in the time display
 	char filler[32]; 
 
 };

@@ -155,7 +155,7 @@ sys.patch("x")	: Change the status of the vs1053 patch at power on.
 				  0 = Patch will not be loaded, 1 or up = Patch will be loaded (default) at power On
 sys.patch		: Display the vs1053 patch status
 sys.led("x")	: Change the led indication: 
-				  0 = Led is in Play mode (lighted when a station is playing), 1 or up = Led is in Blink mode (default)
+				  1 = Led is in Play mode (lighted when a station is playing), 0 = Led is in Blink mode (default)
 sys.led			: Display the led indication status
 sys.tzo("xx")	: Set the timezone offset of your country.
 sys.tzo			: Display the timezone offset
@@ -188,5 +188,6 @@ sys.lcd			: Display the current lcd type
 sys.lcd("x")	: Change the lcd type to x on next reset
 sys.ledgpio		: Display the default Led GPIO
 sys.ledgpio("x"): Change the default Led GPIO (4) to x
-
+sys.ddmm: display the date format\n\
+sys.ddmm(\"x\"): Change the date format. 0:MMDD, 1:DDMM\n\
 

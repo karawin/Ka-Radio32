@@ -8,7 +8,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <stdio.h>
-#include "driver\gpio.h"
+#include "driver/gpio.h"
 #include "esp_heap_trace.h"
 #include "gpio.h"
 #include "addon.h"
@@ -17,7 +17,7 @@
 #include <time.h>
 #include "esp_log.h"
 #include "logo.h"
-
+#include "interface.h"
 #define TAG  "addonucg"
 
 
@@ -378,8 +378,11 @@ int i;
 		ucg_DrawBox(&ucg,0,0,x-1,15);  
 		for (i=0;i<LINES;i++) draw(i);
 		// no break
-	case 2:	  
-		sprintf(strsec,"%02d-%02d  %02d:%02d:%02d",dt->tm_mon+1,dt->tm_mday,dt->tm_hour, dt->tm_min,dt->tm_sec);
+	case 2:	
+		if (getDdmm())
+			sprintf(strsec,"%02d-%02d  %02d:%02d:%02d",dt->tm_mday,dt->tm_mon+1,dt->tm_hour, dt->tm_min,dt->tm_sec);
+		else
+			sprintf(strsec,"%02d-%02d  %02d:%02d:%02d",dt->tm_mon+1,dt->tm_mday,dt->tm_hour, dt->tm_min,dt->tm_sec);
 		markDrawUcg(TIME);
 		drawLinesUcg();
 		break;
@@ -531,7 +534,10 @@ void drawTimeUcg(uint8_t mTscreen,struct tm *dt,unsigned timein)
         //ucg_SetFont(&ucg,ucg_font_6x13_tf);
         ucg_DrawString(&ucg,4,yy-18,0,strdate);		
       case 2:
-	    sprintf(strdate,"%02d-%02d-%04d", dt->tm_mon+1, dt->tm_mday, dt->tm_year+1900);
+	    if (getDdmm())
+			sprintf(strdate,"%02d-%02d-%04d", dt->tm_mday, dt->tm_mon+1,  dt->tm_year+1900);
+	    else
+			sprintf(strdate,"%02d-%02d-%04d", dt->tm_mon+1, dt->tm_mday, dt->tm_year+1900);
 		drawTTitleUcg(strdate);
 		if (strcmp(TTimeStr,strtime)!= 0)
 		{	

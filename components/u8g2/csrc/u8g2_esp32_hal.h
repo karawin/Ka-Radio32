@@ -8,7 +8,7 @@
 #ifndef U8G2_ESP32_HAL_H_
 #define U8G2_ESP32_HAL_H_
 #include "u8g2.h"
-
+#define KaRadio32 
 #include "driver/gpio.h"
 #include "driver/spi_master.h"
 #include "driver/i2c.h"

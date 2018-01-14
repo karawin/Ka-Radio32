@@ -369,8 +369,10 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
 		ESP_LOGE(TAG, "\nWifi Disconnected. Connection tried again");
         if (getAutoWifi()) 
 		{
-			ESP_LOGE(TAG, "\nWifi Disconnected. Connection tried again");
-			esp_wifi_connect();
+			ESP_LOGE(TAG, "\nWifi Disconnected. reboot");
+			esp_restart();
+//			ESP_LOGE(TAG, "\nWifi Disconnected. Connection tried again");
+//			esp_wifi_connect();
 		} else
 			ESP_LOGE(TAG, "\nWifi Disconnected.");
         break;
@@ -804,6 +806,8 @@ void app_main()
 
 	// log level
 	setLogLevel(device->trace_level);
+	//time display
+	setDdmm(device->ddmm);
 	
 	//SPI init for the vs1053 and lcd if spi.
 	VS1053_spi_init(HSPI_HOST);
