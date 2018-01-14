@@ -6,6 +6,7 @@ The esp32 adds the output on the internal dac or with i2s to an external dac<br/
 but only mp3 stations can be played.<br/>
 Adding a vs1053 board, all stations can be played.<br/>
 Compatible with esp8266 KaRadio addons.<br/>
+Uart or telnet commands: http://karadio.karawin.fr/Interface.txt <br/>
 <br/>
 ## Added features
 Work with i2s, internal DAC or a vs1053<br/>
