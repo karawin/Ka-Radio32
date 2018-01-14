@@ -17,7 +17,9 @@ PDM to output a PDM (Pulse Density Modulation) stream<br/>
 VS1053 to connect to a vs1053 board.<br/>
 <br/>
 LCD or Oled support integrated: most common b/w or color oled and lcd can be used.<br/>
-IR support integrated. Nec protocol only.<br/>
+Programmable lcd off timer<br/>
+Date format DD:MM:YYYY or MM:DD:YYYY .<br/>
+Remote IR support integrated. Nec protocol only.<br/>
 Rotary encoder support integrated. Common functions: play/stop, volume, station change, date time display.<br/>
 
 
