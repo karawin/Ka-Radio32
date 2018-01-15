@@ -717,7 +717,7 @@ void clientDisconnect(const char* from)
 	kprintf(CLISTOP,from);
 	xSemaphoreGive(sDisconnect);
 	audio_player_stop();
-	if ((from[0]!='C') && (from[0]!='_'))
+	if ((from[0]!='C') || (from[1]!='_'))
 		if (!ledStatus) gpio_set_level(getLedGpio(),0);
 	vTaskDelay(6);
 }
