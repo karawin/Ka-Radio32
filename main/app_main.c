@@ -942,6 +942,8 @@ void app_main()
 	}
 	printf(" Done\n");
 	
+	// led mode
+	if(device->options & T_LED) ledStatus = false;
 	
 	//autostart	
 	kprintf("autostart: playing:%d, currentstation:%d\n",device->autostart,device->currentstation);
