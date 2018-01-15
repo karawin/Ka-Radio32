@@ -717,8 +717,9 @@ void clientDisconnect(const char* from)
 	kprintf(CLISTOP,from);
 	xSemaphoreGive(sDisconnect);
 	audio_player_stop();
-	if (!ledStatus) gpio_set_level(getLedGpio(),0);
-	vTaskDelay(10);
+	if ((from[0]!='C') && (from[0]!='_'))
+		if (!ledStatus) gpio_set_level(getLedGpio(),0);
+	vTaskDelay(6);
 }
 
 IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
