@@ -108,6 +108,7 @@ const int CONNECTED_AP  = 0x00000010;
 
 void start_network();
 /* */
+static bool wifiInitDone = false;
 static EventGroupHandle_t wifi_event_group ;
 xQueueHandle event_queue;
 static wifi_mode_t mode;
@@ -351,6 +352,7 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
 		
 	case SYSTEM_EVENT_STA_CONNECTED:
 		xEventGroupSetBits(wifi_event, CONNECTED_AP);
+		wifiInitDone = true;
 		ESP_LOGE(TAG, "\nWifi connected");
 		
 		break;
@@ -367,20 +369,25 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
 		xEventGroupClearBits(wifi_event, CONNECTED_AP);
         xEventGroupClearBits(wifi_event, CONNECTED_BIT);
 		ESP_LOGE(TAG, "\nWifi Disconnected. Connection tried again");
-        if (getAutoWifi()) 
+        if (getAutoWifi()&&(wifiInitDone)) 
 		{
 			ESP_LOGE(TAG, "\nWifi Disconnected. reboot");
 			esp_restart();
 //			ESP_LOGE(TAG, "\nWifi Disconnected. Connection tried again");
 //			esp_wifi_connect();
 		} else
-			ESP_LOGE(TAG, "\nWifi Disconnected.");
+			if (!wifiInitDone)
+			{
+				ESP_LOGE(TAG, "\nWifi Disconnected.");
+				esp_wifi_connect();
+			}
         break;
 
 	case SYSTEM_EVENT_AP_START:
 		FlashOn = 5;FlashOff = 395;
 		xEventGroupSetBits(wifi_event, CONNECTED_AP);
 		xEventGroupSetBits(wifi_event, CONNECTED_BIT);
+		wifiInitDone = true;
 		break;
 		
 	case SYSTEM_EVENT_AP_STADISCONNECTED:

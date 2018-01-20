@@ -416,6 +416,13 @@ void nbStation(char nb)
   irStr[id+1] = 0;
 }
  
+// 
+// toggle main / time
+static void toggletime()
+{
+	(stateScreen==smain)?Screen(stime):Screen(smain);
+	drawScreen(); 
+}
 //-----------------------
  // Compute the encoder
  //----------------------
@@ -448,10 +455,8 @@ void encoderLoop()
 			wakeLcd();
 			ESP_LOGD(TAG,"Button: %d",newButton);
 			if (newButton == Clicked) {startStop();}
-			if (newButton == DoubleClicked) {
-				(stateScreen==smain)?Screen(stime):Screen(smain);
-				drawScreen(); 
-			}
+			if (newButton == DoubleClicked) { toggletime();}
+
 //			if (getPinState() == getpinsActive())
 			if ((newButton == Held)&&(getPinState() == getpinsActive()))
 			{   
@@ -481,9 +486,13 @@ void encoderLoop()
 
 }
 
+
+
+
  //-----------------------
- // Compute the encoder
+ // Compute the ir code
  //----------------------
+ 
  void irLoop()
  {
 // IR
@@ -496,59 +505,83 @@ event_ir_t evt;
 		if (!evt.repeat_flag ) // avoid repetition
 		switch(evtir)
 		{
+		case 0xDF2047:
+		case 0xDF2002:
 		case 0xFF0046: 
-		case 0xFF18E7:
-		case 0xF70812:  /*(" FORWARD");*/  changeStation(+1);  break;
+		case 0xF70812:  /*(" FORWARD");*/  changeStation(+1);  
+		break;
+		case 0xDF2049:
+		case 0xDF2041:
 		case 0xFF0044:
-		case 0XFF10EF:
 		case 0xF70842:
-		case 0xF70815: /*(" LEFT");*/  setRelVolume(-5);  break;
+		case 0xF70815: /*(" LEFT");*/  setRelVolume(-5);  
+		break;
+		case 0xDF204A:
 		case 0xFF0040:
-		case 0XFF38C7:
-		case 0xF7081E: /*(" -OK-");*/ stationOk();     break;
+		case 0xF7081E: /*(" -OK-");*/ stationOk();     
+		break;
+		case 0xDF204B:
+		case 0xDF2003:
 		case 0xFF0043:
-		case 0XFF5AA5:
 		case 0xF70841:
-		case 0xF70814: /*(" RIGHT");*/ setRelVolume(+5);     break; // volume +
+		case 0xF70814: /*(" RIGHT");*/ setRelVolume(+5);     
+		break; // volume +
+		case 0xDF204D:
+		case 0xDF2009:
 		case 0xFF0015:
-		case 0XFF4AB5:
-		case 0xF70813: /*(" REVERSE");*/ changeStation(-1); break;
+		case 0xF70813: /*(" REVERSE");*/ changeStation(-1);
+		break;
+		case 0xDF2000:
 		case 0xFF0016:
-		case 0XFFA25D:
-		case 0xF70801: /*(" 1");*/ nbStation('1');   break;
+		case 0xF70801: /*(" 1");*/ nbStation('1');   
+		break;
+		case 0xDF2010:
 		case 0xFF0019:
-		case 0XFF629D:
-		case 0xF70802: /*(" 2");*/ nbStation('2');   break;
+		case 0xF70802: /*(" 2");*/ nbStation('2');   
+		break;
+		case 0xDF2011:
 		case 0xFF000D:
-		case 0XFFE21D:
-		case 0xF70803: /*(" 3");*/ nbStation('3');   break;
+		case 0xF70803: /*(" 3");*/ nbStation('3');   
+		break;
+		case 0xDF2013:
 		case 0xFF000C:
-		case 0XFF22DD:
-		case 0xF70804: /*(" 4");*/ nbStation('4');   break;
+		case 0xF70804: /*(" 4");*/ nbStation('4');   
+		break;
+		case 0xDF2014:
 		case 0xFF0018:
-		case 0XFF02FD:
-		case 0xF70805: /*(" 5");*/ nbStation('5');   break;
+		case 0xF70805: /*(" 5");*/ nbStation('5');   
+		break;
+		case 0xDF2015:
 		case 0xFF005E:
-		case 0XFFC23D:
-		case 0xF70806: /*(" 6");*/ nbStation('6');   break;
+		case 0xF70806: /*(" 6");*/ nbStation('6');   
+		break;
+		case 0xDF2017:
 		case 0xFF0008:
-		case 0XFFE01F:
-		case 0xF70807: /*(" 7");*/ nbStation('7');   break;
+		case 0xF70807: /*(" 7");*/ nbStation('7');   
+		break;
+		case 0xDF2018:
 		case 0xFF001C:
-		case 0XFFA857:
-		case 0xF70808: /*(" 8");*/ nbStation('8');   break;
+		case 0xF70808: /*(" 8");*/ nbStation('8');   
+		break;
+		case 0xDF2019:
 		case 0xFF005A:
-		case 0XFF906F:
-		case 0xF70809: /*(" 9");*/ nbStation('9');   break;
+		case 0xF70809: /*(" 9");*/ nbStation('9');   
+		break;
+		case 0xDF2045:
 		case 0xFF0042:
-		case 0XFF6897:
-		case 0xF70817: /*(" *");*/   playStationInt(futurNum);   break;
+		case 0xF70817: /*(" *");*/   playStationInt(futurNum);   
+		break;
+		case 0xDF201B:
 		case 0xFF0052:
-		case 0XFF9867:
-		case 0xF70800: /*(" 0");*/ nbStation('0');   break;
+		case 0xF70800: /*(" 0");*/ nbStation('0');   
+		break;
+		case 0xDF205B:
 		case 0xFF004A:
-		case 0XFFB04F:
-		case 0xF7081D: /*(" #");*/  stopStation();    break;
+		case 0xF7081D: /*(" #");*/  stopStation();    
+		break;
+		case 0xDF2007: /*(" Info")*/
+									toggletime();	
+		break;
 		default:;
 		/*SERIALX.println(F(" other button   "));*/
 		}// End Case
@@ -556,16 +589,28 @@ event_ir_t evt;
 		if (evt.repeat_flag ) // repetition
 		switch(evtir)
 		{
+		case 0xDF2047:
+		case 0xDF2002:			
 		case 0xFF0046: 
-		case 0xF70812:  /*(" FORWARD");*/  changeStation(+1); break;
+		case 0xF70812:  /*(" FORWARD");*/  changeStation(+1); 
+		break;
+		case 0xDF204D:
+		case 0xDF2009:
 		case 0xFF0015:
-		case 0xF70813:  /*(" REVERSE");*/ changeStation(-1); break;
+		case 0xF70813:  /*(" REVERSE");*/ changeStation(-1); 
+		break;
+		case 0xDF2049:
+		case 0xDF2041:
 		case 0xFF0044:
 		case 0xF70842:
-		case 0xF70815: /*(" LEFT");*/  setRelVolume(-5);  break;
+		case 0xF70815: /*(" LEFT");*/  setRelVolume(-5);  
+		break;
+		case 0xDF204B:
+		case 0xDF2003:
 		case 0xFF0043:
 		case 0xF70841:
-		case 0xF70814: /*(" RIGHT");*/ setRelVolume(+5);  break; // volume +
+		case 0xF70814: /*(" RIGHT");*/ setRelVolume(+5); 
+		break; // volume +
 		default:;
 		} 						
 	}
