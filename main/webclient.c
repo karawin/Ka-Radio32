@@ -688,12 +688,12 @@ void clientConnect()
 void clientConnectOnce()
 {
 	cstatus = C_HEADER;
-	once = 1; // play one time
 	if((server = (struct hostent*)gethostbyname(clientURL))) {
 		xSemaphoreGive(sConnect);
 	} else {
 		clientDisconnect("clientConnectOnce");
 	}
+	once = 1; // play one time
 }
 void clientSilentConnect()
 {
@@ -709,6 +709,11 @@ void clientSilentDisconnect()
 {
 	xSemaphoreGive(sDisconnect);
 	audio_player_stop();
+	for (int i = 0;i<100;i++)
+	{
+		if(!clientIsConnected())break;
+		vTaskDelay(1);
+	}	
 	
 }
 
@@ -717,6 +722,11 @@ void clientDisconnect(const char* from)
 	kprintf(CLISTOP,from);
 	xSemaphoreGive(sDisconnect);
 	audio_player_stop();
+	for (int i = 0;i<100;i++)
+	{
+		if(!clientIsConnected())break;
+		vTaskDelay(1);
+	}	
 	if ((from[0]!='C') || (from[1]!='_'))
 		if (!ledStatus) gpio_set_level(getLedGpio(),0);
 	vTaskDelay(6);
@@ -1055,6 +1065,7 @@ ESP_LOGD(TAG,"mt2 len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,cle
 			setVolumei(0);
 			playing=1;
 			if (once == 0)vTaskDelay(20);
+			else vTaskDelay(1);
 			setVolumei(getVolume());
 			kprintf(CLIPLAY,0x0d,0x0a);
 			if (!ledStatus) gpio_set_level(getLedGpio(),1);

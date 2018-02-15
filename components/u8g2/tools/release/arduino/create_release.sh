@@ -18,6 +18,12 @@ rm ./../../../../U8g2_Arduino/src/clib/u8x8_d_stdio.c
 mkdir ../../../../U8g2_Arduino/examples/page_buffer/Chinese
 cp ../../../sys/arduino/u8g2_page_buffer/Chinese/*.ino ../../../../U8g2_Arduino/examples/page_buffer/Chinese/.
 
+mkdir ../../../../U8g2_Arduino/examples/page_buffer/Shennong
+cp ../../../sys/arduino/u8g2_page_buffer/Shennong/*.ino ../../../../U8g2_Arduino/examples/page_buffer/Shennong/.
+
+mkdir ../../../../U8g2_Arduino/examples/page_buffer/Shennong
+cp ../../../sys/arduino/u8g2_full_buffer/Shennong/*.ino ../../../../U8g2_Arduino/examples/full_buffer/Shennong/.
+
 mkdir ../../../../U8g2_Arduino/examples/page_buffer/Japanese
 cp ../../../sys/arduino/u8g2_page_buffer/Japanese/*.ino ../../../../U8g2_Arduino/examples/page_buffer/Japanese/.
 
@@ -47,6 +53,9 @@ cp ../../../sys/arduino/u8g2_page_buffer/HelloWorld/*.ino ../../../../U8g2_Ardui
 
 mkdir ../../../../U8g2_Arduino/examples/page_buffer/PrintHelloWorld
 cp ../../../sys/arduino/u8g2_page_buffer/PrintHelloWorld/*.ino ../../../../U8g2_Arduino/examples/page_buffer/PrintHelloWorld/.
+
+mkdir ../../../../U8g2_Arduino/examples/page_buffer/PrintProgmem
+cp ../../../sys/arduino/u8g2_page_buffer/PrintProgmem/*.ino ../../../../U8g2_Arduino/examples/page_buffer/PrintProgmem/.
 
 mkdir ../../../../U8g2_Arduino/examples/page_buffer/PrintUTF8
 cp ../../../sys/arduino/u8g2_page_buffer/PrintUTF8/*.ino ../../../../U8g2_Arduino/examples/page_buffer/PrintUTF8/.
@@ -85,6 +94,9 @@ cp ../../../sys/arduino/u8g2_page_buffer/LittleRookChess/*.ino ../../../../U8g2_
 
 mkdir ../../../../U8g2_Arduino/examples/full_buffer/HelloWorld
 cp ../../../sys/arduino/u8g2_full_buffer/HelloWorld/*.ino ../../../../U8g2_Arduino/examples/full_buffer/HelloWorld/.
+
+mkdir ../../../../U8g2_Arduino/examples/full_buffer/FontUsage
+cp ../../../sys/arduino/u8g2_full_buffer/FontUsage/*.ino ../../../../U8g2_Arduino/examples/full_buffer/FontUsage/.
 
 mkdir ../../../../U8g2_Arduino/examples/full_buffer/U8g2Logo
 cp ../../../sys/arduino/u8g2_full_buffer/U8g2Logo/*.ino ../../../../U8g2_Arduino/examples/full_buffer/U8g2Logo/.

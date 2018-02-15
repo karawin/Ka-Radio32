@@ -146,41 +146,7 @@ static const uint8_t u8x8_d_ssd1306_128x64_alt0_init_seq[] = {
   U8X8_END_TRANSFER(),             	/* disable chip */
   U8X8_END()             			/* end of sequence */
 };
-///////////////////////////////////
-static const uint8_t u8x8_d_ssd1306_128x32_alt0_init_seq[] = {
-    
-  U8X8_START_TRANSFER(),             	/* enable chip, delay is part of the transfer start */
-  
-  
-  U8X8_C(0x0ae),		                /* display off */
-  U8X8_CA(0x0d5, 0x080),		/* clock divide ratio (0x00=1) and oscillator frequency (0x8) */
-  U8X8_CA(0x0a8, 0x03f),		/* multiplex ratio */
-  U8X8_CA(0x0d3, 0x000),		/* display offset */
-  U8X8_C(0x040),		                /* set display start line to 0 */
-  U8X8_CA(0x08d, 0x014),		/* [2] charge pump setting (p62): 0x014 enable, 0x010 disable, SSD1306 only, should be removed for SH1106 */
-  U8X8_CA(0x020, 0x000),		/* page addressing mode */
-  
-  U8X8_C(0x0a1),				/* segment remap a0/a1*/
-  U8X8_C(0x0c8),				/* c0: scan dir normal, c8: reverse */
-  // Flipmode
-  // U8X8_C(0x0a0),				/* segment remap a0/a1*/
-  // U8X8_C(0x0c0),				/* c0: scan dir normal, c8: reverse */
-  
-  U8X8_CA(0x0da, 0x002),		/* com pin HW config, sequential com pin config (bit 4), disable left/right remap (bit 5) */
 
-  U8X8_CA(0x081, 0x0cf), 		/* [2] set contrast control */
-  U8X8_CA(0x0d9, 0x0f1), 		/* [2] pre-charge period 0x022/f1*/
-  U8X8_CA(0x0db, 0x040), 		/* vcomh deselect level */  
-  // if vcomh is 0, then this will give the biggest range for contrast control issue #98
-  // restored the old values for the noname constructor, because vcomh=0 will not work for all OLEDs, #116
-  
-  U8X8_C(0x02e),				/* Deactivate scroll */ 
-  U8X8_C(0x0a4),				/* output ram to display */
-  U8X8_C(0x0a6),				/* none inverted normal display mode */
-    
-  U8X8_END_TRANSFER(),             	/* disable chip */
-  U8X8_END()             			/* end of sequence */
-};
 
 
 /* issue 316: a special sh1106 setup, https://www.mikrocontroller.net/topic/431371?goto=5087807#5087807 */

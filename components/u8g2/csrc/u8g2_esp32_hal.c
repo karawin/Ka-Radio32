@@ -9,6 +9,7 @@
 
 #include "u8g2_esp32_hal.h"
 
+
 static const char *TAG = "u8g2_hal";
 static const unsigned int I2C_TIMEOUT_MS = 1000;
 
@@ -65,7 +66,7 @@ uint8_t u8g2_esp32_spi_byte_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void 
 		  dev_config.cs_ena_pretrans  = 0;
 		  dev_config.clock_speed_hz   = 500000;
 		  dev_config.spics_io_num     = u8g2_esp32_hal.cs;
-		  dev_config.flags            = 0;
+		  dev_config.flags            = u8x8->display_info->chip_enable_level ?SPI_DEVICE_POSITIVE_CS : 0; // ST7920.
 		  dev_config.queue_size       = 2;
 		  dev_config.pre_cb           = NULL;
 		  dev_config.post_cb          = NULL;
@@ -89,6 +90,12 @@ uint8_t u8g2_esp32_spi_byte_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void 
 			ESP_ERROR_CHECK(spi_device_transmit(handle_spi, &trans_desc));
 			break;
 		}
+		case U8X8_MSG_CAD_START_TRANSFER:
+			spi_take_semaphore();
+		break;
+		case U8X8_MSG_CAD_END_TRANSFER:
+			spi_give_semaphore();
+		break;
 	}
 	return 0;
 } // u8g2_esp32_spi_byte_cb

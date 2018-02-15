@@ -203,7 +203,7 @@ static const u8x8_display_info_t u8x8_ssd1306_128x32_univision_display_info =
 
 uint8_t u8x8_d_ssd1306_128x32_univision(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
 {
-	if ( msg == U8X8_MSG_DISPLAY_SETUP_MEMORY )
+    if ( msg == U8X8_MSG_DISPLAY_SETUP_MEMORY )
     {
       u8x8_d_helper_display_setup_memory(u8x8, &u8x8_ssd1306_128x32_univision_display_info);
       return 1;

@@ -39,8 +39,8 @@
 
 
 /* UG-2832HSWEG02 Datasheet, Section 4.4 */
-static const uint8_t u8x8_d_ssd1306_128x32_univision_init_seq_origine[] = {
-	
+static const uint8_t u8x8_d_ssd1306_128x32_univision_init_seq[] = {
+    
   U8X8_START_TRANSFER(),             	/* enable chip, delay is part of the transfer start */
   
   
@@ -48,7 +48,7 @@ static const uint8_t u8x8_d_ssd1306_128x32_univision_init_seq_origine[] = {
   U8X8_CA(0x0d5, 0x080),		/* clock divide ratio (0x00=1) and oscillator frequency (0x8) */
   U8X8_CA(0x0a8, 0x01f),		/* multiplex ratio */
   U8X8_CA(0x0d3, 0x000),		/* display offset */
-  U8X8_C(0x40),		                /* set display start line to 0 */
+  U8X8_C(0x040),		                /* set display start line to 0 */
   U8X8_CA(0x08d, 0x014),		/* [2] charge pump setting (p62): 0x014 enable, 0x010 disable */
   U8X8_CA(0x020, 0x000),		/* page addressing mode */
   
@@ -70,41 +70,6 @@ static const uint8_t u8x8_d_ssd1306_128x32_univision_init_seq_origine[] = {
   U8X8_END_TRANSFER(),             	/* disable chip */
   U8X8_END()             			/* end of sequence */
 };
-////////////////////////////////////////////////////////////////////
-static const uint8_t u8x8_d_ssd1306_128x32_univision_init_seq[] = {
-    
-   U8X8_START_TRANSFER(),             	/* enable chip, delay is part of the transfer start */
- 
-  
-  
-  U8X8_C(0x0ae),		                /* display off */
-  U8X8_CA(0x0d5, 0x080),		/* clock divide ratio (0x00=1) and oscillator frequency (0x8) */
-  U8X8_CA(0x0a8, 0x01f),		/* multiplex ratio */
-  U8X8_CA(0x0d3, 0x000),		/* display offset */
-  U8X8_C(0x40),		                /* set display start line to 0 */
-  U8X8_CA(0x08d, 0x014),		/* [2] charge pump setting (p62): 0x014 enable, 0x010 disable */
-  U8X8_CA(0x020, 0x000),		/* page addressing mode */
-  
-  U8X8_C(0x0a1),				/* segment remap a0/a1*/
-  U8X8_C(0x0c8),				/* c0: scan dir normal, c8: reverse */
-  // Flipmode
-  // U8X8_C(0x0a0),				/* segment remap a0/a1*/
-  // U8X8_C(0x0c0),				/* c0: scan dir normal, c8: reverse */
-  
-  U8X8_CA(0x0da, 0x002),		/* com pin HW config, sequential com pin config (bit 4), disable left/right remap (bit 5) */
-  U8X8_CA(0x081, 0x08f),		/* [2] set contrast control */
-  U8X8_CA(0x0d9, 0x0f1),		/* [2] pre-charge period 0x022/f1*/
-  U8X8_CA(0x0db, 0x040),		/* vcomh deselect level */
-  
-  U8X8_C(0x02e),				/* Deactivate scroll */ 
-  U8X8_C(0x0a4),				/* output ram to display */
-  U8X8_C(0x0a6),				/* none inverted normal display mode */
-   U8X8_C(0x0af),  // display on
-    
-  U8X8_END_TRANSFER(),             	/* disable chip */
-  U8X8_END()             			/* end of sequence */
-};
-
 
 static const uint8_t u8x8_d_ssd1306_128x32_univision_powersave0_seq[] = {
   U8X8_START_TRANSFER(),             	/* enable chip, delay is part of the transfer start */
@@ -136,14 +101,11 @@ static const uint8_t u8x8_d_ssd1306_128x32_univision_flip1_seq[] = {
   U8X8_END()             			/* end of sequence */
 };
 
-#include <string.h>
-#include <stdio.h>	 
 
 static uint8_t u8x8_d_ssd1306_128x32_generic(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
 {
   uint8_t x, c;
   uint8_t *ptr;
-//printf(" u8x8_d_ssd1306_128x32_generic  msg:%d, arg:%d \n",msg,arg_int);
   switch(msg)
   {
     /* handled by the calling function
@@ -153,7 +115,7 @@ static uint8_t u8x8_d_ssd1306_128x32_generic(u8x8_t *u8x8, uint8_t msg, uint8_t 
     */
     case U8X8_MSG_DISPLAY_INIT:
       u8x8_d_helper_display_init(u8x8);
-     u8x8_cad_SendSequence(u8x8, u8x8_d_ssd1306_128x32_univision_init_seq);    
+      u8x8_cad_SendSequence(u8x8, u8x8_d_ssd1306_128x32_univision_init_seq);    
       break;
     case U8X8_MSG_DISPLAY_SET_POWER_SAVE:
       if ( arg_int == 0 )
@@ -215,7 +177,6 @@ static uint8_t u8x8_d_ssd1306_128x32_generic(u8x8_t *u8x8, uint8_t msg, uint8_t 
 }
 
 
-
 static const u8x8_display_info_t u8x8_ssd1306_128x32_univision_display_info =
 {
   /* chip_enable_level = */ 0,
@@ -239,7 +200,6 @@ static const u8x8_display_info_t u8x8_ssd1306_128x32_univision_display_info =
   /* pixel_width = */ 128,
   /* pixel_height = */ 32
 };
-
 
 uint8_t u8x8_d_ssd1306_128x32_univision(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
 {

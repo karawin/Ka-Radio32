@@ -337,11 +337,12 @@ void playStationInt(int sid) {
 			clientSilentDisconnect();
 //			clientDisconnect("playStationInt");
 			ESP_LOGV(TAG,"playstationInt: %d, new station: %s",sid,si->name);
-			for (i = 0;i<100;i++)
+/*			for (i = 0;i<100;i++)
 			{
 				if(!clientIsConnected())break;
 				vTaskDelay(5);
 			}
+*/
 			clientSetName(si->name,sid);
 			clientSetURL(si->domain);
 			clientSetPath(si->file);
@@ -1017,7 +1018,10 @@ static bool httpServerHandleConnection(int conn, char* buf, uint16_t buflen) {
 					clientDisconnect("Web Instant");
 					pathParse(param);
 //					printf("Instant param:%s\n",param);
-					clientParsePlaylist(param);clientConnectOnce();
+					clientParsePlaylist(param);
+					clientSetName("Instant Play",255);
+					clientConnectOnce();
+					vTaskDelay(1);
 					infree(param);
 				}
 // version command				

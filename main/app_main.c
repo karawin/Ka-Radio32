@@ -923,7 +923,7 @@ void app_main()
     ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
 
 	//start tasks of KaRadio32
-	xTaskCreate(uartInterfaceTask, "uartInterfaceTask", 2200, NULL, 2, &pxCreatedTask); 
+	xTaskCreate(uartInterfaceTask, "uartInterfaceTask", 2400, NULL, 2, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","uartInterfaceTask",(unsigned int)pxCreatedTask);
 	
 	xTaskCreate(clientTask, "clientTask", 2300, NULL, 6, &pxCreatedTask); 
