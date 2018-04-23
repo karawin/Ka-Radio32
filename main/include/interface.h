@@ -1,4 +1,8 @@
-
+/******************************************************************************
+ * 
+ * Copyright 2017 karawin (http://www.karawin.fr)
+ *
+*******************************************************************************/
 #ifndef INTERFACE_H
 #define INTERFACE_H
 #include "esp_log.h"
@@ -13,7 +17,7 @@
 
 
 #define RELEASE "0.9"
-#define REVISION "5"
+#define REVISION "6"
 
 uint32_t checkUart(uint32_t speed);
 extern unsigned short adcdiv;	

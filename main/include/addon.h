@@ -1,7 +1,13 @@
-
+/******************************************************************************
+ * 
+ * Copyright 2017 karawin (http://www.karawin.fr)
+ *
+*******************************************************************************/
 #ifndef __have__addon_h__
 #define __have__addon_h__
 
+// Never change this file. See gpio.h to adapt to your pcb.
+// Once ok, set the lcd type with sys.lcd("xxx") command via uart or telnet
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"

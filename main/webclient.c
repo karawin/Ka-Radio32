@@ -426,6 +426,7 @@ void wsStationNext()
 {
 	struct shoutcast_info* si =NULL;
 	do {
+		if (si != NULL) incfree(si,"wsstationN");
 		setCurrentStation(getCurrentStation()+1);
 		if (getCurrentStation() >= 255)
 			setCurrentStation(0);
@@ -441,6 +442,7 @@ void wsStationPrev()
 {
 	struct shoutcast_info* si = NULL;
 	do {
+		if (si != NULL) incfree(si,"wsstationP");
 		if (getCurrentStation() >0)
 		{				
 			setCurrentStation(getCurrentStation()-1);
