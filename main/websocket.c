@@ -49,7 +49,7 @@ void inwfree(void *p,char* from)
 //	printf ("ws free of %x,  from %s             Heap size: %d\n",p,from,xPortGetFreeHeapSize( ));
 } 
  
-void base64_encode(uint8_t * data, size_t length, char* output) {
+void base64_encode_local(uint8_t * data, size_t length, char* output) {
 //    size_t size = ((length * 1.6f) + 1);
     if(output) {
         base64_encodestate _state;
@@ -74,7 +74,7 @@ void  websocketacceptKey(char* clientKey,char* Output) {
     SHA1Init(&ctx);
     SHA1Update(&ctx, clientKey, strlen(clientKey));
     SHA1Final(&sha1HashBin[0], &ctx);
-    base64_encode(sha1HashBin, 20,Output);
+    base64_encode_local(sha1HashBin, 20,Output);
 //    key.trim();
 //	printf ("ws key: \"%s\"  output:\"%s\"\n",clientKey,Output);
 }
