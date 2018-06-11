@@ -66,7 +66,7 @@
 //-----------------------
 #define PIN_I2S_LRCK GPIO_NUM_25	// or Channel1
 #define PIN_I2S_BCLK GPIO_NUM_26	// or channel2
-#define PIN_I2S_DATA GPIO_NUM_22
+#define PIN_I2S_DATA GPIO_NUM_22	// 
 
 
 // to set a value: 		gpio_set_level(gpio_num_t gpio_num,value);

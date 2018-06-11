@@ -926,7 +926,7 @@ void app_main()
 	xTaskCreate(uartInterfaceTask, "uartInterfaceTask", 2400, NULL, 2, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","uartInterfaceTask",(unsigned int)pxCreatedTask);
 	
-	xTaskCreate(clientTask, "clientTask", 2300, NULL, 6, &pxCreatedTask); 
+	xTaskCreate(clientTask, "clientTask", 2400, NULL, 6, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","clientTask",(unsigned int)pxCreatedTask);	
 	
     xTaskCreate(serversTask, "serversTask", 2400, NULL, 3, &pxCreatedTask); 
