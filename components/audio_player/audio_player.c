@@ -71,7 +71,9 @@ static int start_decoder_task(player_t *player)
     }
 
 	if (((task_func != NULL)) && (xTaskCreatePinnedToCore(task_func, task_name, stack_depth, player,
-			PRIO_MAD, NULL, 1) != pdPASS)) {
+			PRIO_MAD, NULL, 0) != pdPASS)) {
+							
+				
 		ESP_LOGE(TAG, "ERROR creating decoder task! Out of memory?");
 		spiRamFifoReset();
 		return -1;

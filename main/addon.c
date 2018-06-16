@@ -665,6 +665,7 @@ void task_addon(void *pvParams)
 		while (xQueueReceive(event_lcd, &evt, 0))
 		{ 
 			wakeLcd();
+			ESP_LOGI(TAG,"event_lcd: %x",(int)evt.lcmd);
 			switch(evt.lcmd)
 			{
 				case lmeta:

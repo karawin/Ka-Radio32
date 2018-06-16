@@ -817,7 +817,7 @@ void app_main()
 	setDdmm(device->ddmm);
 	
 	//SPI init for the vs1053 and lcd if spi.
-	VS1053_spi_init(HSPI_HOST);
+	VS1053_spi_init(KSPI);
 
     init_hardware(); 
 	ESP_LOGI(TAG, "Hardware init done...");
@@ -926,13 +926,13 @@ void app_main()
 	xTaskCreate(uartInterfaceTask, "uartInterfaceTask", 2400, NULL, 2, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","uartInterfaceTask",(unsigned int)pxCreatedTask);
 	
-	xTaskCreate(clientTask, "clientTask", 2400, NULL, 6, &pxCreatedTask); 
+	xTaskCreate(clientTask, "clientTask", 2400, NULL, 4, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","clientTask",(unsigned int)pxCreatedTask);	
 	
     xTaskCreate(serversTask, "serversTask", 2400, NULL, 3, &pxCreatedTask); 
 	ESP_LOGI(TAG, "%s task: %x","serversTask",(unsigned int)pxCreatedTask);	
 	
-	xTaskCreate(task_addon, "task_addon", 2500, NULL, 5, &pxCreatedTask);  //high priority for the spi else too slow due to ucglib
+	xTaskCreatePinnedToCore (task_addon, "task_addon", 2500, NULL, 10, &pxCreatedTask,1);  //high priority for the spi else too slow due to ucglib
 	ESP_LOGI(TAG, "%s task: %x","task_addon",(unsigned int)pxCreatedTask);
 	
 	if (RDA5807M_detection())

@@ -61,17 +61,18 @@ void VS1053_spi_init(uint8_t spi_no){
 	if(!sSPI) vSemaphoreCreateBinary(sSPI);
 	spi_give_semaphore(); 
 	
-	if(spi_no > 1) return; //Only SPI and HSPI are valid spi modules. 	
+	if(spi_no > 2) return; //Only VSPI and HSPI are valid spi modules. 	
 	
 	spi_bus_config_t buscfg={
         .miso_io_num=PIN_NUM_MISO,
         .mosi_io_num=PIN_NUM_MOSI,
         .sclk_io_num=PIN_NUM_CLK,
         .quadwp_io_num=-1,
-        .quadhd_io_num=-1
+        .quadhd_io_num=-1,
+		.flags = SPICOMMON_BUSFLAG_NATIVE_PINS|SPICOMMON_BUSFLAG_MASTER
 //		.max_transfer_sz = 1024		
 	};		
-	ret=spi_bus_initialize(HSPI_HOST, &buscfg, 1);	 // dma	
+	ret=spi_bus_initialize(KSPI, &buscfg, 1);	 // dma	
 	assert(ret==ESP_OK);
 }
 
@@ -89,23 +90,23 @@ void VS1053_HW_init(){
 		.flags = 0,	
         .mode=0,                         //SPI mode 
         .spics_io_num= PIN_NUM_XCS,               //XCS pin
-        .queue_size=10,                          //We want to be able to queue x transactions at a time
+        .queue_size=1,                          //We want to be able to queue x transactions at a time
         //.pre_cb=lcd_spi_pre_transfer_callback,  //Specify pre-transfer callback to handle D/C line
         .pre_cb=NULL,  //Specify pre-transfer callback to handle D/C line
 		.post_cb = NULL
 	};	
 	
- 	//VS1053_spi_init(HSPI_HOST);
+ 	//VS1053_spi_init(KSPI);
 	
 	//slow speed
-	ESP_ERROR_CHECK(spi_bus_add_device(HSPI_HOST, &devcfg, &vsspi));
+	ESP_ERROR_CHECK(spi_bus_add_device(KSPI, &devcfg, &vsspi));
 	
 	//high speed	
 	devcfg.clock_speed_hz = 6000000;
 	devcfg.spics_io_num= PIN_NUM_XDCS;               //XDCS pin
 	devcfg.command_bits = 0;
 	devcfg.address_bits = 0;
-	ESP_ERROR_CHECK(spi_bus_add_device(HSPI_HOST, &devcfg, &hvsspi));
+	ESP_ERROR_CHECK(spi_bus_add_device(KSPI, &devcfg, &hvsspi));
 	
 	//Initialize non-SPI GPIOs
 	gpio_config_t gpio_conf;

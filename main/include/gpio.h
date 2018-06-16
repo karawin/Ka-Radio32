@@ -13,7 +13,10 @@
 // Compatible ESP32 ADB
 // https://www.tindie.com/products/microwavemont/esp32-audio-developing-board-esp32-adb/
 
-// HSPI pins
+// Must be HSPI or VSPI
+#define KSPI VSPI_HOST
+
+// KSPI pins
 //-----------
 #define PIN_NUM_MISO GPIO_NUM_19 	// Master Input, Slave Output
 #define PIN_NUM_MOSI GPIO_NUM_23	// Master Output, Slave Input   Named Data or SDA or D1 for oled
@@ -31,7 +34,7 @@
 #define PIN_NUM_RST  GPIO_NUM_12 
 #define PIN_NUM_XDCS GPIO_NUM_33
 #define PIN_NUM_DREQ GPIO_NUM_34
-// + HSPI pins
+// + KSPI pins
 
 // Encoder knob
 //-------------
@@ -52,7 +55,7 @@
 
 // SPI lcd
 //---------
-// HSPI pins +
+// KSPI pins +
 #define PIN_LCD_CS	GPIO_NUM_13		//CS
 #define PIN_LCD_A0	GPIO_NUM_14		//A0 or D/C
 #define PIN_LCD_RST	GPIO_NUM_2		//Reset RES RST or not used
@@ -66,7 +69,7 @@
 //-----------------------
 #define PIN_I2S_LRCK GPIO_NUM_25	// or Channel1
 #define PIN_I2S_BCLK GPIO_NUM_26	// or channel2
-#define PIN_I2S_DATA GPIO_NUM_22	// 
+#define PIN_I2S_DATA GPIO_NUM_22	//  
 
 
 // to set a value: 		gpio_set_level(gpio_num_t gpio_num,value);

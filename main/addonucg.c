@@ -278,8 +278,8 @@ void setColor(int i)
 // draw one line
 void draw(int i)
 {
-	uint16_t len,xpos,yyy;
-	 
+	uint16_t len,xpos,yyy; 
+	
     if ( mline[i]) mline[i] =0;
     if (i >=3) z = y/2 ; else z = 0;
     switch (i) {
