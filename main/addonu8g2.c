@@ -237,6 +237,7 @@ void drawFrameU8g2(uint8_t mTscreen,struct tm *dt)
 	else 
 		sprintf(strsec,"%02d-%02d-%04d  %02d:%02d:%02d",dt->tm_mon+1,dt->tm_mday,dt->tm_year+1900, dt->tm_hour, dt->tm_min,dt->tm_sec);
 
+	
     setfont8(text);
     u8g2_SetDrawColor(&u8g2, 1);
     y = getFontLineSpacing();
@@ -277,7 +278,8 @@ void drawFrameU8g2(uint8_t mTscreen,struct tm *dt)
 		}
 
     }
-    screenBottomU8g2();    
+    screenBottomU8g2();
+	   
 }
 
 
@@ -339,6 +341,7 @@ void drawTimeU8g2(uint8_t mTscreen,struct tm *dt,unsigned timein)
 {
   char strdate[23];
   char strtime[20];
+//  printf("DRAW TIME U8G2  mtscreen : %d\n",mTscreen);
 	u8g2_ClearBuffer(&u8g2);
 	if (getDdmm())
 		sprintf(strdate,"%02d-%02d-%04d", dt->tm_mday, dt->tm_mon+1,  dt->tm_year+1900);

@@ -338,10 +338,11 @@ void drawScreen()
   {
 //	  printf("drawScreenenter mTscreen:%d\n",mTscreen);
 //printf("drawScreen %d, mTscreen: %d\n",stateScreen,mTscreen);	
+
   switch (stateScreen)
   {
     case smain:  // 
-      drawFrame();
+     drawFrame();
       break;
     case svolume:
       drawVolume();
@@ -359,7 +360,7 @@ void drawScreen()
 	  Screen(smain); 
 	  drawFrame();	  
   }
-  if (!(isColor)) u8g2_SendBuffer(&u8g2); 
+  if (!(isColor)) u8g2_SendBuffer(&u8g2);
   mTscreen = MTNODISPLAY;
   }   
 }
@@ -650,7 +651,7 @@ void task_addon(void *pvParams)
 	event_lcd = xQueueCreate(40, sizeof(event_lcd_t));
 	ESP_LOGI(TAG,"event_lcd: %x",(int)event_lcd);
 	
-	xTaskCreate(rmt_nec_rx_task, "rmt_nec_rx_task", 2148, NULL, 10, NULL);
+	xTaskCreatePinnedToCore(rmt_nec_rx_task, "rmt_nec_rx_task", 2148, NULL, 10, NULL,1);
 //	xTaskCreate(task_addonio, "task_addonio", 2350, NULL, 4, NULL);
 	vTaskDelay(1);
 	wakeLcd();

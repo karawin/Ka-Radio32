@@ -661,7 +661,7 @@ void timerTask(void* p) {
 			}
 			taskYIELD();
 		}
-		taskYIELD();
+//		taskYIELD();
 		if (ledStatus)
 		{
 			
@@ -923,13 +923,13 @@ void app_main()
     ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
 
 	//start tasks of KaRadio32
-	xTaskCreate(uartInterfaceTask, "uartInterfaceTask", 2400, NULL, 2, &pxCreatedTask); 
+	xTaskCreatePinnedToCore(uartInterfaceTask, "uartInterfaceTask", 2400, NULL, 2, &pxCreatedTask,1); 
 	ESP_LOGI(TAG, "%s task: %x","uartInterfaceTask",(unsigned int)pxCreatedTask);
 	
-	xTaskCreate(clientTask, "clientTask", 2400, NULL, 4, &pxCreatedTask); 
+	xTaskCreatePinnedToCore(clientTask, "clientTask", 2400, NULL, 4, &pxCreatedTask,0); 
 	ESP_LOGI(TAG, "%s task: %x","clientTask",(unsigned int)pxCreatedTask);	
 	
-    xTaskCreate(serversTask, "serversTask", 2400, NULL, 3, &pxCreatedTask); 
+    xTaskCreatePinnedToCore(serversTask, "serversTask", 2400, NULL, 3, &pxCreatedTask,0); 
 	ESP_LOGI(TAG, "%s task: %x","serversTask",(unsigned int)pxCreatedTask);	
 	
 	xTaskCreatePinnedToCore (task_addon, "task_addon", 2500, NULL, 10, &pxCreatedTask,1);  //high priority for the spi else too slow due to ucglib
@@ -937,7 +937,7 @@ void app_main()
 	
 	if (RDA5807M_detection())
 	{
-		xTaskCreate(rda5807Task, "rda5807Task", 2500, NULL, 3, &pxCreatedTask);  //
+		xTaskCreatePinnedToCore(rda5807Task, "rda5807Task", 2500, NULL, 3, &pxCreatedTask,1);  //
 		ESP_LOGI(TAG, "%s task: %x","rda5807Task",(unsigned int)pxCreatedTask);
 	}
 	
