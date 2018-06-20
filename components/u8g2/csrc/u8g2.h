@@ -69,7 +69,7 @@
   Use 16 Bit mode for any display with more than 240 pixel in one 
   direction.
 */
-//#define U8G2_16BIT
+#define U8G2_16BIT
 
 
 /*
@@ -92,7 +92,7 @@
   The following macro enables all four drawing directions for glyphs and strings.
   If this macro is not defined, than a string can be drawn only in horizontal direction.
 */
-#define U8G2_WITH_FONT_ROTATION
+//#define U8G2_WITH_FONT_ROTATION
 
 /*
   The following macro activates the early intersection check with the current visible area.
@@ -101,7 +101,7 @@
   With a full framebuffer in RAM and if most graphical elements are drawn within the visible area, then this
   macro can be commented to reduce code size.
 */
-#define U8G2_WITH_INTERSECTION
+//#define U8G2_WITH_INTERSECTION
 
 /*
   U8glib V2 contains support for unicode plane 0 (Basic Multilingual Plane, BMP).

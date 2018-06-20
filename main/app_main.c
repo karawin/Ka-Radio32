@@ -134,6 +134,7 @@ void interrupt1Ms()
 }
 char* getIp() { return (localIp);}
 
+/*
 IRAM_ATTR void   microsCallback(void *pArg) {
 	int timer_idx = (int) pArg;
 	queue_event_t evt;	
@@ -144,7 +145,7 @@ IRAM_ATTR void   microsCallback(void *pArg) {
         evt.i2 = timer_idx;
 	xQueueSendFromISR(event_queue, &evt, NULL);	
 	TIMERG1.hw_timer[timer_idx].config.alarm_en = 1;
-}
+}*/
 //-----------------------------------
 IRAM_ATTR void   msCallback(void *pArg) {
 	int timer_idx = (int) pArg;
@@ -244,17 +245,17 @@ timer_config_t config;
 	ESP_ERROR_CHECK(timer_start(TIMERGROUP1MS, msTimer));
 	
 	/*Configure timer 1µS*/
-	config.auto_reload = TIMER_AUTORELOAD_EN;
+/*	config.auto_reload = TIMER_AUTORELOAD_EN;
 	config.divider = TIMER_DIVIDER1mS;
 	ESP_ERROR_CHECK(timer_init(TIMERGROUP1mS, microsTimer, &config));
 	ESP_ERROR_CHECK(timer_pause(TIMERGROUP1mS, microsTimer));
 	ESP_ERROR_CHECK(timer_isr_register(TIMERGROUP1mS, microsTimer, microsCallback, (void*) microsTimer, 0, NULL));
-	/* start 1µS timer*/
-	ESP_ERROR_CHECK(timer_set_counter_value(TIMERGROUP1mS, microsTimer, 0x00000000ULL));
+*/	/* start 1µS timer*/
+/*	ESP_ERROR_CHECK(timer_set_counter_value(TIMERGROUP1mS, microsTimer, 0x00000000ULL));
 	ESP_ERROR_CHECK(timer_set_alarm_value(TIMERGROUP1mS, microsTimer,TIMERVALUE1mS(10))); // 10 ms timer
 	ESP_ERROR_CHECK(timer_enable_intr(TIMERGROUP1mS, microsTimer));
 	ESP_ERROR_CHECK(timer_set_alarm(TIMERGROUP1mS, microsTimer,TIMER_ALARM_EN));
-	ESP_ERROR_CHECK(timer_start(TIMERGROUP1mS, microsTimer));
+	ESP_ERROR_CHECK(timer_start(TIMERGROUP1mS, microsTimer));*/
 }
 
 
@@ -654,8 +655,8 @@ void timerTask(void* p) {
 					  if (serviceEncoder != NULL) serviceEncoder(); // for the encoder
 					  if (serviceAddon != NULL) serviceAddon(); // for the encoder
 					break;
-					case TIMER_1mS:  //10µs
-					break;
+//					case TIMER_1mS:  //1µs
+//					break;
 					default:
 					break;
 			}

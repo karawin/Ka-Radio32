@@ -27,7 +27,7 @@
 #define VS_WRITE_COMMAND 	0x02
 #define VS_READ_COMMAND 	0x03
 #define SPI_MODE        	0x00
-#define SPI_STATUS      	0x01
+#define SPI_STATUSVS      	0x01
 #define SPI_BASS        	0x02
 #define SPI_CLOCKF      	0x03
 #define SPI_DECODE_TIME 	0x04

@@ -240,7 +240,7 @@ uint16_t MaskAndShiftRight(uint16_t Source, uint16_t Mask, uint16_t Shift){
 
 void VS1053_regtest()
 {
-	int MP3Status = VS1053_ReadRegister(SPI_STATUS);
+	int MP3Status = VS1053_ReadRegister(SPI_STATUSVS);
 	int MP3Mode = VS1053_ReadRegister(SPI_MODE);
 	int MP3Clock = VS1053_ReadRegister(SPI_CLOCKF);
 	ESP_LOGI(TAG,"SCI_Status  = 0x%X",MP3Status);
@@ -300,9 +300,9 @@ void VS1053_Start(){
 	VS1053_WriteRegister16(SPI_WRAM, 0x0003); //GPIO_DDR=3
 	VS1053_WriteRegister16(SPI_WRAMADDR, 0xc019); //address of GPIO_ODATA is 0xC019
 	VS1053_WriteRegister16(SPI_WRAM, 0x0000); //GPIO_ODATA=0
-	vTaskDelay(100);
+	vTaskDelay(200);
 	
-	int MP3Status = VS1053_ReadRegister(SPI_STATUS);
+	int MP3Status = VS1053_ReadRegister(SPI_STATUSVS);
 	vsVersion = (MP3Status >> 4) & 0x000F; //Mask out only the four version bits
 //0 for VS1001, 1 for VS1011, 2 for VS1002, 3 for VS1003, 4 for VS1053 and VS8053,
 //5 for VS1033, 7 for VS1103, and 6 for VS1063	
