@@ -88,7 +88,8 @@ void task_i2sbridge(void *pvParams)
    init_i2s();
 
    int cnt = 0;
-   int bytes_written = 0;
+   int bytes_towrite = 0;
+   size_t bytes_written ;
 
    while(1)
    {
@@ -122,8 +123,9 @@ void task_i2sbridge(void *pvParams)
       }
 
       // local echo
-      bytes_written = samples_read * 2 * (I2S_BITS_PER_SAMPLE_16BIT / 8);
-      i2s_write_bytes(I2S_NUM_0, buf, bytes_written, portMAX_DELAY);
+      bytes_towrite = samples_read * 2 * (I2S_BITS_PER_SAMPLE_16BIT / 8);
+      bytes_written=i2s_write_bytes(I2S_NUM_0, buf, bytes_towrite,  portMAX_DELAY);
+//      i2s_write(I2S_NUM_0, buf, bytes_towrite, &bytes_written, portMAX_DELAY);
 
       cnt += samples_read;
 

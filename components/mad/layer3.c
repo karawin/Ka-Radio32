@@ -2525,7 +2525,7 @@ int mad_layer_III(struct mad_stream *stream, struct mad_frame *frame)
   struct mad_bitptr ptr;
   struct sideinfo si;
   enum mad_error error;
-  int result = 0, i;
+  int result = 0;
   static mad_fixed_t ovlbuf[2 * 32 * 18];
 
   /* allocate Layer III dynamic structures */

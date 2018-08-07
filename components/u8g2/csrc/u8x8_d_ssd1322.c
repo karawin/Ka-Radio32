@@ -271,11 +271,12 @@ static const uint8_t u8x8_d_ssd1322_256x64_init_seq[] = {
   U8X8_CA(0xca, 0x3f),			/* multiplex ratio 1/64 Duty (0x0F~0x3F) */  
   U8X8_CA(0xa2, 0x00),			/* display offset, shift mapping ram counter */  
   U8X8_CA(0xa1, 0x00),			/* display start line */  
-  //U8X8_CAA(0xa0, 0x14, 0x11),	/* Set Re-Map / Dual COM Line Mode */  
-  U8X8_CAA(0xa0, 0x06, 0x011),	/* Set Re-Map / Dual COM Line Mode */  
+  U8X8_CAA(0xa0, 0x14, 0x11),	/* Set Re-Map / Dual COM Line Mode */  
+  //U8X8_CAA(0xa0, 0x06, 0x011),	/* Set Re-Map / Dual COM Line Mode */  
   U8X8_CA(0xab, 0x01),			/* Enable Internal VDD Regulator */  
   U8X8_CAA(0xb4, 0xa0, 0x005|0x0fd),	/* Display Enhancement A */  
-  U8X8_CA(0xc1, 0x9f),			/* contrast */  
+  //U8X8_CA(0xc1, 0x9f),			/* contrast */  
+  U8X8_CA(0xc1, 0xff),			/* contrast */  
   U8X8_CA(0xc7, 0x0f),			/* Set Scale Factor of Segment Output Current Control */  
   U8X8_C(0xb9),		                /* linear grayscale */
   U8X8_CA(0xb1, 0xe2),			/* Phase 1 (Reset) & Phase 2 (Pre-Charge) Period Adjustment */  

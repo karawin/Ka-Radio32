@@ -15,7 +15,7 @@
 #include "esp_log.h"
 #include "driver/gpio.h"
 #include "gpio.h"
-#include "driver/i2s.h"
+
 #include "MerusAudio.h"
 
 #include "audio_player.h"
@@ -49,10 +49,9 @@ static void init_i2s(renderer_config_t *config)
 		comm_fmt = I2S_COMM_FORMAT_PCM | I2S_COMM_FORMAT_PCM_SHORT;
     }
 
-	if ((config->output_mode == I2S))
+	if ((config->output_mode == I2S)||(config->output_mode == I2S_MERUS))
 	{
 	/* don't use audio pll on buggy rev0 chips */
-
 		if(out_info.revision > 0) {
 			use_apll = 1;
 			ESP_LOGI(TAG, "chip revision %d, enabling APLL", out_info.revision);
@@ -141,13 +140,14 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 //    ESP_LOGV(TAG, "buf_desc: bit_depth %d format %d num_chan %d sample_rate %d", buf_desc->bit_depth, buf_desc->buffer_format, buf_desc->num_channels, buf_desc->sample_rate);
 //    ESP_LOGV(TAG, "renderer_instance: bit_depth %d, output_mode %d", renderer_instance->bit_depth, renderer_instance->output_mode);
 
-
+	int res = 0;
     // handle changed sample rate
     if(renderer_instance->sample_rate != buf_desc->sample_rate)
     {
         ESP_LOGD(TAG, "changing sample rate from %d to %d", renderer_instance->sample_rate, buf_desc->sample_rate);
         uint32_t rate = buf_desc->sample_rate * renderer_instance->sample_rate_modifier;
         i2s_set_sample_rates(renderer_instance->i2s_num, rate);
+//		i2s_set_clk(renderer_instance->i2s_num, rate, I2S_BITS_PER_SAMPLE_16BIT, I2S_CHANNEL_STEREO);
         renderer_instance->sample_rate = buf_desc->sample_rate;
     }
 
@@ -183,7 +183,7 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 		}			
 	}
 //-------------------------
-
+/*ESP_LOGW(TAG, "I2S CHECK:  buf_desc->bit_depth %d, renderer_instance->bit_depth %d, buf_desc->buffer_format %d, PCM_INTERLEAVED %d, buf_desc->num_channels %d (2), renderer_instance->output_mode %d, DAC_BUILT_IN %d ",buf_desc->bit_depth,renderer_instance->bit_depth,buf_desc->buffer_format,PCM_INTERLEAVED,buf_desc->num_channels,renderer_instance->output_mode,DAC_BUILT_IN);*/
     // formats match, we can write the whole block
     if (buf_desc->bit_depth == renderer_instance->bit_depth
             && buf_desc->buffer_format == PCM_INTERLEAVED
@@ -194,10 +194,15 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 //        TickType_t max_wait = buf_desc->sample_rate / num_samples / 2;
 
         // don't block, rather retry
-        int bytes_left = buf_len;
-        int bytes_written = 0;
+        size_t bytes_left = buf_len;
+        size_t bytes_written = 0;
         while(bytes_left > 0 && renderer_status != STOPPED) {
+//			ESP_LOGE(TAG, "i2s_write  nb: %d",bytes_left);
             bytes_written = i2s_write_bytes(renderer_instance->i2s_num, buf, bytes_left, 0);
+/*            res = i2s_write(renderer_instance->i2s_num, buf, bytes_left,& bytes_written, 0);
+			if (res != ESP_OK) {
+				ESP_LOGE(TAG, "i2s_write error %d",res);
+			}*/
             bytes_left -= bytes_written;
             buf += bytes_written;
         }
@@ -227,7 +232,7 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
         ptr_r = ptr_l;
     }
 
-    int bytes_pushed = 0;
+    size_t bytes_pushed = 0;
     TickType_t max_wait = 20 / portTICK_PERIOD_MS; // portMAX_DELAY = bad idea
 	//mult = mult>>12;  // for sample on 8 bits 0 to 16
     for (int i = 0; i < num_samples; i++) {
@@ -260,6 +265,7 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
             sample = (sample << 16 & 0xffff0000) | ((uint16_t) right);
 
             bytes_pushed = i2s_push_sample(renderer_instance->i2s_num, (const char*) &sample, max_wait);
+ //           i2s_write(renderer_instance->i2s_num, (const char*) &sample, buf_bytes_per_sample, &bytes_pushed, max_wait);
         }
         else {
 
@@ -267,12 +273,11 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
             {
                 case I2S_BITS_PER_SAMPLE_16BIT:
                     ; // workaround
-
-
+//ESP_LOGI(TAG,"BPS16");
                     /* low - high / low - high */
                     const char samp32[4] = {ptr_l[0], ptr_l[1], ptr_r[0], ptr_r[1]};
-
                     bytes_pushed = i2s_push_sample(renderer_instance->i2s_num, (const char*) &samp32, max_wait);
+ //                   i2s_write(renderer_instance->i2s_num, (const char*) &samp32, 2, &bytes_pushed, max_wait);
                     break;
 
                 case I2S_BITS_PER_SAMPLE_32BIT:
@@ -280,6 +285,7 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 
                     const char samp64[8] = {0, 0, ptr_l[0], ptr_l[1], 0, 0, ptr_r[0], ptr_r[1]};
                     bytes_pushed = i2s_push_sample(renderer_instance->i2s_num, (const char*) &samp64, max_wait);
+//                    i2s_write(renderer_instance->i2s_num, (const char*) &samp64, 4, &bytes_pushed, max_wait);
                     break;
 
                 default:

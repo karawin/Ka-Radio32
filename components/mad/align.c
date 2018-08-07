@@ -9,6 +9,7 @@ char unalChar(const char *adr) {
 	if (w==1) return ((v>>8)&0xff);
 	if (w==2) return ((v>>16)&0xff);
 	if (w==3) return ((v>>24)&0xff);
+	return 0;
 }
 
 

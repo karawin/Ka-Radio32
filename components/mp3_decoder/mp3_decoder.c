@@ -20,7 +20,7 @@
 #include "../mad/frame.h"
 #include "../mad/synth.h"
 
-#include "driver/i2s.h"
+//#include "driver/i2s.h"
 #include "audio_renderer.h"
 #include "audio_player.h"
 #include "spiram_fifo.h"

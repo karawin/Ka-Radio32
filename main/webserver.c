@@ -1139,13 +1139,14 @@ void serverclientTask(void *pvParams) {
 						{	
 //printf ("Server: try receive more:%d bytes. , must be %d\n", recbytes,bend - buf +cl);
 							while(((recb = read(client_sock , buf+recbytes, cl))==0)){vTaskDelay(1);}
-							buf[recbytes+recb] = 0;
+//							buf[recbytes+recb] = 0;
 //printf ("Server: received more now: %d bytes, rec:\n%s\nEnd\n", recbytes+recb,buf);
 							if (recb < 0) {
 								ESP_LOGE(TAG,"read fails 0  errno:%d",errno);
 								respKo(client_sock);
 								break;								
 							}
+							buf[recbytes+recb] = 0;							
 							recbytes += recb;
 						}
 					}
