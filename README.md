@@ -1,9 +1,12 @@
 ## STATE
 KaraDio32 in dev state: Stable<br/>
-Little problem with esp-idf v3.0 and v3.1:<br/>
+Little problem with esp-idf v3.0 and v3.1 for the i2s output:<br/>
 At the top level of github, i copied  i2s.c and i2s.h.<br/>
 These files must be replaced to the esp-idf\components\driver and esp-idf\components\driver/include.<br/>
 Or simply do an OTA if your configuration is compatible to the standard gpio. <br/>
+<br/>
+See https://github.com/espressif/esp-idf/issues/2307 too if you generate your own bin.
+<br/>
 Works on any esp32 board.<br/><br/>
 See the feature on https://hackaday.io/project/11570-wifi-webradio-with-esp8266-and-vs1053 <br/>
 The esp32 adds the output on the internal dac or with i2s to an external dac<br/>
