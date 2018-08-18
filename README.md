@@ -29,7 +29,7 @@ Programmable lcd off timer<br/>
 Date format DD:MM:YYYY or MM:DD:YYYY .<br/>
 Remote IR support integrated. Nec protocol only.<br/>
 Rotary encoder support integrated. Common functions: play/stop, volume, station change, date time display.<br/>
-
+Web command next and prev added.<br/>
 
 ## Build your own
 To build your own release, you must install the idf https://github.com/espressif/esp-idf and the toolchain.
