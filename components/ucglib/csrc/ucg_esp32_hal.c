@@ -24,7 +24,7 @@
 #define TAG  "ucg_hal"
 
 static spi_device_handle_t handle; // SPI handle.
-static ucg_esp32_hal_t ucg_esp32_hal; // HAL state data.
+DRAM_ATTR static ucg_esp32_hal_t ucg_esp32_hal; // HAL state data.
 static ucg_esp32_oneByte oneByte;
 
 /* to init call
@@ -57,7 +57,7 @@ void ucg_esp32_hal_init(ucg_esp32_hal_t ucg_esp32_hal_param) {
 	
 } // ucg_esp32_hal_init
 
-IRAM_ATTR void sendOneByte()
+void sendOneByte()
 {
 	int nb = oneByte.nb;
 	oneByte.nb = 0;	
@@ -81,14 +81,15 @@ IRAM_ATTR void sendOneByte()
 	}
 }
 
-IRAM_ATTR void addOneByte(uint8_t bt)
+//IRAM_ATTR 
+void addOneByte(uint8_t bt)
 {
 	oneByte.data[oneByte.nb++] = bt;
 	if (oneByte.nb >3) sendOneByte(); //security, but ucglib send a max of 4 bytes alone.
 }
 
 
-IRAM_ATTR int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
+int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 {
 //  taskYIELD();
 
@@ -151,7 +152,7 @@ IRAM_ATTR int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *da
 		dev_config.clock_speed_hz   = (1000000000/((ucg_com_info_t *)data)->serial_clk_speed) ;
 		dev_config.spics_io_num     = ucg_esp32_hal.cs;
 		dev_config.flags            = SPI_DEVICE_NO_DUMMY;
-		dev_config.queue_size       = 2;//200;
+		dev_config.queue_size       = 3;//200;
 		dev_config.pre_cb           = NULL;
 		dev_config.post_cb          = NULL;
 		ESP_LOGI(TAG, "... Adding device bus  Speed= %d.",dev_config.clock_speed_hz);

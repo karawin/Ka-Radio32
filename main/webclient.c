@@ -276,6 +276,7 @@ bool clientPrintMeta()
 		kprintf("##CLI.META#: %s\n",header.members.mArr[METADATA]);
 	else
 		kprintf("##CLI.META#:%c", 0x0D);
+	
 	return true;
 }
 

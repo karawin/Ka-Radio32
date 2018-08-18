@@ -710,9 +710,9 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 		char* not2;
 		not2 = header->members.single.notice2;
 		if (not2 ==NULL) not2=header->members.single.audioinfo;
-		if ((header->members.single.notice2 != NULL)&&(strlen(header->members.single.notice2)==0)) not2=header->members.single.audioinfo;
+		//if ((header->members.single.notice2 != NULL)&&(strlen(header->members.single.notice2)==0)) not2=header->members.single.audioinfo;
 		int json_length ;
-		json_length =166+ //144 155
+		json_length =166+ //
 		((header->members.single.description ==NULL)?0:strlen(header->members.single.description)) +
 		((header->members.single.name ==NULL)?0:strlen(header->members.single.name)) +
 		((header->members.single.bitrate ==NULL)?0:strlen(header->members.single.bitrate)) +
@@ -1012,6 +1012,12 @@ static bool httpServerHandleConnection(int conn, char* buf, uint16_t buflen) {
 // stop command				
 				param = strstr(c,"stop") ;
 				if (param != NULL) {clientDisconnect("Web stop");}
+// next command				
+				param = strstr(c,"next") ;
+				if (param != NULL) {wsStationNext();}
+// prev command				
+				param = strstr(c,"prev") ;
+				if (param != NULL) {wsStationPrev();}				
 // instantplay command				
 				param = getParameterFromComment("instant=", c, strlen(c)) ;
 				if (param != NULL) {

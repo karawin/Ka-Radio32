@@ -82,7 +82,7 @@ Copyright (C) 2017  KaraWin
 #include "vs1053.h"
 #include "ClickEncoder.h"
 #include "addon.h"
-#include "rda5807Task.h"
+//#include "rda5807Task.h"
 
 /* The event group allows multiple bits for each event*/
 //   are we connected  to the AP with an IP? */
@@ -826,7 +826,9 @@ void app_main()
 	
 	ESP_LOGE(TAG,"LCD Type %d",device->lcd_type);
 	lcd_init(device->lcd_type);
-	// Init i2c if lcd doesn't not (spi)
+	
+/*	
+	// Init i2c if lcd doesn't not (spi) for rde5807=
 	if (device->lcd_type >= LCD_SPI)
 	{
 		i2c_config_t conf;
@@ -842,6 +844,8 @@ void app_main()
 		//ESP_ERROR_CHECK
 		(i2c_driver_install(I2C_MASTER_NUM, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0));			
 	}
+*/
+
 	
 	// output mode
 	//I2S, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053
@@ -936,12 +940,12 @@ void app_main()
 	xTaskCreatePinnedToCore (task_addon, "task_addon", 2600, NULL, 10, &pxCreatedTask,1);  //high priority for the spi else too slow due to ucglib
 	ESP_LOGI(TAG, "%s task: %x","task_addon",(unsigned int)pxCreatedTask);
 	
-	if (RDA5807M_detection())
+/*	if (RDA5807M_detection())
 	{
 		xTaskCreatePinnedToCore(rda5807Task, "rda5807Task", 2500, NULL, 3, &pxCreatedTask,1);  //
 		ESP_LOGI(TAG, "%s task: %x","rda5807Task",(unsigned int)pxCreatedTask);
 	}
-	
+*/	
 	printf("Init ");
 	for (int i=0;i<15;i++)
 	{
@@ -954,13 +958,13 @@ void app_main()
 	if(device->options & T_LED) ledStatus = false;
 	
 	//autostart	
-	kprintf("autostart: playing:%d, currentstation:%d\n",device->autostart,device->currentstation);
 	setIvol( device->vol);
 	kprintf("READY. Type help for a list of commands\n");
 	
 	
-	if (device->autostart ==1)
+	if ((device->autostart ==1)&&(device->currentstation != 0xFFFF))
 	{	
+		kprintf("autostart: playing:%d, currentstation:%d\n",device->autostart,device->currentstation);
 		vTaskDelay(50); // wait a bit
 		playStationInt(device->currentstation);
 	}

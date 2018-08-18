@@ -21,7 +21,7 @@
 #include "spiram_fifo.h"
 #include "addon.h"
 #include "app_main.h"
-#include "rda5807Task.c"
+//#include "rda5807Task.c"
 
 #include "lwip/sockets.h"
 #include "lwip/dns.h"
@@ -638,7 +638,7 @@ void clientVol(char *s)
 		if ((atoi(vol)>=0)&&(atoi(vol)<=254))
 		{	
 			setVolumew(vol);
-			if (RDA5807M_detection()) RDA5807M_setVolume(atoi(vol)/16);
+//			if (RDA5807M_detection()) RDA5807M_setVolume(atoi(vol)/16);
 		}	
 		free(vol);
     }	
@@ -934,6 +934,8 @@ void setLogLevel(esp_log_level_t level)
 	}	
 	displayLogLevel();
 } 
+
+/*
 void fmSeekUp()
 {seekUp();seekingComplete(); kprintf("##FM.FREQ#: %3.2f MHz\n",getFrequency());}
 void fmSeekDown()
@@ -944,7 +946,7 @@ void fmMute()
 {RDA5807M_unmute(RDA5807M_FALSE); }
 void fmUnmute()
 {RDA5807M_unmute(RDA5807M_TRUE);}
-
+*/
 
 void checkCommand(int size, char* s)
 {
@@ -953,7 +955,7 @@ void checkCommand(int size, char* s)
 	for(i=0;i<size;i++) tmp[i] = s[i];
 	tmp[size] = 0;
 //	kprintf("size: %d, cmd=%s\n",size,tmp);
-	if(startsWith ("fm.", tmp))
+/*	if(startsWith ("fm.", tmp))
 	{
 		if(strcmp(tmp+3, "up") == 0) 	fmSeekUp();
 		else if(strcmp(tmp+3, "down") == 0) 	fmSeekDown();
@@ -962,6 +964,7 @@ void checkCommand(int size, char* s)
 		else if(startsWith (  "vol",tmp+3)) 	clientVol(tmp);	
 		else printInfo(tmp);
 	} else
+*/		
 	if(startsWith ("dbg.", tmp))
 	{
 		if     (strcmp(tmp+4, "fifo") == 0) 	kprintf( "Buffer fill %u%%, %d bytes, OverRun: %ld, UnderRun: %ld\n",
