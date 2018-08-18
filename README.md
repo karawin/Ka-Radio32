@@ -6,7 +6,7 @@ These files must be replaced to the esp-idf\components\driver and esp-idf\compon
 Or simply do an OTA if your configuration is compatible to the standard gpio. <br/>
 <br/>
 See https://github.com/espressif/esp-idf/issues/2307 too if you generate your own bin.
-<br/>
+<br/><br/>
 Works on any esp32 board.<br/><br/>
 See the feature on https://hackaday.io/project/11570-wifi-webradio-with-esp8266-and-vs1053 <br/>
 The esp32 adds the output on the internal dac or with i2s to an external dac<br/>
