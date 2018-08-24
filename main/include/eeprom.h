@@ -19,6 +19,9 @@
 #define APMODE		0
 #define STA1		1
 #define STA2		2
+#define SSIDLEN		32
+#define PASSLEN		64
+#define HOSTLEN		24
 
 struct device_settings {
 	uint16_t cleared; 		// 0xAABB if initialized
@@ -30,10 +33,10 @@ struct device_settings {
 	uint8_t ipAddr2[4];		
 	uint8_t mask2[4];		
 	uint8_t gate2[4];			
-	char ssid1[32]; 
-	char ssid2[32]; 
-	char pass1[64];
-	char pass2[64];
+	char ssid1[SSIDLEN]; 
+	char ssid2[SSIDLEN]; 
+	char pass1[PASSLEN];
+	char pass2[PASSLEN];
 	uint8_t current_ap; // 0 = AP mode, else STA mode: 1 = ssid1, 2 = ssid2
 	uint8_t vol;
 	int8_t treble;
@@ -57,7 +60,8 @@ struct device_settings {
 	uint8_t led_gpio; // the gpio of the led
 	uint32_t lcd_out;	// timeout in seconds to switch off the lcd. 0 = no timeout
 	uint8_t ddmm;		// 0 = MMDD, 1 = DDMM  in the time display
-	char filler[32]; 
+	char hostname[HOSTLEN];
+	char filler[8]; 
 
 };
 

@@ -46,6 +46,7 @@ Copyright (C) 2017  KaraWin
 #include "lwip/api.h"
 #include "lwip/tcp.h"
 #include "lwip/dns.h"
+#include "mdns.h"
 
 #include "app_main.h"
 
@@ -614,13 +615,11 @@ void start_network(){
 			break;
 			}
 		}
-		saveDeviceSettings(device);		
+		saveDeviceSettings(device);	
+		tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, "karadio32");	
 	}
 	free(device);	
 	lcd_state("IP found");	
-  /* start mDNS */
-    // xTaskCreatePinnedToCore(&mdns_task, "mdns_task", 2048, wifi_event_group, 5, NULL, 0);
-
 }
 
 
@@ -759,6 +758,8 @@ void app_main()
 	struct device_settings *device;
 	uint32_t uspeed;
 	xTaskHandle pxCreatedTask;
+	esp_err_t err;
+
 	ESP_LOGI(TAG, "starting app_main()");
     ESP_LOGI(TAG, "RAM left: %u", esp_get_free_heap_size());
 
@@ -766,7 +767,7 @@ void app_main()
 	ESP_LOGE(TAG, "Running partition type %d subtype %d (offset 0x%08x)",
              running->type, running->subtype, running->address);
     // Initialize NVS.
-    esp_err_t err = nvs_flash_init();
+    err = nvs_flash_init();
     if (err == ESP_ERR_NVS_NO_FREE_PAGES) {
         // OTA app partition table has a smaller NVS partition size than the non-OTA
         // partition table. This size mismatch may cause NVS initialization to fail.
@@ -906,6 +907,33 @@ void app_main()
 //-----------------------------------------------------
 	clientInit();	
 
+	//initialize mDNS service
+    err = mdns_init();
+    if (err) 
+        ESP_LOGE(TAG,"mDNS Init failed: %d", err);
+	else
+		ESP_LOGI(TAG,"mDNS Init ok"); 
+	
+	//set hostname and instance name
+	if (strlen(device->hostname) == 0)
+	{	
+		err = mdns_hostname_set("karadio32");
+		strcat(device->hostname,"karadio32");
+	} else
+	{	
+		err = mdns_hostname_set(device->hostname);
+	}	
+	if (err) 
+        ESP_LOGE(TAG,"Hostname Init failed: %d", err);	
+
+	ESP_ERROR_CHECK(mdns_instance_name_set(device->hostname));
+	
+	ESP_ERROR_CHECK(mdns_service_add(NULL, "_http", "_tcp", 80, NULL, 0));	
+ 
+	ESP_ERROR_CHECK(mdns_service_add(NULL, "_telnet", "_tcp", 23, NULL, 0));	
+
+	
+	
     // init player config
     player_config = (player_t*)calloc(1, sizeof(player_t));
     player_config->command = CMD_NONE;
