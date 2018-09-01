@@ -59,7 +59,7 @@ Copyright (C) 2017  KaraWin
 #include <u8g2.h>
 #include "u8g2_esp32_hal.h"
 #include "addon.h"
-
+#include "addonu8g2.h"
 
 
 
@@ -636,6 +636,7 @@ void timerTask(void* p) {
 	gpio_output_conf(getLedGpio());
 	gpio_set_level(getLedGpio(),0);	
 	cCur = FlashOff*10;
+	device = getDeviceSettings();
 	
 	while(1) {
 		// read and treat the timer queue events
@@ -661,7 +662,6 @@ void timerTask(void* p) {
 			}
 			taskYIELD();
 		}
-//		taskYIELD();
 		if (ledStatus)
 		{
 			
@@ -678,22 +678,29 @@ void timerTask(void* p) {
 					gpio_set_level(getLedGpio(),1);	
 					stateLed = true;
 					cCur = FlashOn*10;
-					device = getDeviceSettings();
-					if (device != NULL)
-					{	
-						if (device->vol != getIvol()){ 			
-							device->vol = getIvol();
-							taskYIELD();
-							saveDeviceSettingsVolume(device);
-//							ESP_LOGD("timerTask",striWATERMARK,uxTaskGetStackHighWaterMark( NULL ),xPortGetFreeHeapSize( ));
-						}
-						free(device);	
+					if (device->vol != getIvol()){ 			
+						device->vol = getIvol();
+						taskYIELD();
+						saveDeviceSettingsVolume(device);
+//						ESP_LOGD("timerTask",striWATERMARK,uxTaskGetStackHighWaterMark( NULL ),xPortGetFreeHeapSize( ));
 					}											
 				}
 				ctime = 0;
 			}			
-		}
-		taskYIELD();
+		} else
+		{
+			if (ctime >= cCur)
+			{
+				if (device->vol != getIvol()){ 			
+					device->vol = getIvol();
+					taskYIELD();
+					saveDeviceSettingsVolume(device);
+//					ESP_LOGD("timerTask",striWATERMARK,uxTaskGetStackHighWaterMark( NULL ),xPortGetFreeHeapSize( ));
+				}
+				ctime = 0;
+			}			
+		}			
+//		taskYIELD();
 	}
 //	printf("t0 end\n");
 	vTaskDelete( NULL ); // stop the task (never reached)
@@ -816,8 +823,7 @@ void app_main()
 	// log level
 	setLogLevel(device->trace_level);
 	//time display
-	setDdmm(device->ddmm);
-	
+	setDdmm((device->options32)&T_DDMM);
 	//SPI init for the vs1053 and lcd if spi.
 	VS1053_spi_init(KSPI);
 
@@ -826,6 +832,11 @@ void app_main()
 	//ESP_LOGE(TAG,"Corrupt1 %d",heap_caps_check_integrity(MALLOC_CAP_DMA,1));
 	
 	ESP_LOGE(TAG,"LCD Type %d",device->lcd_type);
+	//lcd rotation
+	setRotat((device->options32)&T_ROTAT) ;	
+//	//font set latin or cyrillic
+//	setCharset((device->options32)&T_CHARSET);
+	
 	lcd_init(device->lcd_type);
 	
 /*	
@@ -876,9 +887,7 @@ void app_main()
 		saveDeviceSettings(device);
 	}	
 	
-	// volume
-	setIvol( device->vol);
-	
+
 	// Version infos
 	ESP_LOGI(TAG, "Release %s, Revision %s",RELEASE,REVISION);
 	ESP_LOGI(TAG, "SDK %s",esp_get_idf_version());
@@ -886,7 +895,10 @@ void app_main()
 
 	lcd_welcome("");
 	
-	
+	// volume
+	setIvol( device->vol);
+	ESP_LOGI(TAG, "Volume set to %d",device->vol);
+		
 	
 // queue for events of the sleep / wake timers
 	event_queue = xQueueCreate(10, sizeof(queue_event_t));

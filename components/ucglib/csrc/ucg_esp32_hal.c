@@ -149,10 +149,11 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 		dev_config.duty_cycle_pos   = 0;
 		dev_config.cs_ena_posttrans = 1;
 		dev_config.cs_ena_pretrans  = 0;
-		dev_config.clock_speed_hz   = (1000000000/((ucg_com_info_t *)data)->serial_clk_speed) ;
+//		dev_config.clock_speed_hz   = (1000000000/((ucg_com_info_t *)data)->serial_clk_speed) ;
+		dev_config.clock_speed_hz   = (2000000000/((ucg_com_info_t *)data)->serial_clk_speed) ; // test at double speed
 		dev_config.spics_io_num     = ucg_esp32_hal.cs;
 		dev_config.flags            = SPI_DEVICE_NO_DUMMY;
-		dev_config.queue_size       = 3;//200;
+		dev_config.queue_size       = 1;
 		dev_config.pre_cb           = NULL;
 		dev_config.post_cb          = NULL;
 		ESP_LOGI(TAG, "... Adding device bus  Speed= %d.",dev_config.clock_speed_hz);

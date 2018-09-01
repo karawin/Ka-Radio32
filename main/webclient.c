@@ -145,6 +145,7 @@ bool clientParsePlaylist(char* s)
   int remove = 0;
   int i = 0; int j = 0;
   
+  ESP_LOGV(TAG,"clientParsePlaylist  %s",s);
 // for extm3u skip line with #EXTINF  
   str = strstr(s,"#EXTINF");
   if (str != NULL) //skip to next line
@@ -172,6 +173,7 @@ bool clientParsePlaylist(char* s)
 		if (str != NULL) remove = 7;
 	}
   }
+/*  
   if (str ==NULL) 
   {	  
 	str = strstr(s,"https://");
@@ -182,7 +184,7 @@ bool clientParsePlaylist(char* s)
 		if (str != NULL) remove = 8;
 	}
   } 
-  
+ */
   if (str != NULL)   
   {
 	str += remove; //skip http://	
@@ -209,7 +211,7 @@ bool clientParsePlaylist(char* s)
 	if (strncmp(url,"localhost",9)!=0) clientSetURL(url);
 	clientSetPath(path);
 	clientSetPort(atoi(port));
-//kprintf("##CLI.URL#: %s, path: %s, port: %s\n",url,path,port);
+	ESP_LOGV(TAG,"clientParsePlaylist: url: %s, path: %s, port: %s",url,path,port);
 	return true;
   }
   else 
@@ -245,11 +247,11 @@ static char* stringify(char* str,int len)
 					new[j++] = '\\';
 					new[j++] =(str)[i] ;
 				}				
-				else	// pseudo ansi utf8 convertion
-					if ((str[i] > 192) && (str[i+1] < 0x80)){ // 128 = 0x80
+/*				else	// pseudo ansi to  utf8 convertion ex: 0xE9 to 0xC3 0xA9 if the next one is not >= 0x80
+				if ((str[i] > 192) && (str[i+1] < 0x80)){ // 128 = 0x80
 					new[j++] = 195; // 192 = 0xC0   195 = 0xC3
 					new[j++] =(str)[i]-64 ; // 64 = 0x40
-				} 
+				} */
 				else new[j++] =(str)[i] ;
 				
 				if ( j+20> nlen) 
@@ -569,7 +571,6 @@ static bool clientSaveOneHeader(char* t, uint16_t len, uint8_t header_num)
 	int i;
 	for(i = 0; i<len+1; i++) tt[i] = 0;
 	strncpy(tt, t, len);
-//	header.members.mArr[header_num] = stringify(header.members.mArr[header_num],len);
 	header.members.mArr[header_num] = stringify(tt,len); //tt is freed here
 	vTaskDelay(10);
 	clientPrintOneHeader(header_num);

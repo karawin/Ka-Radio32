@@ -16,6 +16,8 @@
 #include "esp_log.h"
 #include "logo.h"
 #include "interface.h"
+#include "eeprom.h"
+
 #define TAG  "addonu8g2"
 
 // nams <--> num of line
@@ -53,6 +55,19 @@ static uint8_t  mline[LINES] ; // mark to display
 static char nameNum[5] ; // the number of the current station
 static char genre[BUFLEN/2]; // the local name of the station
 
+
+/*static uint8_t charset = false;
+
+////////////////////////////////////////
+uint8_t getCharset()
+{
+	return charset;
+}
+void setCharset(uint8_t cy)
+{
+	charset = cy;
+}
+*/
 ////////////////////////////////////////
 typedef enum sizefont  {small, text,middle,large} sizefont;
 void setfont8(sizefont size)
@@ -64,53 +79,66 @@ void setfont8(sizefont size)
 		switch(yy)
 		{
 			case 200:
-			u8g2_SetFont(&u8g2,u8g2_font_6x12_tf);
+			u8g2_SetFont(&u8g2,u8g2_font_6x12_t_latcyr);
 			break;
 			case 128:
-			u8g2_SetFont(&u8g2,u8g2_font_6x12_tf);
+			u8g2_SetFont(&u8g2,u8g2_font_6x12_t_latcyr);
 			break;
 			case 32:
-			u8g2_SetFont(&u8g2,u8g2_font_u8glib_4_tr);
+			u8g2_SetFont(&u8g2,u8g2_font_4x6_t_latcyr);
 			break;
 			case 64:
 			default: // 
-			u8g2_SetFont(&u8g2, u8g2_font_5x8_tr);
+			u8g2_SetFont(&u8g2, u8g2_font_5x8_t_latcyr);
 			;
 		}
 		break;
 		case text:
 		switch(yy)
 		{
+			/*
 			case 200:
-			u8g2_SetFont(&u8g2,u8g2_font_7x14_tf);
+			charset?u8g2_SetFont(&u8g2,u8g2_font_7x13_t_cyrillic):u8g2_SetFont(&u8g2,u8g2_font_7x14_tf);//
 			break;
 			case 128:
-			u8g2_SetFont(&u8g2, u8g2_font_7x14_tf);
+			charset?u8g2_SetFont(&u8g2,u8g2_font_7x13_t_cyrillic):u8g2_SetFont(&u8g2, u8g2_font_7x14_tf);//
 			break;
 			case 32:
-			u8g2_SetFont(&u8g2,u8g2_font_5x7_tf);
+			charset?u8g2_SetFont(&u8g2,u8g2_font_5x7_t_cyrillic):u8g2_SetFont(&u8g2,u8g2_font_5x7_tf);//
 			break;
 			case 64:
 			default: // 
-			u8g2_SetFont(&u8g2, u8g2_font_6x12_tf);
-			;
+			charset?u8g2_SetFont(&u8g2, u8g2_font_haxrcorp4089_t_cyrillic ):u8g2_SetFont(&u8g2, u8g2_font_6x12_tf);
+			*/
+			case 200:
+			u8g2_SetFont(&u8g2, u8g2_font_7x13_t_latcyr);//
+			break;
+			case 128:
+			u8g2_SetFont(&u8g2, u8g2_font_7x13_t_latcyr);//
+			break;
+			case 32:
+			u8g2_SetFont(&u8g2, u8g2_font_5x7_t_latcyr);//
+			break;
+			case 64:
+			default: // 
+			u8g2_SetFont(&u8g2, u8g2_font_6x12_t_latcyr);
 		}
 		break;
 		case middle:
 		switch(yy)
 		{
 			case 200:
-			u8g2_SetFont(&u8g2, u8g2_font_9x18_tf);
+			u8g2_SetFont(&u8g2, u8g2_font_9x15_t_latcyr);
 			break;
 			case 128:
-			u8g2_SetFont(&u8g2, u8g2_font_9x18_tf);
+			u8g2_SetFont(&u8g2, u8g2_font_9x15_t_latcyr);
 			break;
 			case 32:
-			u8g2_SetFont(&u8g2, u8g2_font_5x8_tf);
+			u8g2_SetFont(&u8g2, u8g2_font_5x8_t_latcyr);
 			break;
 			case 64:
 			default: // 
-			u8g2_SetFont(&u8g2, u8g2_font_7x14_tf);
+			u8g2_SetFont(&u8g2, u8g2_font_7x13_t_latcyr);
 			;			
 
 		}
@@ -119,17 +147,17 @@ void setfont8(sizefont size)
 		switch(yy)
 		{
 			case 200:
-			u8g2_SetFont(&u8g2, u8g2_font_helvR24_tf);
+			u8g2_SetFont(&u8g2, u8g2_font_10x20_t_latcyr);
 			break;
 			case 128:
-			u8g2_SetFont(&u8g2, u8g2_font_helvR24_tf);
+			u8g2_SetFont(&u8g2, u8g2_font_10x20_t_latcyr);
 			break;
 			case 32:
-			u8g2_SetFont(&u8g2,  u8g2_font_7x14_tf);
+			u8g2_SetFont(&u8g2,  u8g2_font_8x13_t_latcyr);
 			break;
 			case 64:
 			default: // 
-			u8g2_SetFont(&u8g2, u8g2_font_ncenR18_tf);
+			u8g2_SetFont(&u8g2, u8g2_font_10x20_t_latcyr);
 			;		
 		}
 		break;
@@ -185,7 +213,8 @@ void markDrawU8g2(int i)
 // scroll each line
 void scrollU8g2()
 {
-unsigned len;
+unsigned len ;
+	setfont8(text);
 	for (int i = 0;i < LINES;i++)
 	{
 	   if (tline[i]>0) 
@@ -198,8 +227,8 @@ unsigned len;
 		   if ((lline[i] != NULL))
 		   {
 				len = u8g2_GetUTF8Width(&u8g2,lline[i]+iline[i]);
-				if (i == 0)	 len += u8g2_GetUTF8Width(&u8g2,nameNum) ;
-				if (len >= x-20) 
+				if (i == 0)	 len += u8g2_GetUTF8Width(&u8g2,nameNum);
+				if (len >= x) 
 				{iline[i]++;markDrawU8g2(i);}
 				else 
 					tline[i] = 6;
@@ -218,7 +247,7 @@ static void screenBottomU8g2()
 	if (yy != 32) // not enough room
 	{
 		setfont8(small);
-		u8g2_DrawUTF8(&u8g2,x/2-(u8g2_GetUTF8Width(&u8g2,strsec)/2),yy-y-4,strsec);  
+		u8g2_DrawUTF8(&u8g2,x/2-(u8g2_GetUTF8Width(&u8g2,strsec)/2),yy-y-3,strsec);  
 	}	
 }
 
@@ -227,6 +256,28 @@ void drawLinesU8g2()
 {
 u8g2_SendBuffer(&u8g2); 
 }
+
+
+//Thanks to Max
+void eraseSlashes(char * str) {
+	//Symbols: \" \' \\ \? \/
+	char * sym = str, * sym1;
+	if (str != NULL) {
+		while (*sym != 0) {
+			if (*sym == 0x5c) {
+				sym1 = sym + 1;
+				if (*sym1 == 0x22 || *sym1 == 0x27 || *sym1 == 0x5c || *sym1 == 0x3f || *sym1 == 0x2f) {
+					*sym = 0x1f; //Erase \ to non-printable symbol
+					sym++;
+				}	
+			} 
+			sym++;
+		}
+	} 	
+}
+//-Max
+
+
 ////////////////////////////////////////
 // draw all lines
 void drawFrameU8g2(uint8_t mTscreen,struct tm *dt)
@@ -265,13 +316,16 @@ void drawFrameU8g2(uint8_t mTscreen,struct tm *dt)
 		
 		if (lline[i] != NULL)
 		{
+			//Max
+			eraseSlashes(lline[i]);
 			if (i == 0) 
-			{       
+			{      
+//				printf("DRAW: len= %d,STR= %s\n",u8g2_GetUTF8Width(&u8g2,lline[i]+iline[i]),lline[i]+iline[i]);		
 				if (nameNum[0] ==0)  u8g2_DrawUTF8(&u8g2,1,0,lline[i]+iline[i]);
 				else 
 				{
 					u8g2_DrawUTF8(&u8g2,1,0,nameNum);
-					u8g2_DrawUTF8(&u8g2,u8g2_GetUTF8Width(&u8g2,nameNum)-2,0,lline[i]+iline[i]);
+					u8g2_DrawUTF8(&u8g2,u8g2_GetUTF8Width(&u8g2,nameNum)-1,0,lline[i]+iline[i]);
 				}
 			}      
 			else u8g2_DrawUTF8(&u8g2,0,zz+z,lline[i]+iline[i]);
@@ -286,7 +340,6 @@ void drawFrameU8g2(uint8_t mTscreen,struct tm *dt)
 //////////////////////////
 void drawTTitleU8g2(char* ttitle)
 { 
-//	u8g2_SetFont(&u8g2, u8g2_font_8x13B_tf);
 	setfont8(middle);
     uint16_t xxx = (x/2)-(u8g2_GetUTF8Width(&u8g2,ttitle)/2);
     u8g2_SetDrawColor(&u8g2, 1);
@@ -434,58 +487,65 @@ void playingU8g2()
     }
 }
 
+
+
 void lcd_initU8g2(uint8_t *lcd_type)
 {
-		u8g2_esp32_hal_t u8g2_esp32_hal = U8G2_ESP32_HAL_DEFAULT;
-		if (*lcd_type & LCD_SPI) // BW SPI
-		{
-			u8g2_esp32_hal.clk   = PIN_NUM_CLK;
-			u8g2_esp32_hal.mosi  = PIN_NUM_MOSI;
-			u8g2_esp32_hal.cs    = PIN_LCD_CS;
-			u8g2_esp32_hal.dc    = PIN_LCD_A0;
-			u8g2_esp32_hal.reset = PIN_LCD_RST;
-		} else //BW I2C
-		{
-			u8g2_esp32_hal.sda  = PIN_I2C_SDA;
-			u8g2_esp32_hal.scl  = PIN_I2C_SCL;
-			u8g2_esp32_hal.reset = PIN_I2C_RST;
-		}
-		u8g2_esp32_hal_init(u8g2_esp32_hal);		
+	const u8g2_cb_t *rotat;
+	u8g2_esp32_hal_t u8g2_esp32_hal = U8G2_ESP32_HAL_DEFAULT;
+	if (*lcd_type & LCD_SPI) // BW SPI
+	{
+		u8g2_esp32_hal.clk   = PIN_NUM_CLK;
+		u8g2_esp32_hal.mosi  = PIN_NUM_MOSI;
+		u8g2_esp32_hal.cs    = PIN_LCD_CS;
+		u8g2_esp32_hal.dc    = PIN_LCD_A0;
+		u8g2_esp32_hal.reset = PIN_LCD_RST;
+	} else //BW I2C
+	{
+		u8g2_esp32_hal.sda  = PIN_I2C_SDA;
+		u8g2_esp32_hal.scl  = PIN_I2C_SCL;
+		u8g2_esp32_hal.reset = PIN_I2C_RST;
+	}
+	u8g2_esp32_hal_init(u8g2_esp32_hal);		
 	
+	if (getRotat())
+		rotat = U8G2_R2;
+	else
+		rotat = U8G2_R0;
 	
 	switch (*lcd_type){
 	case LCD_I2C_SH1106:
 		u8g2_Setup_sh1106_i2c_128x64_noname_f(
 			&u8g2,
-			U8G2_R0,
+			rotat,
 			u8g2_esp32_i2c_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
 		break;
 	case LCD_I2C_SSD1306NN:
 		u8g2_Setup_ssd1306_i2c_128x64_noname_f(
 			&u8g2,
-			U8G2_R0,
+			rotat,
 			u8g2_esp32_i2c_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
 		break;		
 	case LCD_I2C_SSD1306:
 		u8g2_Setup_ssd1306_i2c_128x64_vcomh0_f(
 			&u8g2,
-			U8G2_R0,
+			rotat,
 			u8g2_esp32_i2c_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
 		break;		
 	case LCD_I2C_SSD1309:	
 		u8g2_Setup_ssd1309_i2c_128x64_noname2_f(
 			&u8g2,
-			U8G2_R0,
+			rotat,
 			u8g2_esp32_i2c_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
 		break;	
 	case LCD_I2C_SSD1325:	
 		u8g2_Setup_ssd1325_i2c_nhd_128x64_f(
 			&u8g2,
-			U8G2_R0,
+			rotat,
 			u8g2_esp32_i2c_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
 
@@ -493,14 +553,14 @@ void lcd_initU8g2(uint8_t *lcd_type)
 	case LCD_I2C_SSD1309NN:	
 		u8g2_Setup_ssd1309_i2c_128x64_noname0_f(
 			&u8g2,
-			U8G2_R0,
+			rotat,
 			u8g2_esp32_i2c_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
 		break;		
 	case LCD_I2C_SSD1306UN:
 		u8g2_Setup_ssd1306_i2c_128x32_univision_f(
 			&u8g2,
-			U8G2_R0,
+			rotat,
 			u8g2_esp32_i2c_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
 		break;
@@ -508,70 +568,70 @@ void lcd_initU8g2(uint8_t *lcd_type)
 	case LCD_SPI_SSD1306NN:	
 		u8g2_Setup_ssd1306_128x64_noname_f(
 			&u8g2,
-			U8G2_R0,
+			rotat,
 			u8g2_esp32_spi_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;			
 	case LCD_SPI_SSD1306:	
 		u8g2_Setup_ssd1306_128x32_univision_f(
 			&u8g2,
-			U8G2_R0,
+			rotat,
 			u8g2_esp32_spi_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;	
 	case LCD_SPI_SSD1309:	
 		u8g2_Setup_ssd1309_128x64_noname2_f(
 			&u8g2,
-			U8G2_R0,
+			rotat,
 			u8g2_esp32_spi_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;	
 	case LCD_SPI_SSD1309NN:
 		u8g2_Setup_ssd1309_128x64_noname0_f(
 			&u8g2,
-			U8G2_R0,
+			rotat,
 			u8g2_esp32_spi_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;		
 	case LCD_SPI_ST7565_ZOLEN:	
 		u8g2_Setup_st7565_zolen_128x64_f(
 			&u8g2,
-			U8G2_R0,
+			rotat,
 			u8g2_esp32_spi_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;		
 	case LCD_SPI_SSD1322_NHD:	
 		u8g2_Setup_ssd1322_nhd_256x64_f(
 			&u8g2,
-			U8G2_R0,
+			rotat,
 			u8g2_esp32_spi_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;	
 	case LCD_SPI_IL3820_V2:	//E Paper
 		u8g2_Setup_il3820_v2_296x128_f(
 			&u8g2,
-			U8G2_R0,
+			rotat,
 			u8g2_esp32_spi_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;	
 	case LCD_SPI_SSD1607:	//E Paper
 		u8g2_Setup_ssd1607_200x200_f(
 			&u8g2,
-			U8G2_R0,
+			rotat,
 			u8g2_esp32_spi_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;	
 	case LCD_SPI_LS013B7DH03:	
 		u8g2_Setup_ls013b7dh03_128x128_f(
 			&u8g2,
-			U8G2_R0,
+			rotat,
 			u8g2_esp32_spi_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;	
 	case LCD_SPI_ST7920:	
 		u8g2_Setup_st7920_s_128x64_f(
 			&u8g2,
-			U8G2_R0,
+			rotat,
 			u8g2_esp32_spi_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;		default:
@@ -583,7 +643,7 @@ void lcd_initU8g2(uint8_t *lcd_type)
 		u8g2_esp32_hal_init(u8g2_esp32_hal);
 		u8g2_Setup_sh1106_128x64_noname_f(
 			&u8g2,
-			U8G2_R0,
+			rotat,
 			u8g2_esp32_i2c_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
 	}

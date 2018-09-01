@@ -16,7 +16,7 @@
 #define MAXDATAT	 256
 
 
-#define RELEASE "1.1"
+#define RELEASE "1.3"
 #define REVISION "0"
 
 uint32_t checkUart(uint32_t speed);
@@ -41,6 +41,8 @@ void fmMute();
 void fmUnmute();
 void setDdmm(uint8_t dm);
 uint8_t getDdmm();
+void setRotat(uint8_t dm);
+uint8_t getRotat();
 
 #define kprintf(fmt, ...) do {    \
         printf(fmt, ##__VA_ARGS__);   \

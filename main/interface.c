@@ -20,6 +20,7 @@
 #include "ota.h"
 #include "spiram_fifo.h"
 #include "addon.h"
+#include "addonu8g2.h"
 #include "app_main.h"
 //#include "rda5807Task.c"
 
@@ -121,6 +122,8 @@ sys.ddmm: display the date format\n\
 sys.ddmm(\"x\"): Change and display the date format. 0:MMDD, 1:DDMM\n\
 sys.host: display the hostname for mDNS\n\
 sys.host(\"your hostname\"): change and display the hostname for mDNS\n\
+sys.rotat: display the lcd rotation option\n\
+sys.rotat(\"x\"): Change and display the lcd rotation option (reset needed). 0:no rotation, 1: rotation\n\
 ///////////\n\
   Other\n\
 ///////////\n\
@@ -142,6 +145,7 @@ void clientVol(char *s);
 #define MAX_WIFI_STATIONS 50
 bool inside = false;
 static uint8_t ddmm;
+static uint8_t rotat;
 uint8_t getDdmm()
 {
 	return ddmm;
@@ -150,7 +154,14 @@ void setDdmm(uint8_t dm)
 {
 	ddmm = dm;
 }
-
+uint8_t getRotat()
+{
+	return rotat;
+}
+void setRotat(uint8_t dm)
+{
+	rotat = dm;
+}
 static bool autoWifi = true; // auto reconnect wifi if disconnected
 bool getAutoWifi(void)
 { return autoWifi;}
@@ -778,7 +789,10 @@ void sysddmm(char* s)
     }	
 	uint8_t value = atoi(t+2);
 	device = getDeviceSettings();
-	device->ddmm = value;
+	if (value == 0)
+		device->options32 &= NT_DDMM;
+	else 
+		device->options32 |= T_DDMM;
 	ddmm = value;
 	saveDeviceSettings(device);	
 	if (ddmm)
@@ -786,8 +800,81 @@ void sysddmm(char* s)
 	else
 		kprintf("##Time is MMDD#\n");
 	free(device);	
-
 }
+
+// display or change the rotation lcd mode
+void sysrotat(char* s)
+{
+    char *t = strstr(s, parslashquote);
+	struct device_settings *device;
+
+	kprintf("##Lcd rotation is ");
+	if(t == NULL)
+	{
+		if (rotat)
+			kprintf("on#\n");
+		else
+			kprintf("off#\n");
+		return;
+	}
+	char *t_end  = strstr(t, parquoteslash);
+    if(t_end == NULL)
+    {
+		kprintf(stritCMDERROR);
+		return;
+    }	
+	uint8_t value = atoi(t+2);
+	device = getDeviceSettings();
+	if (value == 0)
+		device->options32 &= NT_ROTAT;
+	else 
+		device->options32 |= T_ROTAT;
+	rotat = value;
+	saveDeviceSettings(device);	
+	if (rotat)
+		kprintf("on#\n");
+	else
+		kprintf("off#\n");
+	free(device);	
+}
+
+/*
+// display or change the charset. 0:latin, 1:cyrillic
+void syscharset(char* s)
+{
+    char *t = strstr(s, parslashquote);
+	struct device_settings *device;
+
+	kprintf("##Charset: ");
+	if(t == NULL)
+	{
+		if (getCharset())
+			kprintf("Cyrillic#\n");
+		else
+			kprintf("Latin#\n");
+		return;
+	}
+	char *t_end  = strstr(t, parquoteslash);
+    if(t_end == NULL)
+    {
+		kprintf(stritCMDERROR);
+		return;
+    }	
+	uint8_t value = atoi(t+2);
+	device = getDeviceSettings();
+	if (value == 0)
+		device->options32 &= NT_CHARSET;
+	else 
+		device->options32 |= T_CHARSET;
+	setCharset(value);
+	saveDeviceSettings(device);	
+	if (getCharset())
+		kprintf("Cyrillic#\n");
+	else
+		kprintf("Latin#\n");
+	free(device);	
+}
+*/
 
 // Timer in seconds to switch off the lcd
 void syslcdout(char* s)
@@ -795,9 +882,10 @@ void syslcdout(char* s)
     char *t = strstr(s, parslashquote);
 	struct device_settings *device;
 	device = getDeviceSettings();
+	kprintf("##LCD out is ");
 	if(t == NULL)
 	{
-		kprintf("##LCD out is %d#\n",device->lcd_out);
+		kprintf("%d#\n",device->lcd_out);
 		free(device);
 		return;
 	}
@@ -812,7 +900,7 @@ void syslcdout(char* s)
 	device->lcd_out = value; 
 	lcd_out = value;
 	saveDeviceSettings(device);	
-	kprintf("##LCD out is in %d#\n",value);
+	kprintf("%d#\n",value);
 	wakeLcd();
 	free(device);	
 
@@ -1092,6 +1180,8 @@ void checkCommand(int size, char* s)
 		else if(startsWith (  "lcd",tmp+4)) 	syslcd(tmp);
 		else if(startsWith (  "ddmm",tmp+4)) 	sysddmm(tmp);
 		else if(startsWith (  "host",tmp+4)) 	hostname(tmp);
+		else if(startsWith (  "rotat",tmp+4)) 	sysrotat(tmp);
+//		else if(startsWith (  "charset",tmp+4)) syscharset(tmp);
 		else printInfo(tmp);
 	}
 	else 

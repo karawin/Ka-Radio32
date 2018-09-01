@@ -61,6 +61,7 @@
 #include "u8x8.h"
 
 
+
 /*
   The following macro enables 16 Bit mode. 
   Without defining this macro all calulations are done with 8 Bit (1 Byte) variables.
@@ -523,7 +524,9 @@ uint8_t *u8g2_m_48_30_f(uint8_t *page_cnt);
 
 /* u8g2_d_memory.c generated code end */
 
+
 /*==========================================*/
+
 /* u8g2_d_setup.c generated code start */
 void u8g2_Setup_ssd1305_128x32_noname_1(u8g2_t *u8g2, const u8g2_cb_t *rotation, u8x8_msg_cb byte_cb, u8x8_msg_cb gpio_and_delay_cb);
 void u8g2_Setup_ssd1305_128x32_noname_2(u8g2_t *u8g2, const u8g2_cb_t *rotation, u8x8_msg_cb byte_cb, u8x8_msg_cb gpio_and_delay_cb);
@@ -2210,6 +2213,18 @@ extern const uint8_t u8g2_font_px437wyse700b_mf[] U8G2_FONT_SECTION("u8g2_font_p
 extern const uint8_t u8g2_font_px437wyse700b_mr[] U8G2_FONT_SECTION("u8g2_font_px437wyse700b_mr");
 extern const uint8_t u8g2_font_px437wyse700b_mn[] U8G2_FONT_SECTION("u8g2_font_px437wyse700b_mn");
 
+
+/*==========================================*/
+//#include "u8g2-karadio32_fonts.h"
+extern const uint8_t u8g2_font_4x6_t_latcyr[] U8G2_FONT_SECTION("u8g2_font_4x6_t_latcyr");
+extern const uint8_t u8g2_font_5x7_t_latcyr[] U8G2_FONT_SECTION("u8g2_font_5x7_t_latcyr");
+extern const uint8_t u8g2_font_5x8_t_latcyr[] U8G2_FONT_SECTION("u8g2_font_5x8_t_latcyr");
+extern const uint8_t u8g2_font_6x12_t_latcyr[] U8G2_FONT_SECTION("u8g2_font_6x12_t_latcyr");
+extern const uint8_t u8g2_font_6x13_t_latcyr[] U8G2_FONT_SECTION("u8g2_font_6x13_t_latcyr");
+extern const uint8_t u8g2_font_7x13_t_latcyr[] U8G2_FONT_SECTION("u8g2_font_7x13_t_latcyr");
+extern const uint8_t u8g2_font_8x13_t_latcyr[] U8G2_FONT_SECTION("u8g2_font_8x13_t_latcyr");
+extern const uint8_t u8g2_font_9x15_t_latcyr[] U8G2_FONT_SECTION("u8g2_font_9x15_t_latcyr");
+extern const uint8_t u8g2_font_10x20_t_latcyr[] U8G2_FONT_SECTION("u8g2_font_10x20_t_latcyr");
 /* end font list */
 
 /*==========================================*/

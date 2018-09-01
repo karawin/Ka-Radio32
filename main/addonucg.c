@@ -18,6 +18,8 @@
 #include "esp_log.h"
 #include "logo.h"
 #include "interface.h"
+#include "eeprom.h"
+
 #define TAG  "addonucg"
 
 
@@ -75,7 +77,6 @@ static char genre[BUFLEN/2]; // the local name of the station
 static char TTitleStr[15];
 static char TTimeStr[15];
 
-
 ////////////////////////////////////////
 typedef enum sizefont  {small, text,middle,large} sizefont;
 void setfont(sizefont size)
@@ -101,24 +102,26 @@ void setfont(sizefont size)
 			;
 		}
 		break;
+
 		case text:
 		switch(x)
 		{
 			case 320:
-			ucg_SetFont(&ucg,ucg_font_inr16_mf );
+			ucg_SetFont(&ucg,ucg_font_inr16_mf ) ;
 			break;
 			case 128:
-			ucg_SetFont(&ucg,ucg_font_5x7_mf);
+			ucg_SetFont(&ucg,ucg_font_5x7_mf) ;
 			break;
 			case 96:
-			ucg_SetFont(&ucg,ucg_font_4x6_mf);
+			ucg_SetFont(&ucg,ucg_font_4x6_mf) ;
 			break;
 			case 132:
 			default: // 160
-			ucg_SetFont(&ucg,ucg_font_6x13_mf);
+			ucg_SetFont(&ucg,ucg_font_6x13_mf) ;
 			;
 		}
 		break;
+
 		case middle:
 		switch(x)
 		{
@@ -196,6 +199,8 @@ void cleartitleUcg(uint8_t froml)
 void removeUtf8(char *characters)
 {
   int Rindex = 0;
+	
+  ESP_LOGV(TAG,"removeUtf8 in : %s",characters);	
   while (characters[Rindex])
   {
     if ((characters[Rindex] >= 0xc2)&&(characters[Rindex] <= 0xc3)) // only 0 to FF ascii char
@@ -207,6 +212,9 @@ void removeUtf8(char *characters)
     }
     Rindex++;
   }
+
+  ESP_LOGV(TAG,"removeUtf8 out: %s",characters);
+  
 }
 
 // Mark the lines to draw
@@ -677,6 +685,7 @@ void playingUcg()
 
 void lcd_initUcg(uint8_t *lcd_type)
 {
+	uint8_t rotat = getRotat();
 	ESP_LOGI(TAG,"lcd init  type: %d",*lcd_type);
 	
 		ucg_esp32_hal_t ucg_esp32_hal = UCG_ESP32_HAL_DEFAULT;
@@ -730,7 +739,12 @@ void lcd_initUcg(uint8_t *lcd_type)
 		ucg_ClearScreen(&ucg);		
 		
 		
-		switch (*lcd_type)
+		if (rotat)
+			ucg_SetRotate270(&ucg);
+		else 
+			ucg_SetRotate90(&ucg);
+		
+/*		switch (*lcd_type)
 		{
 			case LCD_SPI_ILI9341:
 				ucg_SetRotate270(&ucg);
@@ -738,9 +752,9 @@ void lcd_initUcg(uint8_t *lcd_type)
 			case LCD_SPI_SSD1331:
 				break;
 			default:
-			ucg_SetRotate90(&ucg);
-			
+			ucg_SetRotate90(&ucg);			
 		}
+*/		
 		
 		//ucg_SetFont(&ucg,ucg_font_6x13_tf);
 		ucg_SetFontPosTop(&ucg);

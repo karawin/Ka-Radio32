@@ -162,7 +162,7 @@ void mp3_decoder_task(void *pvParameters)
             }
             mad_synth_frame(synth, frame);
         }
-        ESP_LOGV(TAG, "RAM left %d", esp_get_free_heap_size());
+        //ESP_LOGV(TAG, "RAM left %d", esp_get_free_heap_size());
     }
 	goto cleanup;
 	
