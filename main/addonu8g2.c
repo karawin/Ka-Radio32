@@ -229,7 +229,14 @@ unsigned len ;
 				len = u8g2_GetUTF8Width(&u8g2,lline[i]+iline[i]);
 				if (i == 0)	 len += u8g2_GetUTF8Width(&u8g2,nameNum);
 				if (len >= x) 
-				{iline[i]++;markDrawU8g2(i);}
+				{
+					iline[i]++;
+					//Max
+					while (((*(lline[i]+iline[i])) & 0xc0) == 0x80) {
+						iline[i]++;
+					}
+					markDrawU8g2(i);
+				}
 				else 
 					tline[i] = 6;
 		   }
