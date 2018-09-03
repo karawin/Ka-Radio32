@@ -157,7 +157,7 @@ void setfont(sizefont size)
 		switch(x)
 		{
 			case 320:
-			charset?ucg_SetFont(&ucg,ucg_font_crox5hb ):ucg_SetFont(&ucg,ucg_font_inr33_mf);
+			charset?ucg_SetFont(&ucg,ucg_font_crox5h ):ucg_SetFont(&ucg,ucg_font_inr33_mf);
 			break;
 			case 128:
 			charset?ucg_SetFont(&ucg,ucg_font_crox3c ):ucg_SetFont(&ucg,ucg_font_7x14_mf);
