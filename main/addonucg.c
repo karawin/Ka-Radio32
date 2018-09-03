@@ -22,6 +22,33 @@
 
 #define TAG  "addonucg"
 
+extern const ucg_fntpgm_uint8_t ucg_font_crox1c[] UCG_FONT_SECTION("ucg_font_crox1c");
+extern const ucg_fntpgm_uint8_t ucg_font_crox1cb[] UCG_FONT_SECTION("ucg_font_crox1cb");
+extern const ucg_fntpgm_uint8_t ucg_font_crox1h[] UCG_FONT_SECTION("ucg_font_crox1h");
+extern const ucg_fntpgm_uint8_t ucg_font_crox1hb[] UCG_FONT_SECTION("ucg_font_crox1hb");
+extern const ucg_fntpgm_uint8_t ucg_font_crox1t[] UCG_FONT_SECTION("ucg_font_crox1t");
+extern const ucg_fntpgm_uint8_t ucg_font_crox1b[] UCG_FONT_SECTION("ucg_font_crox1tb");
+extern const ucg_fntpgm_uint8_t ucg_font_crox2c[] UCG_FONT_SECTION("ucg_font_crox2c");
+extern const ucg_fntpgm_uint8_t ucg_font_crox2cb[] UCG_FONT_SECTION("ucg_font_crox2cb");
+extern const ucg_fntpgm_uint8_t ucg_font_crox2h[] UCG_FONT_SECTION("ucg_font_crox2h");
+extern const ucg_fntpgm_uint8_t ucg_font_crox2hb[] UCG_FONT_SECTION("ucg_font_crox2hb");
+extern const ucg_fntpgm_uint8_t ucg_font_crox2t[] UCG_FONT_SECTION("ucg_font_crox2t");
+extern const ucg_fntpgm_uint8_t ucg_font_crox2b[] UCG_FONT_SECTION("ucg_font_crox2tb");
+extern const ucg_fntpgm_uint8_t ucg_font_crox3c[] UCG_FONT_SECTION("ucg_font_crox3c");
+extern const ucg_fntpgm_uint8_t ucg_font_crox3cb[] UCG_FONT_SECTION("ucg_font_crox3cb");
+extern const ucg_fntpgm_uint8_t ucg_font_crox3h[] UCG_FONT_SECTION("ucg_font_crox3h");
+extern const ucg_fntpgm_uint8_t ucg_font_crox3hb[] UCG_FONT_SECTION("ucg_font_crox3hb");
+extern const ucg_fntpgm_uint8_t ucg_font_crox3t[] UCG_FONT_SECTION("ucg_font_crox3t");
+extern const ucg_fntpgm_uint8_t ucg_font_crox3b[] UCG_FONT_SECTION("ucg_font_crox3tb");
+extern const ucg_fntpgm_uint8_t ucg_font_crox4h[] UCG_FONT_SECTION("ucg_font_crox4h");
+extern const ucg_fntpgm_uint8_t ucg_font_crox4hb[] UCG_FONT_SECTION("ucg_font_crox4hb");
+extern const ucg_fntpgm_uint8_t ucg_font_crox4t[] UCG_FONT_SECTION("ucg_font_crox4t");
+extern const ucg_fntpgm_uint8_t ucg_font_crox4tb[] UCG_FONT_SECTION("ucg_font_crox4tb");
+extern const ucg_fntpgm_uint8_t ucg_font_crox5h[] UCG_FONT_SECTION("ucg_font_crox5h");
+extern const ucg_fntpgm_uint8_t ucg_font_crox5hb[] UCG_FONT_SECTION("ucg_font_crox5hb");
+extern const ucg_fntpgm_uint8_t ucg_font_crox5t[] UCG_FONT_SECTION("ucg_font_crox5t");
+extern const ucg_fntpgm_uint8_t ucg_font_crox5tb[] UCG_FONT_SECTION("ucg_font_crox5tb");
+
 
 #define ucg_SetColori(a,b,c,d) ucg_SetColor(a,0,b,c,d)
 
@@ -77,11 +104,13 @@ static char genre[BUFLEN/2]; // the local name of the station
 static char TTitleStr[15];
 static char TTimeStr[15];
 
+static bool charset = false;  // latin or cyrillic
+
 ////////////////////////////////////////
 typedef enum sizefont  {small, text,middle,large} sizefont;
 void setfont(sizefont size)
 {
-//	printf("setfont size: %d, x: %d\n",size,x);
+//	printf("setfont charset: %d, size: %d, x: %d\n",charset,size,x);
 	switch(size)
 	{
 		case small:
@@ -107,17 +136,17 @@ void setfont(sizefont size)
 		switch(x)
 		{
 			case 320:
-			ucg_SetFont(&ucg,ucg_font_inr16_mf ) ;
+			charset?ucg_SetFont(&ucg,ucg_font_crox5h ):ucg_SetFont(&ucg,ucg_font_inr16_mf ) ;
 			break;
 			case 128:
-			ucg_SetFont(&ucg,ucg_font_5x7_mf) ;
+			charset?ucg_SetFont(&ucg,ucg_font_crox3c ):ucg_SetFont(&ucg,ucg_font_5x7_mf) ;
 			break;
 			case 96:
-			ucg_SetFont(&ucg,ucg_font_4x6_mf) ;
+			charset?ucg_SetFont(&ucg,ucg_font_crox2c ):ucg_SetFont(&ucg,ucg_font_4x6_mf) ;
 			break;
 			case 132:
 			default: // 160
-			ucg_SetFont(&ucg,ucg_font_6x13_mf) ;
+			charset?ucg_SetFont(&ucg,ucg_font_crox3c ):ucg_SetFont(&ucg,ucg_font_6x13_mf) ;
 			;
 		}
 		break;
@@ -126,17 +155,17 @@ void setfont(sizefont size)
 		switch(x)
 		{
 			case 320:
-			ucg_SetFont(&ucg,ucg_font_inr33_mf);
+			charset?ucg_SetFont(&ucg,ucg_font_crox5hb ):ucg_SetFont(&ucg,ucg_font_inr33_mf);
 			break;
 			case 128:
-			ucg_SetFont(&ucg,ucg_font_7x14_mf);
+			charset?ucg_SetFont(&ucg,ucg_font_crox5hb ):ucg_SetFont(&ucg,ucg_font_7x14_mf);
 			break;
 			case 96:
-			ucg_SetFont(&ucg,ucg_font_6x12_mf);
+			charset?ucg_SetFont(&ucg,ucg_font_crox4h ):ucg_SetFont(&ucg,ucg_font_6x12_mf);
 			break;
 			case 132:
 			default: // 160
-			ucg_SetFont(&ucg,ucg_font_fur14_tf);
+			charset?ucg_SetFont(&ucg,ucg_font_crox5hb ):ucg_SetFont(&ucg,ucg_font_fur14_tf);
 			
 			;
 		}
@@ -195,21 +224,57 @@ void cleartitleUcg(uint8_t froml)
      }  
 }
 
+//Thanks to Max
+void ucEraseSlashes(char * str) {
+	//Symbols: \" \' \\ \? \/
+	char * sym = str, * sym1;
+	if (str != NULL) {
+		while (*sym != 0) {
+			if (*sym == 0x5c) {
+				sym1 = sym + 1;
+				if (*sym1 == 0x22 || *sym1 == 0x27 || *sym1 == 0x5c || *sym1 == 0x3f || *sym1 == 0x2f) {
+					*sym = 0x1f; //Erase \ to non-printable symbol
+					sym++;
+				}	
+			} 
+			sym++;
+		}
+	} 	
+}
+//-Max
+
 ////////////////////////////////////////
+uint16_t UtoC(uint8_t high,uint8_t low)
+{
+	return(((high<<6)&0xFF) |( low & 0x3F));
+}
+
 void removeUtf8(char *characters)
 {
   int Rindex = 0;
-	
-  ESP_LOGV(TAG,"removeUtf8 in : %s",characters);	
+  uint16_t utf8;
+  ESP_LOGV(TAG,"removeUtf8 in : %s",characters);
+  ucEraseSlashes(characters) ; 
   while (characters[Rindex])
   {
-    if ((characters[Rindex] >= 0xc2)&&(characters[Rindex] <= 0xc3)) // only 0 to FF ascii char
+    if ((characters[Rindex] >= 0xc2)&&(characters[Rindex] <=0xc3)) // only 0 to FF ascii char
     {
-      characters[Rindex+1] = ((characters[Rindex]<<6)&0xFF) | (characters[Rindex+1] & 0x3F);
-      int sind = Rindex+1;
-      while (characters[sind]) { characters[sind-1] = characters[sind];sind++;}
-      characters[sind-1] = 0;
+		utf8 = UtoC(characters[Rindex],characters[Rindex+1]) ; // the utf8
+		characters[Rindex+1] =  (uint8_t)utf8 &0xff;
+		if (utf8>= 0x100) characters[Rindex+1] = 0x1f; //Erase to non-printable symbol
+		int sind = Rindex+1;
+		while (characters[sind]) { characters[sind-1] = characters[sind];sind++;}
+		characters[sind-1] = 0; 
     }
+    if ((characters[Rindex] >= 0xd0)&&(characters[Rindex] <= 0xd1)) // only 0 to FF ascii char
+    {	
+		utf8 = UtoC(characters[Rindex],characters[Rindex+1]) ; // the utf8
+		characters[Rindex+1] =  (uint8_t)utf8 - 0x350;
+		int sind = Rindex+1;
+		while (characters[sind]) { characters[sind-1] = characters[sind];sind++;}
+		characters[sind-1] = 0;
+		charset = true;
+	}
     Rindex++;
   }
 
@@ -245,11 +310,10 @@ setfont(text);
 			} 
 			else
 			{
+				len = ucg_GetStrWidth(&ucg,lline[i]+iline[i]);
 				if (i == 0)
-					len = ucg_GetStrWidth(&ucg,nameNum) + ucg_GetStrWidth(&ucg,lline[i]+iline[i]);
-				else
-					len = ucg_GetStrWidth(&ucg,lline[i]+iline[i]);
-				if (len > x)
+					len += ucg_GetStrWidth(&ucg,nameNum);
+				if (len >= x)
 				{      
 					iline[i] += x/ucg_GetStrWidth(&ucg,"8");//x/6;
 					len = iline[i];
@@ -408,7 +472,6 @@ void drawTTitleUcg(char* ttitle)
 	if (strcmp(ttitle,TTitleStr) != 0)
 	{
 		setfont(middle);
-		//ucg_SetFont(&ucg, ucg_font_helvB18_tf);
 		uint16_t xxx = (x/2)-(ucg_GetStrWidth(&ucg,ttitle)/2);
 		ucg_SetColor(&ucg,0,CTBACK);  
 		ucg_DrawBox(&ucg,0,0,x,HHeader); 
@@ -446,6 +509,7 @@ void drawStationUcg(uint8_t mTscreen,char* snum,char* ddot)
 	
   char ststr[] = {"Station"};
   int16_t len;
+  bool scharset;
     switch (mTscreen){
       case 1:  
 		TTitleStr[0] = 0;        
@@ -454,15 +518,19 @@ void drawStationUcg(uint8_t mTscreen,char* snum,char* ddot)
       case 2:   
         ucg_SetColor(&ucg,0,CBLACK); 
         ucg_DrawBox(&ucg,0,HHeader,x,yy);     
-        setfont(middle);
+ //       setfont(middle);
         ucg_SetColor(&ucg,0,CBODY);
 //        ddot = strstr(sline,":");
         if (ddot != NULL)
         {
+		  scharset = charset;
+		  charset = false;
+		  removeUtf8(ddot);
           ucg_DrawString(&ucg,(x/2)-(ucg_GetStrWidth(&ucg,snum)/2),yy/3,0,snum);
           len = (x/2)-(ucg_GetStrWidth(&ucg,ddot)/2);
           if (len <0) len = 0;
           ucg_DrawString(&ucg,len,yy/3 + ucg_GetFontAscent(&ucg)+y,0, ddot);
+		  charset = scharset;
         }
         break;
       default:; 
@@ -667,6 +735,7 @@ void namesetUcg(char* ici)
 	   setFuturNum(atoi(nameNum));     
     }
     strcpy(nameset,nameset+strlen(nameNum));
+	charset = false;
 	removeUtf8(nameset);
     lline[STATIONNAME] = nameset;
 }

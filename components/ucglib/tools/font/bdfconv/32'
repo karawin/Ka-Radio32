@@ -1,0 +1,15 @@
+Parse File ../bdf/win_crox3c.bdf: 224 glyph(s) found
+Map: map_cmd_list=''32-255,'
+Map: exclude=0 from=0/$0 to=0/$0 map=0/$0
+Reduce: Start
+Reduce: End
+CalculateMaxBBX: x=0, y=0, w=0, h=0
+CalculateMaxBBX: Encodings x=0, y=0, w=0, h=0
+bf_CalculateMinMaxDWidth: dx_min=32767, dx_max=-32767
+bf_CalculateMinMaxDWidth: x_min=32767, x_max=-32767
+bf_CalculateMaxBitFieldSize: bbx.x=0, bbx.y=0, bbx.w=0, bbx.h=0, dwidth=0
+RLE Compress: best zero bits 2, one bits 2, total bit size 0
+RLE Compress: Font code generation, selected glyphs=0, total glyphs=224
+RLE Compress: 'A' pos = 0, 'a' pos = 0
+RLE Compress: Font size 27
+bf_WriteUCGCByFilename: Write file 'win_crox3c.c'
