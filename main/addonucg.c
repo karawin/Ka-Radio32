@@ -139,14 +139,16 @@ void setfont(sizefont size)
 			charset?ucg_SetFont(&ucg,ucg_font_crox5h ):ucg_SetFont(&ucg,ucg_font_inr16_mf ) ;
 			break;
 			case 128:
-			charset?ucg_SetFont(&ucg,ucg_font_crox3c ):ucg_SetFont(&ucg,ucg_font_5x7_mf) ;
-			break;
-			case 96:
-			charset?ucg_SetFont(&ucg,ucg_font_crox2c ):ucg_SetFont(&ucg,ucg_font_4x6_mf) ;
+			charset?ucg_SetFont(&ucg,ucg_font_crox1c ):ucg_SetFont(&ucg,ucg_font_5x7_mf) ;
 			break;
 			case 132:
+			charset?ucg_SetFont(&ucg,ucg_font_crox1c ):ucg_SetFont(&ucg,ucg_font_5x7_mf) ;
+			break;
+			case 96:
+			charset?ucg_SetFont(&ucg,ucg_font_crox1c ):ucg_SetFont(&ucg,ucg_font_4x6_mf) ;
+			break;
 			default: // 160
-			charset?ucg_SetFont(&ucg,ucg_font_crox3c ):ucg_SetFont(&ucg,ucg_font_6x13_mf) ;
+			charset?ucg_SetFont(&ucg,ucg_font_crox1c ):ucg_SetFont(&ucg,ucg_font_6x13_mf) ;
 			;
 		}
 		break;
@@ -158,14 +160,14 @@ void setfont(sizefont size)
 			charset?ucg_SetFont(&ucg,ucg_font_crox5hb ):ucg_SetFont(&ucg,ucg_font_inr33_mf);
 			break;
 			case 128:
-			charset?ucg_SetFont(&ucg,ucg_font_crox5hb ):ucg_SetFont(&ucg,ucg_font_7x14_mf);
+			charset?ucg_SetFont(&ucg,ucg_font_crox3c ):ucg_SetFont(&ucg,ucg_font_7x14_mf);
 			break;
 			case 96:
-			charset?ucg_SetFont(&ucg,ucg_font_crox4h ):ucg_SetFont(&ucg,ucg_font_6x12_mf);
+			charset?ucg_SetFont(&ucg,ucg_font_crox2h ):ucg_SetFont(&ucg,ucg_font_6x12_mf);
 			break;
 			case 132:
 			default: // 160
-			charset?ucg_SetFont(&ucg,ucg_font_crox5hb ):ucg_SetFont(&ucg,ucg_font_fur14_tf);
+			charset?ucg_SetFont(&ucg,ucg_font_crox3c ):ucg_SetFont(&ucg,ucg_font_fur14_tf);
 			
 			;
 		}
@@ -243,10 +245,43 @@ void ucEraseSlashes(char * str) {
 }
 //-Max
 
+// non linear cyrillic conversion
+struct _utf8To1251_t
+{
+  uint16_t utf8;
+  uint8_t c1251;
+
+};
+typedef struct _utf8To1251_t utf8To1251_t;
+#define UTF8TO1251	30
+utf8To1251_t utf8To1251[UTF8TO1251] = {{0x401,0xa8},{0x402,0x80},{0x403,0x81},{0x404,0xaa},{0x405,0xbd},{0x406,0x49/*0xb2*/},{0x407,0xaf},{0x408,0xa3},
+									   {0x409,0x8a},{0x40a,0x8c},{0x40b,0x8e},{0x40c,0x8d},{0x40e,0xa1},{0x40f,0x8f},{0x452,0x90},{0x451,0xb8},
+									   {0x453,0x83},{0x454,0xba},{0x455,0xbe},{0x456,0x69/*0xb3*/},{0x457,0xbf},{0x458,0x6a/*0xbc*/},{0x459,0x9a},{0x45a,0x9c},
+									   {0x45b,0x9e},{0x45c,0x9d},{0x45f,0x9f},{0x490,0xa5},{0x491,0xb4},
+									   {0,0}};
+uint8_t to1251(uint16_t utf8)
+{
+	int i;
+	if (utf8 > 0x491) return 0x1f;
+	for (i = 0; i<UTF8TO1251;i++)
+	{
+		if (utf8 == utf8To1251[i].utf8)
+		{
+//			printf("to1251: utf8: %x, ret: %x\n",utf8,utf8To1251[i].c1251);
+			return utf8To1251[i].c1251;
+		}
+	}
+	
+//	printf("to1251: utf8: %x, ret: %x\n",utf8,(utf8 - 0x350)& 0xff);
+	return ((utf8 - 0x350)& 0xff );
+}
+
+
 ////////////////////////////////////////
 uint16_t UtoC(uint8_t high,uint8_t low)
 {
-	return(((high<<6)&0xFF) |( low & 0x3F));
+	uint16_t res = (( high<<6)  |( low & 0x3F )) & 0x7FF;
+	return(res);
 }
 
 void removeUtf8(char *characters)
@@ -266,10 +301,10 @@ void removeUtf8(char *characters)
 		while (characters[sind]) { characters[sind-1] = characters[sind];sind++;}
 		characters[sind-1] = 0; 
     }
-    if ((characters[Rindex] >= 0xd0)&&(characters[Rindex] <= 0xd1)) // only 0 to FF ascii char
+    if ((characters[Rindex] >= 0xd0)&&(characters[Rindex] <= 0xd3)) // only 0 to FF ascii char
     {	
 		utf8 = UtoC(characters[Rindex],characters[Rindex+1]) ; // the utf8
-		characters[Rindex+1] =  (uint8_t)utf8 - 0x350;
+		characters[Rindex+1] = to1251(utf8);
 		int sind = Rindex+1;
 		while (characters[sind]) { characters[sind-1] = characters[sind];sind++;}
 		characters[sind-1] = 0;
@@ -411,7 +446,7 @@ void draw(int i)
         break;
         default:
           ucg_SetColori(&ucg,0,0,0); 
-          ucg_DrawBox(&ucg,0,y*i+z,x,y/*-ucg_GetFontDescent(&ucg)*/); 
+          ucg_DrawBox(&ucg,0,y*i+z,x,y-ucg_GetFontDescent(&ucg)); 
           setColor(i);
           if (lline[i] != NULL) ucg_DrawString(&ucg,0,y*i+z+1,0,lline[i]+iline[i]);                
    }      
@@ -444,7 +479,7 @@ int i;
 		setfont(text);
 		ucg_SetColor(&ucg,0,255,255,0);  
 		ucg_SetColor(&ucg,1,0,255,255);  
-		ucg_DrawGradientLine(&ucg,0,(4*y) - (y/2)-5,x,0);
+		ucg_DrawGradientLine(&ucg,0,(4*y) - (y/2) -4,x,0);
 		ucg_SetColor(&ucg,0,CBLACK);  
 		ucg_DrawBox(&ucg,0,0,x-1,15);  
 		for (i=0;i<LINES;i++) draw(i);
