@@ -229,7 +229,8 @@ unsigned len ;
 	{
 	   if (tline[i]>0) 
 	   {
-	     if (tline[i] == 4) {iline[i]= 0;markDrawU8g2(i);}
+	     if (tline[i] == 4) {iline[i]= 0;
+		 markDrawU8g2(i);}
 	     tline[i]--;		 
 	   } 
 	   else

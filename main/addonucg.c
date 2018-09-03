@@ -301,28 +301,27 @@ setfont(text);
 		{	
 			if (tline[i]>0) 
 			{
-				if (tline[i] == 3) 
+				len = (i==0)? ucg_GetStrWidth(&ucg,nameNum)+ucg_GetStrWidth(&ucg,lline[i]):ucg_GetStrWidth(&ucg,lline[i]);
+				if ((tline[i] == 4) && (len > x)) 
 				{
 					iline[i]= 0;
-					if (ucg_GetStrWidth(&ucg,lline[i]) > x) markDrawUcg(i);//draw(i);
+					markDrawUcg(i);//draw(i);
 				}
 				tline[i]--;		 
 			} 
 			else
 			{
-				len = ucg_GetStrWidth(&ucg,lline[i]+iline[i]);
-				if (i == 0)
-					len += ucg_GetStrWidth(&ucg,nameNum);
-				if (len >= x)
+				len = (i==0)? ucg_GetStrWidth(&ucg,nameNum)+ucg_GetStrWidth(&ucg,lline[i]+iline[i]):ucg_GetStrWidth(&ucg,lline[i]+iline[i]);
+				if (len > x)
 				{      
-					iline[i] += x/ucg_GetStrWidth(&ucg,"8");//x/6;
+					iline[i] += x/ucg_GetStrWidth(&ucg,"MM");//x/6;
 					len = iline[i];
 					while ((*(lline[i]+iline[i])!=' ')&&(*(lline[i]+iline[i])!='-')&&(iline[i]!= 0))iline[i]--;
 					if (iline[i]==0) iline[i]=len;     
 					markDrawUcg(i); //draw(i);
 				}
 				else 
-					{tline[i] = 4;}
+					{tline[i] = 6;}
 			}
 		}
 	}
