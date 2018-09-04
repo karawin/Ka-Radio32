@@ -733,7 +733,7 @@ void clientDisconnect(const char* from)
 	}	
 	if ((from[0]!='C') || (from[1]!='_'))
 		if (!ledStatus) gpio_set_level(getLedGpio(),0);
-	vTaskDelay(6);
+	vTaskDelay(5);
 }
 
 IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
@@ -763,7 +763,6 @@ IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
 		}
 		if (t1 != NULL) { // 
 			kprintf(CLIPLAY,0x0d,0x0a);
-//			kprintf("\n");
 			clientSaveOneHeader(notfound, 13,METANAME);
 			wsHeaders();
 //			vTaskDelay(200);
@@ -860,6 +859,7 @@ IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
 				} else
 				{
 					t1 = NULL;
+					vTaskDelay(1); //avoid watchdog is infernal loop
 					len += recvfrom(sockfd, pdata+len, RECEIVE-len, 0,NULL,NULL);
 				}
 			} while (t1 == NULL);
@@ -1224,6 +1224,7 @@ void clientTask(void *pvParams) {
 							wsHeaders();
 							vTaskDelay(1);
 							clientDisconnect("not found"); 
+							
 							
 					}	
 					else{  //playing & once=1 and no more received stream
