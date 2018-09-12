@@ -62,7 +62,7 @@ void sendOneByte()
 	int nb = oneByte.nb;
 	oneByte.nb = 0;	
 	
-	
+  taskYIELD();	
 	if (nb != 0)
 	{
 		spi_transaction_t trans_desc;
@@ -91,7 +91,7 @@ void addOneByte(uint8_t bt)
 
 int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 {
-//  taskYIELD();
+  taskYIELD();
 
   switch(msg)
   {

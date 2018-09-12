@@ -804,6 +804,7 @@ IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
 		//no break here
 	case C_HEADER1:  // not ended
 		{
+			int i = 0;
 			cstatus = C_HEADER1;
 			do {
 				t1 = strstr(pdata, "\r\n\r\n"); // END OF HEADER
@@ -859,6 +860,7 @@ IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
 				} else
 				{
 					t1 = NULL;
+					if (i++ > 5) {clientDisconnect("header1");break;}
 					vTaskDelay(1); //avoid watchdog is infernal loop
 					len += recvfrom(sockfd, pdata+len, RECEIVE-len, 0,NULL,NULL);
 				}
