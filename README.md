@@ -1,9 +1,6 @@
 ## STATE
 KaraDio32 in dev state: Stable<br/>
-Little problem with esp-idf v3.0 and v3.1 for the i2s output:<br/>
-At the top level of github, i copied  i2s.c and i2s.h.<br/>
-These files must be replaced to the esp-idf\components\driver and esp-idf\components\driver/include.<br/>
-Or simply do an OTA if your configuration is compatible to the standard gpio. <br/>
+The new code from 3.1 R3 is now compatible. You can restore the tes i2s.c and i2s.h if you changed it<br/>
 <br/>
 See https://github.com/espressif/esp-idf/issues/2307 too if you generate your own bin.
 <br/><br/>
@@ -37,7 +34,7 @@ To build your own release, you must install the idf https://github.com/espressif
 To flash all build output, run 'make flash' or:
 python /home/yourhome/esp/esp-idf/components/esptool_py/esptool/esptool.py --chip esp32 --port com5 --baud 460800 --before default_reset --after hard_reset write_flash -u --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 /home/yourhome/esp/Ka-Radio32/build/bootloader/bootloader.bin 0x10000 /home/yourhome/esp/Ka-Radio32/build/KaRadio32.bin 0x8000 /home/yourhome/esp/Ka-Radio32/build/partitions.bin
 ```
-### GPIO Definition Version 0.9
+### GPIO Definition 
 ```
 //file gpio.h
 //-------------------------------//
