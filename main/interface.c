@@ -53,7 +53,8 @@ wifi.recon: Reconnect wifi if disconnected by wifi.discon\n\
 wifi.con(\"ssid\",\"password\"): Record the given AP ssid with password in AP1 for next reboot\n\
 wifi.discon: disconnect the current ssid\n\
 wifi.station: the current ssid and password\n\
-wifi.status: give the current IP GW and mask\n\n\
+wifi.status: give the current IP GW and mask\n\
+wifi.rssi: print the current rssi (power of the reception\n\n\
 //////////////////\n\
   Station Client commands\n\
 //////////////////\n\
@@ -63,10 +64,11 @@ cli.port(\"xxxx\"): the port number of the station to instant play\n\
 cli.instant: play the instant station\n\
 cli.start: start to play the current station\n\
 cli.play(\"xxx\"): play the xxx recorded station in the list (0 = stop)\n\
-cli.prev (or cli.previous): select the previous station in the list and play it\n\
-cli.next: select the next station in the list and play it"};
+"};
 
 const char stritHELP1[]  = {"\
+cli.prev (or cli.previous): select the previous station in the list and play it\n\
+cli.next: select the next station in the list and play it\
 cli.stop: stop the playing station or instant\n\
 cli.list: list all recorded stations\n\
 cli.list(\"x\"): list only one of the recorded stations. Answer with #CLI.LISTINFO#: followed by infos\n\
@@ -81,7 +83,8 @@ cli.info: Respond with nameset, all icy, meta, volume and stae playing or stoppe
 //////////////////\n\
 sys.uart(\"x\"): Change the baudrate of the uart on the next reset.\n\
  Valid x are: 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 76880, 115200, 230400\n\
-sys.i2s: Display the current I2S speed"};
+sys.i2s: Display the current I2S speed"\
+};
 
 const char stritHELP2[]  = {"\
 sys.i2s(\"x\"): Change and record the I2S clock speed of the vs1053 GPIO5 MCLK for the i2s interface to external dac.\n\
@@ -132,7 +135,8 @@ help: this command\n\
 #INFO:\"\"#\n\
 \n\
 A command error display:\n\
-##CMD_ERROR#\n\r"}; 
+##CMD_ERROR#\n\r"\
+}; 
 
 uint16_t currentStation = 0;
 static uint8_t led_gpio = 255;

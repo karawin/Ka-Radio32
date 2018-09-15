@@ -240,6 +240,7 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 	  {
 		uint8_t* txbf;
 		uint8_t* txb = heap_caps_malloc(arg*2, MALLOC_CAP_DMA);
+		if (txb == NULL) break;
 		txbf = txb;
 		while (i--) { *txbf++ = (char) data[0];} 
 		trans_desc.flags     = 0;
@@ -282,6 +283,7 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 	  {
 		uint8_t* txbf;
 		uint8_t* txb = heap_caps_malloc(arg*2, MALLOC_CAP_DMA);
+		if (txb == NULL) break;
 		txbf = txb;
 		while (i--) { *txbf++ = (char) data[0]; *txbf++ = (char) data[1]; } 
 		trans_desc.flags     = 0;
@@ -324,6 +326,7 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 	  {
 		uint8_t* txbf;
 		uint8_t* txb = heap_caps_malloc(arg*4, MALLOC_CAP_DMA);
+		if (txb == NULL) break;
 		txbf = txb;
 		while (i--) { *txbf++ = (char) data[0]; *txbf++ = (char) data[1]; *txbf++ = (char) data[2];} 
 		*txbf = 0;
@@ -350,6 +353,7 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
       /* "data" is an array with "arg" bytes */
       /* send "arg" bytes to the display */
 	  uint8_t* txb = heap_caps_malloc(arg, MALLOC_CAP_DMA);
+		if (txb == NULL) break;
 	  memcpy(txb,data,arg);
 	  spi_transaction_t trans_desc;
 		trans_desc.addr      = 0;
