@@ -701,7 +701,7 @@ void timerTask(void* p) {
 				ctime = 0;
 			}			
 		}			
-//		taskYIELD();
+		taskYIELD();
 	}
 //	printf("t0 end\n");
 	vTaskDelete( NULL ); // stop the task (never reached)

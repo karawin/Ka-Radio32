@@ -197,16 +197,19 @@ bool clientParsePlaylist(char* s)
 	if (str[i] == ':')  //port
 	{
 		i++;
-		while ((str[i] != '/')&&(str[i] != 0x0a)&&(str[i] != 0x0d)) {port[j] = str[i]; i++ ;j++;}
+		while ((str[i] != '/')&&(str[i] != 0x0a)&&(str[i] != 0x0d)&&(j<5)) {port[j] = str[i]; i++ ;j++;}
 	}
+	ESP_LOGV(TAG,"parse str port %s",port);
 	j = 0;
-	if ((str[i] != 0x0a)&&(str[i] != 0x0d)&&(str[i] != 0)&&(str[i] != '"')&&(str[i] != '<'))
-	{	
-	  while ((str[i] != 0x0a)&&(str[i] != 0x0d)&&(str[i] != 0)&&(str[i] != '"')&&(str[i] != '<')&&(j<255)) {path[j] = str[i]; i++; j++;}
-	  path[j] = 0;
+	if (str[i] == '/')  //path
+	{
+		if ((str[i] != 0x0a)&&(str[i] != 0x0d)&&(str[i] != 0)&&(str[i] != '"')&&(str[i] != '<')&&(j<255))
+		{	
+			while ((str[i] != 0x0a)&&(str[i] != 0x0d)&&(str[i] != 0)&&(str[i] != '"')&&(str[i] != '<')&&(j<255)) {path[j] = str[i]; i++; j++;}
+			path[j] = 0;
+		}
 	}
-	
-	
+	ESP_LOGV(TAG,"parse str path %s",path);
 	
 	if (strncmp(url,"localhost",9)!=0) clientSetURL(url);
 	clientSetPath(path);
