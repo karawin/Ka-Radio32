@@ -739,12 +739,12 @@ void clientDisconnect(const char* from)
 	vTaskDelay(5);
 }
 
-IRAM_ATTR void clientReceiveCallback(int sockfd, char *pdata, int len)
+void clientReceiveCallback(int sockfd, char *pdata, int len)
 {
 	static int metad ;
 	static int rest ;
-	static uint32_t chunked;
-	static uint32_t cchunk;
+	static IRAM_ATTR  uint32_t chunked;
+	static IRAM_ATTR  uint32_t cchunk;
 	static char* metadata = NULL;
 	uint16_t l =0;
 	uint32_t lc;
@@ -1083,9 +1083,9 @@ ESP_LOGD(TAG,"mt2 len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,cle
 }
 
 
-
-static uint8_t bufrec[RECEIVE+20];
-static char useragent[50];
+//IRAM_ATTR uint32_t pad;
+uint8_t bufrec[RECEIVE+20];
+static  char useragent[50];
 
 void clientTask(void *pvParams) { 
 	portBASE_TYPE uxHighWaterMark;

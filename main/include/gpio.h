@@ -12,19 +12,20 @@
 //-------------------------------//
 // Compatible ESP32 ADB
 // https://www.tindie.com/products/microwavemont/esp32-audio-developing-board-esp32-adb/
+// Default value, can be superseeded by the hardware partition.
 
 // Must be HSPI or VSPI
 #define KSPI VSPI_HOST
 
-// KSPI pins
-//-----------
+// KSPI pins of the SPI bus
+//-------------------------
 #define PIN_NUM_MISO GPIO_NUM_19 	// Master Input, Slave Output
 #define PIN_NUM_MOSI GPIO_NUM_23	// Master Output, Slave Input   Named Data or SDA or D1 for oled
 #define PIN_NUM_CLK  GPIO_NUM_18 	// Master clock  Named SCL or SCK or D0 for oled
 
 // status led if any.
 //------------------- 
-//Set the right one with command sys.led
+// Set the right one with command sys.led
 // GPIO can be changed with command sys.ledgpio("x")
 #define GPIO_LED	GPIO_NUM_4		// Flashing led or Playing led
 
@@ -49,16 +50,17 @@
 #define PIN_I2C_RST	GPIO_NUM_2		// or not used
 
 // I2C rda5807 (if lcd is spi)
+// (removed)
 //----------------------------
-#define PIN_SI2C_SCL GPIO_NUM_15
-#define PIN_SI2C_SDA GPIO_NUM_27
+//#define PIN_SI2C_SCL GPIO_NUM_15
+//#define PIN_SI2C_SDA GPIO_NUM_27
 
 // SPI lcd
 //---------
-// KSPI pins +
 #define PIN_LCD_CS	GPIO_NUM_13		//CS
 #define PIN_LCD_A0	GPIO_NUM_14		//A0 or D/C
 #define PIN_LCD_RST	GPIO_NUM_2		//Reset RES RST or not used
+// KSPI pins +
 
 // IR Signal
 //-----------

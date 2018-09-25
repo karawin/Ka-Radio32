@@ -140,7 +140,7 @@ A command error display:\n\
 
 uint16_t currentStation = 0;
 static uint8_t led_gpio = 255;
-static uint32_t lcd_out = 0xFFFFFFFF;
+static IRAM_ATTR uint32_t lcd_out = 0xFFFFFFFF;
 static esp_log_level_t s_log_default_level = CONFIG_LOG_BOOTLOADER_LEVEL;
 extern void wsVol(char* vol);
 extern void playStation(char* id);
@@ -220,6 +220,14 @@ void printInfo(char* s)
 	kprintf("#INFO:\"%s\"#\n", s);
 }
 
+
+const char htitle []  = {"\
+=============================================================================\n \
+             SSID                   |    RSSI    |           AUTH            \n\
+=============================================================================\n\
+"};
+const char hscan1 []  = {"#WIFI.SCAN#\n Number of access points found: %d\n"};
+
 void wifiScan()
 {
 // from https://github.com/VALERE91/ESP32_WifiScan
@@ -239,15 +247,14 @@ wifi_scan_config_t config = {
 	records = malloc(sizeof(wifi_ap_record_t) * number);
 	if (records == NULL) return;
 	esp_wifi_scan_get_ap_records(&number, records); // get the records
-	kprintf("#WIFI.SCAN#\n Number of access points found: %d\n",number);
+	kprintf(hscan1,number);
     if (number == 0) {
 		free (records);
          return ;
 	}
 	int i;
-	kprintf("=============================================================================\n");
-	kprintf("             SSID                   |    RSSI    |           AUTH            \n");
-	kprintf("=============================================================================\n");
+	kprintf(htitle);
+
 	for (i=0; i<number; i++) {
          char *authmode;
          switch(records[i].authmode) {

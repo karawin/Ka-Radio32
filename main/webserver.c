@@ -1101,11 +1101,11 @@ static bool httpServerHandleConnection(int conn, char* buf, uint16_t buflen) {
 
 #define RECLEN	768
 #define DRECLEN (RECLEN*2)
+char  buf[DRECLEN]; 
 
 // Server child task to handle a request from a browser.
 void serverclientTask(void *pvParams) {
 	struct timeval timeout; 
-	char buf[DRECLEN]; 
     timeout.tv_sec = 3; 
     timeout.tv_usec = 0;
 	int recbytes ,recb;

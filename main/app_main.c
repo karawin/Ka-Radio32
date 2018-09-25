@@ -91,14 +91,6 @@ const int CONNECTED_BIT = 0x00000001;
 //
 const int CONNECTED_AP  = 0x00000010;
 
-//#define BLINK_GPIO 4
-#define I2C_EXAMPLE_MASTER_SCL_IO    PIN_I2C_SCL    /*!< gpio number for I2C master clock */////////////
-#define I2C_EXAMPLE_MASTER_SDA_IO    PIN_I2C_SDA    /*!< gpio number for I2C master data  *//////////////
-#define I2C_EXAMPLE_MASTER_NUM I2C_NUM_1   			/*!< I2C port number for master dev */
-#define I2C_EXAMPLE_MASTER_TX_BUF_DISABLE   0   	/*!< I2C master do not need buffer */
-#define I2C_EXAMPLE_MASTER_RX_BUF_DISABLE   0   	/*!< I2C master do not need buffer */
-#define I2C_EXAMPLE_MASTER_FREQ_HZ    100000    	/*!< I2C master clock frequency */
-
 #define TAG "main"
 
 //Priorities of the reader and the decoder thread. bigger number = higher prio
@@ -642,7 +634,7 @@ void timerTask(void* p) {
 	while(1) {
 		// read and treat the timer queue events
 		queue_event_t evt;
-		while (xQueueReceive(event_queue, &evt, 0))
+		while (xQueueReceive(event_queue, &evt, 1))
 		{
 			switch (evt.type){
 					case TIMER_SLEEP:
@@ -661,7 +653,7 @@ void timerTask(void* p) {
 					default:
 					break;
 			}
-			taskYIELD();
+//			taskYIELD();
 		}
 		if (ledStatus)
 		{
