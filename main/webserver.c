@@ -1106,7 +1106,7 @@ char  buf[DRECLEN];
 // Server child task to handle a request from a browser.
 void serverclientTask(void *pvParams) {
 	struct timeval timeout; 
-    timeout.tv_sec = 3; 
+    timeout.tv_sec = 2; 
     timeout.tv_usec = 0;
 	int recbytes ,recb;
 	portBASE_TYPE uxHighWaterMark;
@@ -1144,7 +1144,7 @@ void serverclientTask(void *pvParams) {
 						if ((bend - buf +cl)> recbytes)
 						{	
 //printf ("Server: try receive more:%d bytes. , must be %d\n", recbytes,bend - buf +cl);
-							while(((recb = read(client_sock , buf+recbytes, cl))==0)){vTaskDelay(1);}
+							while(((recb = read(client_sock , buf+recbytes, cl))==0)||(errno == EAGAIN)){vTaskDelay(1);}
 //							buf[recbytes+recb] = 0;
 //printf ("Server: received more now: %d bytes, rec:\n%s\nEnd\n", recbytes+recb,buf);
 							if (recb < 0) {
@@ -1160,7 +1160,7 @@ void serverclientTask(void *pvParams) {
 				else { 
 					
 //					printf ("Server: try receive more for end:%d bytes\n", recbytes);					
-					while(((recb= read(client_sock , buf+recbytes, DRECLEN-recbytes))==0)) vTaskDelay(1);
+					while(((recb= read(client_sock , buf+recbytes, DRECLEN-recbytes))==0)||(errno == EAGAIN)) vTaskDelay(1);
 //					printf ("Server: received more for end now: %d bytes\n", recbytes+recb);
 					if (recb < 0) {
 						ESP_LOGE(TAG,"read fails 1  errno:%d",errno);
