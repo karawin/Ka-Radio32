@@ -68,8 +68,8 @@ bool ntp_get_time(struct tm **dt) {
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_DGRAM; // Use UDP
 	if ((rv = getaddrinfo(node, service, &hints, &servinfo)) != 0) {
-		//ESP_LOGE(TAG,"##SYS.DATE#: ntp fails on %s %d","getaddrinfo",rv);free (msg);
-		if (msg) free(msg);
+		//ESP_LOGE(TAG,"##SYS.DATE#: ntp fails on %s %d","getaddrinfo",rv);
+		free(msg);
 		return false;
 	} 		
 // loop in result socket
@@ -83,22 +83,16 @@ bool ntp_get_time(struct tm **dt) {
 // set a timeout for recvfrom
 	if (setsockopt (sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0){
 		ESP_LOGE(TAG,"##SYS.DATE#: ntp fails on %s %d","setsockopt",0);	free (msg);freeaddrinfo(servinfo);	close(sockfd);
-		if (msg) free(msg);
-		close(sockfd);
 		return false;
 	} 	
 //send the request	
 	if ((rv = sendto(sockfd, msg, sizeof(ntp_t), 0,p->ai_addr, p->ai_addrlen)) == -1) {
 		ESP_LOGE(TAG,"##SYS.DATE#: ntp fails on %s %d","sendto",rv); free (msg);freeaddrinfo(servinfo);	close(sockfd);
-		if (msg) free(msg);
-		close(sockfd);
 		return false;					
 	}
 	freeaddrinfo(servinfo);	
  	if ((rv = recvfrom(sockfd, msg, sizeof(ntp_t) , 0,NULL, NULL)) <=0) {
 		ESP_LOGE(TAG,"##SYS.DATE#: ntp fails on %s %d","recvfrom",rv);free(msg);close(sockfd);
-		if (msg) free(msg);
-		close(sockfd);
 		return false;	
 	}	
 			
@@ -109,7 +103,7 @@ bool ntp_get_time(struct tm **dt) {
 	timestamp -= 2208988800UL;
 	// create tm struct
 	*dt = gmtime(&timestamp);
-	if (msg) free(msg);
+	free(msg);
 	close(sockfd);
 	return true;
 }
