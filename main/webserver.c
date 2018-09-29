@@ -1101,14 +1101,15 @@ static bool httpServerHandleConnection(int conn, char* buf, uint16_t buflen) {
 
 #define RECLEN	768
 #define DRECLEN (RECLEN*2)
-char  buf[DRECLEN]; 
+
 
 // Server child task to handle a request from a browser.
 void serverclientTask(void *pvParams) {
 	struct timeval timeout; 
-    timeout.tv_sec = 2; 
+    timeout.tv_sec = 6; 
     timeout.tv_usec = 0;
 	int recbytes ,recb;
+	char  buf[DRECLEN]; 
 	portBASE_TYPE uxHighWaterMark;
 	int  client_sock =  (int)pvParams;
  //   char *buf = (char *)inmalloc(reclen);
@@ -1144,14 +1145,16 @@ void serverclientTask(void *pvParams) {
 						if ((bend - buf +cl)> recbytes)
 						{	
 //printf ("Server: try receive more:%d bytes. , must be %d\n", recbytes,bend - buf +cl);
-							while(((recb = read(client_sock , buf+recbytes, cl))==0)||(errno == EAGAIN)){vTaskDelay(1);}
-//							buf[recbytes+recb] = 0;
-//printf ("Server: received more now: %d bytes, rec:\n%s\nEnd\n", recbytes+recb,buf);
-							if (recb < 0) {
-								ESP_LOGE(TAG,"read fails 0  errno:%d",errno);
-								respKo(client_sock);
-								break;								
+							while(((recb = read(client_sock , buf+recbytes, cl))==0)||(errno == EAGAIN))
+							{
+								vTaskDelay(1);
+								if ((recb < 0)&&(errno != EAGAIN)) {
+									ESP_LOGE(TAG,"read fails 0  errno:%d",errno);
+									respKo(client_sock);
+									break;	
+								} else recb = 0;
 							}
+//							printf ("Server: received more for end now: %d bytes\n", recbytes+recb);
 							buf[recbytes+recb] = 0;							
 							recbytes += recb;
 						}
@@ -1160,12 +1163,15 @@ void serverclientTask(void *pvParams) {
 				else { 
 					
 //					printf ("Server: try receive more for end:%d bytes\n", recbytes);					
-					while(((recb= read(client_sock , buf+recbytes, DRECLEN-recbytes))==0)||(errno == EAGAIN)) vTaskDelay(1);
-//					printf ("Server: received more for end now: %d bytes\n", recbytes+recb);
-					if (recb < 0) {
-						ESP_LOGE(TAG,"read fails 1  errno:%d",errno);
-						respKo(client_sock);
-						break;	
+					while(((recb= read(client_sock , buf+recbytes, DRECLEN-recbytes))==0)||(errno == EAGAIN))
+					{
+						vTaskDelay(1);
+//						printf ("Server: received more for end now: %d bytes\n", recbytes+recb);
+						if ((recb < 0)&&(errno != EAGAIN)) {
+							ESP_LOGE(TAG,"read fails 1  errno:%d",errno);
+							respKo(client_sock);
+							break;	
+						} else recb = 0;
 					}
 					recbytes += recb;
 				} //until "\r\n\r\n"
