@@ -45,8 +45,6 @@ const char CLISTOP[]  = {"##CLI.STOPPED# from %s\n"};
 
 const char strcMALLOC[]  = {"Client: incmalloc fails for %d\n"};
 const char strcMALLOC1[]  = {"%s malloc fails\n"};
-const char strcWEBSOCKET[]  = {"WebClient webSocket fails %s errno: %d\n"};
-const char strcSOCKET[]  = {"WebClient Socket fails %s errno: %d\n"};
 
 /* TODO:
 	- METADATA HANDLING
@@ -690,6 +688,9 @@ void clientConnect()
 		xSemaphoreGive(sConnect);
 	} else {
 		clientDisconnect("clientConnect");
+		clientSaveOneHeader("Invalid host",15,METANAME);
+		wsHeaders();
+		vTaskDelay(1);
 	}
 }
 void clientConnectOnce()
@@ -1131,7 +1132,7 @@ void clientTask(void *pvParams) {
 			sockfd = socket(AF_INET, SOCK_STREAM, 0);
 			ESP_LOGI(TAG,"Webclient socket: %d, errno: %d", sockfd, errno);
 			if(sockfd >= 0) ;//{printf("WebClient Socket created\n"); }
-			else printf(strcWEBSOCKET,"create",errno);
+			else ESP_LOGE(TAG,"Webclient socket create, errno: %d", errno);
 			bzero(&dest, sizeof(dest));
 			dest.sin_family = AF_INET;
 			dest.sin_port = htons(clientPort);
@@ -1166,12 +1167,12 @@ void clientTask(void *pvParams) {
 				send(sockfd, (char*)bufrec, strlen((char*)bufrec), 0);								
 ///// set timeout
 				if (once == 0)
-					timeout.tv_sec = 20; 
+					timeout.tv_sec = 4; 
 				else
-					timeout.tv_sec = 10; 
+					timeout.tv_sec = 2; 
 
 				if (setsockopt (sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0)
-					printf(strcSOCKET,"setsockopt",errno);
+					ESP_LOGE(TAG,"Client socket: %d  setsockopt: %d  errno:%d ",sockfd, bytes_read,errno);					
 				
 //////				
 				do
@@ -1179,7 +1180,7 @@ void clientTask(void *pvParams) {
 					bytes_read = recvfrom(sockfd, bufrec,RECEIVE, 0, NULL, NULL);	
 					if ( bytes_read < 0 )
 					{
-						ESP_LOGE(TAG,"Client socket: %d  read: %d  errno:%d ",sockfd, bytes_read,errno);						
+						ESP_LOGE(TAG,"Client socket: %d  read: %d  errno:%d ",sockfd, bytes_read,errno);					
 					}
 //if (bytes_read < 1000 )  
 //printf("Rec:%d\n%s\n",bytes_read,bufrec);					
@@ -1187,15 +1188,16 @@ void clientTask(void *pvParams) {
 					{
 							clientReceiveCallback(sockfd,(char*)bufrec, bytes_read);
 					}	
+					else ESP_LOGW(TAG,"No data in recv");
 					vTaskDelay(1);
 					// if a stop is asked
 					if(xSemaphoreTake(sDisconnect, 0))
 						{ clearHeaders(); break;	}
 				}
-				while ( bytes_read > 0 );
+				while (( bytes_read > 0 )||(playing && (bytes_read = 0)));
 			} else
 			{
-				printf(strcSOCKET,"connect", errno);
+				ESP_LOGE(TAG,"Client socket: %d  connect: %d  errno:%d ",sockfd, bytes_read,errno);
 				clientSaveOneHeader("Invalid address",15,METANAME);	
 				wsHeaders();
 				vTaskDelay(1);
@@ -1205,6 +1207,7 @@ void clientTask(void *pvParams) {
 			}	
 			/*---Clean up---*/
 			if (bytes_read <= 0 )  //nothing received or error or disconnected
+//			if (bytes_read < 0 )  //error or disconnected
 			{				
 					if ((playing)&&(once == 0))  // try restart
 					{
@@ -1231,9 +1234,7 @@ void clientTask(void *pvParams) {
 							clientSaveOneHeader(notfound, 9,METANAME);
 							wsHeaders();
 							vTaskDelay(1);
-							clientDisconnect("not found"); 
-							
-							
+							clientDisconnect("not found"); 							
 					}	
 					else{  //playing & once=1 and no more received stream
 						while (spiRamFifoFill()) vTaskDelay(100);
