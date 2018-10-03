@@ -438,13 +438,13 @@ int websocketRead(int conn)
 			if ((errno != EAGAIN )&&(errno != 0 ))
 			{
 				inwfree(buf,"websRead");
-				if (errno != ECONNRESET )
+				if ((errno != 104 /*ECONNRESET*/ )&&(errno != 113 /*EHOSTUNREACH*/ ))
 				{
 					printf (strwSOCKET,"read", errno);
 					wsclientDisconnect(conn, 500,NULL,0);		
-				} // else websocketremoveclient(conn);
+				}
 				return recbytes;
-			} //else printf("ws try again\n");
+			}
 		}
 		if (recbytes > 0)
 		{

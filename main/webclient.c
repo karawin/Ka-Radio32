@@ -1166,9 +1166,9 @@ void clientTask(void *pvParams) {
 				send(sockfd, (char*)bufrec, strlen((char*)bufrec), 0);								
 ///// set timeout
 				if (once == 0)
-					timeout.tv_sec = 10; 
+					timeout.tv_sec = 20; 
 				else
-					timeout.tv_sec = 3; 
+					timeout.tv_sec = 10; 
 
 				if (setsockopt (sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0)
 					printf(strcSOCKET,"setsockopt",errno);
@@ -1177,17 +1177,20 @@ void clientTask(void *pvParams) {
 				do
 				{
 					bytes_read = recvfrom(sockfd, bufrec,RECEIVE, 0, NULL, NULL);	
-					if ( bytes_read < 0 )						
-					ESP_LOGE(TAG,"Client socket: %d  read: %d  errno:%d ",sockfd, bytes_read,errno);	
+					if ( bytes_read < 0 )
+					{
+						ESP_LOGE(TAG,"Client socket: %d  read: %d  errno:%d ",sockfd, bytes_read,errno);						
+					}
 //if (bytes_read < 1000 )  
-//printf("Rec:%d\n%s\n",bytes_read,bufrec);
-					
+//printf("Rec:%d\n%s\n",bytes_read,bufrec);					
 					if ( bytes_read > 0 )
 					{
 							clientReceiveCallback(sockfd,(char*)bufrec, bytes_read);
 					}	
 					vTaskDelay(1);
-					if(xSemaphoreTake(sDisconnect, 0)){ clearHeaders(); break;	}
+					// if a stop is asked
+					if(xSemaphoreTake(sDisconnect, 0))
+						{ clearHeaders(); break;	}
 				}
 				while ( bytes_read > 0 );
 			} else
