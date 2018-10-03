@@ -39,6 +39,7 @@ static const char* icyHeaders[] = { "icy-name:", "icy-notice1:", "icy-notice2:",
 contentType_t contentType;
 
 static char notfound[]={"Not Found"};
+static char nodata[]={"No Data"};
 static char parEmpty[] = {" "};
 const char CLIPLAY[]  = {"##CLI.PLAYING#%c%c"};
 const char CLISTOP[]  = {"##CLI.STOPPED# from %s\n"};
@@ -769,7 +770,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 			kprintf(CLIPLAY,0x0d,0x0a);
 			clientSaveOneHeader(notfound, 13,METANAME);
 			wsHeaders();
-//			vTaskDelay(200);
+			vTaskDelay(1);
 //			clientDisconnect("C_DATA");
 			cstatus = C_HEADER;
 			return;
@@ -1231,10 +1232,10 @@ void clientTask(void *pvParams) {
 					}						
 						//						
 					else if ((!playing)&&(once == 0)) {  // nothing received
-							clientSaveOneHeader(notfound, 9,METANAME);
+							clientDisconnect(nodata); 							
+							clientSaveOneHeader(nodata, 9,METANAME);
 							wsHeaders();
 							vTaskDelay(1);
-							clientDisconnect("not found"); 							
 					}	
 					else{  //playing & once=1 and no more received stream
 						while (spiRamFifoFill()) vTaskDelay(100);
