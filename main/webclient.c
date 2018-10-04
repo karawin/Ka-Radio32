@@ -1181,7 +1181,8 @@ void clientTask(void *pvParams) {
 					bytes_read = recvfrom(sockfd, bufrec,RECEIVE, 0, NULL, NULL);	
 					if ( bytes_read < 0 )
 					{
-						ESP_LOGE(TAG,"Client socket: %d  read: %d  errno:%d ",sockfd, bytes_read,errno);					
+						ESP_LOGE(TAG,"Client socket: %d  read: %d  errno:%d ",sockfd, bytes_read,errno);
+						if (errno == 11) bytes_read = 0;
 					}
 //if (bytes_read < 1000 )  
 //printf("Rec:%d\n%s\n",bytes_read,bufrec);					
