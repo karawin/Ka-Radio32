@@ -1196,7 +1196,7 @@ void clientTask(void *pvParams) {
 					if(xSemaphoreTake(sDisconnect, 0))
 						{ clearHeaders(); break;	}
 				}
-				while (( bytes_read > 0 )||(playing && (bytes_read = 0)));
+				while (( bytes_read > 0 )||(playing && (bytes_read == 0)));
 			} else
 			{
 				ESP_LOGE(TAG,"Client socket: %d  connect: %d  errno:%d ",sockfd, bytes_read,errno);
