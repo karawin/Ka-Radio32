@@ -1132,8 +1132,12 @@ void clientTask(void *pvParams) {
 			xSemaphoreTake(sDisconnect, 0);	
 			sockfd = socket(AF_INET, SOCK_STREAM, 0);
 			ESP_LOGI(TAG,"Webclient socket: %d, errno: %d", sockfd, errno);
-			if(sockfd >= 0) ;//{printf("WebClient Socket created\n"); }
-			else ESP_LOGE(TAG,"Webclient socket create, errno: %d", errno);
+			if(sockfd < 0) 
+			{
+				ESP_LOGE(TAG,"Webclient socket create, errno: %d", errno);
+				xSemaphoreGive(sDisconnect);
+				continue;
+			}
 			bzero(&dest, sizeof(dest));
 			dest.sin_family = AF_INET;
 			dest.sin_port = htons(clientPort);

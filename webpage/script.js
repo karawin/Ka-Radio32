@@ -42,7 +42,7 @@ function openwebsocket(){
 		console.log("onclose code: "+event.code);
 		console.log("onclose reason: "+event.reason);
 		if(!window.timerID){ /* avoid firing a new setInterval, after one has been done */
-		window.timerID=setInterval(function(){checkwebsocket()}, 2000);
+		window.timerID=setInterval(function(){checkwebsocket()}, 1000);
 		}	
 	}	
 	websocket.onerror = function(event) {

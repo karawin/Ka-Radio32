@@ -622,12 +622,13 @@ void timerTask(void* p) {
 	uint32_t ctime = 0;
 	uint32_t cCur;
 	bool stateLed = false;
+	gpio_num_t gpioLed;
 //	int uxHighWaterMark;
 	
 	initTimers();
-	
-	gpio_output_conf(getLedGpio());
-	gpio_set_level(getLedGpio(),0);	
+	gpioLed = getLedGpio();
+	gpio_output_conf(gpioLed);
+	gpio_set_level(gpioLed,0);	
 	cCur = FlashOff*10;
 	device = getDeviceSettings();
 	
@@ -663,12 +664,12 @@ void timerTask(void* p) {
 				taskYIELD();
 				if (stateLed)
 				{
-					gpio_set_level(getLedGpio(),0);	
+					gpio_set_level(gpioLed,0);	
 					stateLed = false;
 					cCur = FlashOff*10;
 				} else
 				{
-					gpio_set_level(getLedGpio(),1);	
+					gpio_set_level(gpioLed,1);	
 					stateLed = true;
 					cCur = FlashOn*10;
 					if (device->vol != getIvol()){ 			
