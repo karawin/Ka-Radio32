@@ -1185,9 +1185,13 @@ void clientTask(void *pvParams) {
 //	printf("Rec:%d\n%s\n",bytes_read,bufrec);					
 					if ( bytes_read > 0 )
 					{
-							clientReceiveCallback(sockfd,(char*)bufrec, bytes_read);
+						clientReceiveCallback(sockfd,(char*)bufrec, bytes_read);
 					}	
-					else ESP_LOGW(TAG,"No data in recv");
+					else 
+					{
+						ESP_LOGW(TAG,"No data in recv");
+						vTaskDelay(100);
+					}
 					vTaskDelay(1);
 					// if a stop is asked
 					if(xSemaphoreTake(sDisconnect, 0))
