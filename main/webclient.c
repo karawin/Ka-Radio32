@@ -1189,8 +1189,9 @@ void clientTask(void *pvParams) {
 					}	
 					else 
 					{
-						ESP_LOGW(TAG,"No data in recv");
+						ESP_LOGW(TAG,"No data in recv. Errno = %d",errno);
 						vTaskDelay(100);
+						if (errno == 128) break;
 					}
 					vTaskDelay(1);
 					// if a stop is asked
