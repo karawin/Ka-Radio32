@@ -661,6 +661,7 @@ void timerTask(void* p) {
 			
 			if (ctime >= cCur)
 			{
+				gpioLed = getLedGpio();
 				taskYIELD();
 				if (stateLed)
 				{
