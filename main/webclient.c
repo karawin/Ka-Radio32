@@ -1095,6 +1095,7 @@ void clientTask(void *pvParams) {
 	timeout.tv_sec = 4; 
 	int sockfd;
 	int bytes_read;
+	uint8_t cnterror;
 //	char *useragent;
 	struct device_settings* device;
 	struct sockaddr_in dest;
@@ -1173,6 +1174,7 @@ void clientTask(void *pvParams) {
 				if (setsockopt (sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0)
 					ESP_LOGE(TAG,"Client socket: %d  setsockopt: %d  errno:%d ",sockfd, bytes_read,errno);				
 //////				
+				cnterror = 0;
 				do
 				{
 					bytes_read = recvfrom(sockfd, bufrec,RECEIVE, 0, NULL, NULL);	
@@ -1190,8 +1192,9 @@ void clientTask(void *pvParams) {
 					else 
 					{
 						ESP_LOGW(TAG,"No data in recv. Errno = %d",errno);
+						cnterror++;
 						vTaskDelay(100);
-						if (errno == 128) break;
+						if ((errno == 128)||(cnterror >= 5)) break;
 					}
 					vTaskDelay(1);
 					// if a stop is asked

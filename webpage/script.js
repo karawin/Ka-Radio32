@@ -20,6 +20,7 @@ function openwebsocket(){
 				//document.getElementById("CONTENT").style.marginTop = document.getElementById('HEADER').clientHeight+"px" ;
 				setMainHeight(curtab);
 			}
+		changeTitle(document.getElementById('meta').innerHTML);
 		if (arr["wsvol"]) onRangeVolChange(arr['wsvol'],false); 
 		if (arr["wsicy"]) icyResp(arr["wsicy"]); 
 		if (arr["wssound"]) soundResp(arr["wssound"]); 
@@ -50,6 +51,11 @@ function openwebsocket(){
 		console.log("onerror reason: "+event.reason);
 		websocket.close();
 	}
+}
+
+// Change the title of the page
+function changeTitle($arr) {
+    window.parent.document.title = $arr; // on change l'attribut <title>
 }
 
 // ask for the rssi and restart the timer
@@ -388,7 +394,7 @@ function icyResp(arr) {
 			if (arr["meta"] == "") 
 				{ document.getElementById('meta').innerHTML = karadio;setMainHeight(curtab);}			
 			if (arr["meta"]) document.getElementById('meta').innerHTML = arr["meta"].replace(/\\/g,"");
-//					else document.getElementById('meta').innerHTML = karadio;
+			changeTitle(document.getElementById('meta').innerHTML);
             if (typeof arr["auto"] != 'undefined')  // undefined for websocket
 			if (arr["auto"] == "1")
 				document.getElementById("aplay").setAttribute("checked","");
