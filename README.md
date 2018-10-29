@@ -20,6 +20,8 @@ I2SMERUS to connect a merus amplifier<br/>
 DAC to use the built in DAC of the esp32<br/>
 PDM to output a PDM (Pulse Density Modulation) stream<br/>
 VS1053 to connect to a vs1053 board.<br/>
+mDNS support.<br/>
+Latin, Cyrillic and Greek support.<br/>
 <br/>
 LCD or Oled support integrated: most common b/w or color oled and lcd can be used.<br/>
 Programmable lcd off timer<br/>
