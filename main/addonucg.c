@@ -49,6 +49,12 @@ extern const ucg_fntpgm_uint8_t ucg_font_crox5hb[] UCG_FONT_SECTION("ucg_font_cr
 extern const ucg_fntpgm_uint8_t ucg_font_crox5t[] UCG_FONT_SECTION("ucg_font_crox5t");
 extern const ucg_fntpgm_uint8_t ucg_font_crox5tb[] UCG_FONT_SECTION("ucg_font_crox5tb");
 
+extern const ucg_fntpgm_uint8_t ucg_font_5x7_gr[] UCG_FONT_SECTION("ucg_font_5x7_gr");
+extern const ucg_fntpgm_uint8_t ucg_font_6x13_gr[] UCG_FONT_SECTION("ucg_font_6x13_gr");
+extern const ucg_fntpgm_uint8_t ucg_font_9x16_gr[] UCG_FONT_SECTION("ucg_font_9x16_gr");
+extern const ucg_fntpgm_uint8_t ucg_font_helvR14_gr[] UCG_FONT_SECTION("ucg_font_helvR14_gr");
+extern const ucg_fntpgm_uint8_t ucg_font_helvR18_gr[] UCG_FONT_SECTION("ucg_font_helvR18_gr");
+
 
 #define ucg_SetColori(a,b,c,d) ucg_SetColor(a,0,b,c,d)
 
@@ -104,7 +110,8 @@ static char genre[BUFLEN/2]; // the local name of the station
 static char TTitleStr[15];
 static char TTimeStr[15];
 
-static bool charset = false;  // latin or cyrillic
+typedef enum Lang {Latin,Cyrillic,Greek} LANG; 
+static LANG charset = Latin;  // latin or cyrillic
 
 ////////////////////////////////////////
 typedef enum sizefont  {small, text,middle,large} sizefont;
@@ -136,19 +143,49 @@ void setfont(sizefont size)
 		switch(x)
 		{
 			case 320:
-			charset?ucg_SetFont(&ucg,ucg_font_crox5h ):ucg_SetFont(&ucg,ucg_font_inr16_mf ) ;
+			switch (charset){ 	
+								case Cyrillic: ucg_SetFont(&ucg,ucg_font_crox5h );break; 
+								case Greek:ucg_SetFont(&ucg,ucg_font_helvR18_gr );break;
+								default:
+								case Latin:ucg_SetFont(&ucg,ucg_font_inr16_mf );break;
+							}
+//			charset?ucg_SetFont(&ucg,ucg_font_crox5h ):ucg_SetFont(&ucg,ucg_font_inr16_mf ) ;
 			break;
 			case 128:
-			charset?ucg_SetFont(&ucg,ucg_font_crox1c ):ucg_SetFont(&ucg,ucg_font_5x7_mf) ;
+			switch (charset){
+								case Cyrillic: ucg_SetFont(&ucg,ucg_font_crox1c );break; 
+								case Greek:ucg_SetFont(&ucg,ucg_font_5x7_gr );break;
+								default:
+								case Latin:ucg_SetFont(&ucg,ucg_font_5x7_mf );break;
+							}
+//			charset?ucg_SetFont(&ucg,ucg_font_crox1c ):ucg_SetFont(&ucg,ucg_font_5x7_mf) ;
 			break;
 			case 132:
-			charset?ucg_SetFont(&ucg,ucg_font_crox1c ):ucg_SetFont(&ucg,ucg_font_5x7_mf) ;
+			switch (charset){
+								case Cyrillic: ucg_SetFont(&ucg,ucg_font_crox1c );break; 
+								case Greek:ucg_SetFont(&ucg,ucg_font_helvR14_gr );break;
+								default:
+								case Latin:ucg_SetFont(&ucg,ucg_font_5x7_mf );break;
+							}
+//			charset?ucg_SetFont(&ucg,ucg_font_crox1c ):ucg_SetFont(&ucg,ucg_font_5x7_mf) ;
 			break;
 			case 96:
-			charset?ucg_SetFont(&ucg,ucg_font_crox1c ):ucg_SetFont(&ucg,ucg_font_4x6_mf) ;
+			switch (charset){
+								case Cyrillic: ucg_SetFont(&ucg,ucg_font_crox1c );break; 
+								case Greek:ucg_SetFont(&ucg,ucg_font_5x7_gr );break;
+								default:
+								case Latin:ucg_SetFont(&ucg,ucg_font_5x7_mf );break;
+							}
+//			charset?ucg_SetFont(&ucg,ucg_font_crox1c ):ucg_SetFont(&ucg,ucg_font_4x6_mf) ;
 			break;
 			default: // 160
-			charset?ucg_SetFont(&ucg,ucg_font_crox1c ):ucg_SetFont(&ucg,ucg_font_6x13_mf) ;
+			switch (charset){
+								case Cyrillic: ucg_SetFont(&ucg,ucg_font_crox1c );break; 
+								case Greek:ucg_SetFont(&ucg,ucg_font_6x13_gr );break;
+								default:
+								case Latin:ucg_SetFont(&ucg,ucg_font_6x13_mf );break;
+							}
+//			charset?ucg_SetFont(&ucg,ucg_font_crox1c ):ucg_SetFont(&ucg,ucg_font_6x13_mf) ;
 			;
 		}
 		break;
@@ -157,17 +194,41 @@ void setfont(sizefont size)
 		switch(x)
 		{
 			case 320:
-			charset?ucg_SetFont(&ucg,ucg_font_crox5h ):ucg_SetFont(&ucg,ucg_font_inr33_mf);
+			switch (charset){ 	
+								case Cyrillic: ucg_SetFont(&ucg,ucg_font_crox5h );break; 
+								case Greek:ucg_SetFont(&ucg,ucg_font_helvR18_gr );break;
+								default:
+								case Latin:ucg_SetFont(&ucg,ucg_font_inr33_mf );break;
+							}
+//			charset?ucg_SetFont(&ucg,ucg_font_crox5h ):ucg_SetFont(&ucg,ucg_font_inr33_mf);
 			break;
 			case 128:
-			charset?ucg_SetFont(&ucg,ucg_font_crox3c ):ucg_SetFont(&ucg,ucg_font_7x14_mf);
+			switch (charset){ 	
+								case Cyrillic: ucg_SetFont(&ucg,ucg_font_crox3c );break; 
+								case Greek:ucg_SetFont(&ucg,ucg_font_helvR14_gr );break;
+								default:
+								case Latin:ucg_SetFont(&ucg,ucg_font_7x14_mf );break;
+							}
+//			charset?ucg_SetFont(&ucg,ucg_font_crox3c ):ucg_SetFont(&ucg,ucg_font_7x14_mf);
 			break;
 			case 96:
-			charset?ucg_SetFont(&ucg,ucg_font_crox2h ):ucg_SetFont(&ucg,ucg_font_6x12_mf);
+			switch (charset){ 	
+								case Cyrillic: ucg_SetFont(&ucg,ucg_font_crox2h );break; 
+								case Greek:ucg_SetFont(&ucg,ucg_font_5x7_gr );break;
+								default:
+								case Latin:ucg_SetFont(&ucg,ucg_font_6x12_mf );break;
+							}
+//			charset?ucg_SetFont(&ucg,ucg_font_crox2h ):ucg_SetFont(&ucg,ucg_font_6x12_mf);
 			break;
 			case 132:
 			default: // 160
-			charset?ucg_SetFont(&ucg,ucg_font_crox3c ):ucg_SetFont(&ucg,ucg_font_fur14_tf);
+			switch (charset){ 	
+								case Cyrillic: ucg_SetFont(&ucg,ucg_font_crox3c );break; 
+								case Greek:ucg_SetFont(&ucg,ucg_font_helvR14_gr );break;
+								default:
+								case Latin:ucg_SetFont(&ucg,ucg_font_fur14_tf );break;
+							}
+//			charset?ucg_SetFont(&ucg,ucg_font_crox3c ):ucg_SetFont(&ucg,ucg_font_fur14_tf);
 			
 			;
 		}
@@ -254,11 +315,13 @@ struct _utf8To1251_t
 };
 typedef struct _utf8To1251_t utf8To1251_t;
 #define UTF8TO1251	30
-utf8To1251_t utf8To1251[UTF8TO1251] = {{0x401,0x45/*0xa8*/},{0x402,0x80},{0x403,0x81},{0x404,0xaa},{0x405,0xbd},{0x406,0x49/*0xb2*/},{0x407,0xaf},{0x408,0xa3},
+const utf8To1251_t utf8To1251[UTF8TO1251] = {{0x401,0x45/*0xa8*/},{0x402,0x80},{0x403,0x81},{0x404,0xaa},{0x405,0xbd},{0x406,0x49/*0xb2*/},{0x407,0xaf},{0x408,0xa3},
 									   {0x409,0x8a},{0x40a,0x8c},{0x40b,0x8e},{0x40c,0x8d},{0x40e,0xa1},{0x40f,0x8f},{0x452,0x90},{0x451,0x65/*0xb8*/},
 									   {0x453,0x83},{0x454,0xba},{0x455,0xbe},{0x456,0x69/*0xb3*/},{0x457,0xbf},{0x458,0x6a/*0xbc*/},{0x459,0x9a},{0x45a,0x9c},
 									   {0x45b,0x9e},{0x45c,0x9d},{0x45f,0x9f},{0x490,0xa5},{0x491,0xb4},
 									   {0,0}};
+
+//Cyrillic									   
 uint8_t to1251(uint16_t utf8)
 {
 	int i;
@@ -276,6 +339,23 @@ uint8_t to1251(uint16_t utf8)
 	return ((utf8 - 0x350)& 0xff );
 }
 
+//Greek
+uint8_t to1253(uint16_t utf8)
+{
+/*	int i;
+	if (utf8 > 0x491) return 0x1f;
+	for (i = 0; i<UTF8TO1251;i++)
+	{
+		if (utf8 == utf8To1251[i].utf8)
+		{
+//			printf("to1251: utf8: %x, ret: %x\n",utf8,utf8To1251[i].c1251);
+			return utf8To1251[i].c1251;
+		}
+	}
+*/	
+//	printf("to1253: utf8: %x, ret: %x\n",utf8,(utf8 - 0x300)& 0xff);
+	return ((utf8 - 0x300)& 0xff );
+}
 
 ////////////////////////////////////////
 uint16_t UtoC(uint8_t high,uint8_t low)
@@ -301,14 +381,23 @@ void removeUtf8(char *characters)
 		while (characters[sind]) { characters[sind-1] = characters[sind];sind++;}
 		characters[sind-1] = 0; 
     }
-    if ((characters[Rindex] >= 0xd0)&&(characters[Rindex] <= 0xd3)) // only 0 to FF ascii char
+    else if ((characters[Rindex] >= 0xd0)&&(characters[Rindex] <= 0xd3)) // only 0 to FF ascii char
     {	
 		utf8 = UtoC(characters[Rindex],characters[Rindex+1]) ; // the utf8
 		characters[Rindex+1] = to1251(utf8);
 		int sind = Rindex+1;
 		while (characters[sind]) { characters[sind-1] = characters[sind];sind++;}
 		characters[sind-1] = 0;
-		charset = true;
+		charset = Cyrillic;
+	}
+    else if ((characters[Rindex] >= 0xcd)&&(characters[Rindex] <= 0xcf)) // only 0 to FF ascii char
+    {	
+		utf8 = UtoC(characters[Rindex],characters[Rindex+1]) ; // the utf8
+		characters[Rindex+1] = to1253(utf8);
+		int sind = Rindex+1;
+		while (characters[sind]) { characters[sind-1] = characters[sind];sind++;}
+		characters[sind-1] = 0;
+		charset = Greek;
 	}
     Rindex++;
   }
@@ -544,7 +633,7 @@ void drawStationUcg(uint8_t mTscreen,char* snum,char* ddot)
 	
   char ststr[] = {"Station"};
   int16_t len;
-  bool scharset;
+  LANG scharset;
     switch (mTscreen){
       case 1:  
 		TTitleStr[0] = 0;        
@@ -559,7 +648,7 @@ void drawStationUcg(uint8_t mTscreen,char* snum,char* ddot)
         if (ddot != NULL)
         {
 		  scharset = charset;
-		  charset = false;
+		  charset = Latin;
 		  removeUtf8(ddot);
           ucg_DrawString(&ucg,(x/2)-(ucg_GetStrWidth(&ucg,snum)/2),yy/3,0,snum);
           len = (x/2)-(ucg_GetStrWidth(&ucg,ddot)/2);
@@ -606,7 +695,7 @@ void drawVolumeUcg(uint8_t mTscreen,char* aVolume)
 //  screenBottomUcg(); 
 }
 
-static void drawSecond(struct tm *dt,unsigned timein)
+static  void drawSecond(struct tm *dt,unsigned timein)
 {
   static unsigned insec;
   if (insec != timein)
@@ -770,7 +859,7 @@ void namesetUcg(char* ici)
 	   setFuturNum(atoi(nameNum));     
     }
     strcpy(nameset,nameset+strlen(nameNum));
-	charset = false;
+	charset = Latin;
 	removeUtf8(nameset);
     lline[STATIONNAME] = nameset;
 }
