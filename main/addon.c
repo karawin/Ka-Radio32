@@ -142,6 +142,7 @@ void lcd_init(uint8_t Type)
 	if (lcd_type == LCD_NONE) return;
 	
 	// init the gpio for backlight
+	// gpio_output_conf(gpioLedBacklight)
 	//gpio_set_level(gpioLedBacklight,0);
 	
 	if (lcd_type & LCD_COLOR) // Color one
