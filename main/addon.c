@@ -125,12 +125,25 @@ void wakeLcd()
 	timerLcdOut = getLcdOut();
 	if((isColor) && (itLcdOut))  mTscreen = MTNEW;
 	itLcdOut = false;
+	
+	// add the gpio switch on here gpioLedBacklight can be directly a GPIO_NUM_xx or declared in gpio.h
+	//gpio_set_level(gpioLedBacklight,0);
+}
+
+void sleepLcd()
+{
+	// add the gpio switch off here
+	//gpio_set_level(gpioLedBacklight,1);
 }
 
 void lcd_init(uint8_t Type)
 {	
 	lcd_type = Type;
 	if (lcd_type == LCD_NONE) return;
+	
+	// init the gpio for backlight
+	//gpio_set_level(gpioLedBacklight,0);
+	
 	if (lcd_type & LCD_COLOR) // Color one
 	{
 		lcd_initUcg(&lcd_type);
@@ -749,6 +762,7 @@ void task_addon(void *pvParams)
 		if (itLcdOut) // switch off the lcd
 		{
 			isColor?ucg_ClearScreen(&ucg):u8g2_ClearDisplay(&u8g2);
+			sleepLcd();
 		}
 		
 		if (timerScreen >= 2) // 2 sec timeout 
