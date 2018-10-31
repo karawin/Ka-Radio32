@@ -17,6 +17,7 @@
 #include "interface.h"
 
 #include "addon.h"
+#include "custom.h"
 #include "u8g2_esp32_hal.h"
 #include "ucg_esp32_hal.h"
 #include <time.h>
@@ -127,23 +128,21 @@ void wakeLcd()
 	itLcdOut = false;
 	
 	// add the gpio switch on here gpioLedBacklight can be directly a GPIO_NUM_xx or declared in gpio.h
-	//gpio_set_level(gpioLedBacklight,0);
+	LedBacklightOn();
 }
 
 void sleepLcd()
 {
 	// add the gpio switch off here
-	//gpio_set_level(gpioLedBacklight,1);
+	LedBacklightOff();
 }
 
 void lcd_init(uint8_t Type)
 {	
 	lcd_type = Type;
-	if (lcd_type == LCD_NONE) return;
-	
 	// init the gpio for backlight
-	// gpio_output_conf(gpioLedBacklight)
-	//gpio_set_level(gpioLedBacklight,0);
+	LedBacklightInit();
+	if (lcd_type == LCD_NONE) return;
 	
 	if (lcd_type & LCD_COLOR) // Color one
 	{

@@ -1,0 +1,5 @@
+key,type,encoding,value
+gpio_space,namespace,,
+PIN_NUM_MISO,data,u8,19
+PIN_NUM_MOSI,data,u8,23
+PIN_NUM_CLK,data,u8,18
