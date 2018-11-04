@@ -172,7 +172,7 @@ The tool to use is here: http://espressif.com/en/support/download/other-tools <b
 (change the security of the installation directory to permit all)<br/>
 See the image at http://karadio.karawin.fr/karawin32Flash.jpg <br/>
 
-<img src="https://github.com/karawin/Ka-Radio32/blob/master/images/karawin32Flash.jpg" alt="screenshot" border=0> 
+<img src="https://github.com/karawin/Ka-Radio32/blob/master/images/downloadtool32.jpg" alt="screenshot" border=0> 
 <br/><br/>
 The scheme from tomasf71</br>
 <img src="https://github.com/karawin/Ka-Radio32/blob/master/images/schemekaradio32.jpg" alt="scheme" border=0> 
