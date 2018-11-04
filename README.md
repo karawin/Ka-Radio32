@@ -1,6 +1,5 @@
 ## STATE
 KaraDio32 in dev state: Stable<br/>
-The new code from 3.1 R3 is now compatible. You can restore the tes i2s.c and i2s.h if you changed it<br/>
 <br/>
 See https://github.com/espressif/esp-idf/issues/2307 too if you generate your own bin.
 <br/><br/>
@@ -29,6 +28,9 @@ Date format DD:MM:YYYY or MM:DD:YYYY .<br/>
 Remote IR support integrated. Nec protocol only.<br/>
 Rotary encoder support integrated. Common functions: play/stop, volume, station change, date time display.<br/>
 Web command next and prev added.<br/>
+
+## Configure the hardware and IR codes
+See http://karadio.karawin.fr/HardwareConfig.txt <br/>
 
 ## Build your own
 To build your own release, you must install the idf https://github.com/espressif/esp-idf and the toolchain.
