@@ -40,7 +40,6 @@ python /home/yourhome/esp/esp-idf/components/esptool_py/esptool/esptool.py --chi
 ```
 ### GPIO Definition 
 ```
-//file gpio.h
 //-------------------------------//
 // Define GPIO used in KaRadio32 //
 //-------------------------------//
@@ -49,6 +48,7 @@ python /home/yourhome/esp/esp-idf/components/esptool_py/esptool/esptool.py --chi
 // Default value, can be superseeded by the hardware partition.
 
 // Must be HSPI or VSPI
+
 #define KSPI VSPI_HOST
 
 // KSPI pins of the SPI bus
@@ -73,9 +73,12 @@ python /home/yourhome/esp/esp-idf/components/esptool_py/esptool/esptool.py --chi
 
 // Encoder knob
 //-------------
-#define PIN_ENC_A   GPIO_NUM_16		// CLK
-#define PIN_ENC_B   GPIO_NUM_17		// DT
-#define PIN_ENC_BTN GPIO_NUM_5		// SW
+#define PIN_ENC0_A   GPIO_NUM_16		// CLK. 0 if encoder not used
+#define PIN_ENC0_B   GPIO_NUM_17		// DT
+#define PIN_ENC0_BTN GPIO_NUM_5		// SW
+#define PIN_ENC1_A   0		// CLK. 0 if encoder not used
+#define PIN_ENC1_B   0		// DT
+#define PIN_ENC1_BTN 0		// SW
 
 // I2C lcd (and rda5807 if lcd is i2c or LCD_NONE)
 //------------------------------------------------
@@ -83,11 +86,6 @@ python /home/yourhome/esp/esp-idf/components/esptool_py/esptool/esptool.py --chi
 #define PIN_I2C_SDA GPIO_NUM_13
 #define PIN_I2C_RST	GPIO_NUM_2		// or not used
 
-// I2C rda5807 (if lcd is spi)
-// (removed)
-//----------------------------
-//#define PIN_SI2C_SCL GPIO_NUM_15
-//#define PIN_SI2C_SDA GPIO_NUM_27
 
 // SPI lcd
 //---------
@@ -106,7 +104,6 @@ python /home/yourhome/esp/esp-idf/components/esptool_py/esptool/esptool.py --chi
 #define PIN_I2S_LRCK GPIO_NUM_25	// or Channel1
 #define PIN_I2S_BCLK GPIO_NUM_26	// or channel2
 #define PIN_I2S_DATA GPIO_NUM_22	//  
-
 
 ```
 ### Oled and lcd support
