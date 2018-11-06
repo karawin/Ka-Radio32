@@ -516,7 +516,7 @@ void encoderLoop()
 		{
 			if ((stateScreen  != sstation)&&(newValue0 != 0))
 			{    
-				ESP_LOGv(TAG,"Volume newvalue %d, oldValue %d, volume %d",newValue0,oldValue0,newValue0+(oldValue0*5));
+				ESP_LOGV(TAG,"Volume newvalue %d, oldValue %d, volume %d",newValue0,oldValue0,newValue0+(oldValue0*5));
 				evtVolume(evt,newValue0+(oldValue0*3));
 			} 
 			if ((stateScreen  == sstation)&&(newValue0 != 0))
