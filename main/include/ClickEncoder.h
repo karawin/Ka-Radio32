@@ -17,10 +17,9 @@
 
 #include "driver/gpio.h"
 // ---Button defaults-------------------------------------------------------------
-
-#define BTN_DOUBLECLICKTIME  400  // second click within 400ms
+#define ENC_BUTTONINTERVAL    10  // check enc->button every x milliseconds, also debouce time
+#define BTN_DOUBLECLICKTIME  600  // second click within 400ms
 #define BTN_HOLDTIME        1000  // report held button after 1s
-
 
 // ----------------------------------------------------------------------------
 
@@ -82,8 +81,6 @@ typedef gpio_mode_t pinMode_t;
   bool buttonOnPinZeroEnabled ;
   uint16_t keyDownTicks ;
   uint16_t doubleClickTicks ;
-  uint16_t buttonHoldTime ;
-  uint16_t buttonDoubleClickTime ;
   unsigned long lastButtonCheck ;
   } Encoder_t;	  
   

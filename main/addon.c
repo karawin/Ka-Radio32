@@ -516,6 +516,7 @@ void encoderLoop()
 		{
 			if ((stateScreen  != sstation)&&(newValue0 != 0))
 			{    
+				ESP_LOGW(TAG,"Volume newvalue %d, oldValue %d, volume %d",newValue0,oldValue0,newValue0+(oldValue0*5));
 				evtVolume(evt,newValue0+(oldValue0*3));
 			} 
 			if ((stateScreen  == sstation)&&(newValue0 != 0))
@@ -879,7 +880,7 @@ void task_addon(void *pvParams)
 			sleepLcd();
 		}
 		
-		if (timerScreen >= 2) // 2 sec timeout 
+		if (timerScreen >= 3) // 2 sec timeout 
 		{
 			timerScreen = 0;
 			if ((stateScreen != smain)&&(stateScreen != stime)&&(stateScreen != snull))

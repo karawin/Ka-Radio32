@@ -387,6 +387,7 @@ void drawStationU8g2(uint8_t mTscreen,char* snum,char* ddot)
   drawTTitleU8g2(ststr);   
   if (ddot != NULL)
   {
+		setfont8(middle);
         u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,snum)/2),yy/3-2, snum);
         len = (x/2)-(u8g2_GetUTF8Width(&u8g2,ddot)/2);
         if (len <0) len = 0;

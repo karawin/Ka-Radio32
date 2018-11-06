@@ -18,19 +18,12 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-
-
-// ----------------------------------------------------------------------------
-// enc->button configuration (values for 1ms timer service calls)
-//
-#define ENC_BUTTONINTERVAL    10  // check enc->button every x milliseconds, also debouce time
-
 // ----------------------------------------------------------------------------
 // enc->acceleration configuration (for 1000Hz calls to ::service())
 //
 #define ENC_ACCEL_TOP      3072   // max. enc->acceleration: *12 (val >> 8)
-#define ENC_ACCEL_INC        25
-#define ENC_ACCEL_DEC         2
+#define ENC_ACCEL_INC      50//  25
+#define ENC_ACCEL_DEC      2//   2
 
 // ----------------------------------------------------------------------------
 /*
@@ -82,8 +75,6 @@ Encoder_t* ClickEncoderInit(int8_t A, int8_t B, int8_t BTN)
 	enc->buttonOnPinZeroEnabled = false;
 	enc->keyDownTicks = 0;
 	enc->doubleClickTicks = 0;
-	enc->buttonHoldTime = BTN_HOLDTIME;
-	enc->buttonDoubleClickTime = BTN_DOUBLECLICKTIME;
 	enc->lastButtonCheck = 0;
 	
 	gpio_config_t gpio_conf;
@@ -171,7 +162,7 @@ void service(Encoder_t *enc)
     
     if (pinRead == enc->pinsActive) { // key is down
       enc->keyDownTicks++;
-      if ((enc->keyDownTicks > (enc->buttonHoldTime / ENC_BUTTONINTERVAL)) && (enc->buttonHeldEnabled)) {
+      if ((enc->keyDownTicks > (BTN_HOLDTIME / ENC_BUTTONINTERVAL)) && (enc->buttonHeldEnabled)) {
         enc->button = Held;
       }
     }
@@ -185,13 +176,13 @@ void service(Encoder_t *enc)
         else {
           #define ENC_SINGLECLICKONLY 1
           if (enc->doubleClickTicks > ENC_SINGLECLICKONLY) {   // prevent trigger in single click mode
-            if (enc->doubleClickTicks < (enc->buttonDoubleClickTime / ENC_BUTTONINTERVAL)) {
+            if (enc->doubleClickTicks < (BTN_DOUBLECLICKTIME / ENC_BUTTONINTERVAL)) {
               enc->button = DoubleClicked;
               enc->doubleClickTicks = 0;
             }
           }
           else {
-            enc->doubleClickTicks = (enc->doubleClickEnabled) ? (enc->buttonDoubleClickTime / ENC_BUTTONINTERVAL) : ENC_SINGLECLICKONLY;
+            enc->doubleClickTicks = (enc->doubleClickEnabled) ? (BTN_DOUBLECLICKTIME / ENC_BUTTONINTERVAL) : ENC_SINGLECLICKONLY;
           }
         }
       }
@@ -220,7 +211,8 @@ int16_t getValue(Encoder_t *enc)
   if (enc->steps == 2) enc->delta = val & 1;
   else if (enc->steps == 4) enc->delta = val & 3;
   else enc->delta = 0; // default to 1 step per notch
-
+  interrupts();
+  
   if (enc->steps == 4) val >>= 2;
   if (enc->steps == 2) val >>= 1;
 
@@ -233,7 +225,7 @@ int16_t getValue(Encoder_t *enc)
   else if (val > 0) {
     r += 1 + accel;
   }
-  interrupts();
+  
 
   return r;
 }
@@ -247,7 +239,6 @@ Button getButton(Encoder_t *enc)
     enc->button = Open; // reset
   }
   interrupts();
-
   return ret;
 }
 
