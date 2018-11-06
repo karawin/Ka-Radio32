@@ -1,8 +1,7 @@
 ## STATE
 KaraDio32 in dev state: Stable<br/>
 <br/>
-See https://github.com/espressif/esp-idf/issues/2307 too if you generate your own bin.
-<br/><br/>
+<br/>
 Works on any esp32 board.<br/><br/>
 See the feature on https://hackaday.io/project/11570-wifi-webradio-with-esp8266-and-vs1053 <br/>
 The esp32 adds the output on the internal dac or with i2s to an external dac<br/>
@@ -73,8 +72,8 @@ python /home/yourhome/esp/esp-idf/components/esptool_py/esptool/esptool.py --chi
 
 // Encoder knob
 //-------------
-#define PIN_ENC0_A   GPIO_NUM_16		// CLK. 0 if encoder not used
-#define PIN_ENC0_B   GPIO_NUM_17		// DT
+#define PIN_ENC0_A   GPIO_NUM_16	// CLK. 0 if encoder not used
+#define PIN_ENC0_B   GPIO_NUM_17	// DT
 #define PIN_ENC0_BTN GPIO_NUM_5		// SW
 #define PIN_ENC1_A   0		// CLK. 0 if encoder not used
 #define PIN_ENC1_B   0		// DT
