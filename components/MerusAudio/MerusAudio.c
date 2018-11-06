@@ -28,8 +28,6 @@
         }
 
 
-#define I2C_MASTER_SCL_IO    PIN_I2C_SCL   /*!< gpio number for I2C master clock */
-#define I2C_MASTER_SDA_IO    PIN_I2C_SDA
     /*!< gpio number for I2C master data  */
 #define I2C_MASTER_NUM I2C_NUM_0   /*!< I2C port number for master dev */
 #define I2C_MASTER_TX_BUF_DISABLE   0   /*!< I2C master do not need buffer */
@@ -49,12 +47,18 @@
 void i2c_master_init()
 {   
 // KaRadio32, I2C may be already configured.
+	gpio_num_t scl;
+	gpio_num_t sda;
+	gpio_num_t rsti2c;
+	
+	gpio_get_i2c(&scl,&sda,&rsti2c);
+
 	int i2c_master_port = I2C_MASTER_NUM;
     i2c_config_t conf;
     conf.mode = I2C_MODE_MASTER;
-    conf.sda_io_num = I2C_MASTER_SDA_IO;
+    conf.sda_io_num = sda;
     conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
-    conf.scl_io_num = I2C_MASTER_SCL_IO;
+    conf.scl_io_num = scl;
     conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
     conf.master.clk_speed = I2C_MASTER_FREQ_HZ;
     esp_err_t res = i2c_param_config(i2c_master_port, &conf);

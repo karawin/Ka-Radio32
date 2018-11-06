@@ -11,6 +11,9 @@ P_DREQ,data,u8,34
 P_ENC0_A,data,u8,16
 P_ENC0_B,data,u8,17
 P_ENC0_BTN,data,u8,5
+P_ENC1_A,data,u8,
+P_ENC1_B,data,u8,
+P_ENC1_BTN,data,u8,
 P_I2C_SCL,data,u8,14
 P_I2C_SDA,data,u8,13
 P_I2C_RST,data,u8,2

@@ -77,6 +77,7 @@ typedef struct {
 extern xQueueHandle event_ir;
 extern u8g2_t u8g2;
 extern ucg_t ucg;
+void (*serviceEncoder)();
 void task_addon(void *pvParams);
 void lcd_init(uint8_t Type);
 void (*serviceAddon)();

@@ -878,25 +878,42 @@ void playingUcg()
 
 void lcd_initUcg(uint8_t *lcd_type)
 {
+	
+	gpio_num_t miso;
+	gpio_num_t mosi;
+	gpio_num_t sclk;	
+	uint8_t spi_no;
+	
+	gpio_num_t scl;
+	gpio_num_t sda;
+	gpio_num_t rsti2c;
+	
+	gpio_num_t cs;
+	gpio_num_t a0;
+	gpio_num_t rstlcd;
+	
 	uint8_t rotat = getRotat();
 	ESP_LOGI(TAG,"lcd init  type: %d",*lcd_type);
+	gpio_get_spi_bus(&spi_no,&miso,&mosi,&sclk);
+	gpio_get_i2c(&scl,&sda,&rsti2c);
+	gpio_get_spi_lcd(&cs ,&a0,&rstlcd);
 	
-		ucg_esp32_hal_t ucg_esp32_hal = UCG_ESP32_HAL_DEFAULT;
-		if (*lcd_type & LCD_SPI) // Color SPI
-		{
-			ucg_esp32_hal.clk   = PIN_NUM_CLK;
-			ucg_esp32_hal.mosi  = PIN_NUM_MOSI;
-			ucg_esp32_hal.cs    = PIN_LCD_CS;
-			ucg_esp32_hal.dc    = PIN_LCD_A0;
-			ucg_esp32_hal.reset = PIN_LCD_RST;
-		} else //Color I2c
-		{
-			ucg_esp32_hal.sda  = PIN_I2C_SDA;
-			ucg_esp32_hal.scl  = PIN_I2C_SCL;
-			ucg_esp32_hal.reset = PIN_LCD_RST;
-		}
+	ucg_esp32_hal_t ucg_esp32_hal = UCG_ESP32_HAL_DEFAULT;
+	if (*lcd_type & LCD_SPI) // Color SPI
+	{
+		ucg_esp32_hal.clk   = sclk;
+		ucg_esp32_hal.mosi  = mosi;
+		ucg_esp32_hal.cs    = cs;
+		ucg_esp32_hal.dc    = a0;
+		ucg_esp32_hal.reset = rstlcd;
+	} else //Color I2c (never seen this one)
+	{
+		ucg_esp32_hal.sda  = sda;
+		ucg_esp32_hal.scl  = scl;
+		ucg_esp32_hal.reset = rsti2c;
+	}
 		
-		ucg_esp32_hal_init(ucg_esp32_hal);	
+	ucg_esp32_hal_init(ucg_esp32_hal);	
 		
 	switch (*lcd_type){		
 // Color spi
@@ -922,7 +939,8 @@ void lcd_initUcg(uint8_t *lcd_type)
 		ucg_Init(&ucg, ucg_dev_seps225_16x128x128_univision, ucg_ext_seps225_16, ucg_com_hal);
 		break;	
 	default: 
-		ESP_LOGE(TAG,"lcd invalid type: %d",*lcd_type);
+		ESP_LOGE(TAG,"lcd invalid type: %d, Fall back to none",*lcd_type);
+		*lcd_type = LCD_NONE;
 		return;
 	}	
 		
@@ -930,26 +948,12 @@ void lcd_initUcg(uint8_t *lcd_type)
 		// define prefered font rendering method (no text will be visibile, if this is missing 
 		ucg_SetFontMode(&ucg, UCG_FONT_MODE_TRANSPARENT); 
 		ucg_ClearScreen(&ucg);		
-		
-		
+			
 		if (rotat)
 			ucg_SetRotate270(&ucg);
 		else 
-			ucg_SetRotate90(&ucg);
+			ucg_SetRotate90(&ucg);	
 		
-/*		switch (*lcd_type)
-		{
-			case LCD_SPI_ILI9341:
-				ucg_SetRotate270(&ucg);
-				break;
-			case LCD_SPI_SSD1331:
-				break;
-			default:
-			ucg_SetRotate90(&ucg);			
-		}
-*/		
-		
-		//ucg_SetFont(&ucg,ucg_font_6x13_tf);
 		ucg_SetFontPosTop(&ucg);
 		x  = ucg_GetWidth(&ucg);
 		

@@ -739,7 +739,7 @@ uint8_t getLedGpio()
 		device = getDeviceSettings();
 		uint8_t ledgpio = device->led_gpio;
 		if (ledgpio == 0) {
-			ledgpio = 4;
+			ledgpio = GPIO_LED;
 			device->led_gpio = ledgpio;
 			led_gpio = ledgpio;
 			saveDeviceSettings(device);

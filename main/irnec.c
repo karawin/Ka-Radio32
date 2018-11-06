@@ -30,7 +30,6 @@
 //IR
 #define RMT_RX_ACTIVE_LEVEL  0   /*!< If we connect with a IR receiver, the data is active low */
 #define RMT_RX_CHANNEL    0     /*!< RMT channel for receiver */
-#define RMT_RX_GPIO_NUM  PIN_IR_SIGNAL     /*!< GPIO number for receiver */
 #define RMT_CLK_DIV      100    /*!< RMT counter clock divider */
 #define RMT_TICK_10_US    (80000000/RMT_CLK_DIV/100000)   /*!< RMT counter value for 10 us.(Source clock is APB clock) */
 
@@ -196,9 +195,11 @@ static int nec_parse_items(rmt_item32_t* item, int item_num, uint16_t* addr, uin
  */
 static void nec_rx_init()
 {
+	gpio_num_t ir;
+	gpio_get_ir_signal(&ir);
     rmt_config_t rmt_rx;
     rmt_rx.channel = RMT_RX_CHANNEL;
-    rmt_rx.gpio_num = RMT_RX_GPIO_NUM;
+    rmt_rx.gpio_num = ir;
     rmt_rx.clk_div = RMT_CLK_DIV;
     rmt_rx.mem_block_num = 1;
     rmt_rx.rmt_mode = RMT_MODE_RX;

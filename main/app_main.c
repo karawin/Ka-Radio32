@@ -820,7 +820,7 @@ void app_main()
 	//time display
 	setDdmm((device->options32)&T_DDMM);
 	//SPI init for the vs1053 and lcd if spi.
-	VS1053_spi_init(KSPI);
+	VS1053_spi_init();
 
     init_hardware(); 
 	ESP_LOGI(TAG, "Hardware init done...");

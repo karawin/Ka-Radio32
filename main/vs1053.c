@@ -36,14 +36,20 @@ extern void  LoadUserCodes(void);
 
 #define TAG "vs1053"
 
+
 int vsVersion ; // the version of the chip
 //	SS_VER is 0 for VS1001, 1 for VS1011, 2 for VS1002, 3 for VS1003, 4 for VS1053 and VS8053, 5 for VS1033, 7 for VS1103, and 6 for VS1063.
 //char strvMODE[] STORE_ATTR ICACHE_RODATA_ATTR = {"SCI_Mode (0x4800) = 0x%X\n"};
 
 const char strvI2S[] = {"I2S Speed: %d\n"};
 
-spi_device_handle_t vsspi;  // the device handle of the vs1053 spi
-spi_device_handle_t hvsspi;  // the device handle of the vs1053 spi high speed
+	gpio_num_t xcs;
+	gpio_num_t rst;
+	gpio_num_t xdcs;
+	gpio_num_t dreq;
+
+static spi_device_handle_t vsspi;  // the device handle of the vs1053 spi
+static spi_device_handle_t hvsspi;  // the device handle of the vs1053 spi high speed
 
 xSemaphoreHandle sSPI = NULL;
 
@@ -56,29 +62,43 @@ void spi_give_semaphore() {
 	if(sSPI) xSemaphoreGive(sSPI);
 }
 
-void VS1053_spi_init(uint8_t spi_no){
+void VS1053_spi_init(){
 	esp_err_t ret;
+	gpio_num_t miso;
+	gpio_num_t mosi;
+	gpio_num_t sclk;
+	uint8_t spi_no; // the spi bus to use
+	
 	if(!sSPI) vSemaphoreCreateBinary(sSPI);
 	spi_give_semaphore(); 
 	
+	gpio_get_spi_bus(&spi_no,&miso,&mosi,&sclk);	
 	if(spi_no > 2) return; //Only VSPI and HSPI are valid spi modules. 	
-	
+
 	spi_bus_config_t buscfg={
-        .miso_io_num=PIN_NUM_MISO,
-        .mosi_io_num=PIN_NUM_MOSI,
-        .sclk_io_num=PIN_NUM_CLK,
+        .miso_io_num=miso,
+        .mosi_io_num=mosi,
+        .sclk_io_num=sclk,
         .quadwp_io_num=-1,
         .quadhd_io_num=-1,
 		.flags = SPICOMMON_BUSFLAG_NATIVE_PINS|SPICOMMON_BUSFLAG_MASTER
 //		.max_transfer_sz = 1024		
 	};		
-	ret=spi_bus_initialize(KSPI, &buscfg, 1);	 // dma	
+	ret=spi_bus_initialize(spi_no, &buscfg, 1);	 // dma	
 	assert(ret==ESP_OK);
 }
 
 int getVsVersion() { return vsVersion;}
 
-void VS1053_HW_init(){
+void VS1053_HW_init()
+{
+	gpio_num_t miso;
+	gpio_num_t mosi;
+	gpio_num_t sclk;
+	uint8_t spi_no; // the spi bus to use
+	
+	gpio_get_spi_bus(&spi_no,&miso,&mosi,&sclk);	
+	gpio_get_vs1053(&xcs,&rst,&xdcs,&dreq);
 	spi_device_interface_config_t devcfg={
         .clock_speed_hz=2*1000*1000,               //Clock out at x MHz
 		.command_bits = 8,
@@ -89,24 +109,24 @@ void VS1053_HW_init(){
 		.cs_ena_posttrans = 1,
 		.flags = 0,	
         .mode=0,                         //SPI mode 
-        .spics_io_num= PIN_NUM_XCS,               //XCS pin
+        .spics_io_num= xcs,               //XCS pin
         .queue_size=1,                          //We want to be able to queue x transactions at a time
         //.pre_cb=lcd_spi_pre_transfer_callback,  //Specify pre-transfer callback to handle D/C line
         .pre_cb=NULL,  //Specify pre-transfer callback to handle D/C line
 		.post_cb = NULL
 	};	
 	
- 	//VS1053_spi_init(KSPI);
+ 	//VS1053_spi_init(spi_no);
 	
 	//slow speed
-	ESP_ERROR_CHECK(spi_bus_add_device(KSPI, &devcfg, &vsspi));
+	ESP_ERROR_CHECK(spi_bus_add_device(spi_no, &devcfg, &vsspi));
 	
 	//high speed	
 	devcfg.clock_speed_hz = 6000000;
-	devcfg.spics_io_num= PIN_NUM_XDCS;               //XDCS pin
+	devcfg.spics_io_num= xdcs;               //XDCS pin
 	devcfg.command_bits = 0;
 	devcfg.address_bits = 0;
-	ESP_ERROR_CHECK(spi_bus_add_device(KSPI, &devcfg, &hvsspi));
+	ESP_ERROR_CHECK(spi_bus_add_device(spi_no, &devcfg, &hvsspi));
 	
 	//Initialize non-SPI GPIOs
 	gpio_config_t gpio_conf;
@@ -114,31 +134,31 @@ void VS1053_HW_init(){
 	gpio_conf.pull_up_en =  GPIO_PULLUP_DISABLE;
 	gpio_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
 	gpio_conf.intr_type = GPIO_INTR_DISABLE;	
-	gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<PIN_NUM_RST));
+	gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<rst));
 	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
 	
 	ControlReset(RESET);
-    //gpio_set_direction(PIN_NUM_RST, GPIO_MODE_OUTPUT);
+    //gpio_set_direction(rst, GPIO_MODE_OUTPUT);
 		
 	gpio_conf.mode = GPIO_MODE_INPUT;
 	gpio_conf.pull_up_en =  GPIO_PULLUP_DISABLE;
 	gpio_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
 	gpio_conf.intr_type = GPIO_INTR_DISABLE;	
-	gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<PIN_NUM_DREQ));
+	gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<dreq));
 	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
 	
-	//gpio_set_direction(PIN_NUM_DREQ, GPIO_MODE_INPUT);
-	//gpio_set_pull_mode(PIN_NUM_DREQ, GPIO_PULLDOWN_ENABLE); //usefull for no vs1053 test
+	//gpio_set_direction(dreq, GPIO_MODE_INPUT);
+	//gpio_set_pull_mode(dreq, GPIO_PULLDOWN_ENABLE); //usefull for no vs1053 test
 	
 }
 
 
 void ControlReset(uint8_t State){
-	gpio_set_level(PIN_NUM_RST, State);
+	gpio_set_level(rst, State);
 }
 
 uint8_t VS1053_checkDREQ() {
-	return gpio_get_level(PIN_NUM_DREQ);
+	return gpio_get_level(dreq);
 }
 
 void VS1053_spi_write_char(spi_device_handle_t ivsspi, uint8_t *cbyte, uint16_t len)

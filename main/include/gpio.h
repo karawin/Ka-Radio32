@@ -6,7 +6,8 @@
 #pragma once
 #ifndef __GPIO_H__
 #define __GPIO_H__
-
+#include "nvs_flash.h"
+#include "driver/spi_master.h"
 //-------------------------------//
 // Define GPIO used in KaRadio32 //
 //-------------------------------//
@@ -15,6 +16,7 @@
 // Default value, can be superseeded by the hardware partition.
 
 // Must be HSPI or VSPI
+
 #define KSPI VSPI_HOST
 
 // KSPI pins of the SPI bus
@@ -39,9 +41,12 @@
 
 // Encoder knob
 //-------------
-#define PIN_ENC_A   GPIO_NUM_16		// CLK
-#define PIN_ENC_B   GPIO_NUM_17		// DT
-#define PIN_ENC_BTN GPIO_NUM_5		// SW
+#define PIN_ENC0_A   GPIO_NUM_16		// CLK. 0 if encoder not used
+#define PIN_ENC0_B   GPIO_NUM_17		// DT
+#define PIN_ENC0_BTN GPIO_NUM_5		// SW
+#define PIN_ENC1_A   0		// CLK. 0 if encoder not used
+#define PIN_ENC1_B   0		// DT
+#define PIN_ENC1_BTN 0		// SW
 
 // I2C lcd (and rda5807 if lcd is i2c or LCD_NONE)
 //------------------------------------------------
@@ -49,11 +54,6 @@
 #define PIN_I2C_SDA GPIO_NUM_13
 #define PIN_I2C_RST	GPIO_NUM_2		// or not used
 
-// I2C rda5807 (if lcd is spi)
-// (removed)
-//----------------------------
-//#define PIN_SI2C_SCL GPIO_NUM_15
-//#define PIN_SI2C_SDA GPIO_NUM_27
 
 // SPI lcd
 //---------
@@ -74,9 +74,29 @@
 #define PIN_I2S_DATA GPIO_NUM_22	//  
 
 
+// I2C rda5807 (if lcd is spi)
+// (removed)
+//----------------------------
+//#define PIN_SI2C_SCL GPIO_NUM_15
+//#define PIN_SI2C_SDA GPIO_NUM_27
+
+
 // to set a value: 		gpio_set_level(gpio_num_t gpio_num,value);
 // to read a value: 	int gpio_get_level(gpio_num_t gpio_num)
 
+// init a gpio as output
 void gpio_output_conf(gpio_num_t gpio);
 
+// get the hardware partition infos
+esp_err_t open_partition(const char *partition_label, const char *namespace,nvs_handle *handle);
+void close_partition(nvs_handle handle,const char *partition_label);
+void gpio_get_spi_bus(uint8_t *spi_no,gpio_num_t *miso,gpio_num_t *mosi,gpio_num_t *sclk);
+void gpio_get_vs1053(gpio_num_t * xcs,gpio_num_t *rst,gpio_num_t *xdcs,gpio_num_t *dreq);
+void gpio_get_encoder0(gpio_num_t *enca, gpio_num_t *encb, gpio_num_t *encbtn);
+void gpio_get_encoder1(gpio_num_t *enca, gpio_num_t *encb, gpio_num_t *encbtn);
+void gpio_get_i2c(gpio_num_t *scl,gpio_num_t *sda,gpio_num_t *rsti2c);
+void gpio_get_spi_lcd(gpio_num_t *cs ,gpio_num_t *a0,gpio_num_t *rstlcd);
+void gpio_get_ir_signal(gpio_num_t *ir);
+void gpio_get_i2s(gpio_num_t *lrck ,gpio_num_t *bclk ,gpio_num_t *i2sdata );
+void gpio_get_ir_key(nvs_handle handle,const char *key, int32_t *out_value1 , int32_t *out_value2);
 #endif

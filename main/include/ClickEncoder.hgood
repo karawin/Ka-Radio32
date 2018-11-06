@@ -66,35 +66,13 @@ typedef gpio_mode_t pinMode_t;
     DoubleClicked   
   } Button;
 
-  typedef struct {
- int8_t pinA;
-  int8_t pinB;
-  int8_t pinBTN;
-  bool pinsActive;
-  volatile int16_t delta;
-  volatile int16_t last;
-  volatile uint8_t steps;
-  volatile uint16_t acceleration;
-  bool accelerationEnabled;
-  volatile Button button;
-  bool doubleClickEnabled;
-  bool buttonHeldEnabled;
-  bool buttonOnPinZeroEnabled ;
-  uint16_t keyDownTicks ;
-  uint16_t doubleClickTicks ;
-  uint16_t buttonHoldTime ;
-  uint16_t buttonDoubleClickTime ;
-  unsigned long lastButtonCheck ;
-  } Encoder_t;	  
+  void ClickEncoderInit(int8_t A, int8_t B, int8_t BTN );
   
-  
-  Encoder_t* ClickEncoderInit(int8_t A, int8_t B, int8_t BTN );
-  
-  void service(Encoder_t *enc); 
-  int16_t getValue(Encoder_t *enc);
-  Button getButton(Encoder_t *enc);
-  bool getPinState(Encoder_t *enc);
-  bool getpinsActive(Encoder_t *enc);
+  void service(void); 
+  int16_t getValue(void);
+  Button getButton(void);
+  bool getPinState();
+  bool getpinsActive();
   
 
 
