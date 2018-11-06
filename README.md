@@ -73,10 +73,10 @@ python /home/yourhome/esp/esp-idf/components/esptool_py/esptool/esptool.py --chi
 
 // Encoder knob
 //-------------
-#define PIN_ENC0_A   GPIO_NUM_16		// CLK. 0 if encoder not used
+#define PIN_ENC0_A   GPIO_NUM_16		// 0 if encoder not used
 #define PIN_ENC0_B   GPIO_NUM_17		// DT
 #define PIN_ENC0_BTN GPIO_NUM_5		// SW
-#define PIN_ENC1_A   0		// CLK. 0 if encoder not used
+#define PIN_ENC1_A   0		// 0 if encoder not used
 #define PIN_ENC1_B   0		// DT
 #define PIN_ENC1_BTN 0		// SW
 
