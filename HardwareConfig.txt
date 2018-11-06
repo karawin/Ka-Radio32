@@ -56,6 +56,10 @@ K_SPI,data,u8,2
 1 is the spi HSPI_HOST
 
 If P_ENC0_A = 0 the encoder is disabled (not used, the gpio's may be reused elsewhere).
+If P_ENC1_A = 0 the encoder is disabled (not used, the gpio's may be reused elsewhere).
+
+Encoder0 the volume control and stations change when pushed and held,
+Encoder1 the station control and volume change when pushed and heldi.
 
 
 3/ IR key definitions

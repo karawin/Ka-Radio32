@@ -642,7 +642,7 @@ void drawStationUcg(uint8_t mTscreen,char* snum,char* ddot)
       case 2:   
         ucg_SetColor(&ucg,0,CBLACK); 
         ucg_DrawBox(&ucg,0,HHeader,x,yy);     
- //       setfont(middle);
+        setfont(middle);
         ucg_SetColor(&ucg,0,CBODY);
 //        ddot = strstr(sline,":");
         if (ddot != NULL)

@@ -85,7 +85,7 @@ typedef enum {KEY_UP,KEY_LEFT,KEY_OK,KEY_RIGHT,KEY_DOWN,
 static uint32_t customKey[KEY_MAX][2]; 
 
 static bool isEncoder0 = true;
-static bool isEncoder1 = false;
+static bool isEncoder1 = true;
 void Screen(typeScreen st); 
  
 Encoder_t* encoder0;
