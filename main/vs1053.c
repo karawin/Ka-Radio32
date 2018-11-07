@@ -37,9 +37,9 @@ extern void  LoadUserCodes(void);
 #define TAG "vs1053"
 
 
-int vsVersion ; // the version of the chip
+int vsVersion = -1; // the version of the chip
 //	SS_VER is 0 for VS1001, 1 for VS1011, 2 for VS1002, 3 for VS1003, 4 for VS1053 and VS8053, 5 for VS1033, 7 for VS1103, and 6 for VS1063.
-//char strvMODE[] STORE_ATTR ICACHE_RODATA_ATTR = {"SCI_Mode (0x4800) = 0x%X\n"};
+
 
 const char strvI2S[] = {"I2S Speed: %d\n"};
 
@@ -90,7 +90,7 @@ void VS1053_spi_init(){
 
 int getVsVersion() { return vsVersion;}
 
-void VS1053_HW_init()
+bool VS1053_HW_init()
 {
 	gpio_num_t miso;
 	gpio_num_t mosi;
@@ -99,6 +99,14 @@ void VS1053_HW_init()
 	
 	gpio_get_spi_bus(&spi_no,&miso,&mosi,&sclk);	
 	gpio_get_vs1053(&xcs,&rst,&xdcs,&dreq);
+	
+	// if xcs = 0 the vs1053 is not used
+	if (xcs == 0)
+	{
+		vsVersion = 0; 
+		ESP_LOGE(TAG,"VS1053 not used");
+		return false;
+	}
 	spi_device_interface_config_t devcfg={
         .clock_speed_hz=2*1000*1000,               //Clock out at x MHz
 		.command_bits = 8,
@@ -116,8 +124,7 @@ void VS1053_HW_init()
 		.post_cb = NULL
 	};	
 	
- 	//VS1053_spi_init(spi_no);
-	
+
 	//slow speed
 	ESP_ERROR_CHECK(spi_bus_add_device(spi_no, &devcfg, &vsspi));
 	
@@ -149,7 +156,7 @@ void VS1053_HW_init()
 	
 	//gpio_set_direction(dreq, GPIO_MODE_INPUT);
 	//gpio_set_pull_mode(dreq, GPIO_PULLDOWN_ENABLE); //usefull for no vs1053 test
-	
+	return true;
 }
 
 
@@ -343,7 +350,7 @@ void VS1053_Start(){
 	printf("device: %x\n",(int)device);
 	if (device != NULL)
 	{	
-	// enable I2C dac output
+	// enable I2C dac output of the vs1053
 		if (vsVersion == 4) // only 1053
 		{
 			VS1053_WriteRegister16(SPI_WRAMADDR, 0xc017); //

@@ -671,9 +671,9 @@ void lcd_initU8g2(uint8_t *lcd_type)
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;
 	default:
-		ESP_LOGE(TAG,"Unknown lcd lcd_type %d. Fall back to type 0",*lcd_type);
-		*lcd_type = 0;
-		u8g2_esp32_hal_t u8g2_esp32_hal = U8G2_ESP32_HAL_DEFAULT;
+		ESP_LOGE(TAG,"UNKNOWN LCD lcd_type %d. Fall back to type \"LCD_NONE\"",*lcd_type);
+		*lcd_type = LCD_NONE;
+/*		u8g2_esp32_hal_t u8g2_esp32_hal = U8G2_ESP32_HAL_DEFAULT;
 		u8g2_esp32_hal.sda  = sda;
 		u8g2_esp32_hal.scl  = scl;
 		u8g2_esp32_hal_init(u8g2_esp32_hal);
@@ -682,27 +682,29 @@ void lcd_initU8g2(uint8_t *lcd_type)
 			rotat,
 			u8g2_esp32_i2c_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
+*/			
 	}
-	
-	ESP_LOGD(TAG,"lcd init BW type: %d",*lcd_type);
-	if (*lcd_type < LCD_SPI) u8x8_SetI2CAddress(&u8g2.u8x8,0x78);
-	u8g2_InitDisplay(&u8g2); // send init sequence to the display, display is in sleep mode after this,
-	u8g2_SetPowerSave(&u8g2, 0); // wake up display
-	u8g2_ClearBuffer(&u8g2);
-	u8g2_ClearDisplay(&u8g2);
-	yy = u8g2.height;
-	x  = u8g2.width;
-	z = 0;
-	u8g2_SetFontPosTop(&u8g2);
-	setfont8(text);
-	y = getFontLineSpacing();
-	if (yy>= logo_height)
+	if (*lcd_type != LCD_NONE)
+	{
+		ESP_LOGD(TAG,"lcd init BW type: %d",*lcd_type);
+		if (*lcd_type < LCD_SPI) u8x8_SetI2CAddress(&u8g2.u8x8,0x78);
+		u8g2_InitDisplay(&u8g2); // send init sequence to the display, display is in sleep mode after this,
+		u8g2_SetPowerSave(&u8g2, 0); // wake up display
+		u8g2_ClearBuffer(&u8g2);
+		u8g2_ClearDisplay(&u8g2);
+		yy = u8g2.height;
+		x  = u8g2.width;
+		z = 0;
+		u8g2_SetFontPosTop(&u8g2);
+		setfont8(text);
+		y = getFontLineSpacing();
+		if (yy>= logo_height)
 			 u8g2_DrawXBM( &u8g2,x/2-logo_width/2, yy/2-logo_height/2, logo_width, logo_height, logo_bits);
-	else u8g2_DrawXBM( &u8g2,x/2-logo_width/2, 0, logo_width, logo_height, logo_bits);
-	u8g2_SendBuffer(&u8g2);
-	printf("X: %d, YY: %d, Y: %d\n",x,yy,y);
-	vTaskDelay(100);
-	z = 0; 	
-	
+		else u8g2_DrawXBM( &u8g2,x/2-logo_width/2, 0, logo_width, logo_height, logo_bits);
+		u8g2_SendBuffer(&u8g2);
+		printf("X: %d, YY: %d, Y: %d\n",x,yy,y);
+		vTaskDelay(100);
+//		z = 0; 	
+	}
 }
 

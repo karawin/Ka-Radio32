@@ -318,8 +318,8 @@ uint32_t checkUart(uint32_t speed)
 *******************************************************************************/
 static void init_hardware()
 {
-	VS1053_HW_init(); // init spi
-	VS1053_Start();
+	if (VS1053_HW_init()) // init spi
+		VS1053_Start();
 	
     //Initialize the SPI RAM chip communications and see if it actually retains some bytes. If it
     //doesn't, warn user.
