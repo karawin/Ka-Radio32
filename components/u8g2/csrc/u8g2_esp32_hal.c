@@ -78,7 +78,7 @@ uint8_t u8g2_esp32_spi_byte_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int,  void
 		  dev_config.pre_cb           = NULL;
 		  dev_config.post_cb          = NULL;
 		  //ESP_LOGI(TAG, "... Adding device bus.");
-		  ESP_ERROR_CHECK(spi_bus_add_device(KSPI, &dev_config, &handle_spi));
+		  ESP_ERROR_CHECK(spi_bus_add_device(u8g2_esp32_hal.spi_no, &dev_config, &handle_spi));
 
 		  break;
 		}

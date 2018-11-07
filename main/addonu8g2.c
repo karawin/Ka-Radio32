@@ -530,6 +530,7 @@ void lcd_initU8g2(uint8_t *lcd_type)
 	{
 		gpio_get_spi_bus(&spi_no,&miso,&mosi,&sclk);
 		gpio_get_spi_lcd(&cs ,&a0,&rstlcd);
+		u8g2_esp32_hal.spi_no   = spi_no;
 		u8g2_esp32_hal.clk   = sclk;
 		u8g2_esp32_hal.mosi  = mosi;
 		u8g2_esp32_hal.cs    = cs;
