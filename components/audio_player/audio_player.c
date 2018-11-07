@@ -24,8 +24,8 @@
 #include "app_main.h"
 
 #define TAG "audio_player"
-//#define PRIO_MAD configMAX_PRIORITIES - 4
-#define PRIO_MAD 4
+#define PRIO_MAD configMAX_PRIORITIES - 4
+//#define PRIO_MAD 5
 
 static player_t *player_instance = NULL;
 static component_status_t player_status = UNINITIALIZED;
@@ -71,7 +71,7 @@ static int start_decoder_task(player_t *player)
     }
 
 	if (((task_func != NULL)) && (xTaskCreatePinnedToCore(task_func, task_name, stack_depth, player,
-			PRIO_MAD, NULL, 0) != pdPASS)) {
+			PRIO_MAD, NULL, 1) != pdPASS)) {
 							
 				
 		ESP_LOGE(TAG, "ERROR creating decoder task! Out of memory?");

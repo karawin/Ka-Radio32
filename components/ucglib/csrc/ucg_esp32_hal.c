@@ -159,7 +159,7 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 		dev_config.pre_cb           = NULL;
 		dev_config.post_cb          = NULL;
 		ESP_LOGI(TAG, "... Adding device bus  Speed= %d.",dev_config.clock_speed_hz);
-		ESP_ERROR_CHECK(spi_bus_add_device(KSPI, &dev_config, &handle)); 
+		ESP_ERROR_CHECK(spi_bus_add_device(ucg_esp32_hal.spi_no, &dev_config, &handle)); 
 	}
 		break;
 

@@ -523,13 +523,13 @@ void lcd_initU8g2(uint8_t *lcd_type)
 	gpio_num_t a0;
 	gpio_num_t rstlcd;
 	
-	gpio_get_spi_bus(&spi_no,&miso,&mosi,&sclk);
-	gpio_get_i2c(&scl,&sda,&rsti2c);
-	gpio_get_spi_lcd(&cs ,&a0,&rstlcd);
+	if (*lcd_type == LCD_NONE) return;
 	
 	u8g2_esp32_hal_t u8g2_esp32_hal = U8G2_ESP32_HAL_DEFAULT;
 	if (*lcd_type & LCD_SPI) // BW SPI
 	{
+		gpio_get_spi_bus(&spi_no,&miso,&mosi,&sclk);
+		gpio_get_spi_lcd(&cs ,&a0,&rstlcd);
 		u8g2_esp32_hal.clk   = sclk;
 		u8g2_esp32_hal.mosi  = mosi;
 		u8g2_esp32_hal.cs    = cs;
@@ -537,6 +537,7 @@ void lcd_initU8g2(uint8_t *lcd_type)
 		u8g2_esp32_hal.reset = rstlcd;
 	} else //BW I2C
 	{
+		gpio_get_i2c(&scl,&sda,&rsti2c);
 		u8g2_esp32_hal.sda  = sda;
 		u8g2_esp32_hal.scl  = scl;
 		u8g2_esp32_hal.reset = rsti2c;

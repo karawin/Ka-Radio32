@@ -894,13 +894,14 @@ void lcd_initUcg(uint8_t *lcd_type)
 	
 	uint8_t rotat = getRotat();
 	ESP_LOGI(TAG,"lcd init  type: %d",*lcd_type);
-	gpio_get_spi_bus(&spi_no,&miso,&mosi,&sclk);
-	gpio_get_i2c(&scl,&sda,&rsti2c);
-	gpio_get_spi_lcd(&cs ,&a0,&rstlcd);
+	if (*lcd_type == LCD_NONE) return;
 	
 	ucg_esp32_hal_t ucg_esp32_hal = UCG_ESP32_HAL_DEFAULT;
 	if (*lcd_type & LCD_SPI) // Color SPI
 	{
+		gpio_get_spi_bus(&spi_no,&miso,&mosi,&sclk);
+		gpio_get_spi_lcd(&cs ,&a0,&rstlcd);
+		ucg_esp32_hal.spi_no   = spi_no;
 		ucg_esp32_hal.clk   = sclk;
 		ucg_esp32_hal.mosi  = mosi;
 		ucg_esp32_hal.cs    = cs;
@@ -908,6 +909,7 @@ void lcd_initUcg(uint8_t *lcd_type)
 		ucg_esp32_hal.reset = rstlcd;
 	} else //Color I2c (never seen this one)
 	{
+		gpio_get_i2c(&scl,&sda,&rsti2c);
 		ucg_esp32_hal.sda  = sda;
 		ucg_esp32_hal.scl  = scl;
 		ucg_esp32_hal.reset = rsti2c;
@@ -939,7 +941,7 @@ void lcd_initUcg(uint8_t *lcd_type)
 		ucg_Init(&ucg, ucg_dev_seps225_16x128x128_univision, ucg_ext_seps225_16, ucg_com_hal);
 		break;	
 	default: 
-		ESP_LOGE(TAG,"lcd invalid type: %d, Fall back to none",*lcd_type);
+		ESP_LOGE(TAG,"lcd invalid type: %d, Fall back to LCD_NONE",*lcd_type);
 		*lcd_type = LCD_NONE;
 		return;
 	}	

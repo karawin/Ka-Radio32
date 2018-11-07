@@ -14,6 +14,9 @@
 #define UCG_ESP32_HAL_UNDEFINED (-1)
 
 typedef struct {
+#ifdef KaRadio32	
+	uint8_t spi_no;
+#endif	
 	gpio_num_t clk;
 	gpio_num_t mosi;
 	gpio_num_t sda; // data for I²C
@@ -30,8 +33,13 @@ typedef struct {
 } ucg_esp32_oneByte;
 
 
-
+#ifdef KaRadio32	
+#define UCG_ESP32_HAL_DEFAULT {UCG_ESP32_HAL_UNDEFINED,UCG_ESP32_HAL_UNDEFINED, UCG_ESP32_HAL_UNDEFINED, UCG_ESP32_HAL_UNDEFINED, UCG_ESP32_HAL_UNDEFINED, UCG_ESP32_HAL_UNDEFINED, UCG_ESP32_HAL_UNDEFINED, UCG_ESP32_HAL_UNDEFINED }
+#else
 #define UCG_ESP32_HAL_DEFAULT {UCG_ESP32_HAL_UNDEFINED, UCG_ESP32_HAL_UNDEFINED, UCG_ESP32_HAL_UNDEFINED, UCG_ESP32_HAL_UNDEFINED, UCG_ESP32_HAL_UNDEFINED, UCG_ESP32_HAL_UNDEFINED, UCG_ESP32_HAL_UNDEFINED }
+#endif	
+
+
 
 void ucg_esp32_hal_init(ucg_esp32_hal_t ucg_esp32_hal_param);
 
