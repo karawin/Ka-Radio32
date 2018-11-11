@@ -35,7 +35,7 @@ void u8g2_esp32_hal_init(u8g2_esp32_hal_t u8g2_esp32_hal_param) {
  * HAL callback function as prescribed by the U8G2 library.  This callback is invoked
  * to handle SPI communications.
  */
-uint8_t u8g2_esp32_spi_byte_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
+uint8_t u8g2_esp32_spi_byte_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int,  void *arg_ptr) {
 //	ESP_LOGD(TAG, "spi_byte_cb: Received a msg: %d, arg_int: %d, arg_ptr: %p", msg, arg_int, arg_ptr);
 	taskYIELD(); // some delay to let the vs1053 play
 	switch(msg) {
@@ -53,6 +53,7 @@ uint8_t u8g2_esp32_spi_byte_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void 
 			}
 #ifndef KaRadio32
 		  spi_bus_config_t bus_config;
+		  memset(&bus_config, 0, sizeof(spi_bus_config_t));
 		  bus_config.sclk_io_num   = u8g2_esp32_hal.clk; // CLK
 		  bus_config.mosi_io_num   = u8g2_esp32_hal.mosi; // MOSI
 		  bus_config.miso_io_num   = -1; // MISO
@@ -77,21 +78,21 @@ uint8_t u8g2_esp32_spi_byte_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void 
 		  dev_config.pre_cb           = NULL;
 		  dev_config.post_cb          = NULL;
 		  //ESP_LOGI(TAG, "... Adding device bus.");
-		  ESP_ERROR_CHECK(spi_bus_add_device(KSPI, &dev_config, &handle_spi));
+		  ESP_ERROR_CHECK(spi_bus_add_device(u8g2_esp32_hal.spi_no, &dev_config, &handle_spi));
 
 		  break;
 		}
 
 		case U8X8_MSG_BYTE_SEND: {
 			spi_transaction_t trans_desc;
-			trans_desc.addr      = 0;
+			memset(&trans_desc,0,sizeof(spi_transaction_t));
+/*			trans_desc.addr      = 0;
 			trans_desc.cmd   	 = 0;
 			trans_desc.flags     = 0;
-			trans_desc.length    = 8 * arg_int; // Number of bits NOT number of bytes.
-			trans_desc.rxlength  = 0;
-			trans_desc.tx_buffer = arg_ptr;
 			trans_desc.rx_buffer = NULL;
-
+			trans_desc.rxlength  = 0; */
+			trans_desc.length    = 8 * arg_int; // Number of bits NOT number of bytes.
+			trans_desc.tx_buffer = arg_ptr;
 			//ESP_LOGI(TAG, "... Transmitting %d bytes.", arg_int);
 			ESP_ERROR_CHECK(spi_device_transmit(handle_spi, &trans_desc));
 			break;

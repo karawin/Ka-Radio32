@@ -80,10 +80,14 @@ static void init_i2s(renderer_config_t *config)
 			.use_apll = use_apll			
     };
 
+	gpio_num_t lrck;
+	gpio_num_t bclk;
+	gpio_num_t i2sdata;
+	gpio_get_i2s(&lrck ,&bclk ,&i2sdata );
     i2s_pin_config_t pin_config = {
-            .bck_io_num = PIN_I2S_BCLK,
-            .ws_io_num = PIN_I2S_LRCK,
-            .data_out_num = PIN_I2S_DATA,
+            .bck_io_num = bclk,
+            .ws_io_num = lrck,
+            .data_out_num = i2sdata,
             .data_in_num = I2S_PIN_NO_CHANGE
     };
 

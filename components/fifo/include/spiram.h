@@ -1,7 +1,7 @@
 #ifndef _SPIRAM_H_
 #define _SPIRAM_H_
 
-#define SPIRAMSIZE (64*1024) //for a 23LC1024 chip
+#define SPIRAMSIZE (52*1024) //for a 23LC1024 chip
 
 
 //Define this to use the SPI RAM in QSPI mode. This mode theoretically improves

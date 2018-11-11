@@ -1,12 +1,7 @@
 ## STATE
 KaraDio32 in dev state: Stable<br/>
-Little problem with esp-idf v3.0 and v3.1 for the i2s output:<br/>
-At the top level of github, i copied  i2s.c and i2s.h.<br/>
-These files must be replaced to the esp-idf\components\driver and esp-idf\components\driver/include.<br/>
-Or simply do an OTA if your configuration is compatible to the standard gpio. <br/>
 <br/>
-See https://github.com/espressif/esp-idf/issues/2307 too if you generate your own bin.
-<br/><br/>
+<br/>
 Works on any esp32 board.<br/><br/>
 See the feature on https://hackaday.io/project/11570-wifi-webradio-with-esp8266-and-vs1053 <br/>
 The esp32 adds the output on the internal dac or with i2s to an external dac<br/>
@@ -23,6 +18,8 @@ I2SMERUS to connect a merus amplifier<br/>
 DAC to use the built in DAC of the esp32<br/>
 PDM to output a PDM (Pulse Density Modulation) stream<br/>
 VS1053 to connect to a vs1053 board.<br/>
+mDNS support.<br/>
+Latin, Cyrillic and Greek support.<br/>
 <br/>
 LCD or Oled support integrated: most common b/w or color oled and lcd can be used.<br/>
 Programmable lcd off timer<br/>
@@ -31,29 +28,38 @@ Remote IR support integrated. Nec protocol only.<br/>
 Rotary encoder support integrated. Common functions: play/stop, volume, station change, date time display.<br/>
 Web command next and prev added.<br/>
 
+## Configure the hardware and IR codes
+See http://karadio.karawin.fr/HardwareConfig.txt <br/>
+
 ## Build your own
 To build your own release, you must install the idf https://github.com/espressif/esp-idf and the toolchain.
 ```
 To flash all build output, run 'make flash' or:
 python /home/yourhome/esp/esp-idf/components/esptool_py/esptool/esptool.py --chip esp32 --port com5 --baud 460800 --before default_reset --after hard_reset write_flash -u --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 /home/yourhome/esp/Ka-Radio32/build/bootloader/bootloader.bin 0x10000 /home/yourhome/esp/Ka-Radio32/build/KaRadio32.bin 0x8000 /home/yourhome/esp/Ka-Radio32/build/partitions.bin
 ```
-### GPIO Definition Version 0.9
+### GPIO Definition 
 ```
-//file gpio.h
 //-------------------------------//
 // Define GPIO used in KaRadio32 //
 //-------------------------------//
 // Compatible ESP32 ADB
 // https://www.tindie.com/products/microwavemont/esp32-audio-developing-board-esp32-adb/
+// Default value, can be superseeded by the hardware partition.
 
-// HSPI pins
-//-----------
+// Must be HSPI or VSPI
+
+#define KSPI VSPI_HOST
+
+// KSPI pins of the SPI bus
+//-------------------------
 #define PIN_NUM_MISO GPIO_NUM_19 	// Master Input, Slave Output
 #define PIN_NUM_MOSI GPIO_NUM_23	// Master Output, Slave Input   Named Data or SDA or D1 for oled
 #define PIN_NUM_CLK  GPIO_NUM_18 	// Master clock  Named SCL or SCK or D0 for oled
 
 // status led if any.
 //------------------- 
+// Set the right one with command sys.led
+// GPIO can be changed with command sys.ledgpio("x")
 #define GPIO_LED	GPIO_NUM_4		// Flashing led or Playing led
 
 // gpio of the vs1053
@@ -62,26 +68,30 @@ python /home/yourhome/esp/esp-idf/components/esptool_py/esptool/esptool.py --chi
 #define PIN_NUM_RST  GPIO_NUM_12 
 #define PIN_NUM_XDCS GPIO_NUM_33
 #define PIN_NUM_DREQ GPIO_NUM_34
-// + HSPI pins
+// + KSPI pins
 
 // Encoder knob
 //-------------
-#define PIN_ENC_A   GPIO_NUM_16		// CLK
-#define PIN_ENC_B   GPIO_NUM_17		// DT
-#define PIN_ENC_BTN GPIO_NUM_5		// SW
+#define PIN_ENC0_A   GPIO_NUM_16	// CLK. 0 if encoder not used
+#define PIN_ENC0_B   GPIO_NUM_17	// DT
+#define PIN_ENC0_BTN GPIO_NUM_5		// SW
+#define PIN_ENC1_A   0		// CLK. 0 if encoder not used
+#define PIN_ENC1_B   0		// DT
+#define PIN_ENC1_BTN 0		// SW
 
-// I2C lcd
-//----------
+// I2C lcd (and rda5807 if lcd is i2c or LCD_NONE)
+//------------------------------------------------
 #define PIN_I2C_SCL GPIO_NUM_14
 #define PIN_I2C_SDA GPIO_NUM_13
 #define PIN_I2C_RST	GPIO_NUM_2		// or not used
 
+
 // SPI lcd
 //---------
-// HSPI pins +
 #define PIN_LCD_CS	GPIO_NUM_13		//CS
 #define PIN_LCD_A0	GPIO_NUM_14		//A0 or D/C
 #define PIN_LCD_RST	GPIO_NUM_2		//Reset RES RST or not used
+// KSPI pins +
 
 // IR Signal
 //-----------
@@ -90,9 +100,9 @@ python /home/yourhome/esp/esp-idf/components/esptool_py/esptool/esptool.py --chi
 
 // I2S DAC or PDM output
 //-----------------------
-#define PIN_I2S_LRCK GPIO_NUM_25
-#define PIN_I2S_BCLK GPIO_NUM_26
-#define PIN_I2S_DATA GPIO_NUM_22
+#define PIN_I2S_LRCK GPIO_NUM_25	// or Channel1
+#define PIN_I2S_BCLK GPIO_NUM_26	// or channel2
+#define PIN_I2S_DATA GPIO_NUM_22	//  
 
 ```
 ### Oled and lcd support
@@ -136,6 +146,34 @@ Other type and some color lcd added later.<BR/>
 #define LCD_SPI_SEPS225			198 // 96x64
 
 ```
+
+## First use
+- If the acces point of your router is not known, the webradio inits itself as an AP. Connect the wifi of your computer to the ssid "WifiKaRadio",  
+- Browse to 192.168.4.1 to display the page, got to "setting" "Wifi" and configure your ssid ap, the password if any, the wanted IP or use dhcp if you know how to retrieve the dhcp given ip (terminal or scan of the network).
+- In the gateway field, enter the ip address of your router.
+- Validate. The equipment restart to the new configuration. Connect your wifi to your AP and browse to the ip given in configuration.
+- Congratulation, you can edit your own station list. Dont forget to save your stations list in case of problem or for new equipments.
+- if the AP is already know by the esp32, the default ip is given by dhcp.
+- a sample of stations list is on http://karadio.karawin.fr/WebStations.txt . Can be uploaded via the web page.        
+
+
+<br/>
+<br/>
+To flash your KaRadio32 you will need these files:<br/>
+
+http://karadio.karawin.fr/KaRadio32.bin <br/>
+and<br/>
+http://karadio.karawin.fr/KaRadio32sup.zip <br/>
+The tool to use is here: http://espressif.com/en/support/download/other-tools <br/>
+(change the security of the installation directory to permit all)<br/>
+See the image at http://karadio.karawin.fr/karawin32Flash.jpg <br/>
+
+<img src="https://github.com/karawin/Ka-Radio32/blob/master/images/downloadtool32.jpg" alt="screenshot" border=0> 
+<br/><br/>
+The scheme from tomasf71</br>
+<img src="https://github.com/karawin/Ka-Radio32/blob/master/images/schemekaradio32.jpg" alt="scheme" border=0> 
+<br/>
+
 ## Audio output
 
 In the Setting panel on the webpage of KaraDio32 you can set the desired output method for audio.
@@ -201,33 +239,6 @@ But when a connection to the server of the radio station is (temporarily) disrup
 - If the relaunch of the connection fails again, the webpage of Karadio then shows “invalid address” and goes into the stop state. If you have a display connected to Karadio it will then show the Date, Time and IP address.
 - You can try to relaunch the connection manually by pressing “play” on the Karadio webpage, or resetting the ESP32.
 - If the wifi is disconnected, the esp is rebooted.
-
-## First use
-- If the acces point of your router is not known, the webradio inits itself as an AP. Connect the wifi of your computer to the ssid "WifiKaRadio",  
-- Browse to 192.168.4.1 to display the page, got to "setting" "Wifi" and configure your ssid ap, the password if any, the wanted IP or use dhcp if you know how to retrieve the dhcp given ip (terminal or scan of the network).
-- In the gateway field, enter the ip address of your router.
-- Validate. The equipment restart to the new configuration. Connect your wifi to your AP and browse to the ip given in configuration.
-- Congratulation, you can edit your own station list. Dont forget to save your stations list in case of problem or for new equipments.
-- if the AP is already know by the esp32, the default ip is given by dhcp.
-- a sample of stations list is on http://karadio.karawin.fr/WebStations.txt . Can be uploaded via the web page.        
-
-
-<br/>
-<br/>
-To flash your KaRadio32 you will need these files:<br/>
-
-http://karadio.karawin.fr/KaRadio32.bin <br/>
-and<br/>
-http://karadio.karawin.fr/KaRadio32sup.zip <br/>
-The tool to use is here: http://espressif.com/en/support/download/other-tools <br/>
-(change the security of the installation directory to permit all)<br/>
-See the image at http://karadio.karawin.fr/karawin32Flash.jpg <br/>
-
-<img src="https://github.com/karawin/Ka-Radio32/blob/master/images/karawin32Flash.jpg" alt="screenshot" border=0> 
-<br/><br/>
-The scheme from tomasf71</br>
-<img src="https://github.com/karawin/Ka-Radio32/blob/master/images/schemekaradio32.jpg" alt="scheme" border=0> 
-<br/>
 
 ## List of sources and components adapted for KaRadio32
 <br/>

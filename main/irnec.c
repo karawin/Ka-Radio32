@@ -30,7 +30,6 @@
 //IR
 #define RMT_RX_ACTIVE_LEVEL  0   /*!< If we connect with a IR receiver, the data is active low */
 #define RMT_RX_CHANNEL    0     /*!< RMT channel for receiver */
-#define RMT_RX_GPIO_NUM  PIN_IR_SIGNAL     /*!< GPIO number for receiver */
 #define RMT_CLK_DIV      100    /*!< RMT counter clock divider */
 #define RMT_TICK_10_US    (80000000/RMT_CLK_DIV/100000)   /*!< RMT counter value for 10 us.(Source clock is APB clock) */
 
@@ -194,11 +193,14 @@ static int nec_parse_items(rmt_item32_t* item, int item_num, uint16_t* addr, uin
 /*
  * @brief RMT receiver initialization
  */
-static void nec_rx_init()
+static bool nec_rx_init()
 {
+	gpio_num_t ir;
+	gpio_get_ir_signal(&ir);
+	if (ir == GPIO_NONE) return false; //no IR needed
     rmt_config_t rmt_rx;
     rmt_rx.channel = RMT_RX_CHANNEL;
-    rmt_rx.gpio_num = RMT_RX_GPIO_NUM;
+    rmt_rx.gpio_num = ir;
     rmt_rx.clk_div = RMT_CLK_DIV;
     rmt_rx.mem_block_num = 1;
     rmt_rx.rmt_mode = RMT_MODE_RX;
@@ -207,6 +209,7 @@ static void nec_rx_init()
     rmt_rx.rx_config.idle_threshold = rmt_item32_tIMEOUT_US / 10 * (RMT_TICK_10_US);
     rmt_config(&rmt_rx);
     rmt_driver_install(rmt_rx.channel, 1000, 0);
+	return true;
 }
 
 
@@ -219,58 +222,59 @@ void rmt_nec_rx_task()
 	event_ir_t evt;
 	event_ir_t last_evt;
     int channel = RMT_RX_CHANNEL;
-    nec_rx_init();
-    RingbufHandle_t rb = NULL;
-	bool flagFirstRepeat = false;
-    //get RMT RX ringbuffer
-    ESP_ERROR_CHECK(rmt_get_ringbuf_handle(channel, &rb));
-    ESP_ERROR_CHECK(rmt_rx_start(channel, 1));
-	ESP_LOGD(NEC_TAG,"RMT started");
-    while(rb) {
-        size_t rx_size = 0;
-        //try to receive data from ringbuffer.
-        //RMT driver will push all the data it receives to its ringbuffer.
-        //We just need to parse the value and return the spaces of ringbuffer.
-        rmt_item32_t* item = (rmt_item32_t*) xRingbufferReceive(rb, &rx_size, 1000);
-        if(item) {
-            uint16_t rmt_addr;
-            uint16_t rmt_cmd;
-            int offset = 0;
-            while(1) {
-                //parse data value from ringbuffer.
-                int res = nec_parse_items(item + offset, rx_size / 4 - offset, &rmt_addr, &rmt_cmd);
-				if (res == RTN_REPEAT)
-				{
-					if (flagFirstRepeat ==  true)
-						xQueueSend(event_ir,&last_evt, 0);
-					flagFirstRepeat = true;	// not the first one
-					offset += 3;
-					
+    if (nec_rx_init())
+	{
+		RingbufHandle_t rb = NULL;
+		bool flagFirstRepeat = false;
+		//get RMT RX ringbuffer
+		ESP_ERROR_CHECK(rmt_get_ringbuf_handle(channel, &rb) );
+		ESP_ERROR_CHECK(rmt_rx_start(channel, 1));
+		ESP_LOGD(NEC_TAG,"RMT started");
+		while(rb) {
+			size_t rx_size = 0;
+			//try to receive data from ringbuffer.
+			//RMT driver will push all the data it receives to its ringbuffer.
+			//We just need to parse the value and return the spaces of ringbuffer.
+			rmt_item32_t* item = (rmt_item32_t*) xRingbufferReceive(rb, &rx_size, 1000);
+			if(item) {
+				uint16_t rmt_addr;
+				uint16_t rmt_cmd;
+				int offset = 0;
+				while(1) {
+					//parse data value from ringbuffer.
+					int res = nec_parse_items(item + offset, rx_size / 4 - offset, &rmt_addr, &rmt_cmd);
+					if (res == RTN_REPEAT)
+					{
+						if (flagFirstRepeat ==  true)
+							xQueueSend(event_ir,&last_evt, 0);
+						flagFirstRepeat = true;	// not the first one
+						offset += 3;		
+					}
+					else if(res > 0) {
+						offset += res + 1;
+						ESP_LOGD(NEC_TAG, "RMT RCV --- addr: 0x%04x cmd: 0x%04x", rmt_addr, rmt_cmd);
+						evt.channel = channel;
+						evt.addr = rmt_addr;
+						evt.cmd =  rmt_cmd;
+						evt.repeat_flag = false;
+						last_evt.addr = evt.addr;
+						last_evt.cmd = evt.cmd;
+						last_evt.repeat_flag = true;
+						flagFirstRepeat = false;
+						xQueueSend(event_ir,&evt, 0);
+					} else {
+						ESP_LOGD(NEC_TAG, "RMT Res: %d",res);
+						break;
+					}
 				}
-                else if(res > 0) {
-                    offset += res + 1;
-                    ESP_LOGD(NEC_TAG, "RMT RCV --- addr: 0x%04x cmd: 0x%04x", rmt_addr, rmt_cmd);
-					evt.channel = channel;
-					evt.addr = rmt_addr;
-					evt.cmd =  rmt_cmd;
-					evt.repeat_flag = false;
-					last_evt.addr = evt.addr;
-					last_evt.cmd = evt.cmd;
-					last_evt.repeat_flag = true;
-					flagFirstRepeat = false;
-					xQueueSend(event_ir,&evt, 0);
-                } else {
-					ESP_LOGD(NEC_TAG, "RMT Res: %d",res);
-                    break;
-                }
-            }
-            //after parsing the data, return spaces to ringbuffer.
-            vRingbufferReturnItem(rb, (void*) item);
-        } else {
-			vTaskDelay(10);
-            //break;
-        }
-    }
+				//after parsing the data, return spaces to ringbuffer.
+				vRingbufferReturnItem(rb, (void*) item);
+			} else 	{
+				vTaskDelay(10);
+				//break;
+			}
+		}
+	}
 	ESP_LOGD(NEC_TAG,"RMT finished");
     vTaskDelete(NULL);
 }

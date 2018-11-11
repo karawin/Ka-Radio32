@@ -1,5 +1,5 @@
 // ----------------------------------------------------------------------------
-// Rotary Encoder Driver with Acceleration
+// Rotary Encoder Driver with enc->acceleration
 // Supports Click, DoubleClick, Long Click
 //
 // (c) 2010 karl@pitrich.com
@@ -15,52 +15,41 @@
 #include <sys/time.h>
 #include "ClickEncoder.h"
 #include "app_main.h"
-#include "gpio.h"
-#include "webclient.h"
-#include "webserver.h"
-#include "interface.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-
 // ----------------------------------------------------------------------------
-// Button configuration (values for 1ms timer service calls)
+// enc->acceleration configuration (for 1000Hz calls to ::service())
 //
-#define ENC_BUTTONINTERVAL    10  // check button every x milliseconds, also debouce time
+#define ENC_ACCEL_TOP      3072   // max. enc->acceleration: *12 (val >> 8)
+#define ENC_ACCEL_INC      50//  25
+#define ENC_ACCEL_DEC      2//   2
 
 // ----------------------------------------------------------------------------
-// Acceleration configuration (for 1000Hz calls to ::service())
-//
-#define ENC_ACCEL_TOP      3072   // max. acceleration: *12 (val >> 8)
-#define ENC_ACCEL_INC        25
-#define ENC_ACCEL_DEC         2
-
-// ----------------------------------------------------------------------------
-
-  int8_t pinA;
-  int8_t pinB;
-  int8_t pinBTN;
-  bool pinsActive;
-  volatile int16_t delta;
-  volatile int16_t last;
-  volatile uint8_t steps;
-  volatile uint16_t acceleration;
-  bool accelerationEnabled;
-#if ENC_DECODER != ENC_NORMAL
-  static const int8_t table[16];
-#endif
-  volatile Button button;
-  bool doubleClickEnabled;
+/*
+  int8_t enc->pinA;
+  int8_t enc->pinB;
+  int8_t enc->pinBTN;
+  bool enc->pinsActive;
+  volatile int16_t enc->delta;
+  volatile int16_t enc->last;
+  volatile uint8_t enc->steps;
+  volatile uint16_t enc->acceleration;
+  bool enc->accelerationEnabled;
+  volatile enc->button enc->button;
+  bool enc->doubleClickEnabled;
   bool buttonHeldEnabled;
-  bool buttonOnPinZeroEnabled = false;
-  uint16_t keyDownTicks = 0;
-  uint16_t doubleClickTicks = 0;
+  bool enc->buttonOnPinZeroEnabled = false;
+  uint16_t enc->keyDownTicks = 0;
+  uint16_t enc->doubleClickTicks = 0;
   uint16_t buttonHoldTime = BTN_HOLDTIME;
   uint16_t buttonDoubleClickTime = BTN_DOUBLECLICKTIME;
-  unsigned long lastButtonCheck = 0;
+  unsigned long enc->lastButtonCheck = 0;
+*/
 
 
 #define TAG "ClickEncoder"
+
 
 
 void noInterrupts()
@@ -68,170 +57,158 @@ void noInterrupts()
 
 void interrupts()
 {interrupt1Ms();}
-
-
-#if ENC_DECODER != ENC_NORMAL
-#  if ENC_HALFSTEP
-     // decoding table for hardware with flaky notch (half resolution)
-     const int8_t ClickEncoder::table[16] __attribute__((__progmem__)) = { 
-       0, 0, -1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, -1, 0, 0 
-     };    
-#  else
-     // decoding table for normal hardware
-     const int8_t ClickEncoder::table[16] __attribute__((__progmem__)) = { 
-       0, 1, -1, 0, -1, 0, 0, 1, 1, 0, 0, -1, 0, -1, 1, 0 
-     };    
-#  endif
-#endif
-
+  
 // ----------------------------------------------------------------------------
 
-bool getpinsActive() {return pinsActive;}
+bool getpinsActive(Encoder_t *enc) {return enc->pinsActive;}
 
-void ClickEncoderInit(int8_t A, int8_t B, int8_t BTN)
+Encoder_t* ClickEncoderInit(int8_t A, int8_t B, int8_t BTN, bool initHalfStep)
 {
-	pinA = A; pinB = B; pinBTN = BTN;
-	pinsActive = LOW; delta = 0; last = 0; steps = 4; accelerationEnabled = true; button = Open;
-	doubleClickEnabled = true; buttonHeldEnabled = true;
+	
+	Encoder_t* enc = malloc(sizeof(Encoder_t));
+	enc->pinA = A; enc->pinB = B;
+	if (BTN == -1) enc->pinBTN = 0;
+		else enc->pinBTN = BTN;
+	enc->pinsActive = LOW; enc->delta = 0; enc->last = 0; enc->steps = 4; 
+	enc->accelerationEnabled = true; enc->button = Open;
+	enc->doubleClickEnabled = true; enc->buttonHeldEnabled = true;
+
+	if (initHalfStep) enc->steps = 2;
+	
+	enc->keyDownTicks = 0;
+	enc->doubleClickTicks = 0;
+	enc->lastButtonCheck = 0;
 	
 	gpio_config_t gpio_conf;
 	gpio_conf.mode = GPIO_MODE_INPUT;
-	gpio_conf.pull_up_en =  (pinsActive == LOW) ?GPIO_PULLUP_ENABLE : GPIO_PULLUP_DISABLE;
-	gpio_conf.pull_down_en = (pinsActive == LOW) ?GPIO_PULLDOWN_DISABLE : GPIO_PULLDOWN_ENABLE;
+	gpio_conf.pull_up_en =  (enc->pinsActive == LOW) ?GPIO_PULLUP_ENABLE : GPIO_PULLUP_DISABLE;
+	gpio_conf.pull_down_en = (enc->pinsActive == LOW) ?GPIO_PULLDOWN_DISABLE : GPIO_PULLDOWN_ENABLE;
 	gpio_conf.intr_type = GPIO_INTR_DISABLE;
 	
-  if (pinA >= 0) 
+  if (enc->pinA >= 0) 
   {
-	gpio_conf.pin_bit_mask = BIT(pinA);
+	gpio_conf.pin_bit_mask = BIT(enc->pinA);
 	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
   }
-  if (pinB >= 0) 
+  if (enc->pinB >= 0) 
   {
-	gpio_conf.pin_bit_mask = BIT(pinB);
+	gpio_conf.pin_bit_mask = BIT(enc->pinB);
 	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
   }
-  if (pinBTN >= 0) 
+  if (enc->pinBTN > 0) 
   {
-	gpio_conf.pin_bit_mask = BIT(pinBTN);
+	gpio_conf.pin_bit_mask = BIT(enc->pinBTN);
 	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
   }
 
   
-  if (digitalRead(pinA) == pinsActive) {
-    last = 3;
+  if (digitalRead(enc->pinA) == enc->pinsActive) {
+    enc->last = 3;
   }
 
-  if (digitalRead(pinB) == pinsActive) {
-    last ^=1;
+  if (digitalRead(enc->pinB) == enc->pinsActive) {
+    enc->last ^=1;
   }
+  return enc;
 }
 
+// number of steps per notch
+void setHalfStep(Encoder_t *enc, bool value)
+{
+	if (value) enc->steps = 2;	
+	else enc->steps = 4;	
+}
+bool getHalfStep(Encoder_t *enc)
+{
+//	return enc->halfStep ;	
+   if (enc->steps == 2) return true;
+   return false;
+}
 // ----------------------------------------------------------------------------
 // call this every 1 millisecond via timer ISR
 //
-void (*serviceEncoder)() = NULL;
-void service(void)
+//void (*serviceEncoder)() = NULL;
+void service(Encoder_t *enc)
 {
   bool moved = false;
-
-  if (pinA >= 0 && pinB >= 0) {
-  if (accelerationEnabled) { // decelerate every tick
-    acceleration -= ENC_ACCEL_DEC;
-    if (acceleration & 0x8000) { // handle overflow of MSB is set
-      acceleration = 0;
+  
+  if (enc->pinA >= 0 && enc->pinB >= 0) {
+  if (enc->accelerationEnabled) { // decelerate every tick
+    enc->acceleration -= ENC_ACCEL_DEC;
+    if (enc->acceleration & 0x8000) { // handle overflow of MSB is set
+      enc->acceleration = 0;
     }
   }
 
-#if ENC_DECODER == ENC_FLAKY
-  last = (last << 2) & 0x0F;
+	int8_t curr = 0; 
+	if (digitalRead(enc->pinA) == enc->pinsActive) {
+		curr = 3;
+	}
 
-  if (digitalRead(pinA) == pinsActive) {
-    last |= 2;
-  }
-
-  if (digitalRead(pinB) == pinsActive) {
-    last |= 1;
-  }
-
-  int8_t tbl = pgm_read_byte(&table[last]); 
-  if (tbl) {
-    delta += tbl;
-    moved = true;
-  }
-#elif ENC_DECODER == ENC_NORMAL
-  int8_t curr = 0;
-
-  if (digitalRead(pinA) == pinsActive) {
-    curr = 3;
-  }
-
-  if (digitalRead(pinB) == pinsActive) {
-    curr ^= 1;
-  }
+	if (digitalRead(enc->pinB) == enc->pinsActive) {
+		curr ^= 1;
+	}
   
-  int8_t diff = last - curr;
+	int8_t diff = enc->last - curr;
+  
+	if (diff & 1) {            // bit 0 = step
+		enc->last = curr;
+		enc->delta += (diff & 2) - 1; // bit 1 = direction (+/-)
+		moved = true;    
+	}
 
-  if (diff & 1) {            // bit 0 = step
-    last = curr;
-    delta += (diff & 2) - 1; // bit 1 = direction (+/-)
-    moved = true;    
-  }
-#else
-# error "Error: define ENC_DECODER to ENC_NORMAL or ENC_FLAKY"
-#endif
-
-  if (accelerationEnabled && moved) {
+  if (enc->accelerationEnabled && moved) {
     // increment accelerator if encoder has been moved
-    if (acceleration <= (ENC_ACCEL_TOP - ENC_ACCEL_INC)) {
-      acceleration += ENC_ACCEL_INC;
+    if (enc->acceleration <= (ENC_ACCEL_TOP - ENC_ACCEL_INC)) {
+      enc->acceleration += ENC_ACCEL_INC;
     }
   }
 }
-  // handle button
+  // handle enc->button
   //
   unsigned long currentMillis = xTaskGetTickCount()* portTICK_PERIOD_MS;
-  if (currentMillis < lastButtonCheck) lastButtonCheck = 0;        // Handle case when millis() wraps back around to zero
-  if ((pinBTN > 0 || (pinBTN == 0 && buttonOnPinZeroEnabled))        // check button only, if a pin has been provided
-      && ((currentMillis - lastButtonCheck) >= ENC_BUTTONINTERVAL))            // checking button is sufficient every 10-30ms
+  if (currentMillis < enc->lastButtonCheck) enc->lastButtonCheck = 0;        // Handle case when millis() wraps back around to zero
+  if ((enc->pinBTN > 0 )        // check enc->button only, if a pin has been provided
+      && ((currentMillis - enc->lastButtonCheck) >= ENC_BUTTONINTERVAL))            // checking enc->button is sufficient every 10-30ms
   { 
-    lastButtonCheck = currentMillis;
+    enc->lastButtonCheck = currentMillis;
 
-    bool pinRead = getPinState();
+    bool pinRead = getPinState(enc);
     
-    if (pinRead == pinsActive) { // key is down
-      keyDownTicks++;
-      if ((keyDownTicks > (buttonHoldTime / ENC_BUTTONINTERVAL)) && (buttonHeldEnabled)) {
-        button = Held;
+    if (pinRead == enc->pinsActive) { // key is down
+      enc->keyDownTicks++;
+      if ((enc->keyDownTicks > (BTN_HOLDTIME / ENC_BUTTONINTERVAL)) && (enc->buttonHeldEnabled)) {
+        enc->button = Held;
       }
     }
 
-    if (pinRead == !pinsActive) { // key is now up
-      if (keyDownTicks > 1) {               //Make sure key was down through 1 complete tick to prevent random transients from registering as click
-        if (button == Held) {
-          button = Released;
-          doubleClickTicks = 0;
+    if (pinRead == !enc->pinsActive) { // key is now up
+      if (enc->keyDownTicks > 1) {               //Make sure key was down through 1 complete tick to prevent random transients from registering as click
+        if (enc->button == Held) {
+          enc->button = Released;
+          enc->doubleClickTicks = 0;
         }
         else {
           #define ENC_SINGLECLICKONLY 1
-          if (doubleClickTicks > ENC_SINGLECLICKONLY) {   // prevent trigger in single click mode
-            if (doubleClickTicks < (buttonDoubleClickTime / ENC_BUTTONINTERVAL)) {
-              button = DoubleClicked;
-              doubleClickTicks = 0;
+          if (enc->doubleClickTicks > ENC_SINGLECLICKONLY) {   // prevent trigger in single click mode
+            if (enc->doubleClickTicks < (BTN_DOUBLECLICKTIME / ENC_BUTTONINTERVAL)) {
+              enc->button = DoubleClicked;
+              enc->doubleClickTicks = 0;
             }
           }
           else {
-            doubleClickTicks = (doubleClickEnabled) ? (buttonDoubleClickTime / ENC_BUTTONINTERVAL) : ENC_SINGLECLICKONLY;
+            enc->doubleClickTicks = (enc->doubleClickEnabled) ? (BTN_DOUBLECLICKTIME / ENC_BUTTONINTERVAL) : ENC_SINGLECLICKONLY;
           }
         }
       }
 
-      keyDownTicks = 0;
+      enc->keyDownTicks = 0;
     }
   
-    if (doubleClickTicks > 0) {
-      doubleClickTicks--;
-      if (doubleClickTicks == 0) {
-        button = Clicked;
+    if (enc->doubleClickTicks > 0) {
+      enc->doubleClickTicks--;
+      if (enc->doubleClickTicks == 0) {
+        enc->button = Clicked;
       }
     }
   }
@@ -239,22 +216,23 @@ void service(void)
 
 // ----------------------------------------------------------------------------
 
-int16_t getValue(void)
+int16_t getValue(Encoder_t *enc)
 {
   int16_t val;
   
   noInterrupts();
-  val = delta;
+  val = enc->delta;
 
-  if (steps == 2) delta = val & 1;
-  else if (steps == 4) delta = val & 3;
-  else delta = 0; // default to 1 step per notch
-
-  if (steps == 4) val >>= 2;
-  if (steps == 2) val >>= 1;
+  if (enc->steps == 2) enc->delta = val & 1;
+  else if (enc->steps == 4) enc->delta = val & 3;
+  else enc->delta = 0; // default to 1 step per notch
+  interrupts();
+  
+  if (enc->steps == 4) val >>= 2;
+  if (enc->steps == 2) val >>= 1;
 
   int16_t r = 0;
-  int16_t accel = ((accelerationEnabled) ? (acceleration >> 8) : 0);
+  int16_t accel = ((enc->accelerationEnabled) ? (enc->acceleration >> 8) : 0);
 
   if (val < 0) {
     r -= 1 + accel;
@@ -262,30 +240,29 @@ int16_t getValue(void)
   else if (val > 0) {
     r += 1 + accel;
   }
-  interrupts();
+  
 
   return r;
 }
 
 // ----------------------------------------------------------------------------
-Button getButton(void)
+Button getButton(Encoder_t *enc)
 {
   noInterrupts();
-  Button ret = button;
-  if (button != Held && ret != Open) {
-    button = Open; // reset
+  Button ret = enc->button;
+  if (enc->button != Held && ret != Open) {
+    enc->button = Open; // reset
   }
   interrupts();
-
   return ret;
 }
 
 
 
-bool getPinState() {
+bool getPinState(Encoder_t *enc) {
   bool pinState;
   {
-    pinState = digitalRead(pinBTN);
+    pinState = digitalRead(enc->pinBTN);
   }
   return pinState;
 }

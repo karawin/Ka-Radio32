@@ -91,14 +91,6 @@ const int CONNECTED_BIT = 0x00000001;
 //
 const int CONNECTED_AP  = 0x00000010;
 
-//#define BLINK_GPIO 4
-#define I2C_EXAMPLE_MASTER_SCL_IO    PIN_I2C_SCL    /*!< gpio number for I2C master clock */////////////
-#define I2C_EXAMPLE_MASTER_SDA_IO    PIN_I2C_SDA    /*!< gpio number for I2C master data  *//////////////
-#define I2C_EXAMPLE_MASTER_NUM I2C_NUM_1   			/*!< I2C port number for master dev */
-#define I2C_EXAMPLE_MASTER_TX_BUF_DISABLE   0   	/*!< I2C master do not need buffer */
-#define I2C_EXAMPLE_MASTER_RX_BUF_DISABLE   0   	/*!< I2C master do not need buffer */
-#define I2C_EXAMPLE_MASTER_FREQ_HZ    100000    	/*!< I2C master clock frequency */
-
 #define TAG "main"
 
 //Priorities of the reader and the decoder thread. bigger number = higher prio
@@ -326,8 +318,8 @@ uint32_t checkUart(uint32_t speed)
 *******************************************************************************/
 static void init_hardware()
 {
-	VS1053_HW_init(); // init spi
-	VS1053_Start();
+	if (VS1053_HW_init()) // init spi
+		VS1053_Start();
 	
     //Initialize the SPI RAM chip communications and see if it actually retains some bytes. If it
     //doesn't, warn user.
@@ -630,19 +622,20 @@ void timerTask(void* p) {
 	uint32_t ctime = 0;
 	uint32_t cCur;
 	bool stateLed = false;
+	gpio_num_t gpioLed;
 //	int uxHighWaterMark;
 	
 	initTimers();
-	
-	gpio_output_conf(getLedGpio());
-	gpio_set_level(getLedGpio(),0);	
+	gpioLed = getLedGpio();
+	gpio_output_conf(gpioLed);
+	gpio_set_level(gpioLed,0);	
 	cCur = FlashOff*10;
 	device = getDeviceSettings();
 	
 	while(1) {
 		// read and treat the timer queue events
 		queue_event_t evt;
-		while (xQueueReceive(event_queue, &evt, 0))
+		while (xQueueReceive(event_queue, &evt, 1))
 		{
 			switch (evt.type){
 					case TIMER_SLEEP:
@@ -661,22 +654,23 @@ void timerTask(void* p) {
 					default:
 					break;
 			}
-			taskYIELD();
+//			taskYIELD();
 		}
 		if (ledStatus)
 		{
 			
 			if (ctime >= cCur)
 			{
+				gpioLed = getLedGpio();
 				taskYIELD();
 				if (stateLed)
 				{
-					gpio_set_level(getLedGpio(),0);	
+					gpio_set_level(gpioLed,0);	
 					stateLed = false;
 					cCur = FlashOff*10;
 				} else
 				{
-					gpio_set_level(getLedGpio(),1);	
+					gpio_set_level(gpioLed,1);	
 					stateLed = true;
 					cCur = FlashOn*10;
 					if (device->vol != getIvol()){ 			
@@ -701,7 +695,7 @@ void timerTask(void* p) {
 				ctime = 0;
 			}			
 		}			
-//		taskYIELD();
+		taskYIELD();
 	}
 //	printf("t0 end\n");
 	vTaskDelete( NULL ); // stop the task (never reached)
@@ -826,7 +820,7 @@ void app_main()
 	//time display
 	setDdmm((device->options32)&T_DDMM);
 	//SPI init for the vs1053 and lcd if spi.
-	VS1053_spi_init(KSPI);
+	VS1053_spi_init();
 
     init_hardware(); 
 	ESP_LOGI(TAG, "Hardware init done...");
@@ -835,8 +829,6 @@ void app_main()
 	ESP_LOGE(TAG,"LCD Type %d",device->lcd_type);
 	//lcd rotation
 	setRotat((device->options32)&T_ROTAT) ;	
-//	//font set latin or cyrillic
-//	setCharset((device->options32)&T_CHARSET);
 	
 	lcd_init(device->lcd_type);
 	
@@ -978,7 +970,7 @@ void app_main()
     xTaskCreatePinnedToCore(serversTask, "serversTask", 3000, NULL, 3, &pxCreatedTask,0); 
 	ESP_LOGI(TAG, "%s task: %x","serversTask",(unsigned int)pxCreatedTask);	
 	
-	xTaskCreatePinnedToCore (task_addon, "task_addon", 2600, NULL, 10, &pxCreatedTask,1);  //high priority for the spi else too slow due to ucglib
+	xTaskCreatePinnedToCore (task_addon, "task_addon", 2600, NULL, 4, &pxCreatedTask,1);  //high priority for the spi else too slow due to ucglib
 	ESP_LOGI(TAG, "%s task: %x","task_addon",(unsigned int)pxCreatedTask);
 	
 /*	if (RDA5807M_detection())

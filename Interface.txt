@@ -15,6 +15,8 @@ infos			: return
 list=xxx		: return the name of the station xxx (0 to 254)				
 stop			: stop playing the current station.
 start			: start playing the current station.
+next			: play the next station
+prev			: play the previous station
 play=xxx		: with xxx from 0 to 254  play the station xxx
 volume=xxx		: with xxx from 0 to 254  change the volume to xxx
 uart			: uart baudrate at 115200 not saved on next reset
@@ -109,6 +111,7 @@ wifi.status			: give #WIFI.STATUS#			start of the answer
 				255.255.255.0			the network mask
 				192.168.1.70			the network gateway
 				##WIFI.STATUS#			end of the answer
+wifi.rssi			: print the current rssi (reception level)
 				
 ///////////////////////////
 // Station Client commands
@@ -165,7 +168,7 @@ sys.date		: Send a ntp request and Display the current locale time
 sys.adc			: Read the current value of the adc input. (Not for KaRadio32)
 sys.log			: Do nothing. Used for debug of the addon.	
 sys.version		: Display the release and Revision of KaraDio
-			
+sys.host: display the hostname for mDNS			
 
 ///////
 //Other
@@ -189,5 +192,6 @@ sys.lcd("x")	: Change the lcd type to x on next reset
 sys.ledgpio		: Display the default Led GPIO
 sys.ledgpio("x"): Change the default Led GPIO (4) to x
 sys.ddmm: display the date format\n\
-sys.ddmm(\"x\"): Change the date format. 0:MMDD, 1:DDMM\n\
+sys.ddmm(\"x\"): Change the date format. 0:MMDD, 1:DDMM
 
+sys.host(\"your hostname\"): change and display the hostname for mDNS

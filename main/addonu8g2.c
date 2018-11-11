@@ -387,6 +387,7 @@ void drawStationU8g2(uint8_t mTscreen,char* snum,char* ddot)
   drawTTitleU8g2(ststr);   
   if (ddot != NULL)
   {
+		setfont8(middle);
         u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,snum)/2),yy/3-2, snum);
         len = (x/2)-(u8g2_GetUTF8Width(&u8g2,ddot)/2);
         if (len <0) len = 0;
@@ -510,19 +511,37 @@ void playingU8g2()
 void lcd_initU8g2(uint8_t *lcd_type)
 {
 	const u8g2_cb_t *rotat;
+	
+	uint8_t spi_no;
+	gpio_num_t miso;
+	gpio_num_t mosi;
+	gpio_num_t sclk;
+	gpio_num_t scl;
+	gpio_num_t sda;
+	gpio_num_t rsti2c;
+	gpio_num_t cs;
+	gpio_num_t a0;
+	gpio_num_t rstlcd;
+	
+	if (*lcd_type == LCD_NONE) return;
+	
 	u8g2_esp32_hal_t u8g2_esp32_hal = U8G2_ESP32_HAL_DEFAULT;
 	if (*lcd_type & LCD_SPI) // BW SPI
 	{
-		u8g2_esp32_hal.clk   = PIN_NUM_CLK;
-		u8g2_esp32_hal.mosi  = PIN_NUM_MOSI;
-		u8g2_esp32_hal.cs    = PIN_LCD_CS;
-		u8g2_esp32_hal.dc    = PIN_LCD_A0;
-		u8g2_esp32_hal.reset = PIN_LCD_RST;
+		gpio_get_spi_bus(&spi_no,&miso,&mosi,&sclk);
+		gpio_get_spi_lcd(&cs ,&a0,&rstlcd);
+		u8g2_esp32_hal.spi_no   = spi_no;
+		u8g2_esp32_hal.clk   = sclk;
+		u8g2_esp32_hal.mosi  = mosi;
+		u8g2_esp32_hal.cs    = cs;
+		u8g2_esp32_hal.dc    = a0;
+		u8g2_esp32_hal.reset = rstlcd;
 	} else //BW I2C
 	{
-		u8g2_esp32_hal.sda  = PIN_I2C_SDA;
-		u8g2_esp32_hal.scl  = PIN_I2C_SCL;
-		u8g2_esp32_hal.reset = PIN_I2C_RST;
+		gpio_get_i2c(&scl,&sda,&rsti2c);
+		u8g2_esp32_hal.sda  = sda;
+		u8g2_esp32_hal.scl  = scl;
+		u8g2_esp32_hal.reset = rsti2c;
 	}
 	u8g2_esp32_hal_init(u8g2_esp32_hal);		
 	
@@ -652,20 +671,23 @@ void lcd_initU8g2(uint8_t *lcd_type)
 			rotat,
 			u8g2_esp32_spi_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
-		break;		default:
-		ESP_LOGE(TAG,"Unknown lcd lcd_type %d. Fall back to type 0",*lcd_type);
-		*lcd_type = 0;
-		u8g2_esp32_hal_t u8g2_esp32_hal = U8G2_ESP32_HAL_DEFAULT;
-		u8g2_esp32_hal.sda  = PIN_I2C_SDA;
-		u8g2_esp32_hal.scl  = PIN_I2C_SCL;
+		break;
+	default:
+		ESP_LOGE(TAG,"UNKNOWN LCD lcd_type %d. Fall back to type \"LCD_NONE\"",*lcd_type);
+		*lcd_type = LCD_NONE;
+/*		u8g2_esp32_hal_t u8g2_esp32_hal = U8G2_ESP32_HAL_DEFAULT;
+		u8g2_esp32_hal.sda  = sda;
+		u8g2_esp32_hal.scl  = scl;
 		u8g2_esp32_hal_init(u8g2_esp32_hal);
 		u8g2_Setup_sh1106_128x64_noname_f(
 			&u8g2,
 			rotat,
 			u8g2_esp32_i2c_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
+*/			
 	}
-	
+	if (*lcd_type != LCD_NONE)
+	{
 		ESP_LOGD(TAG,"lcd init BW type: %d",*lcd_type);
 		if (*lcd_type < LCD_SPI) u8x8_SetI2CAddress(&u8g2.u8x8,0x78);
 		u8g2_InitDisplay(&u8g2); // send init sequence to the display, display is in sleep mode after this,
@@ -684,8 +706,7 @@ void lcd_initU8g2(uint8_t *lcd_type)
 		u8g2_SendBuffer(&u8g2);
 		printf("X: %d, YY: %d, Y: %d\n",x,yy,y);
 		vTaskDelay(100);
-		z = 0; 	
-	
-	
+//		z = 0; 	
+	}
 }
 

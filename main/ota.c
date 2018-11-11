@@ -214,7 +214,7 @@ static void ota_task(void *pvParameter)
             }
             binary_file_length += buff_len;
             ESP_LOGD(TAG, "Have written image length %d", binary_file_length);
-			if (binary_file_length == reclen)
+			if (binary_file_length >= reclen)
 			{
 				flag = false; // all received, exit
 				ESP_LOGI(TAG, "Connection closed, all packets received");

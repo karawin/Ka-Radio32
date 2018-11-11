@@ -66,10 +66,12 @@ void sendOneByte()
 	if (nb != 0)
 	{
 		spi_transaction_t trans_desc;
-		trans_desc.addr      = 0;
+		memset(&trans_desc,0,sizeof(spi_transaction_t));
+/*		trans_desc.addr      = 0;
 		trans_desc.cmd   = 0;
 		trans_desc.rx_buffer = NULL;
 		trans_desc.rxlength  = 0;
+		*/
 		trans_desc.flags     =  SPI_TRANS_USE_TXDATA;
 		trans_desc.length    = 8*nb;  // Number of bits NOT number of bytes.
 		trans_desc.tx_data[0] = oneByte.data[0];// data;
@@ -157,7 +159,7 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 		dev_config.pre_cb           = NULL;
 		dev_config.post_cb          = NULL;
 		ESP_LOGI(TAG, "... Adding device bus  Speed= %d.",dev_config.clock_speed_hz);
-		ESP_ERROR_CHECK(spi_bus_add_device(KSPI, &dev_config, &handle)); 
+		ESP_ERROR_CHECK(spi_bus_add_device(ucg_esp32_hal.spi_no, &dev_config, &handle)); 
 	}
 		break;
 
@@ -204,19 +206,7 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
       /* "data" is not used */
       /* "arg" contains one byte, which should be sent to the display */
       /* The current status of the CD line is available */
-      /* in bit 0 of u8g->com_status */
-/*			spi_transaction_t trans_desc;
-			trans_desc.addr      = 0;
-			trans_desc.cmd   = 0;
-			trans_desc.flags     = SPI_TRANS_USE_TXDATA;
-			trans_desc.length    = 8 ; // Number of bits NOT number of bytes.
-			trans_desc.rxlength  = 0;
-			trans_desc.tx_data[0] = (char) arg;
-			trans_desc.rx_buffer = NULL;
-			 
-			ESP_ERROR_CHECK(spi_device_transmit(handle, &trans_desc));
-//			ESP_ERROR_CHECK(spi_device_queue_trans(handle, &trans_desc,portMAX_DELAY));
-*/			 
+      /* in bit 0 of u8g->com_status */		 
 	  }
       break;
     case UCG_COM_MSG_REPEAT_1_BYTE: 
@@ -231,33 +221,17 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
       /* in bit 0 of u8g->com_status */
 		uint16_t i = arg;	  
 		spi_transaction_t trans_desc;
-		trans_desc.addr      = 0;
-		trans_desc.cmd   = 0;
-		trans_desc.rx_buffer = NULL;
-		trans_desc.rxlength  = 0;
-	  
-	  if (arg >4)
-	  {
+		memset(&trans_desc,0,sizeof(spi_transaction_t));
 		uint8_t* txbf;
 		uint8_t* txb = heap_caps_malloc(arg*2, MALLOC_CAP_DMA);
+//		WORD_ALIGNED_ATTR void* txb = data;
 		if (txb == NULL) break;
 		txbf = txb;
 		while (i--) { *txbf++ = (char) data[0];} 
-		trans_desc.flags     = 0;
 		trans_desc.length    = 8*arg ; // Number of bits NOT number of bytes.
 		trans_desc.tx_buffer = txb;
 		ESP_ERROR_CHECK(spi_device_transmit(handle, &trans_desc));				
 		heap_caps_free(txb);	
-	  } else
-	  {	
-		trans_desc.flags     =  SPI_TRANS_USE_TXDATA;
-		trans_desc.length    = 8*arg;  // Number of bits NOT number of bytes.
-		trans_desc.tx_data[0] = data[0];// data;
-		trans_desc.tx_data[1] = data[0];// data;
-		trans_desc.tx_data[2] = data[0];// data;
-		trans_desc.tx_data[3] = data[0];// data;			
-		ESP_ERROR_CHECK(spi_device_transmit(handle, &trans_desc));
-	  } 
 	}
       break;
     case UCG_COM_MSG_REPEAT_2_BYTES: 
@@ -274,33 +248,17 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 	  uint16_t i = arg;
 	  
 	  spi_transaction_t trans_desc;
-		trans_desc.addr      = 0;
-		trans_desc.cmd   = 0;
-		trans_desc.rx_buffer = NULL;
-		trans_desc.rxlength  = 0;
-	  
-	  if (arg >2)
-	  {
+	  memset(&trans_desc,0,sizeof(spi_transaction_t));
 		uint8_t* txbf;
 		uint8_t* txb = heap_caps_malloc(arg*2, MALLOC_CAP_DMA);
+//		WORD_ALIGNED_ATTR void* txb = data;
 		if (txb == NULL) break;
 		txbf = txb;
 		while (i--) { *txbf++ = (char) data[0]; *txbf++ = (char) data[1]; } 
-		trans_desc.flags     = 0;
 		trans_desc.length    = 16*arg ; // Number of bits NOT number of bytes.
 		trans_desc.tx_buffer = txb;
 		ESP_ERROR_CHECK(spi_device_transmit(handle, &trans_desc));				
 		heap_caps_free(txb);	
-	  } else
-	  {	
-		trans_desc.flags     =  SPI_TRANS_USE_TXDATA;
-		trans_desc.length    = 16*arg;  // Number of bits NOT number of bytes.
-		trans_desc.tx_data[0] = data[0];// data;
-		trans_desc.tx_data[1] = data[1];// data;
-		trans_desc.tx_data[2] = data[0];// data;
-		trans_desc.tx_data[3] = data[1];// data;			
-		ESP_ERROR_CHECK(spi_device_transmit(handle, &trans_desc));
-	  } 
 	}
     break;
     case UCG_COM_MSG_REPEAT_3_BYTES: 
@@ -317,34 +275,18 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
       /* in bit 0 of u8g->com_status */
 	  uint16_t i = arg;	  
 	  spi_transaction_t trans_desc;
-		trans_desc.addr      = 0;
-		trans_desc.cmd   = 0;
-		trans_desc.rxlength  = 0;
-		trans_desc.rx_buffer = NULL;
-		
-	  if (arg >1)
-	  {
+	  memset(&trans_desc,0,sizeof(spi_transaction_t));
 		uint8_t* txbf;
 		uint8_t* txb = heap_caps_malloc(arg*4, MALLOC_CAP_DMA);
 		if (txb == NULL) break;
 		txbf = txb;
 		while (i--) { *txbf++ = (char) data[0]; *txbf++ = (char) data[1]; *txbf++ = (char) data[2];} 
 		*txbf = 0;
-		trans_desc.flags     = 0;
 		trans_desc.length    = 24*arg ; // Number of bits NOT number of bytes.
 		trans_desc.tx_buffer = txb;
 		ESP_ERROR_CHECK(spi_device_transmit(handle, &trans_desc));				
 		heap_caps_free(txb);	
-	  } else
-	  {	
-		trans_desc.flags     =  SPI_TRANS_USE_TXDATA;
-		trans_desc.length    = 24;  // Number of bits NOT number of bytes.
-		trans_desc.tx_data[0] = data[0];// data;
-		trans_desc.tx_data[1] = data[1];// data;
-		trans_desc.tx_data[2] = data[2];// data;
-		trans_desc.tx_data[3] = 0;//			
-		ESP_ERROR_CHECK(spi_device_transmit(handle, &trans_desc));
-	  } 
+
 	}
     break;
     case UCG_COM_MSG_SEND_STR: {
@@ -352,19 +294,11 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 		sendOneByte();
       /* "data" is an array with "arg" bytes */
       /* send "arg" bytes to the display */
-	  uint8_t* txb = heap_caps_malloc(arg, MALLOC_CAP_DMA);
-		if (txb == NULL) break;
-	  memcpy(txb,data,arg);
 	  spi_transaction_t trans_desc;
-		trans_desc.addr      = 0;
-		trans_desc.cmd   = 0;
-		trans_desc.flags     = 0;
-		trans_desc.length    = 8*arg ; // Number of bits NOT number of bytes.
-		trans_desc.rxlength  = 0;
-		trans_desc.tx_buffer = txb;
-		trans_desc.rx_buffer = NULL;
-		ESP_ERROR_CHECK(spi_device_transmit(handle, &trans_desc));
-		heap_caps_free(txb);	 
+	  memset(&trans_desc,0,sizeof(spi_transaction_t));	
+	  trans_desc.length    = 8*arg ; // Number of bits NOT number of bytes.
+	  trans_desc.tx_buffer = data;
+	  ESP_ERROR_CHECK(spi_device_transmit(handle, &trans_desc));
 	}
     break;
     case UCG_COM_MSG_SEND_CD_DATA_SEQUENCE:
@@ -375,29 +309,26 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
       /* The content of bit 0 in u8g->com_status is undefined for this message */
 //	  printf("D");
 	  sendOneByte();
+	  spi_transaction_t trans_desc;
+	  memset(&trans_desc,0,sizeof(spi_transaction_t));	
       while(arg > 0)
       {
-		if ( *data != 0 )
+//		if ( *data != 0 )
 		{
 			if ( *data == 1 )
 			{// set CD (=D/C=A0) line to low 			
-				gpio_set_level(ucg_esp32_hal.dc, 0);}
+				gpio_set_level(ucg_esp32_hal.dc, 1);}
 			else
 			{// set CD (=D/C=A0) line to high 
-				gpio_set_level(ucg_esp32_hal.dc, 1);
+				gpio_set_level(ucg_esp32_hal.dc, 0);
 			}
 		}
 		data++;
         /* send *data to the display */
-		spi_transaction_t trans_desc;
-		trans_desc.addr      = 0;
-		trans_desc.cmd   = 0;
+
 		trans_desc.flags     = SPI_TRANS_USE_TXDATA;
 		trans_desc.length    = 8 ; // Number of bits NOT number of bytes.
-		trans_desc.rxlength  = 0;
-		trans_desc.tx_buffer = NULL;
 		trans_desc.tx_data[0] = (char)*data;// data;
-		trans_desc.rx_buffer = NULL;		 
 		ESP_ERROR_CHECK(spi_device_transmit(handle, &trans_desc));
 		data++;
 		arg--;

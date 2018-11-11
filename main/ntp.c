@@ -68,7 +68,8 @@ bool ntp_get_time(struct tm **dt) {
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_DGRAM; // Use UDP
 	if ((rv = getaddrinfo(node, service, &hints, &servinfo)) != 0) {
-		//ESP_LOGE(TAG,"##SYS.DATE#: ntp fails on %s %d","getaddrinfo",rv);free (msg);
+		//ESP_LOGE(TAG,"##SYS.DATE#: ntp fails on %s %d","getaddrinfo",rv);
+		free(msg);
 		return false;
 	} 		
 // loop in result socket
@@ -102,7 +103,7 @@ bool ntp_get_time(struct tm **dt) {
 	timestamp -= 2208988800UL;
 	// create tm struct
 	*dt = gmtime(&timestamp);
-	if (msg) free(msg);
+	free(msg);
 	close(sockfd);
 	return true;
 }

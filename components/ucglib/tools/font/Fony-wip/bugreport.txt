@@ -1,0 +1,199 @@
+date/time         : 2018-10-28, 23:16:03, 353ms
+computer name     : JP-PC
+user name         : jp
+operating system  : Windows NT New x64 build 9200
+system language   : French
+system up time    : 16 days 4 hours
+program up time   : 38 seconds
+processors        : 4x Intel(R) Core(TM) i3 CPU M 330 @ 2.13GHz
+physical memory   : 1095/5815 MB (free/total)
+free disk space   : (C:) 24,70 GB
+display mode      : 1600x900, 32 bit
+process id        : $51a4
+allocated memory  : 67,20 MB
+executable        : Fony.exe
+exec. date/time   : 2013-07-26 13:53
+version           : 1.4.4.0
+compiled with     : Delphi 2010
+madExcept version : 3.0l
+callstack crc     : $be5fa941, $36121830, $36121830
+count             : 2
+Fony.exe.mad      : $00027f1c, $5ec042fa, $52ce3375
+exception number  : 2
+exception class   : EAccessViolation
+exception message : Access violation at address 006104BC in module 'Fony.exe'. Read of address 0786FFEC.
+
+main thread ($1f50):
+006104bc +014 Fony.exe     segment%151 public%11381
+00699ebc +5d0 Fony.exe     segment%226 public%14304
+004983d3 +00f Fony.exe     segment%32  public%3750
+00527ae5 +031 Fony.exe     segment%66  public%6729
+00528830 +050 Fony.exe     segment%66  public%6787
+00498297 +013 Fony.exe     segment%32  public%3739
+0056db61 +085 Fony.exe     segment%83  public%8192
+00580ea9 +015 Fony.exe     segment%85  public%8649
+0056da66 +0b2 Fony.exe     segment%83  public%8190
+00498a80 +014 Fony.exe     segment%32  public%3772
+76908c1b +00b user32.dll               DispatchMessageW
+0053b85d +11d Fony.exe     segment%67  public%7204
+0053b8a2 +00a Fony.exe     segment%67  public%7206
+0053bbcd +0c9 Fony.exe     segment%67  public%7211
+006a9d16 +136 Fony.exe     segment%349 public%14518
+73a08672 +022 KERNEL32.DLL             BaseThreadInitThunk
+
+thread $4680:
+73a08672 +22 KERNEL32.DLL  BaseThreadInitThunk
+
+thread $4208:
+73a08672 +22 KERNEL32.DLL  BaseThreadInitThunk
+
+thread $3e5c: <priority:2>
+768ffd4b +eb user32.dll              GetMessageA
+0045f435 +0d Fony.exe     segment%23 public%2294
+0045f49f +37 Fony.exe     segment%23 public%2295
+73a08672 +22 KERNEL32.DLL            BaseThreadInitThunk
+>> created by main thread ($1f50) at:
+7355318b +00 winmm.dll
+
+thread $710:
+73a08672 +22 KERNEL32.DLL  BaseThreadInitThunk
+
+thread $3864:
+73a08672 +22 KERNEL32.DLL  BaseThreadInitThunk
+
+thread $11e4:
+73ed4b4d +fd KERNELBASE.dll            WaitForMultipleObjectsEx
+0045f435 +0d Fony.exe       segment%23 public%2294
+0045f49f +37 Fony.exe       segment%23 public%2295
+73a08672 +22 KERNEL32.DLL              BaseThreadInitThunk
+>> created by main thread ($1f50) at:
+7426802d +00 combase.dll
+
+thread $3b48:
+7690b26e +2e user32.dll              GetMessageW
+0045f435 +0d Fony.exe     segment%23 public%2294
+0045f49f +37 Fony.exe     segment%23 public%2295
+73a08672 +22 KERNEL32.DLL            BaseThreadInitThunk
+>> created by main thread ($1f50) at:
+7426802d +00 combase.dll
+
+thread $2784:
+73ed4b4d +fd KERNELBASE.dll  WaitForMultipleObjectsEx
+74266b5a +6a combase.dll     CoWaitForMultipleHandles
+73a08672 +22 KERNEL32.DLL    BaseThreadInitThunk
+
+thread $3fd4:
+73a08672 +22 KERNEL32.DLL  BaseThreadInitThunk
+
+thread $3540:
+73a08672 +22 KERNEL32.DLL  BaseThreadInitThunk
+
+thread $253c:
+73a08672 +22 KERNEL32.DLL  BaseThreadInitThunk
+
+thread $1dc0:
+73a08672 +22 KERNEL32.DLL  BaseThreadInitThunk
+
+thread $4740:
+73a08672 +22 KERNEL32.DLL  BaseThreadInitThunk
+
+thread $2470:
+73ee30dd +3d KERNELBASE.dll  ConnectNamedPipe
+73a08672 +22 KERNEL32.DLL    BaseThreadInitThunk
+
+thread $33a4:
+73ed4b4d +fd KERNELBASE.dll            WaitForMultipleObjectsEx
+0045f435 +0d Fony.exe       segment%23 public%2294
+0045f49f +37 Fony.exe       segment%23 public%2295
+73a08672 +22 KERNEL32.DLL              BaseThreadInitThunk
+>> created by thread $3b48 at:
+7426802d +00 combase.dll
+
+thread $6fc:
+73a08672 +22 KERNEL32.DLL  BaseThreadInitThunk
+
+thread $3820:
+73ec2493 +93 KERNELBASE.dll            WaitForSingleObjectEx
+73ec23ed +0d KERNELBASE.dll            WaitForSingleObject
+0045f435 +0d Fony.exe       segment%23 public%2294
+0045f49f +37 Fony.exe       segment%23 public%2295
+73a08672 +22 KERNEL32.DLL              BaseThreadInitThunk
+>> created by thread $253c at:
+74d57443 +00 shcore.dll
+
+thread $20e8:
+73a08672 +22 KERNEL32.DLL  BaseThreadInitThunk
+
+thread $2758:
+73a08672 +22 KERNEL32.DLL  BaseThreadInitThunk
+
+thread $668:
+73a08672 +22 KERNEL32.DLL  BaseThreadInitThunk
+
+thread $13ec:
+73ec2493 +93 KERNELBASE.dll            WaitForSingleObjectEx
+73ec23ed +0d KERNELBASE.dll            WaitForSingleObject
+0045f435 +0d Fony.exe       segment%23 public%2294
+0045f49f +37 Fony.exe       segment%23 public%2295
+73a08672 +22 KERNEL32.DLL              BaseThreadInitThunk
+>> created by thread $253c at:
+74d57443 +00 shcore.dll
+
+thread $3698:
+73ec2493 +93 KERNELBASE.dll            WaitForSingleObjectEx
+73ec23ed +0d KERNELBASE.dll            WaitForSingleObject
+0045f435 +0d Fony.exe       segment%23 public%2294
+0045f49f +37 Fony.exe       segment%23 public%2295
+73a08672 +22 KERNEL32.DLL              BaseThreadInitThunk
+>> created by thread $253c at:
+74d57443 +00 shcore.dll
+
+thread $3a34:
+73ec2493 +93 KERNELBASE.dll  WaitForSingleObjectEx
+73ec23ed +0d KERNELBASE.dll  WaitForSingleObject
+73a08672 +22 KERNEL32.DLL    BaseThreadInitThunk
+
+thread $2a28:
+73a08672 +22 KERNEL32.DLL  BaseThreadInitThunk
+
+thread $4388:
+73ed4b4d +fd KERNELBASE.dll  WaitForMultipleObjectsEx
+73a08672 +22 KERNEL32.DLL    BaseThreadInitThunk
+
+thread $4e58:
+73a08672 +22 KERNEL32.DLL  BaseThreadInitThunk
+
+thread $4de0:
+73a08672 +22 KERNEL32.DLL  BaseThreadInitThunk
+
+thread $5370:
+7690af18 +38 user32.dll              MsgWaitForMultipleObjectsEx
+74266b79 +89 combase.dll             CoWaitForMultipleHandles
+0045f435 +0d Fony.exe     segment%23 public%2294
+0045f49f +37 Fony.exe     segment%23 public%2295
+73a08672 +22 KERNEL32.DLL            BaseThreadInitThunk
+>> created by thread $3fd4 at:
+74d57443 +00 shcore.dll
+
+stack dump:
+0019fc0c  1c 3c 48 00 ff ff ff ff - e0 d7 47 04 e0 d7 47 04  .<H.......G...G.
+0019fc1c  06 00 00 00 00 00 06 00 - e0 fc 19 00 c1 9e 69 00  ..............i.
+0019fc2c  00 00 00 00 28 fd 19 00 - d8 5e 40 00 e0 fc 19 00  ....(....^@.....
+0019fc3c  20 71 4c 04 a4 7e 52 00 - f0 ed 4a 04 00 00 00 00  .qL..~R...J.....
+0019fc4c  00 00 00 00 00 00 00 00 - 00 00 00 00 00 00 00 00  ................
+0019fc5c  00 00 00 00 00 00 00 00 - 00 00 00 00 00 00 00 00  ................
+0019fc6c  00 00 00 00 00 00 00 00 - 00 00 00 00 00 00 00 00  ................
+0019fc7c  04 00 00 00 2c 1a 78 07 - 51 00 00 00 4c e2 51 04  ....,.x.Q...L.Q.
+0019fc8c  5c 00 00 00 fc 91 46 04 - 00 00 00 00 00 03 00 00  \.....F.........
+0019fc9c  70 f6 4e 04 00 00 00 00 - 00 00 00 00 00 00 00 00  p.N.............
+0019fcac  0f 00 00 00 13 00 00 00 - 04 00 00 00 00 00 00 00  ................
+0019fcbc  cc 09 00 00 05 00 00 00 - 13 00 00 00 0c 00 00 00  ................
+0019fccc  f0 ed 4a 04 00 00 00 00 - 00 00 00 00 00 00 00 00  ..J.............
+0019fcdc  00 00 00 00 44 fd 19 00 - d6 83 49 00 f0 ed 4a 04  ....D.....I...J.
+0019fcec  ea 7a 52 00 4c fd 19 00 - e0 87 52 00 f0 ed 4a 04  .zR.L.....R...J.
+0019fcfc  35 88 52 00 60 b7 84 07 - 9c 82 49 00 60 b7 84 07  5.R.`.....I.`...
+0019fd0c  b0 a9 43 04 64 db 56 00 - b0 ee 53 04 b0 a9 43 04  ..C.d.V...S...C.
+0019fd1c  ae 0e 58 00 ff ff ff ff - 69 da 56 00 6c fe 19 00  ..X.....i.V.l...
+0019fd2c  a8 5c 40 00 44 fd 19 00 - 76 01 71 04 fc 13 0e 00  .\@.D...v.q.....
+0019fd3c  00 00 00 00 b0 a9 43 04 - 5c fd 19 00 82 8a 49 00  ......C.\.....I.
+
