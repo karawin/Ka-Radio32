@@ -28,6 +28,7 @@
 #include "addonu8g2.h"
 #include "addonucg.h"
 
+#include "esp_adc_cal.h"
 
 #define TAG  "addon"
 
@@ -88,11 +89,18 @@ static bool isEncoder0 = true;
 static bool isEncoder1 = true;
 void Screen(typeScreen st); 
  
-Encoder_t* encoder0;
-Encoder_t* encoder1;
+Encoder_t* encoder0 = NULL;
+Encoder_t* encoder1 = NULL;
 static int16_t oldValue0 = 0;
 static int16_t oldValue1 = 0;
-// Compatibility B/W Color-------------------- 
+
+
+void* getEncoder(int num)
+{
+	if (num == 0) return (void*)encoder0;
+	if (num == 1) return (void*)encoder1;
+	return NULL;
+}
 
 static void ClearBuffer()
 {
@@ -458,6 +466,7 @@ static void evtVolume(event_lcd_t evt,int16_t value)
 	evt.lcmd = evol;
 	evt.lline = (char*)((uint32_t)value);
 	xQueueSend(event_lcd,&evt, 0);	
+	
 }
 static void evtStation(event_lcd_t evt,int16_t value)
 {
@@ -466,14 +475,105 @@ static void evtStation(event_lcd_t evt,int16_t value)
 	xQueueSend(event_lcd,&evt, 0);			
 }
 
+
+//----------------------------
+// Adc read: keyboard buttons
+//----------------------------
+
+static adc1_channel_t  channel = GPIO_NONE;
+static bool inside = false;
+uint8_t gpioToChannel(uint8_t gpio)
+{
+	if (gpio == GPIO_NONE) return GPIO_NONE;
+	if (gpio >= 38) return (gpio-36);
+	else return (gpio-28);	
+}
+void adcInit()
+{
+	gpio_get_adc(&channel);	
+	channel = gpioToChannel(channel);
+	ESP_LOGD(TAG,"ADC Channel: %i",channel);
+	if (channel != GPIO_NONE)
+	{
+		adc1_config_width(ADC_WIDTH_BIT_12);
+		adc1_config_channel_atten(channel, ADC_ATTEN_DB_0);
+	}
+}
+
+void adcLoop(event_lcd_t evt) {
+	int voltage,voltage0,voltage1;
+	
+	if (channel == GPIO_NONE) return;  // no gpio specified
+	
+	voltage0 =adc1_get_raw(channel); //
+	vTaskDelay(1);
+	voltage1 = adc1_get_raw(channel); 
+	voltage = (voltage0+voltage1)*110/819;
+	
+	if (voltage <  20) return; // no panel
+
+	if (inside&&(voltage0 > 3700)) 
+	{
+		inside = false;
+		return;
+	}
+	if ((voltage0 >3700) || (voltage1 >3700)) return; // must be two valid voltage	
+	
+	if (voltage < 990) //ESP_LOGD(TAG,"Voltage: %i",voltage);	
+		printf("VOLTAGE: %d\n",voltage);
+	if ((voltage >400) && (voltage < 590)) // volume +
+	{
+		//setRelVolume(+5);
+		evtVolume(evt,5);
+		ESP_LOGI(TAG,"Volume+ : %i",voltage);
+	}
+	else if ((voltage >730) && (voltage < 836)) // volume -
+	{
+		//setRelVolume(-5);
+		evtVolume(evt,-5);
+		ESP_LOGI(TAG,"Volume- : %i",voltage);
+	}	
+		else if ((voltage >835) && (voltage < 990)) // station+
+		{
+//			inside = true;
+			evtStation(evt,1);
+//			changeStation(+1);
+			ESP_LOGI(TAG,"station+: %i",voltage);
+		}	
+		else if ((voltage >590) && (voltage < 710)) // station-
+		{
+//			inside = true;
+			evtStation(evt,-1);
+//			changeStation(-1);
+			ESP_LOGI(TAG,"station-: %i",voltage);
+		}	
+	if (!inside)
+	{	
+		if  ((voltage >100) && (voltage < 220)) // toggle time/info  old stop
+		{
+			inside = true;
+			toggletime();
+			//stopStation();
+			ESP_LOGI(TAG,"toggle time: %i",voltage);	
+		}
+		else if ((voltage >278) && (voltage < 380)) //start stop toggle   old start
+		{
+			inside = true;
+			startStop();
+			//playStationInt(futurNum);
+			ESP_LOGI(TAG,"start stop: %i",voltage);
+		}
+
+	}
+}
+
 //-----------------------
  // Compute the encoder
  //----------------------
 void encoderLoop()
 {	
 	Button newButton ;
-	event_lcd_t evt;
-	
+
 // encoder0 = volume control or station when pushed
 // encoder1 = station control or volume when pushed
 	
@@ -484,7 +584,6 @@ void encoderLoop()
 		newButton = getButton(encoder0);
 		if (newValue0 != 0) 
 		{
-		//    Serial.print("Encoder: ");Serial.println(newValue0);
 			// reset our accelerator
 			if ((newValue0 >0)&&(oldValue0<0)) oldValue0 = 0;
 			if ((newValue0 <0)&&(oldValue0>0)) oldValue0 = 0;
@@ -508,8 +607,7 @@ void encoderLoop()
 			if ((newButton == Held)&&(getPinState(encoder0) == getpinsActive(encoder0)))
 			{   
 				currentValue = newValue0;
-//				changeStation(newValue0);
-				evtStation(evt,newValue0);
+				changeStation(newValue0);
 			} 			
 		}	else
 		// no event on button switch
@@ -517,12 +615,12 @@ void encoderLoop()
 			if ((stateScreen  != sstation)&&(newValue0 != 0))
 			{    
 				ESP_LOGV(TAG,"Volume newvalue %d, oldValue %d, volume %d",newValue0,oldValue0,newValue0+(oldValue0*5));
-				evtVolume(evt,newValue0+(oldValue0*3));
+				setRelVolume(newValue0+(oldValue0*3));
 			} 
 			if ((stateScreen  == sstation)&&(newValue0 != 0))
 			{    
 				currentValue += newValue0;
-				evtStation(evt,newValue0);				
+				changeStation(newValue0);				
 			} 	
 		}		
 		oldValue0 += newValue0;
@@ -535,7 +633,6 @@ void encoderLoop()
 		newButton = getButton(encoder1);
 		if (newValue1 != 0) 
 		{
-		//    Serial.print("Encoder: ");Serial.println(newValue0);
 			// reset our accelerator
 			if ((newValue1 >0)&&(oldValue1<0)) oldValue1 = 0;
 			if ((newValue1 <0)&&(oldValue1>0)) oldValue1 = 0;
@@ -556,18 +653,18 @@ void encoderLoop()
 
 			if ((newButton == Held)&&(getPinState(encoder1) == getpinsActive(encoder1)))
 			{   
-				evtVolume(evt,newValue1+(oldValue1*3));
+				setRelVolume(newValue1+(oldValue1*3));
 			} 			
 		}	else
 		{
 			if ((stateScreen  != svolume)&&(newValue1 != 0))
 			{    
 				currentValue += newValue1;
-				evtStation(evt,newValue1);				
+				changeStation(newValue1);				
 			} 
 			if ((stateScreen  == svolume)&&(newValue1 != 0))
 			{    
-				evtVolume(evt,newValue1+(oldValue1*3));
+				setRelVolume(newValue1+(oldValue1*3));
 			} 	
 		}		
 		oldValue1 += newValue1;
@@ -609,7 +706,7 @@ bool irCustom(uint32_t evtir, bool repeat)
 			case KEY_INFO: if (!repeat ) toggletime();  break;
 			default: ;			
 		}
-		ESP_LOGV(TAG,"irCustom success, evt %x, i: %d",evtir,i);
+		ESP_LOGV(TAG,"irCustom success, evtir %x, i: %d",evtir,i);
 		return true;
 	}
 	return false;
@@ -718,6 +815,7 @@ event_ir_t evt;
  
 void initEncoder()
 {
+	struct device_settings *device;
 	gpio_num_t enca0;
 	gpio_num_t encb0;
 	gpio_num_t encbtn0;
@@ -726,11 +824,13 @@ void initEncoder()
 	gpio_num_t encbtn1;	
 	gpio_get_encoder0(&enca0, &encb0, &encbtn0);
 	gpio_get_encoder1(&enca1, &encb1, &encbtn1);
-	if (enca1 ==0) isEncoder1 = false; //no encoder
-	if (enca0 ==0) isEncoder0 = false; //no encoder
+	if (enca1 == GPIO_NONE) isEncoder1 = false; //no encoder
+	if (enca0 == GPIO_NONE) isEncoder0 = false; //no encoder
 
-	if (isEncoder0)	encoder0 = ClickEncoderInit(enca0, encb0, encbtn0);	
-	if (isEncoder1)	encoder1 = ClickEncoderInit(enca1, encb1, encbtn1);	
+	device = getDeviceSettings();
+	if (isEncoder0)	encoder0 = ClickEncoderInit(enca0, encb0, encbtn0,((device->options32&T_ENC0)==0)?false:true );	
+	if (isEncoder1)	encoder1 = ClickEncoderInit(enca1, encb1, encbtn1,((device->options32&T_ENC1)==0)?false:true );	
+	free (device);
 }
 
 
@@ -772,6 +872,8 @@ void task_addon(void *pvParams)
 
 	customKeyInit();
 	initEncoder();
+	adcInit();
+	
 	serviceEncoder = &multiService;	; // connect the 1ms interruption
 	serviceAddon = &ServiceAddon;	; // connect the 1ms interruption
 	futurNum = getCurrentStation();
@@ -790,8 +892,9 @@ void task_addon(void *pvParams)
 	while (1)
 	{
 
+		adcLoop(evt);  // compute the adc keyboard
 		encoderLoop(); // compute the encoder
-		irLoop();
+		irLoop();  // compute the ir
 
 		while (xQueueReceive(event_lcd, &evt, 0))
 		{ 
@@ -915,7 +1018,6 @@ void task_addon(void *pvParams)
 			}
 			timerScroll = 0;
 		}  
-	
 		vTaskDelay(25);
 	}
 	
@@ -1005,10 +1107,13 @@ void addonParse(const char *fmt, ...)
    //////Volume   ##CLI.VOL#:
    if ((ici=strstr(line,"VOL#:")) != NULL)  
    {
+	   if (*(ici+6) != 'x') // ignore help display.
+	   {
 		volume = atoi(ici+6);
  		evt.lcmd = lvol;
 		evt.lline = NULL;
 		xQueueSend(event_lcd,&evt, 0);
+	   }
    } else
   //////Volume offset    ##CLI.OVOLSET#:
    if ((ici=strstr(line,"OVOLSET#:")) != NULL)  

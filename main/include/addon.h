@@ -88,5 +88,6 @@ void setFuturNum(int16_t new);
 int16_t getFuturNum();
 void addonDt();
 void wakeLcd();
+void* getEncoder(int num);
 
 #endif

@@ -55,11 +55,11 @@ Never change "P_XXXX, data,u8,"
 1- SPI bus;
    K_SPI,data,u8,2
    2 is the spi VSPI_HOST (default)
-  1 is the spi HSPI_HOST
+   1 is the spi HSPI_HOST
 
 2- Encoders
-If P_ENC0_A = 0 the encoder is disabled (not used, the gpio's may be reused elsewhere).
-If P_ENC1_A = 0 the encoder is disabled (not used, the gpio's may be reused elsewhere).
+If P_ENC0_A = 255 the encoder is disabled (not used, the gpio's may be reused elsewhere).
+If P_ENC1_A = 255 the encoder is disabled (not used, the gpio's may be reused elsewhere).
 
 Encoder0 the volume control and stations change when pushed and held,
 Encoder1 the station control and volume change when pushed and heldi.
@@ -68,7 +68,11 @@ Encoder1 the station control and volume change when pushed and heldi.
 If I2C is not used (spi lcd) the gpio of the i2C can be reused elsewhere.
 
 4- VS1053b
-If not used P_XCS must be set to 0. Gpio of P_RST P_XDCS P_DREQ may be reused elsewhere.
+If not used P_XCS must be set to 255. Gpio of P_RST P_XDCS P_DREQ may be reused elsewhere.
+
+5- If IR remote control is not used P_IR_SIGNAL must be set to 255
+
+6- If the ADC keyboard is missing, set P_ADC  to 255.
 
 3/ IR key definitions
 ---------------------
@@ -133,6 +137,11 @@ done
 5/ Flash bin
 ------------
 With ESP DOWNLOAD TOOL or esptool.py command at address, 0x3a2000
+
+It seems that there is a problem with this ESP DOWNLOAD TOOL for flashing the bin alone.
+In case of problem, flash it with another bin (bootloader.bin or KaRadio32.bin)
+ 
+
 This binary is to flash one time and on each modification of the csv.
 
 

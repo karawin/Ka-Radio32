@@ -58,15 +58,24 @@ void noInterrupts()
 void interrupts()
 {interrupt1Ms();}
 
+// decoding table for hardware with flaky notch (half resolution)
+const int8_t tableH[16]  = { 
+       0, 0, -1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, -1, 0, 0 
+};    
+// decoding table for normal hardware
+//const int8_t tableN[16]  = { 
+//       0, 1, -1, 0, -1, 0, 0, 1, 1, 0, 0, -1, 0, -1, 1, 0 
+//};    
 
 // ----------------------------------------------------------------------------
 
 bool getpinsActive(Encoder_t *enc) {return enc->pinsActive;}
 
-Encoder_t* ClickEncoderInit(int8_t A, int8_t B, int8_t BTN)
+Encoder_t* ClickEncoderInit(int8_t A, int8_t B, int8_t BTN, bool initHalfStep)
 {
 	
 	Encoder_t* enc = malloc(sizeof(Encoder_t));
+	enc->halfStep = initHalfStep;
 	enc->pinA = A; enc->pinB = B; enc->pinBTN = BTN;
 	enc->pinsActive = LOW; enc->delta = 0; enc->last = 0; enc->steps = 4; 
 	enc->accelerationEnabled = true; enc->button = Open;
@@ -110,6 +119,14 @@ Encoder_t* ClickEncoderInit(int8_t A, int8_t B, int8_t BTN)
   return enc;
 }
 
+void setHalfStep(Encoder_t *enc, bool value)
+{
+	enc->halfStep = value;	
+}
+bool getHalfStep(Encoder_t *enc)
+{
+	return enc->halfStep ;	
+}
 // ----------------------------------------------------------------------------
 // call this every 1 millisecond via timer ISR
 //
@@ -117,8 +134,7 @@ Encoder_t* ClickEncoderInit(int8_t A, int8_t B, int8_t BTN)
 void service(Encoder_t *enc)
 {
   bool moved = false;
-  int8_t curr = 0;
-
+  
   if (enc->pinA >= 0 && enc->pinB >= 0) {
   if (enc->accelerationEnabled) { // decelerate every tick
     enc->acceleration -= ENC_ACCEL_DEC;
@@ -127,21 +143,41 @@ void service(Encoder_t *enc)
     }
   }
 
-  if (digitalRead(enc->pinA) == enc->pinsActive) {
-    curr = 3;
-  }
+  if (enc->halfStep)
+  {
+	enc->last = (enc->last << 2) & 0x0F;
 
-  if (digitalRead(enc->pinB) == enc->pinsActive) {
-    curr ^= 1;
+	if (digitalRead(enc->pinA) == enc->pinsActive) {
+		enc->last |= 2;
+	}
+
+	if (digitalRead(enc->pinB) == enc->pinsActive) {
+		enc->last |= 1;
+	}
+	int8_t tbl = tableH[enc->last];
+	if (tbl) {
+		enc->delta += tbl;
+		moved = true;
+	}
   }
+  else{
+	int8_t curr = 0; 
+	if (digitalRead(enc->pinA) == enc->pinsActive) {
+		curr = 3;
+	}
+
+	if (digitalRead(enc->pinB) == enc->pinsActive) {
+		curr ^= 1;
+	}
   
-  int8_t diff = enc->last - curr;
-  if (diff & 1) {            // bit 0 = step
-    enc->last = curr;
-    enc->delta += (diff & 2) - 1; // bit 1 = direction (+/-)
-    moved = true;    
+	int8_t diff = enc->last - curr;
+  
+	if (diff & 1) {            // bit 0 = step
+		enc->last = curr;
+		enc->delta += (diff & 2) - 1; // bit 1 = direction (+/-)
+		moved = true;    
+	}
   }
-
   if (enc->accelerationEnabled && moved) {
     // increment accelerator if encoder has been moved
     if (enc->acceleration <= (ENC_ACCEL_TOP - ENC_ACCEL_INC)) {

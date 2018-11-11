@@ -179,6 +179,22 @@ void gpio_get_ir_signal(gpio_num_t *ir)
 	close_partition(hardware_handle,hardware);		
 }
 
+void gpio_get_adc(adc1_channel_t  *channel)
+{
+	esp_err_t err;
+	nvs_handle hardware_handle;
+	// init default
+	*channel = PIN_ADC;
+	
+	if (open_partition(hardware, "gpio_space",&hardware_handle)!= ESP_OK) return;
+	
+	err = nvs_get_u8(hardware_handle, "P_ADC",(uint8_t *) channel);
+	if (err != ESP_OK) printf("gpio_get_adc error %d\n",err);
+
+	close_partition(hardware_handle,hardware);		
+}
+
+
 void gpio_get_i2s(gpio_num_t *lrck ,gpio_num_t *bclk ,gpio_num_t *i2sdata )
 {
 	esp_err_t err;

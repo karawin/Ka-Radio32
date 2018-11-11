@@ -23,7 +23,7 @@
 #include "addonu8g2.h"
 #include "app_main.h"
 //#include "rda5807Task.c"
-
+#include "ClickEncoder.h"
 #include "lwip/sockets.h"
 #include "lwip/dns.h"
 #include "lwip/netdb.h"
@@ -813,6 +813,63 @@ void sysddmm(char* s)
 	free(device);	
 }
 
+// get or set the encoder half resolution. Must be set depending of the hardware
+void syshenc(int nenc,char* s)
+{
+    char *t = strstr(s, parslashquote);
+	struct device_settings *device;
+	Encoder_t *encoder;
+	bool encvalue;
+	encoder = (Encoder_t *)getEncoder(nenc);
+	if (encoder == NULL) {kprintf("Encoder not defined#\n"); return;}
+	device = getDeviceSettings();
+	uint8_t options32 = device->options32;
+	free (device);
+	if (nenc == 0) encvalue = options32&T_ENC0;
+	else encvalue = options32&T_ENC1;
+	
+	kprintf("##Step for encoder%d is ",nenc);
+	if(t == NULL)
+	{
+		if (encvalue)
+			kprintf("half#\n");
+		else
+			kprintf("normal#\n");
+		
+//		kprintf("Current value: %d\n",getHalfStep(encoder) );
+		return;
+	}
+	char *t_end  = strstr(t, parquoteslash);
+    if(t_end == NULL)
+    {
+		kprintf(stritCMDERROR);
+		return;
+    }	
+	uint8_t value = atoi(t+2);
+	device = getDeviceSettings();
+	if (value == 0)
+	{
+		if (nenc ==0) device->options32 &= NT_ENC0;
+		else device->options32 &= NT_ENC1;
+	}
+	else 
+	{
+		if (nenc ==0) device->options32 |= T_ENC0;
+		else device->options32 |= T_ENC1;
+	}
+	setHalfStep(encoder, value);
+	if (nenc == 0) encvalue = device->options32&T_ENC0;
+	else encvalue = device->options32&T_ENC1;
+	if (encvalue)
+		kprintf("half ");
+	else
+		kprintf("normal ");
+	kprintf("#\n");
+	
+	saveDeviceSettings(device);	
+	free(device);		
+}
+
 // display or change the rotation lcd mode
 void sysrotat(char* s)
 {
@@ -1192,7 +1249,8 @@ void checkCommand(int size, char* s)
 		else if(startsWith (  "ddmm",tmp+4)) 	sysddmm(tmp);
 		else if(startsWith (  "host",tmp+4)) 	hostname(tmp);
 		else if(startsWith (  "rotat",tmp+4)) 	sysrotat(tmp);
-//		else if(startsWith (  "charset",tmp+4)) syscharset(tmp);
+		else if(startsWith (  "henc0",tmp+4)) 	syshenc(0,tmp);
+		else if(startsWith (  "henc1",tmp+4)) 	syshenc(1,tmp);
 		else printInfo(tmp);
 	}
 	else 

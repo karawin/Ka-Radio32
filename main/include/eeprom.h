@@ -20,8 +20,10 @@
 #define NT_DDMM		0xFE
 #define T_ROTAT		2
 #define NT_ROTAT	0xFD
-#define T_CHARSET	0x0C
-#define NT_CHARSET	0xF3
+#define T_ENC0		4
+#define T_ENC1		8
+#define NT_ENC0	0xFB
+#define NT_ENC1	0xF7
 
 #define APMODE		0
 #define STA1		1
@@ -67,7 +69,7 @@ struct device_settings {
 	uint8_t led_gpio; // the gpio of the led
 	uint32_t lcd_out;	// timeout in seconds to switch off the lcd. 0 = no timeout
 	uint8_t options32;	// bit0:0 = MMDD, 1 = DDMM  in the time display, bit1: 0= lcd without rotation  1 = lcd rotated 180
-						// (removed) bit 2&3: Latin 0 or Cyrillic 1. two bits for extentions
+						// bit 2: Half step of encoder0, bit3: Half step of encoder1
 	char hostname[HOSTLEN];
 	char filler[8]; 
 

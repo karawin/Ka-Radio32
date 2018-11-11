@@ -1,0 +1,46 @@
+key,type,encoding,value
+gpio_space,namespace,,
+K_SPI,data,u8,2
+P_MISO,data,u8,19
+P_MOSI,data,u8,23
+P_CLK,data,u8,18
+P_XCS,data,u8,32
+P_RST,data,u8,12
+P_XDCS,data,u8,33
+P_DREQ,data,u8,34
+P_ENC0_A,data,u8,25
+P_ENC0_B,data,u8,26
+P_ENC0_BTN,data,u8,0
+P_ENC1_A,data,u8,16
+P_ENC1_B,data,u8,17
+P_ENC1_BTN,data,u8,0
+P_I2C_SCL,data,u8,14
+P_I2C_SDA,data,u8,13
+P_I2C_RST,data,u8,2
+P_LCD_CS,data,u8,13
+P_LCD_A0,data,u8,14
+P_LCD_RST,data,u8,2
+P_IR_SIGNAL,data,u8,21
+P_I2S_LRCK,data,u8,0
+P_I2S_BCLK,data,u8,0
+P_I2S_DATA,data,u8,22
+custom_ir_space,namespace,,
+K_UP,data,string,0xFF0047 0xFF0040
+K_LEFT,data,string,0xFF0007
+K_OK,data,string,0xFF0046 0xFF0043
+K_RIGHT,data,string,0xFF0015
+K_DOWN,data,string,0xFF0045 0xFF0044
+K_0,data,string,0xFF0016
+K_1,data,string,0xFF000C
+K_2,data,string,0xFF0018
+K_3,data,string,0xFF005E
+K_4,data,string,0xFF0008
+K_5,data,string,0xFF001C
+K_6,data,string,0xFF005A
+K_7,data,string,0xFF0042
+K_8,data,string,0xFF0052
+K_9,data,string,0xFF004A
+K_STAR,data,string,0xFF000D
+K_DIESE,data,string,0xFF0019
+K_INFO,data,string,0xFF0009
+

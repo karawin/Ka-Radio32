@@ -8,6 +8,10 @@
 #define __GPIO_H__
 #include "nvs_flash.h"
 #include "driver/spi_master.h"
+#include "esp_adc_cal.h"
+
+#define GPIO_NONE 255
+
 //-------------------------------//
 // Define GPIO used in KaRadio32 //
 //-------------------------------//
@@ -44,9 +48,9 @@
 #define PIN_ENC0_A   GPIO_NUM_16		// 0 if encoder not used
 #define PIN_ENC0_B   GPIO_NUM_17		// DT
 #define PIN_ENC0_BTN GPIO_NUM_5		// SW
-#define PIN_ENC1_A   0		// 0 if encoder not used
-#define PIN_ENC1_B   0		// DT
-#define PIN_ENC1_BTN 0		// SW
+#define PIN_ENC1_A   GPIO_NONE		// 0 if encoder not used
+#define PIN_ENC1_B   GPIO_NONE		// DT
+#define PIN_ENC1_BTN GPIO_NONE		// SW
 
 // I2C lcd (and rda5807 if lcd is i2c or LCD_NONE)
 //------------------------------------------------
@@ -73,6 +77,8 @@
 #define PIN_I2S_BCLK GPIO_NUM_26	// or channel2
 #define PIN_I2S_DATA GPIO_NUM_22	//  
 
+// ADC for keyboard buttons
+#define PIN_ADC	GPIO_NONE	//GPIO_NUM_32 TO GPIO_NUM_39 or GPIO_NONE if not used.
 
 // I2C rda5807 (if lcd is spi)
 // (removed)
@@ -97,6 +103,7 @@ void gpio_get_encoder1(gpio_num_t *enca, gpio_num_t *encb, gpio_num_t *encbtn);
 void gpio_get_i2c(gpio_num_t *scl,gpio_num_t *sda,gpio_num_t *rsti2c);
 void gpio_get_spi_lcd(gpio_num_t *cs ,gpio_num_t *a0,gpio_num_t *rstlcd);
 void gpio_get_ir_signal(gpio_num_t *ir);
+void gpio_get_adc(adc1_channel_t  *channel);
 void gpio_get_i2s(gpio_num_t *lrck ,gpio_num_t *bclk ,gpio_num_t *i2sdata );
 void gpio_get_ir_key(nvs_handle handle,const char *key, int32_t *out_value1 , int32_t *out_value2);
 #endif

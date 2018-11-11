@@ -101,7 +101,7 @@ bool VS1053_HW_init()
 	gpio_get_vs1053(&xcs,&rst,&xdcs,&dreq);
 	
 	// if xcs = 0 the vs1053 is not used
-	if (xcs == 0)
+	if (xcs == GPIO_NONE)
 	{
 		vsVersion = 0; 
 		ESP_LOGE(TAG,"VS1053 not used");

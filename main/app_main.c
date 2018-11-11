@@ -829,8 +829,6 @@ void app_main()
 	ESP_LOGE(TAG,"LCD Type %d",device->lcd_type);
 	//lcd rotation
 	setRotat((device->options32)&T_ROTAT) ;	
-//	//font set latin or cyrillic
-//	setCharset((device->options32)&T_CHARSET);
 	
 	lcd_init(device->lcd_type);
 	

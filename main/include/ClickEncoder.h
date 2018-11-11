@@ -26,22 +26,7 @@
 
 
 
-// ----------------------------------------------------------------------------
-
-#define ENC_NORMAL        (1 << 1)   // use Peter Danneger's decoder
-#define ENC_FLAKY         (1 << 2)   // use Table-based decoder
-
-// ----------------------------------------------------------------------------
-
-#ifndef ENC_DECODER
-#  define ENC_DECODER     ENC_NORMAL
-#endif
-
-#if ENC_DECODER == ENC_FLAKY
-#  ifndef ENC_HALFSTEP
-#    define ENC_HALFSTEP  1        // use table for half step per default
-#  endif
-#endif
+// 
 
 // ----------------------------------------------------------------------------
 typedef gpio_mode_t pinMode_t;
@@ -66,7 +51,8 @@ typedef gpio_mode_t pinMode_t;
   } Button;
 
   typedef struct {
- int8_t pinA;
+  bool halfStep; // true if encoder is half step per notch
+  int8_t pinA;
   int8_t pinB;
   int8_t pinBTN;
   bool pinsActive;
@@ -85,8 +71,9 @@ typedef gpio_mode_t pinMode_t;
   } Encoder_t;	  
   
   
-  Encoder_t* ClickEncoderInit(int8_t A, int8_t B, int8_t BTN );
-  
+  Encoder_t* ClickEncoderInit(int8_t A, int8_t B, int8_t BTN , bool half);
+  void setHalfStep(Encoder_t *enc, bool value);
+  bool getHalfStep(Encoder_t *enc);
   void service(Encoder_t *enc); 
   int16_t getValue(Encoder_t *enc);
   Button getButton(Encoder_t *enc);
