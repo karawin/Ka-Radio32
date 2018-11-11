@@ -51,7 +51,6 @@ typedef gpio_mode_t pinMode_t;
   } Button;
 
   typedef struct {
-  bool halfStep; // true if encoder is half step per notch
   int8_t pinA;
   int8_t pinB;
   int8_t pinBTN;
@@ -64,7 +63,6 @@ typedef gpio_mode_t pinMode_t;
   volatile Button button;
   bool doubleClickEnabled;
   bool buttonHeldEnabled;
-  bool buttonOnPinZeroEnabled ;
   uint16_t keyDownTicks ;
   uint16_t doubleClickTicks ;
   unsigned long lastButtonCheck ;

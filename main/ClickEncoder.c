@@ -57,16 +57,7 @@ void noInterrupts()
 
 void interrupts()
 {interrupt1Ms();}
-
-// decoding table for hardware with flaky notch (half resolution)
-const int8_t tableH[16]  = { 
-       0, 0, -1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, -1, 0, 0 
-};    
-// decoding table for normal hardware
-//const int8_t tableN[16]  = { 
-//       0, 1, -1, 0, -1, 0, 0, 1, 1, 0, 0, -1, 0, -1, 1, 0 
-//};    
-
+  
 // ----------------------------------------------------------------------------
 
 bool getpinsActive(Encoder_t *enc) {return enc->pinsActive;}
@@ -75,13 +66,15 @@ Encoder_t* ClickEncoderInit(int8_t A, int8_t B, int8_t BTN, bool initHalfStep)
 {
 	
 	Encoder_t* enc = malloc(sizeof(Encoder_t));
-	enc->halfStep = initHalfStep;
-	enc->pinA = A; enc->pinB = B; enc->pinBTN = BTN;
+	enc->pinA = A; enc->pinB = B;
+	if (BTN == -1) enc->pinBTN = 0;
+		else enc->pinBTN = BTN;
 	enc->pinsActive = LOW; enc->delta = 0; enc->last = 0; enc->steps = 4; 
 	enc->accelerationEnabled = true; enc->button = Open;
 	enc->doubleClickEnabled = true; enc->buttonHeldEnabled = true;
 
-	enc->buttonOnPinZeroEnabled = false;
+	if (initHalfStep) enc->steps = 2;
+	
 	enc->keyDownTicks = 0;
 	enc->doubleClickTicks = 0;
 	enc->lastButtonCheck = 0;
@@ -102,7 +95,7 @@ Encoder_t* ClickEncoderInit(int8_t A, int8_t B, int8_t BTN, bool initHalfStep)
 	gpio_conf.pin_bit_mask = BIT(enc->pinB);
 	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
   }
-  if (enc->pinBTN >= 0) 
+  if (enc->pinBTN > 0) 
   {
 	gpio_conf.pin_bit_mask = BIT(enc->pinBTN);
 	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
@@ -119,13 +112,17 @@ Encoder_t* ClickEncoderInit(int8_t A, int8_t B, int8_t BTN, bool initHalfStep)
   return enc;
 }
 
+// number of steps per notch
 void setHalfStep(Encoder_t *enc, bool value)
 {
-	enc->halfStep = value;	
+	if (value) enc->steps = 2;	
+	else enc->steps = 4;	
 }
 bool getHalfStep(Encoder_t *enc)
 {
-	return enc->halfStep ;	
+//	return enc->halfStep ;	
+   if (enc->steps == 2) return true;
+   return false;
 }
 // ----------------------------------------------------------------------------
 // call this every 1 millisecond via timer ISR
@@ -143,24 +140,6 @@ void service(Encoder_t *enc)
     }
   }
 
-  if (enc->halfStep)
-  {
-	enc->last = (enc->last << 2) & 0x0F;
-
-	if (digitalRead(enc->pinA) == enc->pinsActive) {
-		enc->last |= 2;
-	}
-
-	if (digitalRead(enc->pinB) == enc->pinsActive) {
-		enc->last |= 1;
-	}
-	int8_t tbl = tableH[enc->last];
-	if (tbl) {
-		enc->delta += tbl;
-		moved = true;
-	}
-  }
-  else{
 	int8_t curr = 0; 
 	if (digitalRead(enc->pinA) == enc->pinsActive) {
 		curr = 3;
@@ -177,7 +156,7 @@ void service(Encoder_t *enc)
 		enc->delta += (diff & 2) - 1; // bit 1 = direction (+/-)
 		moved = true;    
 	}
-  }
+
   if (enc->accelerationEnabled && moved) {
     // increment accelerator if encoder has been moved
     if (enc->acceleration <= (ENC_ACCEL_TOP - ENC_ACCEL_INC)) {
@@ -189,7 +168,7 @@ void service(Encoder_t *enc)
   //
   unsigned long currentMillis = xTaskGetTickCount()* portTICK_PERIOD_MS;
   if (currentMillis < enc->lastButtonCheck) enc->lastButtonCheck = 0;        // Handle case when millis() wraps back around to zero
-  if ((enc->pinBTN > 0 || (enc->pinBTN == 0 && enc->buttonOnPinZeroEnabled))        // check enc->button only, if a pin has been provided
+  if ((enc->pinBTN > 0 )        // check enc->button only, if a pin has been provided
       && ((currentMillis - enc->lastButtonCheck) >= ENC_BUTTONINTERVAL))            // checking enc->button is sufficient every 10-30ms
   { 
     enc->lastButtonCheck = currentMillis;
