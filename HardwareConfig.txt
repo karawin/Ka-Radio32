@@ -1,13 +1,12 @@
-Version 1.4 allows you to configure gpio's and two custom IR keys per action.
+Version 1.5 allows you to configure gpio's and two custom IR keys per action.
 This allows you to take advantage of the standard software even if your port configuration and/or your remote control are not the same.
 The configuration must be specified in a csv file. A template is given by the pattern.csv file
 The default configuration of the current software is in the standard_adb.csv file.
 A csv file is interpreted by a utility to generate a bin file that must be flashed at 0x3a2000 one time per esp32
 
-Implementation:
----------------
 The msys32 and KaRadio32 environment must be operational.
 
+---------------
 1/ Prerequisite
 ---------------
 First, make sure you have an updated partitions.bin file.
@@ -38,42 +37,69 @@ python /home/jp/esp/esp-idf/components/esptool_py/esptool/esptool.py --chip esp3
 
 Compared to an old version, it adds the declaration of the partition "hardware" which interests us.
 
+Rename the pattern.csv file with the name of your card, for example lolin32.csv
+Beware: not comment line or empty line allowed in a csv file.
 
+-----------------------
 2/ Definition of gpio's
 -----------------------
-Rename the pattern.csv file with the name of your card, for example lolin32.csv
 Edit this file to enter your gpio definitions.
+See gpio.h for the default values if missing in the csv file.
 Only modify the lines beginning with P_ by modifying only the last number.
 for example
 P_MISO, data,u8,19
 Change 19 to the desired number.
 Do this for all P_ lines.
-Never change "P_XXXX, data,u8,"
+Never change the string "P_XXXX, data,u8,"
+A value base 10 is mandatory for each P_.
 
 #Special cases:
 ---------------
-1- SPI bus;
+1- SPI bus
+----------
    K_SPI,data,u8,2
    2 is the spi VSPI_HOST (default)
    1 is the spi HSPI_HOST
 
 2- Encoders
-If P_ENC0_A = 255 the encoder is disabled (not used, the gpio's may be reused elsewhere).
-If P_ENC1_A = 255 the encoder is disabled (not used, the gpio's may be reused elsewhere).
+-----------
+Two encoders maximun are supported, each with different actions:
+Encoder0: the volume control and stations change when pushed and held,
+Encoder1: the station control and volume change when pushed and heldi.
 
-Encoder0 the volume control and stations change when pushed and held,
-Encoder1 the station control and volume change when pushed and heldi.
+If P_ENC0_A = 255 the encoder (P_ENC0_A, P_ENC0_B, P_ENC0_BTN) is disabled (not used, the gpio's may be reused elsewhere).
+If P_ENC1_A = 255 the encoder (P_ENC1_A, P_ENC1_B, P_ENC1_BTN) is disabled (not used, the gpio's may be reused elsewhere).
+If If P_ENC0_A is not 255 and P_ENC0_BTN = 255, the push button is disabled.
+If If P_ENC1_A is not 255 and P_ENC1_BTN = 255, the push button is disabled.
 
-3- I2C
-If I2C is not used (spi lcd) the gpio of the i2C can be reused elsewhere.
+3- Buttons
+----------
+Two set of three buttons can be configured in place or with encoder(s). The only limit is the available gpio's.
+Each set has functions equivalent to Encoder0 and Encoder1:
+click on button A: Start/Stop playing
+click on button B and C: volume down and up for set 0 (P_BTN0), Station down and up for set 1 (P_BTN1)
+held on button A: click on button B and C: volume down and up for set 1 (P_BTN1), Station down and up for set 0 (P_BTN0)
 
-4- VS1053b
+If a set is not used, P_BTNx_A must be set to 255. In this case P_BTNx_B P_BTNx_C are disabled too.
+
+4- I2C
+------
+If I2C is not used (ie no lcd or spi lcd) the gpio of the i2C can be reused elsewhere.
+
+5- VS1053b
+----------
 If not used P_XCS must be set to 255. Gpio of P_RST P_XDCS P_DREQ may be reused elsewhere.
 
-5- If IR remote control is not used P_IR_SIGNAL must be set to 255
+6- IR
+-----
+If IR remote control is not used P_IR_SIGNAL must be set to 255
 
-6- If the ADC keyboard is missing, set P_ADC  to 255.
+7- ADC keyboard
+---------------
+If the ADC keyboard is missing, set P_ADC  to 255.
 
+
+---------------------
 3/ IR key definitions
 ---------------------
 If you use a remote control with different codes from the default ones, you can give your codes by key.
@@ -119,6 +145,7 @@ No comment is allowed in this csv file.
 Save the csv file.
 
 
+------------------------
 4/ Generation of the bin
 ------------------------
 Start the command
@@ -134,6 +161,7 @@ done
 
 
 
+------------
 5/ Flash bin
 ------------
 With ESP DOWNLOAD TOOL or esptool.py command at address, 0x3a2000
@@ -141,10 +169,8 @@ With ESP DOWNLOAD TOOL or esptool.py command at address, 0x3a2000
 It seems that there is a problem with this ESP DOWNLOAD TOOL for flashing the bin alone.
 In case of problem, flash it with another bin (bootloader.bin or KaRadio32.bin)
  
-
 This binary is to flash one time and on each modification of the csv.
 
-
-Now you can enjoy the standart OTA.
+Now you can enjoy the standart OTA. No needs to generate your own KaRadio32.bin.
 
 JP 2018

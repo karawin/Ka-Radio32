@@ -14,6 +14,12 @@ P_ENC0_BTN,data,u8,37
 P_ENC1_A,data,u8,0
 P_ENC1_B,data,u8,17
 P_ENC1_BTN,data,u8,5
+P_BTN0_A,data,u8,255
+P_BTN0_B,data,u8,255
+P_BTN0_C,data,u8,255
+P_BTN1_A,data,u8,255
+P_BTN1_B,data,u8,255
+P_BTN1_C,data,u8,255
 P_I2C_SCL,data,u8,18
 P_I2C_SDA,data,u8,22
 P_I2C_RST,data,u8,5

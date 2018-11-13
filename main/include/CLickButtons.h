@@ -12,15 +12,28 @@
 // (c) 2017 KaRadio
 // ----------------------------------------------------------------------------
 
-#ifndef __have__ClickButtons_h__
-#define __have__ClickButtons_h__
+#ifndef __have__ClickEncoder_h__
+#define __have__ClickEncoder_h__
 
 #include "driver/gpio.h"
 // ---Button defaults-------------------------------------------------------------
-
-#define BTN_DOUBLECLICKTIME  400  // second click within 400ms
+#define ENC_BUTTONINTERVAL    10  // check enc->button every x milliseconds, also debouce time
+#define BTN_DOUBLECLICKTIME  600  // second click within 400ms
 #define BTN_HOLDTIME        1000  // report held button after 1s
 
+// ----------------------------------------------------------------------------
+
+
+
+
+// 
+
+// ----------------------------------------------------------------------------
+typedef gpio_mode_t pinMode_t;
+#undef INPUT
+#define INPUT	GPIO_MODE_INPUT
+#undef INPUT_PULLUP
+#define INPUT_PULLUP GPIO_MODE_INPUT
 #undef LOW
 #define LOW 0
 #undef HIGH
@@ -37,15 +50,31 @@
     DoubleClicked   
   } Button;
 
-  void ClickEncoderInit(int8_t A, int8_t B, int8_t BTN );
-  void (*serviceEncoder)();
-  void service(void); 
-  Button getButton(uint8_t index);
-  bool getPinState(uint8_t index);
-  bool getpinsActive();
+  typedef struct {
+  int8_t pinBTN[3];
+  int8_t pinA;
+  int8_t pinB;
+  int8_t pinC;
+  bool pinsActive;
+  
+  volatile Button button[3];
+  bool doubleClickEnabled;
+  bool buttonHeldEnabled;
+  uint16_t keyDownTicks[3] ;
+  uint16_t doubleClickTicks[3] ; 
+  unsigned long lastButtonCheck[3];
+  } Button_t;	  
+  
+  
+  Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C );
+  void service(Button_t *enc); 
+  int16_t getValue(Button_t *enc);
+  Button getButton(Button_t *enc,uint8_t index);
+  bool getPinState(Button_t *enc,uint8_t index);
+  bool getpinsActive(Button_t *enc);
   
 
 
 // ----------------------------------------------------------------------------
 
-#endif // __have__ClickButtons_h__
+#endif // __have__ClickEncoder_h__

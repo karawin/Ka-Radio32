@@ -51,15 +51,15 @@ const char strvI2S[] = {"I2S Speed: %d\n"};
 static spi_device_handle_t vsspi;  // the device handle of the vs1053 spi
 static spi_device_handle_t hvsspi;  // the device handle of the vs1053 spi high speed
 
-xSemaphoreHandle sSPI = NULL;
+//xSemaphoreHandle sSPI = NULL;
 
 uint8_t spi_take_semaphore() {
-	if(sSPI) if(xSemaphoreTake(sSPI, portMAX_DELAY)) return 1;
+//	if(sSPI) if(xSemaphoreTake(sSPI, portMAX_DELAY)) return 1;
 	return 1;
 }
 
 void spi_give_semaphore() {
-	if(sSPI) xSemaphoreGive(sSPI);
+//	if(sSPI) xSemaphoreGive(sSPI);
 }
 
 void VS1053_spi_init(){
@@ -69,7 +69,7 @@ void VS1053_spi_init(){
 	gpio_num_t sclk;
 	uint8_t spi_no; // the spi bus to use
 	
-	if(!sSPI) vSemaphoreCreateBinary(sSPI);
+//	if(!sSPI) vSemaphoreCreateBinary(sSPI);
 	spi_give_semaphore(); 
 	
 	gpio_get_spi_bus(&spi_no,&miso,&mosi,&sclk);	

@@ -41,8 +41,8 @@
 #define isColor (lcd_type&LCD_COLOR)
 
 char irStr[4];
-xQueueHandle event_ir;
-xQueueHandle event_lcd;
+xQueueHandle event_ir = NULL;
+xQueueHandle event_lcd = NULL;
 u8g2_t u8g2; // a structure which will contain all the data for one display
 ucg_t  ucg;
 static uint8_t lcd_type;
@@ -93,7 +93,7 @@ Encoder_t* encoder0 = NULL;
 Encoder_t* encoder1 = NULL;
 static int16_t oldValue0 = 0;
 static int16_t oldValue1 = 0;
-
+//xSemaphoreHandle lcdSPI = NULL;
 
 void* getEncoder(int num)
 {
@@ -373,7 +373,8 @@ void drawScreen()
   {
 //	  printf("drawScreenenter mTscreen:%d\n",mTscreen);
 //printf("drawScreen %d, mTscreen: %d\n",stateScreen,mTscreen);	
-
+//  if(!xSemaphoreTake(lcdSPI, portMAX_DELAY)) return;
+//  printf(" xSem take drawScreen\n");
   switch (stateScreen)
   {
     case smain:  // 
@@ -396,6 +397,8 @@ void drawScreen()
 	  drawFrame();	  
   }
   if (!(isColor)) u8g2_SendBuffer(&u8g2);
+//  xSemaphoreGive(lcdSPI);
+//  printf(" xSem give drawScreen\n");
   mTscreen = MTNODISPLAY;
   }   
 }
@@ -461,15 +464,17 @@ static void toggletime()
 }
 
 
-static void evtVolume(event_lcd_t evt,int16_t value)
+static void evtVolume(int16_t value)
 {
+	event_lcd_t evt;
 	evt.lcmd = evol;
 	evt.lline = (char*)((uint32_t)value);
 	xQueueSend(event_lcd,&evt, 0);	
 	
 }
-static void evtStation(event_lcd_t evt,int16_t value)
+static void evtStation(int16_t value)
 {
+	event_lcd_t evt;
 	evt.lcmd = estation;
 	evt.lline = (char*)((uint32_t)value);
 	xQueueSend(event_lcd,&evt, 0);			
@@ -500,7 +505,7 @@ void adcInit()
 	}
 }
 
-void adcLoop(event_lcd_t evt) {
+void adcLoop() {
 	int voltage,voltage0,voltage1;
 	
 	if (channel == GPIO_NONE) return;  // no gpio specified
@@ -524,26 +529,26 @@ void adcLoop(event_lcd_t evt) {
 	if ((voltage >400) && (voltage < 590)) // volume +
 	{
 		//setRelVolume(+5);
-		evtVolume(evt,5);
+		evtVolume(5);
 		ESP_LOGI(TAG,"Volume+ : %i",voltage);
 	}
 	else if ((voltage >730) && (voltage < 836)) // volume -
 	{
 		//setRelVolume(-5);
-		evtVolume(evt,-5);
+		evtVolume(-5);
 		ESP_LOGI(TAG,"Volume- : %i",voltage);
 	}	
 		else if ((voltage >835) && (voltage < 990)) // station+
 		{
 //			inside = true;
-			evtStation(evt,1);
+			evtStation(1);
 //			changeStation(+1);
 			ESP_LOGI(TAG,"station+: %i",voltage);
 		}	
 		else if ((voltage >590) && (voltage < 710)) // station-
 		{
 //			inside = true;
-			evtStation(evt,-1);
+			evtStation(-1);
 //			changeStation(-1);
 			ESP_LOGI(TAG,"station-: %i",voltage);
 		}	
@@ -861,14 +866,93 @@ void multiService()
 	if (isEncoder0) service(encoder0);
 	if (isEncoder1) service(encoder1);
 }
-
+//--------------------
+// LCD display task
+//--------------------
+/*
+void task_lcd(void *pvParams)
+{
+	event_lcd_t evt ; // lcd event	
+	
+	while (1)
+	{	
+		if (event_lcd != NULL)
+		while (xQueueReceive(event_lcd, &evt, 0))
+		{ 
+//			if(!xSemaphoreTake(lcdSPI, portMAX_DELAY)) break;
+//printf(" xSem take task lcd\n");			
+			wakeLcd();	
+			if (evt.lcmd != lmeta)
+				ESP_LOGI(TAG,"event_lcd: %x",(int)evt.lcmd);
+			else
+				ESP_LOGI(TAG,"event_lcd: %x  %s",(int)evt.lcmd,evt.lline);
+			switch(evt.lcmd)
+			{
+				case lmeta:
+					isColor?metaUcg(evt.lline):metaU8g2(evt.lline);
+					break;
+				case licy4:
+					isColor?icy4Ucg(evt.lline):icy4U8g2(evt.lline);
+					break;
+				case licy0:
+					isColor?icy0Ucg(evt.lline):icy0U8g2(evt.lline);
+					break;
+				case lstop:
+					isColor?statusUcg("STOPPED"):statusU8g2("STOPPED");
+					if (stateScreen != smain)
+					{
+						mTscreen= MTNEW;
+						stateScreen =  smain; 
+						drawScreen();
+					}
+					break;
+				case lnameset:
+					isColor?namesetUcg(evt.lline):namesetU8g2(evt.lline);
+					Screen(smain);
+					mTscreen= MTNEW;
+					stateScreen =  smain; 
+					drawScreen();
+					break;
+				case lplay:
+					isColor?playingUcg():playingU8g2();						  
+					break;
+				case lvol:
+					isColor?setVolumeUcg(volume):setVolumeU8g2(volume);
+					if (dvolume)
+						Screen(svolume); 
+					else 
+						dvolume = true;
+					timerScreen = 0;
+					break;
+				case lovol:
+					dvolume = false; // don't show volume on start station
+					break;
+				case evol:
+					setRelVolume((uint32_t)evt.lline);
+					evt.lline = NULL;
+					break;
+				case estation:
+					changeStation((uint32_t)evt.lline);				
+					evt.lline = NULL;
+					break;
+				default:;
+			}
+			if (evt.lline != NULL) free(evt.lline);
+//			xSemaphoreGive(lcdSPI);
+//printf(" xSem give task lcd\n");
+		}
+		vTaskDelay(10);	
+	}
+	vTaskDelete( NULL ); 	
+}*/
 //------------------- 
 // Main task of addon
 //------------------- 
 extern void rmt_nec_rx_task();
 void task_addon(void *pvParams)
 {
-	event_lcd_t evt; // lcd event
+event_lcd_t evt; // lcd event
+//event_lcd_t evtadc; // lcd event
 
 	customKeyInit();
 	initEncoder();
@@ -885,20 +969,25 @@ void task_addon(void *pvParams)
 	event_lcd = xQueueCreate(40, sizeof(event_lcd_t));
 	ESP_LOGI(TAG,"event_lcd: %x",(int)event_lcd);
 	
-	xTaskCreatePinnedToCore(rmt_nec_rx_task, "rmt_nec_rx_task", 2148, NULL, 10, NULL,1);
+//	vSemaphoreCreateBinary(lcdSPI);
+//	xSemaphoreGive(lcdSPI);
+	
+	xTaskCreatePinnedToCore(rmt_nec_rx_task, "rmt_nec_rx_task", 2148, NULL, PRIO_RMT, NULL,CPU_RMT);
 	vTaskDelay(1);
 	wakeLcd();
+	
+//	xTaskCreatePinnedToCore (task_lcd, "task_lcd", 2600, NULL, 3, &pxCreatedTask,1); 
 
 	while (1)
 	{
 
-		adcLoop(evt);  // compute the adc keyboard
+		adcLoop();  // compute the adc keyboard
 		encoderLoop(); // compute the encoder
 		irLoop();  // compute the ir
 
 		while (xQueueReceive(event_lcd, &evt, 0))
 		{ 
-			wakeLcd();
+			wakeLcd();	
 			if (evt.lcmd != lmeta)
 				ESP_LOGI(TAG,"event_lcd: %x",(int)evt.lcmd);
 			else
@@ -958,8 +1047,7 @@ void task_addon(void *pvParams)
 
 		}
 		
-//		vTaskDelay(1);		
-
+		vTaskDelay(1);		
 		if (itAskTime) // time to ntp. Don't do that in interrupt.
 		{			
 			if (ntp_get_time(&dt) )
@@ -969,7 +1057,8 @@ void task_addon(void *pvParams)
 				syncTime = true;				
 			} 
 			itAskTime = false;
-		}
+		}	
+		
 		if (itAskStime) // time start the time display. Don't do that in interrupt.
 		{    
 			Screen(stime);
@@ -983,7 +1072,7 @@ void task_addon(void *pvParams)
 			sleepLcd();
 		}
 		
-		if (timerScreen >= 3) // 2 sec timeout 
+		if (timerScreen >= 3) // 3 sec timeout 
 		{
 			timerScreen = 0;
 			if ((stateScreen != smain)&&(stateScreen != stime)&&(stateScreen != snull))
@@ -1018,6 +1107,7 @@ void task_addon(void *pvParams)
 			}
 			timerScroll = 0;
 		}  
+
 		vTaskDelay(25);
 	}
 	

@@ -65,6 +65,29 @@ extern uint32_t wakeDelay;
 #define TIMER_1MS	2
 #define TIMER_1mS	3
 
+// Tasks priority
+#define PRIO_MAD 		6
+#define PRIO_VS1053 	4
+#define PRIO_RMT		7
+#define PRIO_UART		2
+#define PRIO_CLIENT		4
+#define PRIO_SERVER		3
+#define PRIO_ADDON		5
+#define PRIO_SUBSERV	3
+#define PRIO_TIMER		1
+#define PRIO_OTA		10
+
+// CPU for task
+#define CPU_MAD			1  // internal decoder and vs1053
+#define CPU_RMT			0
+#define CPU_UART		1
+#define CPU_CLIENT		1
+#define CPU_SERVER		0
+#define CPU_ADDON		0
+#define CPU_SUBSERV		0
+#define CPU_TIMER		0
+
+
 
 typedef struct {
     int type;               /*!< event type */

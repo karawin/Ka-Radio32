@@ -24,8 +24,8 @@
 #include "app_main.h"
 
 #define TAG "audio_player"
-#define PRIO_MAD configMAX_PRIORITIES - 4
-//#define PRIO_MAD 5
+//#define PRIO_MAD configMAX_PRIORITIES - 4
+
 
 static player_t *player_instance = NULL;
 static component_status_t player_status = UNINITIALIZED;
@@ -35,6 +35,7 @@ static int start_decoder_task(player_t *player)
     TaskFunction_t task_func;
     char * task_name;
     uint16_t stack_depth;
+	int priority = PRIO_MAD;
 
     ESP_LOGD(TAG, "RAM left %d", esp_get_free_heap_size());
 	if (get_audio_output_mode() == VS1053)
@@ -42,6 +43,7 @@ static int start_decoder_task(player_t *player)
 		task_func = vsTask;
         task_name = "vsTask";
         stack_depth = 3000;
+		priority = PRIO_VS1053;
 	} else
     switch (player->media_stream->content_type)
     {
@@ -71,9 +73,9 @@ static int start_decoder_task(player_t *player)
     }
 
 	if (((task_func != NULL)) && (xTaskCreatePinnedToCore(task_func, task_name, stack_depth, player,
-			PRIO_MAD, NULL, 1) != pdPASS)) {
-							
-				
+			priority, NULL, CPU_MAD) != pdPASS)) 
+	{
+									
 		ESP_LOGE(TAG, "ERROR creating decoder task! Out of memory?");
 		spiRamFifoReset();
 		return -1;

@@ -26,7 +26,7 @@
 static spi_device_handle_t handle; // SPI handle.
 DRAM_ATTR static ucg_esp32_hal_t ucg_esp32_hal; // HAL state data.
 static ucg_esp32_oneByte oneByte;
-
+static spi_transaction_t trans_desc;
 /* to init call
 //init hal
 ucg_esp32_hal_t ucg_esp32_hal = UCG_ESP32_HAL_DEFAULT;
@@ -61,17 +61,12 @@ void sendOneByte()
 {
 	int nb = oneByte.nb;
 	oneByte.nb = 0;	
-	
-  taskYIELD();	
+		
 	if (nb != 0)
 	{
-		spi_transaction_t trans_desc;
+//		spi_transaction_t trans_desc;
 		memset(&trans_desc,0,sizeof(spi_transaction_t));
-/*		trans_desc.addr      = 0;
-		trans_desc.cmd   = 0;
-		trans_desc.rx_buffer = NULL;
-		trans_desc.rxlength  = 0;
-		*/
+		
 		trans_desc.flags     =  SPI_TRANS_USE_TXDATA;
 		trans_desc.length    = 8*nb;  // Number of bits NOT number of bytes.
 		trans_desc.tx_data[0] = oneByte.data[0];// data;
@@ -79,6 +74,14 @@ void sendOneByte()
 		trans_desc.tx_data[2] = oneByte.data[2];// data;
 		trans_desc.tx_data[3] = oneByte.data[3];//			
 		ESP_ERROR_CHECK(spi_device_transmit(handle, &trans_desc));	
+		
+//		printf("NB: %d\n",nb);
+/*		trans_desc.length    = 8*nb ; // Number of bits NOT number of bytes.
+		trans_desc.tx_buffer = oneByte.data;
+		ESP_ERROR_CHECK(spi_device_transmit(handle, &trans_desc));							
+*/		
+		
+		
 //		printf("O");
 	}
 }
@@ -87,7 +90,7 @@ void sendOneByte()
 void addOneByte(uint8_t bt)
 {
 	oneByte.data[oneByte.nb++] = bt;
-	if (oneByte.nb >3) sendOneByte(); //security, but ucglib send a max of 4 bytes alone.
+	if (oneByte.nb >ONEBYTEMAX-1) sendOneByte(); //security, but ucglib send a max of 4 bytes alone.
 }
 
 
@@ -180,11 +183,12 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
       /* "data" is not used */
       /* "arg" = 1: set the reset output line to 1 */
       /* "arg" = 0: set the reset output line to 0 */
+		sendOneByte();
 		gpio_set_level(ucg_esp32_hal.reset, arg);
       break;
     case UCG_COM_MSG_CHANGE_CD_LINE:
 //	printf("C");
-	sendOneByte();
+		sendOneByte();
 //		ESP_LOGD(TAG,"ucg_com_hal  msg: %d, arg: %x, data: %x",msg,arg,(data!=NULL)?*data:0);
       /* "ucg->com_status"  bit 0 contains the old level for the CD line */
       /* "data" is not used */
@@ -199,6 +203,7 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
       /* "arg" = 1: set the chipselect output line to 1 */
       /* "arg" = 0: set the chipselect output line to 0 */
 		//gpio_set_level(ucg_esp32_hal.cs, arg); //done by the spi driver
+		sendOneByte();
       break;
     case UCG_COM_MSG_SEND_BYTE: {
 //		printf("B");
@@ -220,7 +225,7 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
       /* The current status of the CD line is available */
       /* in bit 0 of u8g->com_status */
 		uint16_t i = arg;	  
-		spi_transaction_t trans_desc;
+//		spi_transaction_t trans_desc;
 		memset(&trans_desc,0,sizeof(spi_transaction_t));
 		uint8_t* txbf;
 		uint8_t* txb = heap_caps_malloc(arg*2, MALLOC_CAP_DMA);
@@ -247,7 +252,7 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
       /* in bit 0 of u8g->com_status */
 	  uint16_t i = arg;
 	  
-	  spi_transaction_t trans_desc;
+//	  spi_transaction_t trans_desc;
 	  memset(&trans_desc,0,sizeof(spi_transaction_t));
 		uint8_t* txbf;
 		uint8_t* txb = heap_caps_malloc(arg*2, MALLOC_CAP_DMA);
@@ -274,7 +279,7 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
       /* The current status of the CD line is available */
       /* in bit 0 of u8g->com_status */
 	  uint16_t i = arg;	  
-	  spi_transaction_t trans_desc;
+//	  spi_transaction_t trans_desc;
 	  memset(&trans_desc,0,sizeof(spi_transaction_t));
 		uint8_t* txbf;
 		uint8_t* txb = heap_caps_malloc(arg*4, MALLOC_CAP_DMA);
@@ -294,7 +299,7 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 		sendOneByte();
       /* "data" is an array with "arg" bytes */
       /* send "arg" bytes to the display */
-	  spi_transaction_t trans_desc;
+//	  spi_transaction_t trans_desc;
 	  memset(&trans_desc,0,sizeof(spi_transaction_t));	
 	  trans_desc.length    = 8*arg ; // Number of bits NOT number of bytes.
 	  trans_desc.tx_buffer = data;
@@ -302,6 +307,7 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 	}
     break;
     case UCG_COM_MSG_SEND_CD_DATA_SEQUENCE:
+	{
       /* "data" is a pointer to two bytes, which contain the cd line */
       /* status and display data */
       /* "arg" contains the number of these two byte tuples which need to */
@@ -309,7 +315,7 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
       /* The content of bit 0 in u8g->com_status is undefined for this message */
 //	  printf("D");
 	  sendOneByte();
-	  spi_transaction_t trans_desc;
+//	  spi_transaction_t trans_desc;
 	  memset(&trans_desc,0,sizeof(spi_transaction_t));	
       while(arg > 0)
       {
@@ -333,7 +339,8 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 		data++;
 		arg--;
       }
-      break;
+	}
+     break;
 	default:
 	printf("ucg_esp default to %d\n",msg);
   }

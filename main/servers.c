@@ -14,6 +14,7 @@
 #include "websocket.h"
 #include "webserver.h"
 #include "interface.h"
+#include "app_main.h"
 
 #define stack  4200
 #define TAG	"servers"
@@ -201,8 +202,8 @@ void serversTask(void* pvParams) {
 								"serverclientTask",
 								stack,
 								(void *) client_sock,
-								3, 
-								NULL, 0 ) != pdPASS) 
+								PRIO_SUBSERV, 
+								NULL, CPU_SUBSERV ) != pdPASS) 
 							{								
 								vTaskDelay(200);
 								ESP_LOGE(TAG,"Server low mem. Retrying...");

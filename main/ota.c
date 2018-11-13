@@ -37,7 +37,7 @@
 #include "lwip/netdb.h"
 #include "interface.h"
 #include "webclient.h"
-
+#include "app_main.h"
 #define BUFFSIZE 1024
 
 const char strupd[]  = {\
@@ -264,7 +264,7 @@ static void ota_task(void *pvParameter)
 void update_firmware(char* fname)
 {
 	xTaskHandle pxCreatedTask;
-	xTaskCreate(ota_task, "ota_task", 8192, fname, 5, &pxCreatedTask);
+	xTaskCreate(ota_task, "ota_task", 8192, fname, PRIO_OTA, &pxCreatedTask);
 	ESP_LOGI(TAG, "ota_task: %x",(unsigned int)pxCreatedTask);
 
 }
