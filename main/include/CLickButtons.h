@@ -12,8 +12,8 @@
 // (c) 2017 KaRadio
 // ----------------------------------------------------------------------------
 
-#ifndef __have__ClickEncoder_h__
-#define __have__ClickEncoder_h__
+#ifndef __have__ClickButton_h__
+#define __have__ClickButton_h__
 
 #include "driver/gpio.h"
 // ---Button defaults-------------------------------------------------------------
@@ -40,7 +40,8 @@ typedef gpio_mode_t pinMode_t;
 #define HIGH 1
 #define digitalRead(x) gpio_get_level((gpio_num_t)x)
 
-  typedef enum Button_e {
+#ifndef __have__ClickEncoder_h__
+  typedef enum Buttons_e {
     Open = 0,
     Closed,    
     Pressed,
@@ -49,6 +50,7 @@ typedef gpio_mode_t pinMode_t;
     Clicked,
     DoubleClicked   
   } Button;
+#endif
 
   typedef struct {
   int8_t pinBTN[3];
@@ -67,14 +69,13 @@ typedef gpio_mode_t pinMode_t;
   
   
   Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C );
-  void service(Button_t *enc); 
-  int16_t getValue(Button_t *enc);
-  Button getButton(Button_t *enc,uint8_t index);
-  bool getPinState(Button_t *enc,uint8_t index);
-  bool getpinsActive(Button_t *enc);
+  void serviceBtn(Button_t *enc); 
+  Button getButtons(Button_t *enc,uint8_t index);
+  bool getPinStates(Button_t *enc,uint8_t index);
+  bool getpinsActives(Button_t *enc);
   
 
 
 // ----------------------------------------------------------------------------
 
-#endif // __have__ClickEncoder_h__
+#endif // __have__ClickButton_h__

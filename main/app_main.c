@@ -125,7 +125,11 @@ void interrupt1Ms()
 {
 	timer_enable_intr(TIMERGROUP1MS, msTimer);
 }
+void noInterrupts()
+{noInterrupt1Ms();}
 
+void interrupts()
+{interrupt1Ms();}
 char* getIp() { return (localIp);}
 
 /*

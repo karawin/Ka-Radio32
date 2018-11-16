@@ -397,10 +397,13 @@ void drawStationU8g2(uint8_t mTscreen,char* snum,char* ddot)
 }
 
 
-void drawVolumeU8g2(uint8_t mTscreen,char* aVolume)
+//void drawVolumeU8g2(uint8_t mTscreen,char* aVolume)
+void drawVolumeU8g2(uint8_t mTscreen)
 {
   char vlstr[] = {"Volume"}; 
-  volume = atoi(aVolume);
+  char aVolume[4];
+//  volume = atoi(aVolume);
+  sprintf(aVolume,"%d",volume);
   u8g2_ClearBuffer(&u8g2);
   drawTTitleU8g2(vlstr) ;  
   setfont8(large);  

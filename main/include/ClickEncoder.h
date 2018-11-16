@@ -68,7 +68,7 @@ typedef gpio_mode_t pinMode_t;
   unsigned long lastButtonCheck ;
   } Encoder_t;	  
   
-  
+
   Encoder_t* ClickEncoderInit(int8_t A, int8_t B, int8_t BTN , bool half);
   void setHalfStep(Encoder_t *enc, bool value);
   bool getHalfStep(Encoder_t *enc);

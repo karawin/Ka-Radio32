@@ -9,7 +9,7 @@
 #include "driver/gpio.h"
 #include "gpio.h"
 #include "nvs_flash.h"
-#include "esp_log.h "
+#include "esp_log.h"
 
 #define hardware "hardware"
 
@@ -89,6 +89,42 @@ void gpio_get_vs1053(gpio_num_t * xcs,gpio_num_t *rst,gpio_num_t *xdcs,gpio_num_
 	close_partition(hardware_handle,hardware);	
 }
 
+void gpio_get_button0(gpio_num_t *enca, gpio_num_t *encb, gpio_num_t *encc)
+{
+	esp_err_t err;
+	nvs_handle hardware_handle;
+	// init default
+	*enca = PIN_BTN0_A;
+	*encb = PIN_BTN0_B;
+	*encc = PIN_BTN0_C;
+	
+	if (open_partition(hardware, "gpio_space",&hardware_handle)!= ESP_OK) return;
+	
+	err = nvs_get_u8(hardware_handle, "P_BTN0_A",(uint8_t *) enca);
+	err |=nvs_get_u8(hardware_handle, "P_BTN0_B",(uint8_t *) encb);
+	err |=nvs_get_u8(hardware_handle, "P_BTN0_C", (uint8_t *)encc);
+	if (err != ESP_OK) printf("gpio_get_button0 error %d\n",err);
+
+	close_partition(hardware_handle,hardware);		
+}
+void gpio_get_button1(gpio_num_t *enca, gpio_num_t *encb, gpio_num_t *encc)
+{
+	esp_err_t err;
+	nvs_handle hardware_handle;
+	// init default
+	*enca = PIN_BTN1_A;
+	*encb = PIN_BTN1_B;
+	*encc = PIN_BTN1_C;
+	
+	if (open_partition(hardware, "gpio_space",&hardware_handle)!= ESP_OK) return;
+	
+	err = nvs_get_u8(hardware_handle, "P_BTN1_A",(uint8_t *) enca);
+	err |=nvs_get_u8(hardware_handle, "P_BTN1_B",(uint8_t *) encb);
+	err |=nvs_get_u8(hardware_handle, "P_BTN1_C", (uint8_t *)encc);
+	if (err != ESP_OK) printf("gpio_get_button1 error %d\n",err);
+
+	close_partition(hardware_handle,hardware);		
+}
 void gpio_get_encoder0(gpio_num_t *enca, gpio_num_t *encb, gpio_num_t *encbtn)
 {
 	esp_err_t err;
@@ -193,7 +229,6 @@ void gpio_get_adc(adc1_channel_t  *channel)
 
 	close_partition(hardware_handle,hardware);		
 }
-
 
 void gpio_get_i2s(gpio_num_t *lrck ,gpio_num_t *bclk ,gpio_num_t *i2sdata )
 {

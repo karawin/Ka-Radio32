@@ -664,10 +664,13 @@ void drawStationUcg(uint8_t mTscreen,char* snum,char* ddot)
 }
 
 
-void drawVolumeUcg(uint8_t mTscreen,char* aVolume)
+//void drawVolumeUcg(uint8_t mTscreen,char* aVolume)
+void drawVolumeUcg(uint8_t mTscreen)
 {
   char vlstr[] = {"Volume"};
-  volume = atoi(aVolume);
+//  volume = atoi(aVolume);
+  char aVolume[4];
+  sprintf(aVolume,"%d",volume);
     switch (mTscreen){
       case 1: 
 		ucg_ClearScreen(&ucg);

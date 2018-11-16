@@ -11,6 +11,7 @@
 #include <sys/time.h>
 
 #include "ClickEncoder.h"
+#include "ClickButtons.h"
 #include "app_main.h"
 #include "gpio.h"
 #include "webclient.h"
@@ -87,13 +88,14 @@ static uint32_t customKey[KEY_MAX][2];
 
 static bool isEncoder0 = true;
 static bool isEncoder1 = true;
+static bool isButton0 = true;
+static bool isButton1 = true;
 void Screen(typeScreen st); 
  
 Encoder_t* encoder0 = NULL;
 Encoder_t* encoder1 = NULL;
-static int16_t oldValue0 = 0;
-static int16_t oldValue1 = 0;
-//xSemaphoreHandle lcdSPI = NULL;
+Button_t* button0 = NULL;
+Button_t* button1 = NULL;
 
 void* getEncoder(int num)
 {
@@ -224,8 +226,6 @@ IRAM_ATTR void ServiceAddon(void)
 		// Time compute
         timestamp++;  // time update  
 		if (timerLcdOut >0) timerLcdOut--; // 
-/*		if (state) timein = 0; // only on stop state
-         else */
 		timein++;
 		if ((timestamp % (10*DTIDLE))==0){ itAskTime=true;} // synchronise with ntp every x*DTIDLE
 		 
@@ -233,7 +233,6 @@ IRAM_ATTR void ServiceAddon(void)
 			{itAskStime=true;timein = 0;} // start the time display
         } 
 		if (timerLcdOut == 1) itLcdOut = true;
-		//if (stateScreen == stime) {itAskSsecond=true;} // start the time display
 		if ((stateScreen == stime)||(stateScreen == smain)) { mTscreen = MTREFRESH; } // display time
 		if (!syncTime) itAskTime=true; // first synchro if not done
 		
@@ -269,7 +268,6 @@ void scroll()
 void Screen(typeScreen st){
   if (stateScreen != st)
   {
-//	stateScreen = (stateScreen == smain)?smain0:stateScreen;  
 	oldStateScreen = stateScreen;
 	mTscreen = MTNEW;
   }
@@ -277,7 +275,6 @@ void Screen(typeScreen st){
     if (mTscreen == MTNODISPLAY) mTscreen = MTREFRESH;
   stateScreen = st;  
   timein = 0; 
-//  printf("Screen %d  mTscreen:%d\n",st,mTscreen);
 }
 
 
@@ -349,16 +346,12 @@ void drawStation()
 // draw the volume screen
 void drawVolume()
 {
-  char aVolume[4] ; 
-  sprintf(aVolume,"%d",volume);
-//  printf("drawVolume. mTscreen: %d, aVolume: %d\n",mTscreen,atoi(aVolume));
-  isColor?drawVolumeUcg(mTscreen,aVolume):drawVolumeU8g2(mTscreen,aVolume);	
+  isColor?drawVolumeUcg(mTscreen):drawVolumeU8g2(mTscreen);	
 }
 
 void drawTime()
 {
 	dt=localtime(&timestamp);
-//	printf("drawTime. mTscreen: %d, timein: %d \n",mTscreen,timein);
 	isColor?drawTimeUcg(mTscreen,dt,timein):drawTimeU8g2(mTscreen,dt,timein);	
 }
 
@@ -371,10 +364,6 @@ void drawScreen()
   //ESP_LOGV(TAG,"stateScreen: %d",stateScreen);
   if ((mTscreen != MTNODISPLAY)&&(!itLcdOut))
   {
-//	  printf("drawScreenenter mTscreen:%d\n",mTscreen);
-//printf("drawScreen %d, mTscreen: %d\n",stateScreen,mTscreen);	
-//  if(!xSemaphoreTake(lcdSPI, portMAX_DELAY)) return;
-//  printf(" xSem take drawScreen\n");
   switch (stateScreen)
   {
     case smain:  // 
@@ -397,8 +386,6 @@ void drawScreen()
 	  drawFrame();	  
   }
   if (!(isColor)) u8g2_SendBuffer(&u8g2);
-//  xSemaphoreGive(lcdSPI);
-//  printf(" xSem give drawScreen\n");
   mTscreen = MTNODISPLAY;
   }   
 }
@@ -427,7 +414,6 @@ void stationOk()
 	   }  
         else
         {
- //         if (stateScreen == sstation) 
             startStop();
         }  
         irStr[0] = 0;  
@@ -464,14 +450,6 @@ static void toggletime()
 }
 
 
-static void evtVolume(int16_t value)
-{
-	event_lcd_t evt;
-	evt.lcmd = evol;
-	evt.lline = (char*)((uint32_t)value);
-	xQueueSend(event_lcd,&evt, 0);	
-	
-}
 static void evtStation(int16_t value)
 {
 	event_lcd_t evt;
@@ -480,7 +458,38 @@ static void evtStation(int16_t value)
 	xQueueSend(event_lcd,&evt, 0);			
 }
 
+static void evtClearScreen()
+{
+	event_lcd_t evt;
+	evt.lcmd = eclrs;	
+	evt.lline = NULL;
+	xQueueSend(event_lcd,&evt, 0);	
+}
 
+static void evtDrawScreen()
+{
+	event_lcd_t evt;
+	evt.lcmd = edraws;	
+	evt.lline = NULL;
+	xQueueSend(event_lcd,&evt, 0);	
+}
+
+static void evtScroll()
+{
+	event_lcd_t evt;
+	evt.lcmd = escroll;	
+	evt.lline = NULL;
+	xQueueSend(event_lcd,&evt, 0);	
+}
+
+static void evtStatus(char* label)
+{
+	event_lcd_t evt;
+	evt.lcmd = estatus;	
+	evt.lline = malloc(strlen(label)+1);
+	strcpy(evt.lline,label);
+	xQueueSend(event_lcd,&evt, 0);	
+}
 //----------------------------
 // Adc read: keyboard buttons
 //----------------------------
@@ -528,26 +537,22 @@ void adcLoop() {
 		printf("VOLTAGE: %d\n",voltage);
 	if ((voltage >400) && (voltage < 590)) // volume +
 	{
-		//setRelVolume(+5);
-		evtVolume(5);
+		setRelVolume(+5);
 		ESP_LOGI(TAG,"Volume+ : %i",voltage);
 	}
 	else if ((voltage >730) && (voltage < 836)) // volume -
 	{
-		//setRelVolume(-5);
-		evtVolume(-5);
+		setRelVolume(-5);
 		ESP_LOGI(TAG,"Volume- : %i",voltage);
 	}	
 		else if ((voltage >835) && (voltage < 990)) // station+
 		{
-//			inside = true;
 			evtStation(1);
 //			changeStation(+1);
 			ESP_LOGI(TAG,"station+: %i",voltage);
 		}	
 		else if ((voltage >590) && (voltage < 710)) // station-
 		{
-//			inside = true;
 			evtStation(-1);
 //			changeStation(-1);
 			ESP_LOGI(TAG,"station-: %i",voltage);
@@ -558,18 +563,24 @@ void adcLoop() {
 		{
 			inside = true;
 			toggletime();
-			//stopStation();
 			ESP_LOGI(TAG,"toggle time: %i",voltage);	
 		}
 		else if ((voltage >278) && (voltage < 380)) //start stop toggle   old start
 		{
 			inside = true;
 			startStop();
-			//playStationInt(futurNum);
 			ESP_LOGI(TAG,"start stop: %i",voltage);
 		}
 
 	}
+}
+
+//-----------------------
+ // Compute the Buttons
+ //----------------------
+void buttonsLoop()
+{	
+
 }
 
 //-----------------------
@@ -581,26 +592,12 @@ void encoderLoop()
 
 // encoder0 = volume control or station when pushed
 // encoder1 = station control or volume when pushed
-	
 	if (isEncoder0)
 	{
 // Encoder0	
 		newValue0 = - getValue(encoder0);
 		newButton = getButton(encoder0);
-		if (newValue0 != 0) 
-		{
-			// reset our accelerator
-			if ((newValue0 >0)&&(oldValue0<0)) oldValue0 = 0;
-			if ((newValue0 <0)&&(oldValue0>0)) oldValue0 = 0;
-			wakeLcd();
-		}
-		else
-		{
-			// lower accelerator 
-			if (oldValue0 <0) oldValue0++;
-			if (oldValue0 >0) oldValue0--;
-		}
-    	// if an event on encoder switch	
+   	// if an event on encoder switch	
 		if (newButton != Open)
 		{ 
 			wakeLcd();
@@ -619,8 +616,8 @@ void encoderLoop()
 		{
 			if ((stateScreen  != sstation)&&(newValue0 != 0))
 			{    
-				ESP_LOGV(TAG,"Volume newvalue %d, oldValue %d, volume %d",newValue0,oldValue0,newValue0+(oldValue0*5));
-				setRelVolume(newValue0+(oldValue0*3));
+				ESP_LOGV(TAG,"Volume newvalue %d, volume %d",newValue0,newValue0);
+				setRelVolume(newValue0);
 			} 
 			if ((stateScreen  == sstation)&&(newValue0 != 0))
 			{    
@@ -628,27 +625,12 @@ void encoderLoop()
 				changeStation(newValue0);				
 			} 	
 		}		
-		oldValue0 += newValue0;
 	}
 
 	if (isEncoder1)
 	{
-// Encoder1
 		newValue1 = - getValue(encoder1);
 		newButton = getButton(encoder1);
-		if (newValue1 != 0) 
-		{
-			// reset our accelerator
-			if ((newValue1 >0)&&(oldValue1<0)) oldValue1 = 0;
-			if ((newValue1 <0)&&(oldValue1>0)) oldValue1 = 0;
-			wakeLcd();
-		}
-		else
-		{
-			// lower accelerator 
-			if (oldValue1 <0) oldValue1++;
-			if (oldValue1 >0) oldValue1--;
-		}
     		
 		if (newButton != Open)
 		{ 
@@ -658,7 +640,7 @@ void encoderLoop()
 
 			if ((newButton == Held)&&(getPinState(encoder1) == getpinsActive(encoder1)))
 			{   
-				setRelVolume(newValue1+(oldValue1*3));
+				setRelVolume(newValue1);
 			} 			
 		}	else
 		{
@@ -669,13 +651,11 @@ void encoderLoop()
 			} 
 			if ((stateScreen  == svolume)&&(newValue1 != 0))
 			{    
-				setRelVolume(newValue1+(oldValue1*3));
+				setRelVolume(newValue1);
 			} 	
 		}		
-		oldValue1 += newValue1;
 	}		
 // end Encoder loop
-
 }
 
 
@@ -817,8 +797,8 @@ event_ir_t evt;
 	}
 }
  
- 
-void initEncoder()
+
+void initButtonEncoder()
 {
 	struct device_settings *device;
 	gpio_num_t enca0;
@@ -836,6 +816,14 @@ void initEncoder()
 	if (isEncoder0)	encoder0 = ClickEncoderInit(enca0, encb0, encbtn0,((device->options32&T_ENC0)==0)?false:true );	
 	if (isEncoder1)	encoder1 = ClickEncoderInit(enca1, encb1, encbtn1,((device->options32&T_ENC1)==0)?false:true );	
 	free (device);
+	
+	gpio_get_button0(&enca0, &encb0, &encbtn0);
+	gpio_get_button1(&enca1, &encb1, &encbtn1);
+	if (enca1 == GPIO_NONE) isButton1 = false; //no encoder
+	if (enca0 == GPIO_NONE) isButton0 = false; //no encoder	
+	if (isButton0)	button0 = ClickButtonsInit(enca0, encb0, encbtn0);	
+	if (isButton1)	button1 = ClickButtonsInit(enca1, encb1, encbtn1 );	
+	
 }
 
 
@@ -865,22 +853,23 @@ void multiService()
 {
 	if (isEncoder0) service(encoder0);
 	if (isEncoder1) service(encoder1);
+	if (isButton0) serviceBtn(button0);
+	if (isButton1) serviceBtn(button1);
 }
 //--------------------
 // LCD display task
 //--------------------
-/*
+
 void task_lcd(void *pvParams)
 {
 	event_lcd_t evt ; // lcd event	
+	event_lcd_t evt1 ; // lcd event	
 	
 	while (1)
 	{	
 		if (event_lcd != NULL)
 		while (xQueueReceive(event_lcd, &evt, 0))
 		{ 
-//			if(!xSemaphoreTake(lcdSPI, portMAX_DELAY)) break;
-//printf(" xSem take task lcd\n");			
 			wakeLcd();	
 			if (evt.lcmd != lmeta)
 				ESP_LOGI(TAG,"event_lcd: %x",(int)evt.lcmd);
@@ -917,45 +906,61 @@ void task_lcd(void *pvParams)
 					isColor?playingUcg():playingU8g2();						  
 					break;
 				case lvol:
+/*					isColor?setVolumeUcg(volume):setVolumeU8g2(volume);
+					if (dvolume)
+						Screen(svolume); 
+					else 
+						dvolume = true;
+					timerScreen = 0;*/
+					// ignore it if the next is a lvol
+					if(xQueuePeek(event_lcd, &evt1, 0))
+						if (evt1.lcmd == lvol) break;
 					isColor?setVolumeUcg(volume):setVolumeU8g2(volume);
 					if (dvolume)
 						Screen(svolume); 
 					else 
 						dvolume = true;
-					timerScreen = 0;
+					timerScreen = 0;					
 					break;
 				case lovol:
 					dvolume = false; // don't show volume on start station
 					break;
-				case evol:
-					setRelVolume((uint32_t)evt.lline);
-					evt.lline = NULL;
-					break;
 				case estation:
-					changeStation((uint32_t)evt.lline);				
-					evt.lline = NULL;
+					changeStation((uint32_t)evt.lline);	
+					evt.lline = NULL;					
+					break;
+				case eclrs:
+					isColor?ucg_ClearScreen(&ucg):u8g2_ClearDisplay(&u8g2);
+					break;
+				case edraws:	
+					drawScreen(); 
+					break;
+				case escroll:
+					scroll(); 
+					break;
+				case estatus:
+					isColor?statusUcg(evt.lline):statusU8g2(evt.lline);
 					break;
 				default:;
 			}
 			if (evt.lline != NULL) free(evt.lline);
-//			xSemaphoreGive(lcdSPI);
-//printf(" xSem give task lcd\n");
 		}
 		vTaskDelay(10);	
 	}
 	vTaskDelete( NULL ); 	
-}*/
+}
+
 //------------------- 
 // Main task of addon
 //------------------- 
 extern void rmt_nec_rx_task();
 void task_addon(void *pvParams)
 {
-event_lcd_t evt; // lcd event
-//event_lcd_t evtadc; // lcd event
-
+// 
+//	event_lcd_t evt;
+//	event_lcd_t evt1;
 	customKeyInit();
-	initEncoder();
+	initButtonEncoder();
 	adcInit();
 	
 	serviceEncoder = &multiService;	; // connect the 1ms interruption
@@ -976,77 +981,17 @@ event_lcd_t evt; // lcd event
 	vTaskDelay(1);
 	wakeLcd();
 	
-//	xTaskCreatePinnedToCore (task_lcd, "task_lcd", 2600, NULL, 3, &pxCreatedTask,1); 
+	xTaskCreatePinnedToCore (task_lcd, "task_lcd", 2600, NULL, PRIO_ADDON-1, NULL,0); 
 
 	while (1)
 	{
 
 		adcLoop();  // compute the adc keyboard
 		encoderLoop(); // compute the encoder
+		buttonsLoop(); // compute the buttons
 		irLoop();  // compute the ir
 
-		while (xQueueReceive(event_lcd, &evt, 0))
-		{ 
-			wakeLcd();	
-			if (evt.lcmd != lmeta)
-				ESP_LOGI(TAG,"event_lcd: %x",(int)evt.lcmd);
-			else
-				ESP_LOGI(TAG,"event_lcd: %x  %s",(int)evt.lcmd,evt.lline);
-			switch(evt.lcmd)
-			{
-				case lmeta:
-					isColor?metaUcg(evt.lline):metaU8g2(evt.lline);
-					break;
-				case licy4:
-					isColor?icy4Ucg(evt.lline):icy4U8g2(evt.lline);
-					break;
-				case licy0:
-					isColor?icy0Ucg(evt.lline):icy0U8g2(evt.lline);
-					break;
-				case lstop:
-					isColor?statusUcg("STOPPED"):statusU8g2("STOPPED");
-					if (stateScreen != smain)
-					{
-						mTscreen= MTNEW;
-						stateScreen =  smain; 
-						drawScreen();
-					}
-					break;
-				case lnameset:
-					isColor?namesetUcg(evt.lline):namesetU8g2(evt.lline);
-					Screen(smain);
-					mTscreen= MTNEW;
-					stateScreen =  smain; 
-					drawScreen();
-					break;
-				case lplay:
-					isColor?playingUcg():playingU8g2();						  
-					break;
-				case lvol:
-					isColor?setVolumeUcg(volume):setVolumeU8g2(volume);
-					if (dvolume)
-						Screen(svolume); 
-					else 
-						dvolume = true;
-					timerScreen = 0;
-					break;
-				case lovol:
-					dvolume = false; // don't show volume on start station
-					break;
-				case evol:
-					setRelVolume((uint32_t)evt.lline);
-					evt.lline = NULL;
-					break;
-				case estation:
-					changeStation((uint32_t)evt.lline);				
-					evt.lline = NULL;
-					break;
-				default:;
-			}
-			if (evt.lline != NULL) free(evt.lline);
-
-		}
-		
+	
 		vTaskDelay(1);		
 		if (itAskTime) // time to ntp. Don't do that in interrupt.
 		{			
@@ -1068,7 +1013,8 @@ event_lcd_t evt; // lcd event
 
 		if (itLcdOut) // switch off the lcd
 		{
-			isColor?ucg_ClearScreen(&ucg):u8g2_ClearDisplay(&u8g2);
+//			isColor?ucg_ClearScreen(&ucg):u8g2_ClearDisplay(&u8g2);
+			evtClearScreen();
 			sleepLcd();
 		}
 		
@@ -1091,8 +1037,9 @@ event_lcd_t evt; // lcd event
 					&& playable 
 					&& ( futurNum!= atoi(  isColor?getNameNumUcg():getNameNumU8g2()  ))) 
 				{
-					isColor?statusUcg("STARTING"):statusU8g2("STARTING");
-					if (lcd_type != LCD_NONE) drawScreen(); 
+					evtStatus("STARTING");
+//					isColor?statusUcg("STARTING"):statusU8g2("STARTING");
+					if (lcd_type != LCD_NONE) evtDrawScreen();//drawScreen(); 
 					playStationInt(futurNum);
 				}				
 			}
@@ -1102,19 +1049,20 @@ event_lcd_t evt; // lcd event
 		{
 			if (lcd_type != LCD_NONE) 
 			{
-				if (stateScreen == smain) scroll(); 
-				drawScreen(); 
+				if (stateScreen == smain) evtScroll();//scroll(); 
+//				drawScreen(); 
+				evtDrawScreen();
 			}
-			timerScroll = 0;
+//			timerScroll = 0;
 		}  
 
-		vTaskDelay(25);
+		vTaskDelay(10);
 	}
 	
 	vTaskDelete( NULL ); 
 }
 
-// force a new dt fetch
+// force a new dt ntp fetch
 void addonDt() { itAskTime = true; }
 
 
@@ -1138,7 +1086,7 @@ void addonParse(const char *fmt, ...)
 	line = realloc(line,rlen+1);
 	if (line == NULL) return;	
 	ESP_LOGV(TAG,"LINE: %s",line);
-	
+	evt.lcmd = -1;
   char* ici;
  
  ////// Meta title  ##CLI.META#: 
@@ -1148,7 +1096,7 @@ void addonParse(const char *fmt, ...)
 		evt.lline = malloc(strlen(ici)+1);
 		//evt.lline = NULL;
 		strcpy(evt.lline,ici);
-		xQueueSend(event_lcd,&evt, 0);
+//		xQueueSend(event_lcd,&evt, 0);
    } else 
  ////// ICY4 Description  ##CLI.ICY4#:
     if ((ici=strstr(line,"ICY4#: ")) != NULL)
@@ -1157,7 +1105,7 @@ void addonParse(const char *fmt, ...)
 		evt.lline = malloc(strlen(ici)+1);
 		//evt.lline = NULL;
 		strcpy(evt.lline,ici);
-		xQueueSend(event_lcd,&evt, 0);
+//		xQueueSend(event_lcd,&evt, 0);
     } else 
  ////// ICY0 station name   ##CLI.ICY0#:
    if ((ici=strstr(line,"ICY0#: ")) != NULL)
@@ -1166,7 +1114,7 @@ void addonParse(const char *fmt, ...)
 		evt.lline = malloc(strlen(ici)+1);
 		//evt.lline = NULL;
 		strcpy(evt.lline,ici);
-		xQueueSend(event_lcd,&evt, 0);
+//		xQueueSend(event_lcd,&evt, 0);
    } else
  ////// STOPPED  ##CLI.STOPPED#  
    if ((ici=strstr(line,"STOPPED")) != NULL)
@@ -1174,7 +1122,7 @@ void addonParse(const char *fmt, ...)
 		state = false;	  
  		evt.lcmd = lstop;
 		evt.lline = NULL;
-		xQueueSend(event_lcd,&evt, 0);
+//		xQueueSend(event_lcd,&evt, 0);
    }    
    else  
  //////Nameset    ##CLI.NAMESET#:
@@ -1184,7 +1132,7 @@ void addonParse(const char *fmt, ...)
 		evt.lline = malloc(strlen(ici)+1);
 		//evt.lline = NULL;
 		strcpy(evt.lline,ici);
-		xQueueSend(event_lcd,&evt, 0);
+//		xQueueSend(event_lcd,&evt, 0);
    } else
  //////Playing    ##CLI.PLAYING#
    if ((ici=strstr(line,"YING#")) != NULL)  
@@ -1192,7 +1140,7 @@ void addonParse(const char *fmt, ...)
 		state = true;
  		evt.lcmd = lplay;
 		evt.lline = NULL;
-		xQueueSend(event_lcd,&evt, 0);
+//		xQueueSend(event_lcd,&evt, 0);
    } else
    //////Volume   ##CLI.VOL#:
    if ((ici=strstr(line,"VOL#:")) != NULL)  
@@ -1201,8 +1149,8 @@ void addonParse(const char *fmt, ...)
 	   {
 		volume = atoi(ici+6);
  		evt.lcmd = lvol;
-		evt.lline = NULL;
-		xQueueSend(event_lcd,&evt, 0);
+		evt.lline = NULL;//atoi(ici+6);
+//		xQueueSend(event_lcd,&evt, 0);
 	   }
    } else
   //////Volume offset    ##CLI.OVOLSET#:
@@ -1210,8 +1158,9 @@ void addonParse(const char *fmt, ...)
    {
 	    evt.lcmd = lovol;
 		evt.lline = NULL;
-		xQueueSend(event_lcd,&evt, 0);
+//		xQueueSend(event_lcd,&evt, 0);
    }
+   if (evt.lcmd != -1) xQueueSend(event_lcd,&evt, 0);
    free (line);
 }
 

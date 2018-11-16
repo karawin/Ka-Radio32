@@ -41,19 +41,11 @@
 */
 
 
-#define TAG "ClickEncoder"
-
-
-
-void noInterrupts()
-{noInterrupt1Ms();}
-
-void interrupts()
-{interrupt1Ms();}
+#define TAG "ClickButton"
   
 // ----------------------------------------------------------------------------
 
-bool getpinsActive(Button_t *enc) {return enc->pinsActive;}
+bool getpinsActives(Button_t *enc) {return enc->pinsActive;}
 
 Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C)
 {
@@ -100,7 +92,7 @@ Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C)
 // call this every 1 millisecond via timer ISR
 //
 //void (*serviceEncoder)() = NULL;
-void service(Button_t *enc)
+void serviceBtn(Button_t *enc)
 {
   // handle enc->button
   //
@@ -114,7 +106,7 @@ void service(Button_t *enc)
 	{ 
 		enc->lastButtonCheck[i] = currentMillis;
 
-		bool pinRead = getPinState(enc,i);
+		bool pinRead = getPinStates(enc,i);
     
 		if (pinRead == enc->pinsActive) { // key is down
 			enc->keyDownTicks[i]++;
@@ -158,7 +150,7 @@ void service(Button_t *enc)
 }
 
 // ----------------------------------------------------------------------------
-Button getButton(Button_t *enc,uint8_t index)
+Button getButtons(Button_t *enc,uint8_t index)
 {
   noInterrupts();
   Button ret = enc->button[index];
@@ -171,7 +163,7 @@ Button getButton(Button_t *enc,uint8_t index)
 
 
 
-bool getPinState(Button_t *enc,uint8_t index) {
+bool getPinStates(Button_t *enc,uint8_t index) {
   bool pinState;
   {
     pinState = digitalRead(enc->pinBTN[index]);
