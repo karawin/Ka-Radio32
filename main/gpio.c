@@ -9,7 +9,7 @@
 #include "driver/gpio.h"
 #include "gpio.h"
 #include "nvs_flash.h"
-#include "esp_log.h "
+#include "esp_log.h"
 
 #define hardware "hardware"
 
