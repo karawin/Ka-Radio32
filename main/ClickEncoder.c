@@ -236,8 +236,7 @@ int16_t getValue(Encoder_t *enc)
   else if (val > 0) {
     r += 1 + accel;
   }
-  
-//if (r != 0) printf("Acceleration: %d  accel: %d   val:%d,, R:%d\n",enc->acceleration,accel,val,r);
+  //if (r != 0) printf("Acceleration: %d  accel: %d   val:%d,, R:%d\n",enc->acceleration,accel,val,r);
 
   return r;
 }
