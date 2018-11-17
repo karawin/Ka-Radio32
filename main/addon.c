@@ -74,8 +74,6 @@ static bool itLcdOut = false;
 //static bool itAskSsecond = false; // start the time display
 static bool state = false; // start stop on Ok key
 
-static int16_t newValue0 = 0;
-static int16_t newValue1 = 0;
 static int16_t currentValue = 0;
 static bool dvolume = true; // display volume screen
  
@@ -346,6 +344,7 @@ void drawStation()
 // draw the volume screen
 void drawVolume()
 {
+  printf("drawVolume. mTscreen: %d, Volume: %d\n",mTscreen,volume);
   isColor?drawVolumeUcg(mTscreen):drawVolumeU8g2(mTscreen);	
 }
 
@@ -442,12 +441,7 @@ void nbStation(char nb)
 }
  
 // 
-// toggle main / time
-static void toggletime()
-{
-	(stateScreen==smain)?Screen(stime):Screen(smain);
-	drawScreen(); 
-}
+
 
 
 static void evtStation(int16_t value)
@@ -490,6 +484,16 @@ static void evtStatus(char* label)
 	strcpy(evt.lline,label);
 	xQueueSend(event_lcd,&evt, 0);	
 }
+
+// toggle main / time
+static void toggletime()
+{
+	(stateScreen==smain)?Screen(stime):Screen(smain);
+//	evtClearScreen();
+	mTscreen= MTNEW;
+	evtDrawScreen(); 
+}
+
 //----------------------------
 // Adc read: keyboard buttons
 //----------------------------
@@ -533,7 +537,7 @@ void adcLoop() {
 	}
 	if ((voltage0 >3700) || (voltage1 >3700)) return; // must be two valid voltage	
 	
-	if (voltage < 990) //ESP_LOGD(TAG,"Voltage: %i",voltage);	
+	if (voltage < 985) //ESP_LOGD(TAG,"Voltage: %i",voltage);	
 		printf("VOLTAGE: %d\n",voltage);
 	if ((voltage >400) && (voltage < 590)) // volume +
 	{
@@ -545,7 +549,7 @@ void adcLoop() {
 		setRelVolume(-5);
 		ESP_LOGI(TAG,"Volume- : %i",voltage);
 	}	
-		else if ((voltage >835) && (voltage < 990)) // station+
+		else if ((voltage >835) && (voltage < 985)) // station+
 		{
 			evtStation(1);
 //			changeStation(+1);
@@ -575,88 +579,107 @@ void adcLoop() {
 	}
 }
 
+
+#define VCTRL	true
+#define SCTRL	false
 //-----------------------
  // Compute the Buttons
  //----------------------
+ 
+ void buttonCompute(Button_t *enc,bool role)
+{	
+	int i;
+	Button state[3] ;
+	for (i=0;i<3;i++)
+	{
+		state[i] = getButtons(enc,i);
+	}
+	if (state[0] != Open)
+	{
+		wakeLcd();
+		// clicked = startstop
+		if (state[0] == Clicked) startStop();
+		// double click = toggle time
+		if (state[0] == DoubleClicked) toggletime();	
+		if (state[0] == Held)
+		{   
+			if (stateScreen != sstation) Screen(sstation);			
+		} 			
+	} else
+	{
+		if ((stateScreen  != sstation))
+		{    
+			if (state[1] != Open)
+			role?setRelVolume(5):changeStation(1);
+			if (state[2] != Open)
+			role?setRelVolume(-5):changeStation(-1);		
+		} 
+		if ((stateScreen  == sstation))
+		{    
+			if (state[1] != Open)
+			role?changeStation(1):setRelVolume(5);
+			if (state[2] != Open)
+			role?changeStation(-1):setRelVolume(-5);		
+		} 			
+	}
+}
+ 
 void buttonsLoop()
 {	
-
+// button0 = volume control or station when pushed
+// button1 = station control or volume when pushed
+	if (isButton0) buttonCompute(button0,VCTRL);
+	if (isButton1) buttonCompute(button1,SCTRL);
 }
 
 //-----------------------
  // Compute the encoder
  //----------------------
-void encoderLoop()
+
+void encoderCompute(Encoder_t *enc,bool role)
 {	
 	Button newButton ;
+	int16_t newValue;
 
+	newValue = - getValue(enc);
+	newButton = getButton(enc);
+   	// if an event on encoder switch	
+	if (newButton != Open)
+	{ 
+		wakeLcd();
+		// clicked = startstop
+		if (newButton == Clicked) {startStop();}
+		// double click = toggle time
+		if (newButton == DoubleClicked) { toggletime();}
+		// switch held and rotated then change station
+		if ((newButton == Held)&&(getPinState(enc) == getpinsActive(enc)))
+		{   
+//			currentValue = newValue;
+			role?changeStation(newValue):setRelVolume(newValue);				
+		} 			
+	}	else
+		// no event on button switch
+	{
+		if ((stateScreen  != sstation)&&(newValue != 0))
+		{    
+			role?setRelVolume(newValue):changeStation(newValue);
+		} 
+		if ((stateScreen  == sstation)&&(newValue != 0))
+		{    
+//			currentValue += newValue;
+			role?changeStation(newValue):setRelVolume(newValue);	
+		} 	
+	}		
+}
+
+void encoderLoop()
+{
 // encoder0 = volume control or station when pushed
 // encoder1 = station control or volume when pushed
-	if (isEncoder0)
-	{
-// Encoder0	
-		newValue0 = - getValue(encoder0);
-		newButton = getButton(encoder0);
-   	// if an event on encoder switch	
-		if (newButton != Open)
-		{ 
-			wakeLcd();
-			// clicked = startstop
-			if (newButton == Clicked) {startStop();}
-			// double click = toggle time
-			if (newButton == DoubleClicked) { toggletime();}
-			// switch held and rotated then change station
-			if ((newButton == Held)&&(getPinState(encoder0) == getpinsActive(encoder0)))
-			{   
-				currentValue = newValue0;
-				changeStation(newValue0);
-			} 			
-		}	else
-		// no event on button switch
-		{
-			if ((stateScreen  != sstation)&&(newValue0 != 0))
-			{    
-				ESP_LOGV(TAG,"Volume newvalue %d, volume %d",newValue0,newValue0);
-				setRelVolume(newValue0);
-			} 
-			if ((stateScreen  == sstation)&&(newValue0 != 0))
-			{    
-				currentValue += newValue0;
-				changeStation(newValue0);				
-			} 	
-		}		
-	}
-
-	if (isEncoder1)
-	{
-		newValue1 = - getValue(encoder1);
-		newButton = getButton(encoder1);
-    		
-		if (newButton != Open)
-		{ 
-			wakeLcd();
-			if (newButton == Clicked) {startStop();}
-			if (newButton == DoubleClicked) { toggletime();}
-
-			if ((newButton == Held)&&(getPinState(encoder1) == getpinsActive(encoder1)))
-			{   
-				setRelVolume(newValue1);
-			} 			
-		}	else
-		{
-			if ((stateScreen  != svolume)&&(newValue1 != 0))
-			{    
-				currentValue += newValue1;
-				changeStation(newValue1);				
-			} 
-			if ((stateScreen  == svolume)&&(newValue1 != 0))
-			{    
-				setRelVolume(newValue1);
-			} 	
-		}		
-	}		
-// end Encoder loop
+	if (isEncoder0) encoderCompute(encoder0,VCTRL);
+	if (isEncoder1) encoderCompute(encoder1,SCTRL);
 }
+
 
 
 // compute custom IR
@@ -906,20 +929,13 @@ void task_lcd(void *pvParams)
 					isColor?playingUcg():playingU8g2();						  
 					break;
 				case lvol:
-/*					isColor?setVolumeUcg(volume):setVolumeU8g2(volume);
-					if (dvolume)
-						Screen(svolume); 
-					else 
-						dvolume = true;
-					timerScreen = 0;*/
 					// ignore it if the next is a lvol
 					if(xQueuePeek(event_lcd, &evt1, 0))
 						if (evt1.lcmd == lvol) break;
 					isColor?setVolumeUcg(volume):setVolumeU8g2(volume);
 					if (dvolume)
 						Screen(svolume); 
-					else 
-						dvolume = true;
+					dvolume = true;
 					timerScreen = 0;					
 					break;
 				case lovol:
@@ -944,6 +960,7 @@ void task_lcd(void *pvParams)
 				default:;
 			}
 			if (evt.lline != NULL) free(evt.lline);
+			vTaskDelay(1);	
 		}
 		vTaskDelay(10);	
 	}
@@ -957,8 +974,6 @@ extern void rmt_nec_rx_task();
 void task_addon(void *pvParams)
 {
 // 
-//	event_lcd_t evt;
-//	event_lcd_t evt1;
 	customKeyInit();
 	initButtonEncoder();
 	adcInit();
@@ -973,9 +988,6 @@ void task_addon(void *pvParams)
 	// queue for events of the lcd
 	event_lcd = xQueueCreate(40, sizeof(event_lcd_t));
 	ESP_LOGI(TAG,"event_lcd: %x",(int)event_lcd);
-	
-//	vSemaphoreCreateBinary(lcdSPI);
-//	xSemaphoreGive(lcdSPI);
 	
 	xTaskCreatePinnedToCore(rmt_nec_rx_task, "rmt_nec_rx_task", 2148, NULL, PRIO_RMT, NULL,CPU_RMT);
 	vTaskDelay(1);
@@ -1013,7 +1025,6 @@ void task_addon(void *pvParams)
 
 		if (itLcdOut) // switch off the lcd
 		{
-//			isColor?ucg_ClearScreen(&ucg):u8g2_ClearDisplay(&u8g2);
 			evtClearScreen();
 			sleepLcd();
 		}
@@ -1038,22 +1049,23 @@ void task_addon(void *pvParams)
 					&& ( futurNum!= atoi(  isColor?getNameNumUcg():getNameNumU8g2()  ))) 
 				{
 					evtStatus("STARTING");
-//					isColor?statusUcg("STARTING"):statusU8g2("STARTING");
-					if (lcd_type != LCD_NONE) evtDrawScreen();//drawScreen(); 
+					if (lcd_type != LCD_NONE) evtDrawScreen();
 					playStationInt(futurNum);
 				}				
 			}
 		}
 
-		if ( timerScroll >= 300) //
+		if ( timerScroll >= 600) //
 		{
 			if (lcd_type != LCD_NONE) 
 			{
-				if (stateScreen == smain) evtScroll();//scroll(); 
-//				drawScreen(); 
+				if (stateScreen == smain)
+				{
+					evtScroll();
+				}
 				evtDrawScreen();
 			}
-//			timerScroll = 0;
+			timerScroll = 0;
 		}  
 
 		vTaskDelay(10);
