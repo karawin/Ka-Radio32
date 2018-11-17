@@ -1,4 +1,4 @@
-Version 1.5 allows you to configure gpio's and two custom IR keys per action.
+Version 1.5 and up allows you to configure gpio's and two custom IR keys per action.
 This allows you to take advantage of the standard software even if your port configuration and/or your remote control are not the same.
 The configuration must be specified in a csv file. A template is given by the pattern.csv file
 The default configuration of the current software is in the standard_adb.csv file.
@@ -52,6 +52,55 @@ Change 19 to the desired number.
 Do this for all P_ lines.
 Never change the string "P_XXXX, data,u8,"
 A value base 10 is mandatory for each P_.
+
+SPI Bus:
+P_MISO			Master Input, Slave Output
+P_MOSI			Master Output, Slave Input   Named Data or SDA or D1 for oled
+P_CLK			Master clock  Named SCL or SCK or D0 for oled
+
+VS1053B:
+P_XCS			XCS
+P_RST			RST
+P_XDCS			XDCS
+P_DREQ			P_DREQ
+
+ENCODERS 0 & 1:
+P_ENC0_A		pin A clk
+P_ENC0_B		pin B Data
+P_ENC0_BTN		pin SW
+P_ENC1_A		pin A clk
+P_ENC1_B		pin B Data
+P_ENC1_BTN		pin SW
+
+BUTTONS PANEL 0 & 1 of three buttons (switch to gnd):
+P_BTN0_A		click:start/stop, double click:toggle, help: station
+P_BTN0_B		click: +
+P_BTN0_C		click: -
+P_BTN1_A		start/stop, toggle, volume
+P_BTN1_B		+
+P_BTN1_C		-
+
+Bus I2C (Oled & Lcd):
+P_I2C_SCL		SCL or SCK
+P_I2C_SDA		SDA
+P_I2C_RST		RST if any
+
+LCD on SPI bus:
+P_LCD_CS		CS
+P_LCD_A0		A0 or D/C or DC
+P_LCD_RST		RST or RES
+
+Infrared remote:
+P_IR_SIGNAL		ir Y Signal
+
+I2S bus:
+P_I2S_LRCK		LRCK
+P_I2S_BCLK		BCLK
+P_I2S_DATA		DATA
+
+ADC keyboard:
+P_ADC			gpio32 to 39  or 255 if not used.
+
 
 #Special cases:
 ---------------
