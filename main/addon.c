@@ -344,7 +344,7 @@ void drawStation()
 // draw the volume screen
 void drawVolume()
 {
-  printf("drawVolume. mTscreen: %d, Volume: %d\n",mTscreen,volume);
+//  printf("drawVolume. mTscreen: %d, Volume: %d\n",mTscreen,volume);
   isColor?drawVolumeUcg(mTscreen):drawVolumeU8g2(mTscreen);	
 }
 
@@ -537,29 +537,29 @@ void adcLoop() {
 	}
 	if ((voltage0 >3700) || (voltage1 >3700)) return; // must be two valid voltage	
 	
-	if (voltage < 985) //ESP_LOGD(TAG,"Voltage: %i",voltage);	
-		printf("VOLTAGE: %d\n",voltage);
+	if (voltage < 985) ESP_LOGD(TAG,"Voltage: %i",voltage);	
+//		printf("VOLTAGE: %d\n",voltage);
 	if ((voltage >400) && (voltage < 590)) // volume +
 	{
 		setRelVolume(+5);
-		ESP_LOGI(TAG,"Volume+ : %i",voltage);
+		ESP_LOGD(TAG,"Volume+ : %i",voltage);
 	}
-	else if ((voltage >730) && (voltage < 836)) // volume -
+	else if ((voltage >730) && (voltage < 830)) // volume -
 	{
 		setRelVolume(-5);
-		ESP_LOGI(TAG,"Volume- : %i",voltage);
+		ESP_LOGD(TAG,"Volume- : %i",voltage);
 	}	
-		else if ((voltage >835) && (voltage < 985)) // station+
+		else if ((voltage >838) && (voltage < 985)) // station+
 		{
 			evtStation(1);
 //			changeStation(+1);
-			ESP_LOGI(TAG,"station+: %i",voltage);
+			ESP_LOGD(TAG,"station+: %i",voltage);
 		}	
 		else if ((voltage >590) && (voltage < 710)) // station-
 		{
 			evtStation(-1);
 //			changeStation(-1);
-			ESP_LOGI(TAG,"station-: %i",voltage);
+			ESP_LOGD(TAG,"station-: %i",voltage);
 		}	
 	if (!inside)
 	{	
@@ -567,13 +567,13 @@ void adcLoop() {
 		{
 			inside = true;
 			toggletime();
-			ESP_LOGI(TAG,"toggle time: %i",voltage);	
+			ESP_LOGD(TAG,"toggle time: %i",voltage);	
 		}
 		else if ((voltage >278) && (voltage < 380)) //start stop toggle   old start
 		{
 			inside = true;
 			startStop();
-			ESP_LOGI(TAG,"start stop: %i",voltage);
+			ESP_LOGD(TAG,"start stop: %i",voltage);
 		}
 
 	}
@@ -590,36 +590,42 @@ void adcLoop() {
 {	
 	int i;
 	Button state[3] ;
+	typeScreen stateS;
+	if (role) stateS = sstation; else stateS = svolume;	
 	for (i=0;i<3;i++)
 	{
 		state[i] = getButtons(enc,i);
 	}
+			
 	if (state[0] != Open)
 	{
 		wakeLcd();
+
 		// clicked = startstop
 		if (state[0] == Clicked) startStop();
 		// double click = toggle time
 		if (state[0] == DoubleClicked) toggletime();	
 		if (state[0] == Held)
 		{   
-			if (stateScreen != sstation) Screen(sstation);			
+			if (stateScreen != stateS) Screen(stateS);			
 		} 			
 	} else
 	{
-		if ((stateScreen  != sstation))
+		if (stateScreen != stateS)
 		{    
 			if (state[1] != Open)
-			role?setRelVolume(5):changeStation(1);
+			{	if (role) setRelVolume(5); 
+				else changeStation(1);}
 			if (state[2] != Open)
-			role?setRelVolume(-5):changeStation(-1);		
+			{	if (role) setRelVolume(-5); 
+				else changeStation(-1);}		
 		} 
-		if ((stateScreen  == sstation))
+		if (stateScreen  == stateS)
 		{    
 			if (state[1] != Open)
-			role?changeStation(1):setRelVolume(5);
+			{if (role) changeStation(1);else setRelVolume(5);}
 			if (state[2] != Open)
-			role?changeStation(-1):setRelVolume(-5);		
+			{if (role) changeStation(-1); else setRelVolume(-5);	}	
 		} 			
 	}
 }
@@ -640,6 +646,7 @@ void encoderCompute(Encoder_t *enc,bool role)
 {	
 	Button newButton ;
 	int16_t newValue;
+	typeScreen state;
 
 	newValue = - getValue(enc);
 	newButton = getButton(enc);
@@ -660,14 +667,14 @@ void encoderCompute(Encoder_t *enc,bool role)
 	}	else
 		// no event on button switch
 	{
-		if ((stateScreen  != sstation)&&(newValue != 0))
+		if (role) state = sstation; else state = svolume;
+		if ((stateScreen  != state)&&(newValue != 0))
 		{    
-			role?setRelVolume(newValue):changeStation(newValue);
+			if(role) setRelVolume(newValue);else changeStation(newValue);
 		} 
-		if ((stateScreen  == sstation)&&(newValue != 0))
+		if ((stateScreen  == state)&&(newValue != 0))
 		{    
-//			currentValue += newValue;
-			role?changeStation(newValue):setRelVolume(newValue);	
+			if(role) changeStation(newValue); else setRelVolume(newValue);	
 		} 	
 	}		
 }
@@ -846,7 +853,6 @@ void initButtonEncoder()
 	if (enca0 == GPIO_NONE) isButton0 = false; //no encoder	
 	if (isButton0)	button0 = ClickButtonsInit(enca0, encb0, encbtn0);	
 	if (isButton1)	button1 = ClickButtonsInit(enca1, encb1, encbtn1 );	
-	
 }
 
 

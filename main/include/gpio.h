@@ -45,10 +45,10 @@
 
 // Encoder knob
 //-------------
-#define PIN_ENC0_A   GPIO_NUM_16		// 0 if encoder not used
-#define PIN_ENC0_B   GPIO_NUM_17		// DT
-#define PIN_ENC0_BTN GPIO_NUM_5		// SW
-#define PIN_ENC1_A   GPIO_NONE		// 0 if encoder not used
+#define PIN_ENC0_A   GPIO_NUM_16	//16	// 255 if encoder not used
+#define PIN_ENC0_B   GPIO_NUM_17	//17	// DT
+#define PIN_ENC0_BTN GPIO_NUM_5		//5// SW
+#define PIN_ENC1_A   GPIO_NONE		// 255 if encoder not used
 #define PIN_ENC1_B   GPIO_NONE		// DT
 #define PIN_ENC1_BTN GPIO_NONE		// SW
 

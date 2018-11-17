@@ -54,9 +54,7 @@ typedef gpio_mode_t pinMode_t;
 
   typedef struct {
   int8_t pinBTN[3];
-  int8_t pinA;
-  int8_t pinB;
-  int8_t pinC;
+  
   bool pinsActive;
   
   volatile Button button[3];

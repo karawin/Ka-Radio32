@@ -12,11 +12,11 @@ P_ENC0_A,data,u8,18
 P_ENC0_B,data,u8,19
 P_ENC0_BTN,data,u8,4
 P_ENC1_A,data,u8,255
-P_ENC1_B,data,u8,17
-P_ENC1_BTN,data,u8,5
-P_BTN0_A,data,u8,255
-P_BTN0_B,data,u8,255
-P_BTN0_C,data,u8,255
+P_ENC1_B,data,u8,19
+P_ENC1_BTN,data,u8,255
+P_BTN0_A,data,u8,32
+P_BTN0_B,data,u8,33
+P_BTN0_C,data,u8,35
 P_BTN1_A,data,u8,255
 P_BTN1_B,data,u8,255
 P_BTN1_C,data,u8,255
@@ -30,7 +30,7 @@ P_IR_SIGNAL,data,u8,255
 P_I2S_LRCK,data,u8,25
 P_I2S_BCLK,data,u8,26
 P_I2S_DATA,data,u8,27
-P_ADC,data,u8,34
+P_ADC,data,u8,255
 custom_ir_space,namespace,,
 K_UP,data,string,0xFF0047 0xFF0040
 K_LEFT,data,string,0xFF0007

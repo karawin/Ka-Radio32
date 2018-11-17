@@ -19,27 +19,6 @@
 #include "freertos/task.h"
 
 // ----------------------------------------------------------------------------
-/*
-  int8_t enc->pinA;
-  int8_t enc->pinB;
-  int8_t enc->pinBTN;
-  bool enc->pinsActive;
-  volatile int16_t enc->delta;
-  volatile int16_t enc->last;
-  volatile uint8_t enc->steps;
-  volatile uint16_t enc->acceleration;
-  bool enc->accelerationEnabled;
-  volatile enc->button enc->button;
-  bool enc->doubleClickEnabled;
-  bool buttonHeldEnabled;
-  bool enc->buttonOnPinZeroEnabled = false;
-  uint16_t enc->keyDownTicks = 0;
-  uint16_t enc->doubleClickTicks = 0;
-  uint16_t buttonHoldTime = BTN_HOLDTIME;
-  uint16_t buttonDoubleClickTime = BTN_DOUBLECLICKTIME;
-  unsigned long enc->lastButtonCheck = 0;
-*/
-
 
 #define TAG "ClickButton"
   
@@ -50,7 +29,8 @@ bool getpinsActives(Button_t *enc) {return enc->pinsActive;}
 Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C)
 {
 	Button_t* enc = malloc(sizeof(Button_t));
-	enc->pinBTN[0] = A; enc->pinBTN[1] = B;
+	enc->pinBTN[0] = A; 
+	enc->pinBTN[1] = B;
 	enc->pinBTN[2] = C;
 
 	enc->pinsActive = LOW; 
@@ -63,28 +43,30 @@ Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C)
 	}
 	enc->button[0] = Open;enc->button[1] = Open;enc->button[2] = Open;
 	enc->doubleClickEnabled = true; enc->buttonHeldEnabled = true;
-	
+
 	gpio_config_t gpio_conf;
 	gpio_conf.mode = GPIO_MODE_INPUT;
 	gpio_conf.pull_up_en =  (enc->pinsActive == LOW) ?GPIO_PULLUP_ENABLE : GPIO_PULLUP_DISABLE;
 	gpio_conf.pull_down_en = (enc->pinsActive == LOW) ?GPIO_PULLDOWN_DISABLE : GPIO_PULLDOWN_ENABLE;
-	gpio_conf.intr_type = GPIO_INTR_DISABLE;
-	
-  if (enc->pinA >= 0) 
+	gpio_conf.intr_type = GPIO_INTR_DISABLE;	
+
+  if (enc->pinBTN[0] > 0) 
   {
-	gpio_conf.pin_bit_mask = BIT(enc->pinA);
+	gpio_conf.pin_bit_mask = BIT(enc->pinBTN[0]);
+	gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<enc->pinBTN[0]));
 	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
   }
-  if (enc->pinB >= 0) 
+  if (enc->pinBTN[1] > 0) 
   {
-	gpio_conf.pin_bit_mask = BIT(enc->pinB);
+	gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<enc->pinBTN[1]));
 	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
   }
-  if (enc->pinC > 0) 
+  if (enc->pinBTN[2] > 0) 
   {
-	gpio_conf.pin_bit_mask = BIT(enc->pinC);
+	gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<enc->pinBTN[2]));
 	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
   }
+  
   return enc;
 }
 
