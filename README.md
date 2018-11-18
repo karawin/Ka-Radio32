@@ -17,7 +17,8 @@ Output mode set in Setting panel on web page of KaraDio32:<br/>
 - I2SMERUS to connect a merus amplifier<br/>
 - DAC to use the built in DAC of the esp32<br/>
 - PDM to output a PDM (Pulse Density Modulation) stream<br/>
-- VS1053 to connect to a vs1053 board.<br/><br/>
+- VS1053 to connect to a vs1053 board.<br/>
+<br/>
 mDNS support.<br/>
 Latin, Cyrillic and Greek support.<br/>
 24 types of lcd or oled  B/W or Color supported.<br/>
@@ -25,7 +26,6 @@ Two max  rotary encoders. One for volume priority, one for station change priori
 Two max set of 3 buttons. One for volume priority, one for station change priority.<br/>
 ADC keyboard with 6 buttons.<br/>
 NEC ir remote control.<br/>
-<br/>
 Programmable lcd off timer<br/>
 Date format DD:MM:YYYY or MM:DD:YYYY .<br/>
 Remote IR support integrated. Nec protocol only.<br/>
