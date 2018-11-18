@@ -1,5 +1,5 @@
 ## STATE
-KaraDio32 in dev state: Stable<br/>
+KaraDio32 in dev state: Release 1.5 R0 Stable<br/>
 <br/>
 <br/>
 Works on any esp32 board.<br/><br/>
