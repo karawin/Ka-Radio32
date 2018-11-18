@@ -13,22 +13,28 @@ Uart or telnet commands: http://karadio.karawin.fr/Interface.txt <br/>
 ## Added features
 Work with i2s, internal DAC or a vs1053<br/>
 Output mode set in Setting panel on web page of KaraDio32:<br/>
-I2S for connection to ac external DAC<br/>
-I2SMERUS to connect a merus amplifier<br/>
-DAC to use the built in DAC of the esp32<br/>
-PDM to output a PDM (Pulse Density Modulation) stream<br/>
-VS1053 to connect to a vs1053 board.<br/>
+- I2S for connection to ac external DAC<br/>
+- I2SMERUS to connect a merus amplifier<br/>
+- DAC to use the built in DAC of the esp32<br/>
+- PDM to output a PDM (Pulse Density Modulation) stream<br/>
+- VS1053 to connect to a vs1053 board.<br/>
 mDNS support.<br/>
 Latin, Cyrillic and Greek support.<br/>
+24 types of lcd or oled  B/W or Color supported.<br/>
+Two max  rotary encoders.<br/>
+Two max set of 3 buttons.<br/>
+ADC keyboard with 6 buttons.<br/>
+NEC ir remote control.<br/>
 <br/>
-LCD or Oled support integrated: most common b/w or color oled and lcd can be used.<br/>
 Programmable lcd off timer<br/>
 Date format DD:MM:YYYY or MM:DD:YYYY .<br/>
 Remote IR support integrated. Nec protocol only.<br/>
-Rotary encoder support integrated. Common functions: play/stop, volume, station change, date time display.<br/>
-Web command next and prev added.<br/>
+Rotary encoder and set of buttons support integrated. Common functions: play/stop, volume, station change, date time display.<br/>
+<br/>
 
 ## Configure the hardware and IR codes
+If the default configuration doesn't fit your needs, you can externally configure the software to fit your hardware and peripherals to suit your needs.<br/>
+The configuration file is to be flashed only one time. After that, the standard delivery will become compatible with your hardware gpio use and peripherals configuration. A future standard OTA will automatically works.<br/>
 See http://karadio.karawin.fr/HardwareConfig.txt <br/>
 
 ## Build your own
@@ -38,6 +44,8 @@ To flash all build output, run 'make flash' or:
 python /home/yourhome/esp/esp-idf/components/esptool_py/esptool/esptool.py --chip esp32 --port com5 --baud 460800 --before default_reset --after hard_reset write_flash -u --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 /home/yourhome/esp/Ka-Radio32/build/bootloader/bootloader.bin 0x10000 /home/yourhome/esp/Ka-Radio32/build/KaRadio32.bin 0x8000 /home/yourhome/esp/Ka-Radio32/build/partitions.bin
 ```
 ### GPIO Definition 
+The default configuration is given below. It includes an encoder, an IR remote and a LCD or OLED.<br/>
+See the file main/include/gpio.h and main/include/addon.h <br/>
 ```
 //-------------------------------//
 // Define GPIO used in KaRadio32 //

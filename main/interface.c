@@ -127,6 +127,9 @@ sys.host: display the hostname for mDNS\n\
 sys.host(\"your hostname\"): change and display the hostname for mDNS\n\
 sys.rotat: display the lcd rotation option\n\
 sys.rotat(\"x\"): Change and display the lcd rotation option (reset needed). 0:no rotation, 1: rotation\n\
+sys.henc0 or sys.henc1: Display the current step setting for the encoder. Normal= 4 steps/notch, Half: 2 steps/notch\
+sys.henc0(\"x\") with x=0 Normal, x=1 Half\
+sys.henc1(\"x\") with x=0 Normal, x=1 Half\
 ///////////\n\
   Other\n\
 ///////////\n\

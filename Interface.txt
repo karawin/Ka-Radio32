@@ -168,8 +168,8 @@ sys.date		: Send a ntp request and Display the current locale time
 sys.adc			: Read the current value of the adc input. (Not for KaRadio32)
 sys.log			: Do nothing. Used for debug of the addon.	
 sys.version		: Display the release and Revision of KaraDio
-sys.host: display the hostname for mDNS			
-
+sys.host		: display the hostname for mDNS			
+sys.host("your hostname"): change and display the hostname for mDNS
 ///////
 //Other
 ///////
@@ -191,7 +191,10 @@ sys.lcd			: Display the current lcd type
 sys.lcd("x")	: Change the lcd type to x on next reset
 sys.ledgpio		: Display the default Led GPIO
 sys.ledgpio("x"): Change the default Led GPIO (4) to x
-sys.ddmm: display the date format\n\
-sys.ddmm(\"x\"): Change the date format. 0:MMDD, 1:DDMM
-
-sys.host(\"your hostname\"): change and display the hostname for mDNS
+sys.ddmm: display the date format
+sys.ddmm("x"): Change the date format. 0:MMDD, 1:DDMM
+sys.rotat: display the lcd rotation option
+sys.rotat("x"): Change and display the lcd rotation option (reset needed). 0:no rotation, 1: rotation
+sys.henc0 or sys.henc1: Display the current step setting for the encoder. Normal= 4 steps/notch, Half: 2 steps/notch
+sys.henc0("x") with x=0 Normal, x=1 Half
+sys.henc1("x") with x=0 Normal, x=1 Half

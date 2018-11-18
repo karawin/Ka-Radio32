@@ -73,6 +73,7 @@ extern uint32_t wakeDelay;
 #define PRIO_CLIENT		4
 #define PRIO_SERVER		3
 #define PRIO_ADDON		5
+#define PRIO_LCD		4
 #define PRIO_SUBSERV	3
 #define PRIO_TIMER		1
 #define PRIO_OTA		10
@@ -84,6 +85,7 @@ extern uint32_t wakeDelay;
 #define CPU_CLIENT		1
 #define CPU_SERVER		0
 #define CPU_ADDON		0
+#define CPU_LCD			0
 #define CPU_SUBSERV		0
 #define CPU_TIMER		0
 

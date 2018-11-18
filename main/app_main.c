@@ -936,13 +936,9 @@ void app_main()
         ESP_LOGE(TAG,"Hostname Init failed: %d", err);	
 
 	ESP_ERROR_CHECK(mdns_instance_name_set(device->hostname));
-	
 	ESP_ERROR_CHECK(mdns_service_add(NULL, "_http", "_tcp", 80, NULL, 0));	
- 
 	ESP_ERROR_CHECK(mdns_service_add(NULL, "_telnet", "_tcp", 23, NULL, 0));	
 
-	
-	
     // init player config
     player_config = (player_t*)calloc(1, sizeof(player_t));
     player_config->command = CMD_NONE;
@@ -974,12 +970,9 @@ void app_main()
     xTaskCreatePinnedToCore(serversTask, "serversTask", 3000, NULL, PRIO_SERVER, &pxCreatedTask,CPU_SERVER); 
 	ESP_LOGI(TAG, "%s task: %x","serversTask",(unsigned int)pxCreatedTask);	
 	
-	xTaskCreatePinnedToCore (task_addon, "task_addon", 2600, NULL, PRIO_ADDON, &pxCreatedTask,CPU_ADDON);  //high priority for the spi else too slow due to ucglib
-	ESP_LOGI(TAG, "%s task: %x","task_addon",(unsigned int)pxCreatedTask);
+	xTaskCreatePinnedToCore (task_addon, "task_addon", 2200, NULL, PRIO_ADDON, &pxCreatedTask,CPU_ADDON);  
+	ESP_LOGI(TAG, "%s task: %x","task_addon",(unsigned int)pxCreatedTask);	
 	
-//	xTaskCreatePinnedToCore (task_lcd, "task_lcd", 2600, NULL, 3, &pxCreatedTask,1); 
-//	ESP_LOGI(TAG, "%s task: %x","task_lcd",(unsigned int)pxCreatedTask);
-		
 /*	if (RDA5807M_detection())
 	{
 		xTaskCreatePinnedToCore(rda5807Task, "rda5807Task", 2500, NULL, 3, &pxCreatedTask,1);  //
@@ -987,7 +980,7 @@ void app_main()
 	}
 */	
 	printf("Init ");
-	for (int i=0;i<15;i++)
+	for (int i=0;i<10;i++)
 	{
 		printf(".");
 		vTaskDelay(10);// wait tasks init
@@ -1007,8 +1000,7 @@ void app_main()
 		kprintf("autostart: playing:%d, currentstation:%d\n",device->autostart,device->currentstation);
 		vTaskDelay(50); // wait a bit
 		playStationInt(device->currentstation);
-	}
-	
+	}	
 //
 	free(device);
 //	vTaskDelete( NULL ); 

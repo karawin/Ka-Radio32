@@ -335,14 +335,7 @@ void playStationInt(int sid) {
 			int i;
 			vTaskDelay(4);
 			clientSilentDisconnect();
-//			clientDisconnect("playStationInt");
 			ESP_LOGV(TAG,"playstationInt: %d, new station: %s",sid,si->name);
-/*			for (i = 0;i<100;i++)
-			{
-				if(!clientIsConnected())break;
-				vTaskDelay(5);
-			}
-*/
 			clientSetName(si->name,sid);
 			clientSetURL(si->domain);
 			clientSetPath(si->file);
@@ -365,7 +358,7 @@ void playStationInt(int sid) {
 	device = getDeviceSettings();
 	if (device != NULL)
 	{
-		ESP_LOGV(TAG,"playstationInt: %d, device: %d",sid,device->currentstation);
+		ESP_LOGI(TAG,"playstationInt: %d, device: %d",sid,device->currentstation);
 		if (device->currentstation != sid)
 		{
 			device->currentstation = sid;
@@ -847,8 +840,8 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			pathParse(aua);
 			char* adhcp = getParameterFromResponse("dhcp=", data, data_size);
 			char* adhcp2 = getParameterFromResponse("dhcp2=", data, data_size);
+			ESP_LOGV(TAG,"wifi received  valid:%s,val:%d, ssid:%s, pasw:%s, aip:%s, amsk:%s, agw:%s, adhcp:%s, aua:%s",valid,val,ssid,pasw,aip,amsk,agw,adhcp,aua);
 			if (val) {
-				ESP_LOGV(TAG,"wifi received  valid:%s,val:%d, ssid:%s, pasw:%s, aip:%s, amsk:%s, agw:%s, adhcp:%s, aua:%s",valid,val,ssid,pasw,aip,amsk,agw,adhcp,aua);
 				changed = true;
 				ip_addr_t valu;
 				ipaddr_aton(aip, &valu);
@@ -879,13 +872,14 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 				strcpy(device->ssid2,(ssid2==NULL)?"":ssid2);
 				strcpy(device->pass2,(pasw2==NULL)?"":pasw2);				
 			}
-			if (strlen(device->ua)==0)
+
+			if ((device->ua!= NULL)&&(strlen(device->ua)==0))
 			{
 				if (aua==NULL) {aua= inmalloc(12); strcpy(aua,"Karadio/1.5");}
 			}	
 			if (aua!=NULL) 
 			{
-				if (strcmp(device->ua,aua) != 0)
+				if ((strcmp(device->ua,aua) != 0)&&(strcmp(aua,"undefined") != 0))
 				{
 					strcpy(device->ua,aua);
 					changed = true;

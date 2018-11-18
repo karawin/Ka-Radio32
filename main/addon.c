@@ -900,10 +900,10 @@ void task_lcd(void *pvParams)
 		while (xQueueReceive(event_lcd, &evt, 0))
 		{ 
 			wakeLcd();	
-			if (evt.lcmd != lmeta)
-				ESP_LOGI(TAG,"event_lcd: %x",(int)evt.lcmd);
+/*			if (evt.lcmd != lmeta)
+				ESP_LOGV(TAG,"event_lcd: %x",(int)evt.lcmd);
 			else
-				ESP_LOGI(TAG,"event_lcd: %x  %s",(int)evt.lcmd,evt.lline);
+				ESP_LOGV(TAG,"event_lcd: %x  %s",(int)evt.lcmd,evt.lline);*/
 			switch(evt.lcmd)
 			{
 				case lmeta:
@@ -979,7 +979,7 @@ void task_lcd(void *pvParams)
 extern void rmt_nec_rx_task();
 void task_addon(void *pvParams)
 {
-// 
+	xTaskHandle pxCreatedTask;
 	customKeyInit();
 	initButtonEncoder();
 	adcInit();
@@ -989,28 +989,25 @@ void task_addon(void *pvParams)
 	futurNum = getCurrentStation();
 	//ir
 	// queue for events of the IR nec rx
-	event_ir = xQueueCreate(10, sizeof(event_ir_t));
+	event_ir = xQueueCreate(5, sizeof(event_ir_t));
 	ESP_LOGI(TAG,"event_ir: %x",(int)event_ir);
 	// queue for events of the lcd
-	event_lcd = xQueueCreate(40, sizeof(event_lcd_t));
-	ESP_LOGI(TAG,"event_lcd: %x",(int)event_lcd);
+	event_lcd = xQueueCreate(20, sizeof(event_lcd_t));
+	ESP_LOGI(TAG,"event_lcd: %x",(int)event_lcd);	
 	
-	xTaskCreatePinnedToCore(rmt_nec_rx_task, "rmt_nec_rx_task", 2148, NULL, PRIO_RMT, NULL,CPU_RMT);
-	vTaskDelay(1);
+	xTaskCreatePinnedToCore(rmt_nec_rx_task, "rmt_nec_rx_task", 2148, NULL, PRIO_RMT, pxCreatedTask,CPU_RMT);
+	ESP_LOGI(TAG, "%s task: %x","rmt_nec_rx_task",(unsigned int)pxCreatedTask);		;
+	xTaskCreatePinnedToCore (task_lcd, "task_lcd", 2200, NULL, PRIO_LCD, &pxCreatedTask,CPU_LCD); 
+	ESP_LOGI(TAG, "%s task: %x","task_lcd",(unsigned int)pxCreatedTask);
+	vTaskDelay(1);	
 	wakeLcd();
 	
-	xTaskCreatePinnedToCore (task_lcd, "task_lcd", 2600, NULL, PRIO_ADDON-1, NULL,0); 
-
 	while (1)
 	{
-
 		adcLoop();  // compute the adc keyboard
 		encoderLoop(); // compute the encoder
 		buttonsLoop(); // compute the buttons
-		irLoop();  // compute the ir
-
-	
-		vTaskDelay(1);		
+		irLoop();  // compute the ir		
 		if (itAskTime) // time to ntp. Don't do that in interrupt.
 		{			
 			if (ntp_get_time(&dt) )
@@ -1061,7 +1058,7 @@ void task_addon(void *pvParams)
 			}
 		}
 
-		if ( timerScroll >= 600) //
+		if (timerScroll >= 600) //
 		{
 			if (lcd_type != LCD_NONE) 
 			{
@@ -1073,10 +1070,8 @@ void task_addon(void *pvParams)
 			}
 			timerScroll = 0;
 		}  
-
-		vTaskDelay(10);
-	}
-	
+		vTaskDelay(15);
+	}	
 	vTaskDelete( NULL ); 
 }
 
