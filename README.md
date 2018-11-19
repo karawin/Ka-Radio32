@@ -80,12 +80,21 @@ See the file main/include/gpio.h and main/include/addon.h <br/>
 
 // Encoder knob
 //-------------
-#define PIN_ENC0_A   GPIO_NUM_16	// CLK. 0 if encoder not used
-#define PIN_ENC0_B   GPIO_NUM_17	// DT
-#define PIN_ENC0_BTN GPIO_NUM_5		// SW
-#define PIN_ENC1_A   0		// CLK. 0 if encoder not used
-#define PIN_ENC1_B   0		// DT
-#define PIN_ENC1_BTN 0		// SW
+#define PIN_ENC0_A   GPIO_NUM_16	//16	// 255 if encoder not used
+#define PIN_ENC0_B   GPIO_NUM_17	//17	// DT
+#define PIN_ENC0_BTN GPIO_NUM_5		//5// SW
+#define PIN_ENC1_A   GPIO_NONE		// 255 if encoder not used
+#define PIN_ENC1_B   GPIO_NONE		// DT
+#define PIN_ENC1_BTN GPIO_NONE		// SW
+
+// 3 Buttons
+//-------------
+#define PIN_BTN0_A   GPIO_NONE		
+#define PIN_BTN0_B   GPIO_NONE		
+#define PIN_BTN0_C   GPIO_NONE		
+#define PIN_BTN1_A   GPIO_NONE		
+#define PIN_BTN1_B   GPIO_NONE		
+#define PIN_BTN1_C 	 GPIO_NONE		
 
 // I2C lcd (and rda5807 if lcd is i2c or LCD_NONE)
 //------------------------------------------------
@@ -112,46 +121,8 @@ See the file main/include/gpio.h and main/include/addon.h <br/>
 #define PIN_I2S_BCLK GPIO_NUM_26	// or channel2
 #define PIN_I2S_DATA GPIO_NUM_22	//  
 
-```
-### Oled and lcd support
-The type of lcd can be set with the uart or telnet command sys.lcd("x")<BR/>
-Status: Ready.<BR/>
-Other type and some color lcd added later.<BR/>
-```
-// min 128x64
-#define LCD_I2C			0
-#define LCD_NONE		255
-
-// Black&White
-//I2C
-#define LCD_I2C_SH1106		0 //128X64
-#define LCD_I2C_SSD1306		1 //128X64
-#define LCD_I2C_SSD1309		2 //128X64
-#define LCD_I2C_SSD1325 	3 //128X64
-#define LCD_I2C_SSD1306NN	4 //128X64
-#define LCD_I2C_SSD1309NN	5 //128X64
-#define LCD_I2C_SSD1306UN	6 //128x32
-
-//SPI
-#define LCD_SPI_SSD1306 		64 //128X32 (LCD_SPI =0x40)
-#define LCD_SPI_SSD1309 		65 //128X64
-#define LCD_SPI_ST7565_ZOLEN	66 //128X64
-#define LCD_SPI_SSD1322_NHD		67 //256X64
-#define LCD_SPI_IL3820_V2		68 //296X128
-#define LCD_SPI_SSD1607			69 //200X200
-#define LCD_SPI_LS013B7DH03		70 //128X128
-#define LCD_SPI_SSD1306NN 		71 //128X64
-#define LCD_SPI_SSD1309NN 		72 //128X64
-#define LCD_SPI_ST7920 			  73 //128X64
-
-// Colors
-#define LCD_SPI_ST7735			192 // 128x160  (LCD_COLOR|LCD_SPI =0xC0)
-#define LCD_SPI_SSD1351			193 // 128x128
-#define LCD_SPI_ILI9341			194 // 240x320
-#define LCD_SPI_ILI9163			195 // 128x128
-#define LCD_SPI_PCF8833			196 // 132x132
-#define LCD_SPI_SSD1331			197 // 96x64
-#define LCD_SPI_SEPS225			198 // 96x64
+// ADC for keyboard buttons
+#define PIN_ADC	GPIO_NONE	//GPIO_NUM_32 TO GPIO_NUM_39 or GPIO_NONE if not used.
 
 ```
 
