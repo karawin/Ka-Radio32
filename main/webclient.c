@@ -73,7 +73,7 @@ void *incmalloc(size_t n)
 	ESP_LOGV(TAG,"Client malloc after of %d bytes ret:%x  Heap size: %d",n,(int)ret,xPortGetFreeHeapSize( ));
 	return ret;
 }	
-void incfree(void *p,char* from)
+void incfree(void *p,const char* from)
 {
 	if (p != NULL) free(p);
 //	else printf ("Client incfree from %s NULL\n",from);
@@ -289,7 +289,7 @@ char* getMeta()
 	return (header.members.mArr[METADATA] == NULL)?parEmpty:header.members.mArr[METADATA];
 }
 
-static void removePartOfString(char* origine, char* remove)
+static void removePartOfString(char* origine, const char* remove)
 {
 	if (strlen(origine) == 0) return;
 	char* copy = incmalloc(strlen(origine));
@@ -413,7 +413,7 @@ static void clientSaveMetadata(char* s,int len)
 			if (strlen(header.members.mArr[METADATA])!=0)			
 				t_end = header.members.mArr[METADATA];
 			else	
-				t_end = (header.members.single.name ==NULL)?"":header.members.single.name;
+				t_end = (header.members.single.name ==NULL)?(char*)"":header.members.single.name;
 		
 			char* title = incmalloc(strlen(t_end)+15);
 			if (title != NULL)
@@ -558,7 +558,7 @@ bool clientPrintHeaders()
 	return true;
 }	
 
-static bool clientSaveOneHeader(char* t, uint16_t len, uint8_t header_num)
+static bool clientSaveOneHeader(const char* t, uint16_t len, uint8_t header_num)
 {
 	char* tt;
 	if(header.members.mArr[header_num] != NULL) 
@@ -653,7 +653,7 @@ bool clientParseHeader(char* s)
 }
 
 
-void clientSetName(char* name,uint16_t index)
+void clientSetName(const char* name,uint16_t index)
 {
 	kprintf("##CLI.NAMESET#: %d %s\n",index,name);
 }

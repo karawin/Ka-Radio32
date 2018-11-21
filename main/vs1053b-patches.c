@@ -479,7 +479,7 @@ void  LoadUserCode( const unsigned short* plugin,uint16_t size) {
   ESP_LOGI(TAG,"plugin size %d %d",size,ssize);
   
   //flashRead( iplugin,(uint32_t) plugin, size );
-  iplugin = plugin;
+  iplugin = (unsigned short*)plugin;
   
   ESP_LOGI(TAG,"plugin start: %x %x %x %x\n",*iplugin,*(iplugin+1),*(iplugin+2),*(iplugin+3));
   while (i<ssize) {

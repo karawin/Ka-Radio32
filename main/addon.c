@@ -40,6 +40,7 @@
 
 
 #define isColor (lcd_type&LCD_COLOR)
+const char *stopped = "STOPPED";	
 
 char irStr[4];
 xQueueHandle event_ir = NULL;
@@ -177,7 +178,7 @@ void lcd_init(uint8_t Type)
 }
 
 
-void lcd_state(char* State)
+void lcd_state(const char* State)
 {
 	if (lcd_type == LCD_NONE) return;
 	DrawColor(0,0,0,0);
@@ -189,10 +190,9 @@ void lcd_state(char* State)
 	if (!(isColor)) u8g2_SendBuffer(&u8g2);
 }
 
-void lcd_welcome(char* ip)
+void lcd_welcome(const char* ip)
 {
 	if (lcd_type == LCD_NONE) return;
-    char *url = "Stopped";// get_url(); // play_url();	
 	if (strlen(ip)==0) ClearBuffer();
     if (isColor) 
 		ucg_SetFont(&ucg,ucg_font_helvR14_tf );
@@ -206,7 +206,7 @@ void lcd_welcome(char* ip)
 	DrawColor(0,0,0,0);
 	DrawBox(2, 40, 128-30, 12);
 	DrawColor(1,255,255,255);
-	DrawString(2,40,url);
+	DrawString(2,40,stopped);
 	DrawString( DrawString(2,53,"IP")+18,53,ip);
 	if (!(isColor)) u8g2_SendBuffer(&u8g2);
 }
@@ -476,7 +476,7 @@ static void evtScroll()
 	xQueueSend(event_lcd,&evt, 0);	
 }
 
-static void evtStatus(char* label)
+static void evtStatus(const char* label)
 {
 	event_lcd_t evt;
 	evt.lcmd = estatus;	
@@ -899,7 +899,7 @@ void task_lcd(void *pvParams)
 		if (event_lcd != NULL)
 		while (xQueueReceive(event_lcd, &evt, 0))
 		{ 
-			wakeLcd();	
+//			wakeLcd();	
 /*			if (evt.lcmd != lmeta)
 				ESP_LOGV(TAG,"event_lcd: %x",(int)evt.lcmd);
 			else
@@ -907,16 +907,19 @@ void task_lcd(void *pvParams)
 			switch(evt.lcmd)
 			{
 				case lmeta:
+					wakeLcd();	
 					isColor?metaUcg(evt.lline):metaU8g2(evt.lline);
 					break;
 				case licy4:
 					isColor?icy4Ucg(evt.lline):icy4U8g2(evt.lline);
 					break;
 				case licy0:
+					wakeLcd();	
 					isColor?icy0Ucg(evt.lline):icy0U8g2(evt.lline);
 					break;
 				case lstop:
-					isColor?statusUcg("STOPPED"):statusU8g2("STOPPED");
+					wakeLcd();	
+					isColor?statusUcg(stopped):statusU8g2(stopped);
 					if (stateScreen != smain)
 					{
 						mTscreen= MTNEW;
@@ -935,6 +938,7 @@ void task_lcd(void *pvParams)
 					isColor?playingUcg():playingU8g2();						  
 					break;
 				case lvol:
+					wakeLcd();	
 					// ignore it if the next is a lvol
 					if(xQueuePeek(event_lcd, &evt1, 0))
 						if (evt1.lcmd == lvol) break;

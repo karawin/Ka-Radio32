@@ -86,7 +86,7 @@ static struct servFile* findFile(char* name)
 }
 
 
-static void respOk(int conn,char* message)
+static void respOk(int conn,const char* message)
 {
 	char rempty[] = {""};
 	if (message == NULL) message = rempty;
@@ -175,7 +175,7 @@ static void serveFile(char* name, int conn)
 
 
 
-static char* getParameter(char* sep,char* param, char* data, uint16_t data_length) {
+static char* getParameter(const char* sep,const char* param, char* data, uint16_t data_length) {
 	if ((data == NULL) || (param == NULL))return NULL;
 	char* p = strstr(data, param);
 	if(p != NULL) {
@@ -195,10 +195,10 @@ static char* getParameter(char* sep,char* param, char* data, uint16_t data_lengt
 		} else return NULL;
 	} else return NULL;
 }
-static char* getParameterFromResponse(char* param, char* data, uint16_t data_length) {
+static char* getParameterFromResponse(const char* param, char* data, uint16_t data_length) {
 	return getParameter("&",param,data, data_length) ;
 }
-static char* getParameterFromComment(char* param, char* data, uint16_t data_length) {
+static char* getParameterFromComment(const char* param, char* data, uint16_t data_length) {
 	return getParameter("\"",param,data, data_length) ;
 }
 
@@ -319,7 +319,7 @@ void websockethandle(int socket, wsopcode_t opcode, uint8_t * payload, size_t le
 	else if (strstr((char*)payload,"stopWake")!= NULL){stopWake();}
 	//monitor
 	else if (strstr((char*)payload,"monitor")!= NULL){wsMonitor();}
-	else if (strstr((char*)payload,"upgrade")!= NULL){update_firmware("KaRadio32");	}
+	else if (strstr((char*)payload,"upgrade")!= NULL){update_firmware((char*)"KaRadio32");	}
 	else if (strstr((char*)payload,"theme")!= NULL){theme();}
 	else if (strstr((char*)payload,"wsrssi")!= NULL){rssi(socket);}
 }

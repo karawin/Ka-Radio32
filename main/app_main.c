@@ -616,7 +616,7 @@ void start_network(){
 		tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, "karadio32");	
 	}
 	free(device);	
-	lcd_state("IP found");	
+	lcd_state("IP found");
 }
 
 

@@ -2,7 +2,7 @@
 #define ADDONUCG_H_
 void playingUcg();
 void namesetUcg(char* ici);
-void statusUcg(char* label);
+void statusUcg(const char* label);
 void icy0Ucg(char* ici);
 void icy4Ucg(char* ici);
 void metaUcg(char* ici);

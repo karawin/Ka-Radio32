@@ -262,22 +262,22 @@ wifi_scan_config_t config = {
          char *authmode;
          switch(records[i].authmode) {
             case WIFI_AUTH_OPEN:
-               authmode = "WIFI_AUTH_OPEN";
+               authmode = (char*)"WIFI_AUTH_OPEN";
                break;
             case WIFI_AUTH_WEP:
-               authmode = "WIFI_AUTH_WEP";
+               authmode = (char*)"WIFI_AUTH_WEP";
                break;           
             case WIFI_AUTH_WPA_PSK:
-               authmode = "WIFI_AUTH_WPA_PSK";
+               authmode = (char*)"WIFI_AUTH_WPA_PSK";
                break;           
             case WIFI_AUTH_WPA2_PSK:
-               authmode = "WIFI_AUTH_WPA2_PSK";
+               authmode = (char*)"WIFI_AUTH_WPA2_PSK";
                break;           
             case WIFI_AUTH_WPA_WPA2_PSK:
-               authmode = "WIFI_AUTH_WPA_WPA2_PSK";
+               authmode = (char*)"WIFI_AUTH_WPA_WPA2_PSK";
                break;
             default:
-               authmode = "Unknown";
+               authmode = (char*)"Unknown";
                break;
          }
          kprintf("%32.32s    |    % 4d    |    %22.22s\n",records[i].ssid, records[i].rssi, authmode);
@@ -542,7 +542,7 @@ void clientInfo()
 		ntp_print_time();
 		clientSetName(si->name,currentStation);
 		clientPrintHeaders();
-		clientVol("");
+		clientVol((char*)"");
 		clientPrintState();
 		free(si);
 	}
@@ -1211,7 +1211,7 @@ void checkCommand(int size, char* s)
 		else if(startsWith (  "path", tmp+4))	clientParsePath(tmp);
 		else if(startsWith (  "port", tmp+4)) 	clientParsePort(tmp);
 		else if(strcmp(tmp+4, "instant") == 0) {clientDisconnect("cli instantplay");clientConnectOnce();}
-		else if(strcmp(tmp+4, "start") == 0) 	clientPlay("(\"255\")"); // outside value to play the current station
+		else if(strcmp(tmp+4, "start") == 0) 	clientPlay((char*)"(\"255\")"); // outside value to play the current station
 		else if(strcmp(tmp+4, "stop") == 0) 	clientDisconnect("cli stop");
 		else if(startsWith (  "list", tmp+4)) 	clientList(tmp);
 		else if(strcmp(tmp+4, "next") == 0) 	wsStationNext();
@@ -1231,7 +1231,7 @@ void checkCommand(int size, char* s)
 		else if(strcmp(tmp+4, "erase") == 0) 	eeEraseAll();
 		else if(strcmp(tmp+4, "heap") == 0) 	heapSize();
 		else if(strcmp(tmp+4, "boot") == 0) 	esp_restart();
-		else if(strcmp(tmp+4, "update") == 0) 	update_firmware("KaRadio32");
+		else if(strcmp(tmp+4, "update") == 0) 	update_firmware((char*)"KaRadio32");
 //bouchon		else if(strcmp(tmp+4, "prerelease") == 0) 	update_firmware("prv");
 		else if(startsWith (  "patch",tmp+4)) 	syspatch(tmp);
 		else if(startsWith (  "ledg",tmp+4)) 	sysledgpio(tmp); //ledgpio

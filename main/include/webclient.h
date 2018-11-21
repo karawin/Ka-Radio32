@@ -51,7 +51,7 @@ void clientInit();
 uint8_t clientIsConnected();
 bool clientParsePlaylist(char* s);
 void clientSetURL(char* url);
-void clientSetName(char* name,uint16_t index);
+void clientSetName(const char* name,uint16_t index);
 void clientSetPath(char* path);
 void clientSetPort(uint16_t port);
 bool clientPrintHeaders();

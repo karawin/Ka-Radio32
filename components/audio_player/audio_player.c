@@ -41,7 +41,7 @@ static int start_decoder_task(player_t *player)
 	if (get_audio_output_mode() == VS1053)
 	{
 		task_func = vsTask;
-        task_name = "vsTask";
+        task_name = (char*)"vsTask";
         stack_depth = 3000;
 		priority = PRIO_VS1053;
 	} else
@@ -49,20 +49,20 @@ static int start_decoder_task(player_t *player)
     {
         case AUDIO_MPEG:
             task_func = mp3_decoder_task;
-            task_name = "mp3_decoder_task";
+            task_name = (char*)"mp3_decoder_task";
             stack_depth = 8448;
             break;
 
  /*       case AUDIO_MP4:
             task_func = libfaac_decoder_task;
-            task_name = "libfaac_decoder_task";
+            task_name = (char*)"libfaac_decoder_task";
             stack_depth = 54000; //55000
             break;
 
 		case AUDIO_AAC:
         case OCTET_STREAM: // probably .aac
             task_func = helixaac_decoder_task;
-            task_name = "helixaac_decoder_task";
+            task_name = (char*)"helixaac_decoder_task";
             stack_depth = 3000; //6144; //6144
             break;
 */			

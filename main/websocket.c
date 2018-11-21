@@ -43,7 +43,7 @@ void *inwmalloc(size_t n)
 //	printf ("ws Malloc after of %d bytes ret:%x  Heap size: %d\n",n,ret,xPortGetFreeHeapSize( ));
 	return ret;
 }	
-void inwfree(void *p,char* from)
+void inwfree(void *p,const char* from)
 {
 	if (p != NULL) free(p);
 //	printf ("ws free of %x,  from %s             Heap size: %d\n",p,from,xPortGetFreeHeapSize( ));
