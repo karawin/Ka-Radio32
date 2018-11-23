@@ -53,7 +53,7 @@
 #define LCD_SPI_PCF8833			196 // 132x132
 #define LCD_SPI_SSD1331			197 // 96x64
 #define LCD_SPI_SEPS225			198 // 96x64
-
+#define LCD_SPI_ST7789V			199 // 240x320
 		
 
 typedef struct {

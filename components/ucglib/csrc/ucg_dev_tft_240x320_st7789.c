@@ -1,12 +1,12 @@
 /*
 
-  ucg_dev_tft_128x128_ili9163.c
+  ucg_dev_tft_128x160_st7789.c
   
-  ILI9363 with 4-Wire SPI (SCK, SDI, CS, D/C and optional reset)
+  ST7735 with 4-Wire SPI (SCK, SDI, CS, D/C and optional reset)
 
   Universal uC Color Graphics Library
   
-  Copyright (c) 2015, olikraus@gmail.com
+  Copyright (c) 2014, olikraus@gmail.com
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without modification, 
@@ -37,9 +37,8 @@
 
 #include "ucg.h"
 
-
-
-static const ucg_pgm_uint8_t ucg_tft_128x128_ili9163_init_seq[] = {
+//static const uint8_t ucg_dev_ssd1351_128x128_init_seq[] PROGMEM = {
+static const ucg_pgm_uint8_t ucg_tft_240x320_st7789_init_seq[] = {
   UCG_CFG_CD(0,1),				/* DC=0 for command mode, DC=1 for data and args */
   UCG_RST(1),					
   UCG_CS(1),					/* disable chip */
@@ -55,9 +54,8 @@ static const ucg_pgm_uint8_t ucg_tft_128x128_ili9163_init_seq[] = {
   //UCG_C10(0x038),				/* idle mode off */
   UCG_C10(0x013),				/* normal display on */
 
-  //UCG_C14(0x0ed, 0x055, 0x001, 0x023, 0x001), 	/* power on sequence control (POR values) */
-  //UCG_C11(0x0f7, 0x020), 		/* pump ratio control (POR value) */
   
+
 
   UCG_C10(0x20), 				/* not inverted */
   //UCG_C10(0x21), 				/* inverted */
@@ -67,23 +65,24 @@ static const ucg_pgm_uint8_t ucg_tft_128x128_ili9163_init_seq[] = {
 
   //UCG_C12(0x0b1, 0x000, 0x01b), 	/* frame rate control (POR values) */
 
-  //UCG_C14(0x0b6, 0x00a, 0x082 | (1<<5), 0x027, 0x000), 	/* display function control (POR values, except for shift direction bit) */
+  UCG_C14(0x0b6, 0x00a, 0x082 | (1<<5), 0x027, 0x000), 	/* display function control (POR values, except for shift direction bit) */
   
   //UCG_C11(0x0b7, 0x006), 		/* entry mode, bit 0: Low voltage detection control (0=off) */
 
-  UCG_C12(0x0c0, 0x00a, 0x002), 	/* power control 1 */
+  UCG_C11(0x0c0, 0x021), 		/* power control 1 (reference voltage level), POR=21 */
   UCG_C11(0x0c1, 0x002), 		/* power control 2 (step up factor), POR=2 */
-  UCG_C11(0x0c7, 0x0d0), 		/* VCOM control 2, enable VCOM control 1 */
-  UCG_C12(0x0c5, 0x040, 0x04a), 	/* VCOM control 1, POR=31,3C */
+  UCG_C11(0x0c7, 0x0c0), 		/* VCOM control 2, enable VCOM control 1 */
+  UCG_C12(0x0c5, 0x031, 0x03c), 	/* VCOM control 1, POR=31,3C */
   
- // UCG_C15(0x0cb, 0x039, 0x02c, 0x000, 0x034, 0x002), 	/* power control A (POR values) */
- // UCG_C13(0x0cf, 0x000, 0x081, 0x030), 	/* power control B (POR values) */
+  UCG_C15(0x0cb, 0x039, 0x02c, 0x000, 0x034, 0x002), 	/* power control A (POR values) */
+  UCG_C13(0x0cf, 0x000, 0x081, 0x030), 	/* power control B (POR values) */
 
- // UCG_C13(0x0e8, 0x084, 0x011, 0x07a), 	/* timer driving control A (POR values) */
+  UCG_C13(0x0e8, 0x084, 0x011, 0x07a), 	/* timer driving control A (POR values) */
 
-//  UCG_C12(0x0ea, 0x066, 0x000), 	/* timer driving control B (POR values) */
+  UCG_C12(0x0ea, 0x066, 0x000), 	/* timer driving control B (POR values) */
   //UCG_C12(0x0ea, 0x000, 0x000), 		/* timer driving control B  */
 
+ 
   //UCG_C10(0x28), 				/* display off */
   //UCG_C11(0x0bf, 0x003), 		/* backlight control 8 */
   UCG_C10(0x029), 				/* display on */
@@ -92,10 +91,11 @@ static const ucg_pgm_uint8_t ucg_tft_128x128_ili9163_init_seq[] = {
   //UCG_C10(0x028), 				/* display off */
 
 
-  UCG_C11( 0x036, 0x008),
+
+  UCG_C11( 0x036, 0x008),		/* memory control */
   
-  UCG_C14(  0x02a, 0x000, 0x000, 0x000, 0x07f),              /* Horizontal GRAM Address Set */
-  UCG_C14(  0x02b, 0x000, 0x000, 0x000, 0x07f),              /* Vertical GRAM Address Set */
+  UCG_C14(  0x02a, 0x000, 0x000, 0x000, 0x0ef),              /* Horizontal GRAM Address Set */
+  UCG_C14(  0x02b, 0x000, 0x000, 0x000, 0x03f),              /* Vertical GRAM Address Set */
   UCG_C10(  0x02c),               /* Write Data to GRAM */
 
   
@@ -103,30 +103,30 @@ static const ucg_pgm_uint8_t ucg_tft_128x128_ili9163_init_seq[] = {
   UCG_END(),					/* end of sequence */
 };
 
-ucg_int_t ucg_dev_ili9163_18x128x128(ucg_t *ucg, ucg_int_t msg, void *data)
+ucg_int_t ucg_dev_st7789_18x240x320(ucg_t *ucg, ucg_int_t msg, void *data)
 {
   switch(msg)
   {
     case UCG_MSG_DEV_POWER_UP:
       /* 1. Call to the controller procedures to setup the com interface */
-      if ( ucg_dev_ic_ili9163_18(ucg, msg, data) == 0 )
+      if ( ucg_dev_ic_st7789_18(ucg, msg, data) == 0 )
 	return 0;
 
       /* 2. Send specific init sequence for this display module */
-      ucg_com_SendCmdSeq(ucg, ucg_tft_128x128_ili9163_init_seq);
+      ucg_com_SendCmdSeq(ucg, ucg_tft_240x320_st7789_init_seq);
       
       return 1;
       
     case UCG_MSG_DEV_POWER_DOWN:
       /* let do power down by the conroller procedures */
-      return ucg_dev_ic_ili9163_18(ucg, msg, data);  
+      return ucg_dev_ic_st7789_18(ucg, msg, data);  
     
     case UCG_MSG_GET_DIMENSION:
-      ((ucg_wh_t *)data)->w = 128;
-      ((ucg_wh_t *)data)->h = 128;
+      ((ucg_wh_t *)data)->w = 240;
+      ((ucg_wh_t *)data)->h = 320;
       return 1;
   }
   
   /* all other messages are handled by the controller procedures */
-  return ucg_dev_ic_ili9163_18(ucg, msg, data);  
+  return ucg_dev_ic_st7789_18(ucg, msg, data);  
 }

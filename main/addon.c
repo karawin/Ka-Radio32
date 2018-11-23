@@ -402,10 +402,12 @@ void startStation()
 }
 void startStop()
 {   
+	ESP_LOGD(TAG,"START/STOP State: %d",state);
     state?stopStation():startStation();
 }  
 void stationOk()
 {
+	ESP_LOGD(TAG,"STATION OK");
        if (strlen(irStr) >0)
 	   {	   
 		  futurNum = atoi(irStr);
@@ -588,43 +590,40 @@ void adcLoop() {
  
  void buttonCompute(Button_t *enc,bool role)
 {	
-	int i;
-	Button state[3] ;
 	typeScreen stateS;
 	if (role) stateS = sstation; else stateS = svolume;	
-	for (i=0;i<3;i++)
+	
+	Button state0 = getButtons(enc,0);	
+	if (state0 != Open)
 	{
-		state[i] = getButtons(enc,i);
-	}
-			
-	if (state[0] != Open)
-	{
+		ESP_LOGD(TAG,"Button0: %i",state0);	
 		wakeLcd();
-
 		// clicked = startstop
-		if (state[0] == Clicked) startStop();
+		if (state0 == Clicked) startStop();
 		// double click = toggle time
-		if (state[0] == DoubleClicked) toggletime();	
-		if (state[0] == Held)
+		if (state0 == DoubleClicked) toggletime();	
+		if (state0 == Held)
 		{   
 			if (stateScreen != stateS) Screen(stateS);			
 		} 			
 	} else
 	{
+		Button state1 = getButtons(enc,1);
+		Button state2 = getButtons(enc,2);
 		if (stateScreen != stateS)
 		{    
-			if (state[1] != Open)
+			if (state1 != Open)
 			{	if (role) setRelVolume(5); 
 				else changeStation(1);}
-			if (state[2] != Open)
+			if (state2 != Open)
 			{	if (role) setRelVolume(-5); 
 				else changeStation(-1);}		
 		} 
 		if (stateScreen  == stateS)
 		{    
-			if (state[1] != Open)
+			if (state1 != Open)
 			{if (role) changeStation(1);else setRelVolume(5);}
-			if (state[2] != Open)
+			if (state2 != Open)
 			{if (role) changeStation(-1); else setRelVolume(-5);	}	
 		} 			
 	}
@@ -644,12 +643,8 @@ void buttonsLoop()
 
 void encoderCompute(Encoder_t *enc,bool role)
 {	
-	Button newButton ;
-	int16_t newValue;
-	typeScreen state;
-
-	newValue = - getValue(enc);
-	newButton = getButton(enc);
+	int16_t newValue = - getValue(enc);
+	Button newButton = getButton(enc);
    	// if an event on encoder switch	
 	if (newButton != Open)
 	{ 
@@ -667,6 +662,7 @@ void encoderCompute(Encoder_t *enc,bool role)
 	}	else
 		// no event on button switch
 	{
+		typeScreen state;
 		if (role) state = sstation; else state = svolume;
 		if ((stateScreen  != state)&&(newValue != 0))
 		{    
@@ -991,6 +987,7 @@ void task_addon(void *pvParams)
 	serviceEncoder = &multiService;	; // connect the 1ms interruption
 	serviceAddon = &ServiceAddon;	; // connect the 1ms interruption
 	futurNum = getCurrentStation();
+	
 	//ir
 	// queue for events of the IR nec rx
 	event_ir = xQueueCreate(5, sizeof(event_ir_t));
@@ -1004,6 +1001,8 @@ void task_addon(void *pvParams)
 	xTaskCreatePinnedToCore (task_lcd, "task_lcd", 2200, NULL, PRIO_LCD, &pxCreatedTask,CPU_LCD); 
 	ESP_LOGI(TAG, "%s task: %x","task_lcd",(unsigned int)pxCreatedTask);
 	vTaskDelay(1);	
+
+	if (!(isColor)) u8g2_SendBuffer(&u8g2);
 	wakeLcd();
 	
 	while (1)
