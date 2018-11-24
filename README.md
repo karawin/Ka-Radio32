@@ -36,7 +36,7 @@ Others features :
 ## Configure the hardware and IR codes
 If the default configuration doesn't fit your needs, you can externally configure the software to fit your hardware and peripherals to suit your needs.  
 The configuration file is to be flashed only one time. After that, the standard delivery will become compatible with your hardware gpio use and peripherals configuration. A future standard OTA will automatically works.  
-See : http://karadio.karawin.fr/HardwareConfig.txt  
+See : https://github.com/karawin/Ka-Radio32/blob/master/HardwareConfig.md
 
 ## Build your own
 To build your own release, you must install the idf https://github.com/espressif/esp-idf and the toolchain.
