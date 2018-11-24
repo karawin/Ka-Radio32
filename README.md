@@ -132,6 +132,45 @@ See the file main/include/gpio.h and main/include/addon.h
 // ADC for keyboard buttons
 #define PIN_ADC	GPIO_NONE	//GPIO_NUM_32 TO GPIO_NUM_39 or GPIO_NONE if not used.
 ```
+### LCD or oled declaration  
+You can configure the kind of display used in your configuration with the command  
+'sys.lcd("x")' with x:  
+'''
+#define LCD_NONE		255
+
+// Black&White
+//I2C
+#define LCD_I2C_SH1106		0 //128X64
+#define LCD_I2C_SSD1306		1 //128X64
+#define LCD_I2C_SSD1309		2 //128X64
+#define LCD_I2C_SSD1325 	3 //128X64
+#define LCD_I2C_SSD1306NN	4 //128X64
+#define LCD_I2C_SSD1309NN	5 //128X64
+#define LCD_I2C_SSD1306UN	6 //128x32
+
+//SPI
+#define LCD_SPI_SSD1306 		64 //128X32 (LCD_SPI =0x40)
+#define LCD_SPI_SSD1309 		65 //128X64
+#define LCD_SPI_ST7565_ZOLEN	66 //128X64
+#define LCD_SPI_SSD1322_NHD		67 //256X64
+#define LCD_SPI_IL3820_V2		68 //296X128
+#define LCD_SPI_SSD1607			69 //200X200
+#define LCD_SPI_LS013B7DH03		70 //128X128
+#define LCD_SPI_SSD1306NN 		71 //128X64
+#define LCD_SPI_SSD1309NN 		72 //128X64
+#define LCD_SPI_ST7920 			73 //128X64
+
+// Colors
+#define LCD_SPI_ST7735			192 // 128x160  (LCD_COLOR|LCD_SPI =0xC0)
+#define LCD_SPI_SSD1351			193 // 128x128
+#define LCD_SPI_ILI9341			194 // 240x320
+#define LCD_SPI_ILI9163			195 // 128x128
+#define LCD_SPI_PCF8833			196 // 132x132
+#define LCD_SPI_SSD1331			197 // 96x64
+#define LCD_SPI_SEPS225			198 // 96x64
+#define LCD_SPI_ST7789V			199 // 240x320
+'''
+  
 
 ## First use
 - If the acces point of your router is not known, the webradio inits itself as an AP. Connect the wifi of your computer to the ssid "WifiKaRadio",  
