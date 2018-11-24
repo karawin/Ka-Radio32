@@ -135,7 +135,8 @@ See the file main/include/gpio.h and main/include/addon.h
 ### LCD or oled declaration  
 You can configure the kind of display used in your configuration with the command  
 'sys.lcd("x")' with x:  
-'''
+  
+```
 #define LCD_NONE		255
 
 // Black&White
@@ -169,7 +170,7 @@ You can configure the kind of display used in your configuration with the comman
 #define LCD_SPI_SSD1331			197 // 96x64
 #define LCD_SPI_SEPS225			198 // 96x64
 #define LCD_SPI_ST7789V			199 // 240x320
-'''
+```
   
 
 ## First use
