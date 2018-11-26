@@ -1,5 +1,5 @@
 ## STATE
-Release 1.5 R1 Stable
+Release 1.5 Stable
 
 Works on any esp32 board.  
 See the boards directory for a list of pre-configured boards.
@@ -171,6 +171,7 @@ You can configure the kind of display used in your configuration with the comman
 #define LCD_SPI_SSD1331			197 // 96x64
 #define LCD_SPI_SEPS225			198 // 96x64
 #define LCD_SPI_ST7789V			199 // 240x320
+#define LCD_SPI_ST7735S			200 // 128x128
 ```
   
 

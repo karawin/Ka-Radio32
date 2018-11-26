@@ -928,6 +928,9 @@ void lcd_initUcg(uint8_t *lcd_type)
 	case LCD_SPI_ST7735:
 		ucg_Init(&ucg, ucg_dev_st7735_18x128x160, ucg_ext_st7735_18, ucg_com_hal);
 		break;
+	case LCD_SPI_ST7735S:
+		ucg_Init(&ucg, ucg_dev_st7735_18x128x128, ucg_ext_st7735_18, ucg_com_hal);
+		break;
 	case LCD_SPI_ILI9341:
 		ucg_Init(&ucg, ucg_dev_ili9341_18x240x320, ucg_ext_ili9341_18, ucg_com_hal);
 		break;
