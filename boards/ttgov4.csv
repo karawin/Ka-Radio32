@@ -3,7 +3,7 @@ gpio_space,namespace,,
 K_SPI,data,u8,2
 P_MISO,data,u8,19
 P_MOSI,data,u8,23
-P_CLK,data,u8,18
+P_CLK,data,u8,5
 P_XCS,data,u8,255
 P_RST,data,u8,33
 P_XDCS,data,u8,2
