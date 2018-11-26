@@ -26,7 +26,7 @@ function openwebsocket(){
 		if (arr["wssound"]) soundResp(arr["wssound"]); 
 		if (arr["monitor"]) playMonitor(arr["monitor"]); 
 		if (arr["wsstation"]) wsplayStation(arr["wsstation"]); 
-		if (arr["wsrssi"]) {document.getElementById('rssi').innerHTML = arr["wsrssi"]+' dBm';recrssi = 0};
+		if (arr["wsrssi"]) {document.getElementById('rssi').innerHTML = arr["wsrssi"]+' dBm';recrssi = 0;}
 	} catch(e){ console.log("error"+e);}
 }
 
@@ -1275,4 +1275,5 @@ document.addEventListener("DOMContentLoaded", function() {
 	promptworking("");
    	if (intervalrssi != 0)  window.clearTimeout(intervalrssi);
 	intervalrssi = 0;
-	intervalrssi = window.setInterval(wsaskrssi,5000 );});
+	intervalrssi = window.setInterval(wsaskrssi,5000 );
+});

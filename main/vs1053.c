@@ -51,16 +51,6 @@ const char strvI2S[] = {"I2S Speed: %d\n"};
 static spi_device_handle_t vsspi;  // the device handle of the vs1053 spi
 static spi_device_handle_t hvsspi;  // the device handle of the vs1053 spi high speed
 
-//xSemaphoreHandle sSPI = NULL;
-
-uint8_t spi_take_semaphore() {
-//	if(sSPI) if(xSemaphoreTake(sSPI, portMAX_DELAY)) return 1;
-	return 1;
-}
-
-void spi_give_semaphore() {
-//	if(sSPI) xSemaphoreGive(sSPI);
-}
 
 void VS1053_spi_init(){
 	esp_err_t ret;
@@ -68,9 +58,6 @@ void VS1053_spi_init(){
 	gpio_num_t mosi;
 	gpio_num_t sclk;
 	uint8_t spi_no; // the spi bus to use
-	
-//	if(!sSPI) vSemaphoreCreateBinary(sSPI);
-	spi_give_semaphore(); 
 	
 	gpio_get_spi_bus(&spi_no,&miso,&mosi,&sclk);	
 	if(spi_no > 2) return; //Only VSPI and HSPI are valid spi modules. 	
@@ -81,7 +68,8 @@ void VS1053_spi_init(){
         .sclk_io_num=sclk,
         .quadwp_io_num=-1,
         .quadhd_io_num=-1,
-		.flags = SPICOMMON_BUSFLAG_NATIVE_PINS|SPICOMMON_BUSFLAG_MASTER
+//		.flags = SPICOMMON_BUSFLAG_NATIVE_PINS|SPICOMMON_BUSFLAG_MASTER
+		.flags = SPICOMMON_BUSFLAG_MASTER
 //		.max_transfer_sz = 1024		
 	};		
 	ret=spi_bus_initialize(spi_no, &buscfg, 1);	 // dma	
@@ -176,11 +164,9 @@ void VS1053_spi_write_char(spi_device_handle_t ivsspi, uint8_t *cbyte, uint16_t 
 	t.tx_buffer = cbyte;	
     t.length= len*8; 
     //t.rxlength=0;	
-	spi_take_semaphore();
 	while(VS1053_checkDREQ() == 0)taskYIELD ();
     ESP_ERROR_CHECK(spi_device_transmit(ivsspi, &t));  //Transmit!
 	while(VS1053_checkDREQ() == 0);
-	spi_give_semaphore();
 	//printf("VS1053_spi_write val: %x  rxlen: %x \n",*cbyte,t.rxlength);
    // return ret;
 }
@@ -199,11 +185,9 @@ void VS1053_WriteRegister(uint8_t addressbyte, uint8_t highbyte, uint8_t lowbyte
 	t.tx_data[0] = highbyte;
 	t.tx_data[1] = lowbyte;		
     t.length= 16;
-	spi_take_semaphore();
 	while(VS1053_checkDREQ() == 0)taskYIELD ();
     ESP_ERROR_CHECK(spi_device_transmit(vsspi, &t));  //Transmit!	
 	while(VS1053_checkDREQ() == 0);
-	spi_give_semaphore();
 }
 
 void VS1053_WriteRegister16(uint8_t addressbyte, uint16_t value)
@@ -216,11 +200,10 @@ void VS1053_WriteRegister16(uint8_t addressbyte, uint16_t value)
 	t.tx_data[0] = (value>>8)&0xff;	
 	t.tx_data[1] = value&0xff;		
     t.length= 16;
-	spi_take_semaphore();
 	while(VS1053_checkDREQ() == 0)taskYIELD ();
     ESP_ERROR_CHECK(spi_device_transmit(vsspi, &t));  //Transmit!	
 	while(VS1053_checkDREQ() == 0);
-	spi_give_semaphore();
+
 }
 
 uint16_t VS1053_ReadRegister(uint8_t addressbyte){
@@ -232,12 +215,10 @@ uint16_t VS1053_ReadRegister(uint8_t addressbyte){
 	t.cmd = VS_READ_COMMAND;
 	t.addr = addressbyte;
     t.rx_buffer=&data;
-	spi_take_semaphore();    
 	ESP_ERROR_CHECK(spi_device_transmit(vsspi, &t));  //Transmit!
 	while(VS1053_checkDREQ() == 0)taskYIELD ();
 	result =  (((data&0xFF)<<8) | ((data>>8)&0xFF)) ;  	
 	while(VS1053_checkDREQ() == 0);
-	spi_give_semaphore();
 	return result;
 }
 
@@ -381,7 +362,6 @@ void VS1053_Start(){
 int VS1053_SendMusicBytes(uint8_t* music, uint16_t quantity){
 	if(quantity ==0) return 0;
 	int oo = 0;
-//	spi_take_semaphore();
 //	while(VS1053_checkDREQ() == 0);taskYIELD ();
 	while(quantity)
 	{
@@ -394,7 +374,6 @@ int VS1053_SendMusicBytes(uint8_t* music, uint16_t quantity){
 			quantity -= t;
 		} // else taskYIELD ();
 	}
-//	spi_give_semaphore();
 	return oo;
 }
 

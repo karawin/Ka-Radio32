@@ -1,13 +1,14 @@
 ## STATE
-KaraDio32 in dev state : Release 1.5 R0 Stable
+Release 1.5 R1 Stable
 
-Works on any esp32 board.
+Works on any esp32 board.  
+See the boards directory for a list of pre-configured boards.
 
 See the feature on https://hackaday.io/project/11570-wifi-webradio-with-esp8266-and-vs1053.  
-The esp32 adds the output on the internal dac or with i2s to an external dac but only mp3 stations can be played.  
+- The esp32 adds the output on the internal dac or with i2s to an external dac but only mp3 stations can be played.  
 Adding a vs1053 board, all stations can be played.  
 Compatible with esp8266 KaRadio addons.  
-Uart or telnet commands : http://karadio.karawin.fr/Interface.txt  
+- Serial or telnet commands : https://github.com/karawin/Ka-Radio32/blob/master/Interface.md
 
 ## Added features
 Work with i2s, internal DAC or a vs1053.  
@@ -197,7 +198,7 @@ http://karadio.karawin.fr/karawin32Flash.jpg
 
 ![Screenshoot of download tool](https://raw.githubusercontent.com/karawin/Ka-Radio32/master/images/downloadtool32.jpg)
 
-The scheme from tomasf71 :  
+### The scheme from tomasf71 :  
 ![Scheme](https://raw.githubusercontent.com/karawin/Ka-Radio32/master/images/schemekaradio32.jpg)
 
 ## Audio output

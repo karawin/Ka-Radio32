@@ -880,6 +880,7 @@ void multiService()
 	if (isEncoder1) service(encoder1);
 	if (isButton0) serviceBtn(button0);
 	if (isButton1) serviceBtn(button1);
+	ServiceAddon();
 }
 //--------------------
 // LCD display task
@@ -984,8 +985,7 @@ void task_addon(void *pvParams)
 	initButtonEncoder();
 	adcInit();
 	
-	serviceEncoder = &multiService;	; // connect the 1ms interruption
-	serviceAddon = &ServiceAddon;	; // connect the 1ms interruption
+	serviceAddon = &multiService;		; // connect the 1ms interruption
 	futurNum = getCurrentStation();
 	
 	//ir

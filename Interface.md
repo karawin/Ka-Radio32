@@ -1,30 +1,32 @@
-HTML interface for the Wifi Webradio
+# Interfaces of KaRadio and KaRadio32
 ____________________________________
-Any browser or wget can be used to send basic commands to the webradio.
-A command format is http://yourip/?command[&command]
+
+## HTML interface for the Wifi Webradio
+Any browser or wget can be used to send basic commands to the webradio.  
+A command format is http://yourip/?command[&command]  
 If a command return some informations, it must be the last of the list or alone.
 
-Commands are:
-version			: return 'Release: x.x, Revision: x'
-infos			: return 
-				'vol: 46						the current volume
-				num: 240						the current station number
-				stn: Hotmix 80					the name of the current station
-				tit: BANANARAMA - Venus '		the title of the son playing
-				sts: 1							the state of the player: 0 stopped, 1: playing
-list=xxx		: return the name of the station xxx (0 to 254)				
-stop			: stop playing the current station.
-start			: start playing the current station.
-next			: play the next station
-prev			: play the previous station
-play=xxx		: with xxx from 0 to 254  play the station xxx
-volume=xxx		: with xxx from 0 to 254  change the volume to xxx
-uart			: uart baudrate at 115200 not saved on next reset
-instant="http://your url" : instant play a site
-Example: http://192.168.1.253/?instant="http://api.voicerss.org/?f=32khz_16bit_stereo&key=29334415954d491b85535df4eb4dd821&hl=en-us&src=hello?the-sun-is-yellow?and-i-like-it"
-the url must begin with http:// or https:// and be surrounded by " and no space char allowed.
+## Commands:  
+- version		: return 'Release: x.x, Revision: x'  
+- infos			: return   
+				vol: 46						:the current volume  
+				num: 240						:the current station number  
+				stn: Hotmix 80					:the name of the current station  
+				tit: BANANARAMA - Venus 		:the title of the son playing  
+				sts: 1							:the state of the player: 0 stopped, 1:   playing.
+- list=xxx		: return the name of the station xxx (0 to 254)				
+- stop			: stop playing the current station.
+- start			: start playing the current station.
+- next			: play the next station
+- prev			: play the previous station
+- play=xxx		: with xxx from 0 to 254  play the station xxx
+- volume=xxx		: with xxx from 0 to 254  change the volume to xxx
+- uart			: uart baudrate at 115200 not saved on next reset
+- instant="http://your url" : instant play a site  
+Example: http://192.168.1.253/?instant=http://api.voicerss.org/?f=32khz_16bit_stereo&key=29334415954d491b85535df4eb4dd821&hl=en-us&src=hello?the-sun-is-yellow?and-i-like-it"  
+the url must begin with http:// and be surrounded by " and no space char allowed.
 
-Volume may be combined with other command.
+Volume may be combined with other command.  
 Example: 192.168.1.253/?volume=50&play=128&infos
 
 Reminder: the url without parameter is the full web interface.
@@ -32,12 +34,15 @@ Reminder: the url without parameter is the full web interface.
 
 
 -------------------------------------------------
-| UART ot telnet interface for the Wifi Webradio |
--------------------------------------------------
+## Serial ot telnet interface for the Wifi Webradio
 
-The uart inteface can be used to receive events from the webradio and to send commands to it.
 
-Example of indications received:
+The serial inteface can be used to receive events from the webradio and to send commands to it.  
+The telnet interface is reached by the port 23.  
+The serial interface adds the logs output of the tasks.  
+
+Example of indications received: 
+```
 ##CLI.STOPPED# from playStationInt
 ##CLI.NAMESET#: 88 Public Domain Classical - Swiss Internet Radio
 ##CLI.URLSET#: 82.197.165.137
@@ -87,19 +92,16 @@ Example of indications received:
 ##CLI.META#: The Beatles - Mother Nature's Son 
 ##SYS.TZO#: 1
 ##SYS.DATE#: 2017-04-13T22:47:44+01:00
+```
 
-
-
-
-with ICYx: 0:"icy-name:", 1:"icy-notice1:", 2:"icy-notice2:",  3:"icy-url:", 4:"icy-genre:", 5:"icy-br:", 6:"icy-description:", 7:"ice-audio-info:"
+with ICYx: 0:"icy-name:", 1:"icy-notice1:", 2:"icy-notice2:",  3:"icy-url:", 4:"icy-genre:", 5:"icy-br:", 6:"icy-description:", 7:"ice-audio-info:"  
 Some other informations may be printed for debug purpose, but usefull events always start with ##
 
 
-Commands:
----------
-////////////////////////
-// Wifi related commands
-////////////////////////
+## Commands:
+
+### Wifi related commands
+```
 wifi.list			: give the list of received SSID
 wifi.con			: Display the AP1 and AP2 SSID
 wifi.con("ssid","password")	: Record the given AP ssid with password in AP1 for next reboot
@@ -112,10 +114,10 @@ wifi.status			: give #WIFI.STATUS#			start of the answer
 				192.168.1.70			the network gateway
 				##WIFI.STATUS#			end of the answer
 wifi.rssi			: print the current rssi (reception level)
-				
-///////////////////////////
-// Station Client commands
-///////////////////////////
+```				
+
+### Station Client commands
+```
 // instant play
 cli.url("url")		: the name or ip of the station to instant play
 cli.path("/path")	: the path of the station to instant play
@@ -140,10 +142,9 @@ Every vol command from uart or web or browser respond with ##CLI.VOL#: xxx
 // Client information
 cli.info			: Respond with nameset, all icy, meta, volume and stae playing or stopped. Used to refresh the lcd informations
 					: see Example of indications received
-
-//////////////////
-// System commands
-//////////////////
+```
+### System commands
+```
 sys.uart("x")	: Change the baudrate of the uart on the next reset. 
 			Valid x are: 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 76880, 115200, 230400	
 sys.i2s			: Display the current I2S speed			
@@ -170,19 +171,20 @@ sys.log			: Do nothing. Used for debug of the addon.
 sys.version		: Display the release and Revision of KaraDio
 sys.host		: display the hostname for mDNS			
 sys.host("your hostname"): change and display the hostname for mDNS
-///////
-//Other
-///////
+```
+### Other
+```
 <enter> will display 
 #INFO:""#
 
 help			: list the available commands.
-
+```
 A command error display:
+```
 ##CMD_ERROR#
-
-Extension for KaRadio32 only:
------------------------------
+```
+### Extension for KaRadio32 only:
+```
 sys.dlog		: Display the current log level
 sys.logx		: Set log level to x with x=n for none, v for verbose, d for debug, i for info, w for warning, e for error
 sys.lcdout		: Display the timer to switch off the lcd. 0= no timer
@@ -198,3 +200,4 @@ sys.rotat("x"): Change and display the lcd rotation option (reset needed). 0:no 
 sys.henc0 or sys.henc1: Display the current step setting for the encoder. Normal= 4 steps/notch, Half: 2 steps/notch
 sys.henc0("x") with x=0 Normal, x=1 Half
 sys.henc1("x") with x=0 Normal, x=1 Half
+```

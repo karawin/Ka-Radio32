@@ -58,6 +58,7 @@ A value base 10 is mandatory for each P_.
 
 ```
 SPI Bus:  
+K_SPI    Select the used spi : 1: HSPI, 2: VSPI
 P_MISO			Master Input, Slave Output  
 P_MOSI			Master Output, Slave Input   Named Data or SDA or D1 for oled  
 P_CLK			Master clock  Named SCL or SCK or D0 for oled  

@@ -63,8 +63,6 @@
 //public functions
 //extern int vsVersion;
 int getVsVersion();
-uint8_t spi_take_semaphore();
-void spi_give_semaphore() ;
 bool 	VS1053_HW_init();
 void 	VS1053_SineTest();
 void 	VS1053_I2SRATE(uint8_t speed);

@@ -79,17 +79,17 @@ extern uint32_t wakeDelay;
 #define PRIO_OTA		10
 
 // CPU for task
-#define CPU_MAD			1  // internal decoder and vs1053
+#define CPU_MAD			0  // internal decoder and vs1053
 #define CPU_RMT			0
 #define CPU_UART		1
 #define CPU_CLIENT		1
 #define CPU_SERVER		0
-#define CPU_ADDON		0
-#define CPU_LCD			0
+#define CPU_ADDON		1
+#define CPU_LCD			1
 #define CPU_SUBSERV		0
-#define CPU_TIMER		0
+#define CPU_TIMER		1
 
-
+#define TEMPO_SAVE_VOL	10000
 
 typedef struct {
     int type;               /*!< event type */

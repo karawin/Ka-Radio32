@@ -98,10 +98,10 @@ uint8_t u8g2_esp32_spi_byte_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int,  void
 			break;
 		}
 		case U8X8_MSG_CAD_START_TRANSFER:
-			spi_take_semaphore();
+
 		break;
 		case U8X8_MSG_CAD_END_TRANSFER:
-			spi_give_semaphore();
+
 		break;
 	}
 	return 0;

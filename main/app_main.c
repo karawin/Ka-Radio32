@@ -624,6 +624,7 @@ void start_network(){
 void timerTask(void* p) {
 	struct device_settings *device;	
 	uint32_t ctime = 0;
+	uint32_t ctimeVol = 0;
 	uint32_t cCur;
 	bool stateLed = false;
 	gpio_num_t gpioLed;
@@ -650,7 +651,7 @@ void timerTask(void* p) {
 					break;
 					case TIMER_1MS: // 1 ms 
 					  ctime++;	// for led
-					  if (serviceEncoder != NULL) serviceEncoder(); // for the encoder
+					  ctimeVol++; // to save volume
 					  if (serviceAddon != NULL) serviceAddon(); // for the encoder
 					break;
 //					case TIMER_1mS:  //1µs
@@ -662,7 +663,6 @@ void timerTask(void* p) {
 		}
 		if (ledStatus)
 		{
-			
 			if (ctime >= cCur)
 			{
 				gpioLed = getLedGpio();
@@ -676,30 +676,23 @@ void timerTask(void* p) {
 				{
 					gpio_set_level(gpioLed,1);	
 					stateLed = true;
-					cCur = FlashOn*10;
-					if (device->vol != getIvol()){ 			
-						device->vol = getIvol();
-						taskYIELD();
-						saveDeviceSettingsVolume(device);
-//						ESP_LOGD("timerTask",striWATERMARK,uxTaskGetStackHighWaterMark( NULL ),xPortGetFreeHeapSize( ));
-					}											
+					cCur = FlashOn*10;										
 				}
 				ctime = 0;
 			}			
-		} else
+		} 
+		
+		if (ctimeVol >= TEMPO_SAVE_VOL)
 		{
-			if (ctime >= cCur)
-			{
-				if (device->vol != getIvol()){ 			
-					device->vol = getIvol();
-					taskYIELD();
-					saveDeviceSettingsVolume(device);
-//					ESP_LOGD("timerTask",striWATERMARK,uxTaskGetStackHighWaterMark( NULL ),xPortGetFreeHeapSize( ));
-				}
-				ctime = 0;
-			}			
-		}			
-		taskYIELD();
+			if (device->vol != getIvol()){ 			
+				device->vol = getIvol();
+//				taskYIELD();
+				saveDeviceSettingsVolume(device);
+//				ESP_LOGD("timerTask",striWATERMARK,uxTaskGetStackHighWaterMark( NULL ),xPortGetFreeHeapSize( ));
+			}
+			ctimeVol = 0;
+		}						
+//		taskYIELD();
 	}
 //	printf("t0 end\n");
 	vTaskDelete( NULL ); // stop the task (never reached)
