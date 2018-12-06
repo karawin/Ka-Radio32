@@ -117,11 +117,13 @@ static LANG charset = Latin;  // latin or cyrillic
 typedef enum sizefont  {small, text,middle,large} sizefont;
 void setfont(sizefont size)
 {
-//	printf("setfont charset: %d, size: %d, x: %d\n",charset,size,x);
+	int inX = x;
+	if (yy <=80) inX = 96; // corrected for small yy
+//	printf("setfont charset: %d, size: %d,yy: %d, x: %d,  inX: %d\n",charset,size,yy,x,inX);
 	switch(size)
 	{
 		case small:
-		switch(x)
+		switch(inX)
 		{
 			case 320:
 			ucg_SetFont(&ucg,ucg_font_6x13_mf);
@@ -140,7 +142,7 @@ void setfont(sizefont size)
 		break;
 
 		case text:
-		switch(x)
+		switch(inX)
 		{
 			case 320:
 			switch (charset){ 	
@@ -154,7 +156,7 @@ void setfont(sizefont size)
 			case 128:
 			switch (charset){
 								case Cyrillic: ucg_SetFont(&ucg,ucg_font_crox1c );break; 
-								case Greek:ucg_SetFont(&ucg,ucg_font_5x7_gr );break;
+								case Greek:ucg_SetFont(&ucg,ucg_font_helvR14_gr );break;
 								default:
 								case Latin:ucg_SetFont(&ucg,ucg_font_5x7_mf );break;
 							}
@@ -191,7 +193,7 @@ void setfont(sizefont size)
 		break;
 
 		case middle:
-		switch(x)
+		switch(inX)
 		{
 			case 320:
 			switch (charset){ 	
@@ -234,7 +236,7 @@ void setfont(sizefont size)
 		}
 		break;
 		case large:
-		switch(x)
+		switch(inX)
 		{
 			case 320:
 			ucg_SetFont(&ucg,ucg_font_inr53_mf); 
@@ -255,6 +257,13 @@ void setfont(sizefont size)
 		default:
 		printf("Default for size %d\n",size);
 	}
+	
+		if (yy <= 80)
+			y = - ucg_GetFontDescent(&ucg)+ ucg_GetFontAscent(&ucg)+2 ; //interline
+		else
+			y = - ucg_GetFontDescent(&ucg)+ ucg_GetFontAscent(&ucg) +3; //interline
+	
+	
 }
 
 
@@ -494,10 +503,10 @@ void draw(int i)
 		}
         break;
         case VOLUME:
- 		if ((yy > 64)||(lline[TITLE21] == NULL)||(strlen(lline[TITLE21]) ==0))
+ 		if ((yy > 80)||(lline[TITLE21] == NULL)||(strlen(lline[TITLE21]) ==0))
 		{
           ucg_SetColori(&ucg,0,0,200); 
-		  if (yy <= 64)
+		  if (yy <= 80)
 		  {
 			ucg_DrawFrame(&ucg,0,yy-10,x/3,8); 
 			ucg_SetColori(&ucg,255,0,0); 
@@ -512,14 +521,14 @@ void draw(int i)
 		}		  
         break;
         case TIME:
- 		if ((yy > 64)||(lline[TITLE21] == NULL)||(strlen(lline[TITLE21]) ==0))
+ 		if ((yy > 80)||(lline[TITLE21] == NULL)||(strlen(lline[TITLE21]) ==0))
 		{
 		  setfont(small);
           len = ucg_GetStrWidth(&ucg,strsec);
           ucg_SetColori(&ucg,250,250,255); 
           ucg_SetColor(&ucg,1,CBLACK); 
           ucg_SetFontMode(&ucg,UCG_FONT_MODE_SOLID);
-		  if (yy <= 64)
+		  if (yy <= 80)
 		  {
 			xpos = (5*x/8)-(len/2);
 			yyy = yy -10;
@@ -929,7 +938,13 @@ void lcd_initUcg(uint8_t *lcd_type)
 		ucg_Init(&ucg, ucg_dev_st7735_18x128x160, ucg_ext_st7735_18, ucg_com_hal);
 		break;
 	case LCD_SPI_ST7735S:
-		ucg_Init(&ucg, ucg_dev_st7735_18x128x128, ucg_ext_st7735_18, ucg_com_hal);
+		ucg_Init(&ucg, ucg_dev_st7735_18x128x128, ucg_ext_st7735S_18, ucg_com_hal);
+		break;
+	case LCD_SPI_ST7735L:
+		ucg_Init(&ucg, ucg_dev_st7735_18x80x160, ucg_ext_st7735L_18, ucg_com_hal);
+		break;
+	case LCD_SPI_ST7735W:
+		ucg_Init(&ucg, ucg_dev_st7735_18x128x160_W, ucg_ext_st7735W_18, ucg_com_hal);
 		break;
 	case LCD_SPI_ILI9341:
 		ucg_Init(&ucg, ucg_dev_ili9341_18x240x320, ucg_ext_ili9341_18, ucg_com_hal);
@@ -970,7 +985,7 @@ void lcd_initUcg(uint8_t *lcd_type)
 		
 		setfont(text);
 		yy = ucg_GetHeight(&ucg);
-		if (yy == 64)
+		if (yy <= 80)
 			y = - ucg_GetFontDescent(&ucg)+ ucg_GetFontAscent(&ucg)+2 ; //interline
 		else
 			y = - ucg_GetFontDescent(&ucg)+ ucg_GetFontAscent(&ucg) +3; //interline

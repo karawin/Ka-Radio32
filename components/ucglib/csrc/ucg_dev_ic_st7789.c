@@ -41,7 +41,7 @@
 const ucg_pgm_uint8_t ucg_st7789_set_pos_seq[] = 
 {
   UCG_CS(0),					/* enable chip */
-  UCG_C11( 0x036, 0x008),
+  UCG_C11( 0x036, 0x000),
   UCG_C10(0x02a),	UCG_VARX(0,0x00, 0), UCG_VARX(0,0x0ff, 0), UCG_A2(0x000, 0x0ef),					/* set x position */
   UCG_C10(0x02b),	UCG_VARY(8,0x01, 0), UCG_VARY(0,0x0ff, 0), UCG_A2(0x001, 0x03f),		/* set y position */
   UCG_C10(0x02c),							/* write to RAM */
@@ -58,7 +58,7 @@ const ucg_pgm_uint8_t ucg_st7789_set_pos_dir0_seq[] =
   /* 0x008 vertical increment (dir = 1) */
   /* 0x048 horizontal deccrement (dir = 2) */
   /* 0x088 vertical deccrement (dir = 3) */
-  UCG_C11( 0x036, 0x008),
+  UCG_C11( 0x036, 0x000),
   UCG_C10(0x02a),	UCG_VARX(0,0x00, 0), UCG_VARX(0,0x0ff, 0), UCG_A2(0x000, 0x0ef),					/* set x position */
   UCG_C10(0x02b),	UCG_VARY(8,0x01, 0), UCG_VARY(0,0x0ff, 0), UCG_A2(0x001, 0x03f),		/* set y position */
 
@@ -74,7 +74,7 @@ const ucg_pgm_uint8_t ucg_st7789_set_pos_dir1_seq[] =
   /* 0x008 vertical increment (dir = 1) */
   /* 0x048 horizontal deccrement (dir = 2) */
   /* 0x088 vertical deccrement (dir = 3) */
-  UCG_C11( 0x036, 0x008),
+  UCG_C11( 0x036, 0x000),
   UCG_C10(0x02a),	UCG_VARX(0,0x00, 0), UCG_VARX(0,0x0ff, 0), UCG_VARX(0,0x00, 0), UCG_VARX(0,0x0ff, 0),					/* set x position */
   UCG_C10(0x02b),	UCG_VARY(8,0x01, 0), UCG_VARY(0,0x0ff, 0), UCG_A2(0x001, 0x03f),		/* set y position */
 
@@ -92,8 +92,8 @@ const ucg_pgm_uint8_t ucg_st7789_set_pos_dir2_seq[] =
   /* 0x048 horizontal deccrement (dir = 2) */
   /* 0x088 vertical deccrement (dir = 3) */
   
-  UCG_C11( 0x036, 0x048),
-  UCG_C11( 0x036, 0x048),			/* it seems that this command needs to be sent twice */
+  UCG_C11( 0x036, 0x040),
+  UCG_C11( 0x036, 0x040),			/* it seems that this command needs to be sent twice */
   UCG_C10(0x02a),	UCG_VARX(0,0x00, 0), UCG_VARX(0,0x0ff, 0), UCG_A2(0x000, 0x0ef),					/* set x position */
   UCG_C10(0x02b),	UCG_VARY(8,0x01, 0), UCG_VARY(0,0x0ff, 0), UCG_A2(0x001, 0x03f),		/* set y position */
 
@@ -110,8 +110,8 @@ const ucg_pgm_uint8_t ucg_st7789_set_pos_dir3_seq[] =
   /* 0x008 vertical increment (dir = 1) */
   /* 0x0c8 horizontal deccrement (dir = 2) */
   /* 0x0c8 vertical deccrement (dir = 3) */
-  UCG_C11( 0x036, 0x088),
-  UCG_C11( 0x036, 0x088),		/* it seems that this command needs to be sent twice */
+  UCG_C11( 0x036, 0x080),
+  UCG_C11( 0x036, 0x080),		/* it seems that this command needs to be sent twice */
   UCG_C10(0x02a),	UCG_VARX(0,0x00, 0), UCG_VARX(0,0x0ff, 0), UCG_VARX(0,0x00, 0), UCG_VARX(0,0x0ff, 0),					/* set x position */
   UCG_C10(0x02b),	UCG_VARY(8,0x01, 0), UCG_VARY(0,0x0ff, 0), UCG_A2(0x001, 0x03f),		/* set y position */
 
@@ -148,9 +148,9 @@ ucg_int_t ucg_handle_st7789_l90fx(ucg_t *ucg)
 	ucg->arg.pixel.pos.y = tmp;
 	break;
     }
-    c[2] = ucg->arg.pixel.rgb.color[0];
+    c[0] = ucg->arg.pixel.rgb.color[0];
     c[1] = ucg->arg.pixel.rgb.color[1];
-    c[0] = ucg->arg.pixel.rgb.color[2];
+    c[2] = ucg->arg.pixel.rgb.color[2];
     ucg_com_SendRepeat3Bytes(ucg, ucg->arg.len, c);
     ucg_com_SetCSLineStatus(ucg, 1);		/* disable chip */
     return 1;
@@ -214,9 +214,9 @@ ucg_int_t ucg_handle_st7789_l90tc(ucg_t *ucg)
     pixmap = ucg_pgm_read(ucg->arg.bitmap);
     bitcnt = ucg->arg.pixel_skip;
     pixmap <<= bitcnt;
-    buf[13] = ucg->arg.pixel.rgb.color[0];
+    buf[9] = ucg->arg.pixel.rgb.color[0];
     buf[11] = ucg->arg.pixel.rgb.color[1];
-    buf[9] = ucg->arg.pixel.rgb.color[2];
+    buf[13] = ucg->arg.pixel.rgb.color[2];
     //ucg_com_SetCSLineStatus(ucg, 0);		/* enable chip */
     
     for( i = 0; i < ucg->arg.len; i++ )
@@ -338,9 +338,9 @@ ucg_int_t ucg_dev_ic_st7789_18(ucg_t *ucg, ucg_int_t msg, void *data)
       {
 	uint8_t c[3];
 	ucg_com_SendCmdSeq(ucg, ucg_st7789_set_pos_seq);	
-	c[2] = ucg->arg.pixel.rgb.color[0];
+	c[0] = ucg->arg.pixel.rgb.color[0];
 	c[1] = ucg->arg.pixel.rgb.color[1];
-	c[0] = ucg->arg.pixel.rgb.color[2];
+	c[2] = ucg->arg.pixel.rgb.color[2];
 	ucg_com_SendRepeat3Bytes(ucg, 1, c);
 	ucg_com_SetCSLineStatus(ucg, 1);		/* disable chip */
       }

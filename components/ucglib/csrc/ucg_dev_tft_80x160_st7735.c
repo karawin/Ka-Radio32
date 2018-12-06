@@ -1,6 +1,6 @@
 /*
 
-  ucg_dev_tft_128x128_st7735.c
+  ucg_dev_tft_80x128_st7735.c
   
   ST7735 with 4-Wire SPI (SCK, SDI, CS, D/C and optional reset)
 
@@ -37,8 +37,8 @@
 
 #include "ucg.h"
 
-//static const uint8_t ucg_dev_ssd1351_128x128_init_seq[] PROGMEM = {
-static const ucg_pgm_uint8_t ucg_tft_128x128_st7735_init_seq[] = {
+//static const uint8_t ucg_dev_ssd1351_80x128_init_seq[] PROGMEM = {
+static const ucg_pgm_uint8_t ucg_tft_80x160_st7735_init_seq[] = {
   UCG_CFG_CD(0,1),				/* DC=0 for command mode, DC=1 for data and args */
   UCG_RST(1),					
   UCG_CS(1),					/* disable chip */
@@ -73,8 +73,8 @@ static const ucg_pgm_uint8_t ucg_tft_128x128_st7735_init_seq[] = {
 
   UCG_C11( 0x036, 0x000),		/* memory control */
   
-  UCG_C14(  0x02a, 0x000, 0x000, 0x000, 0x07f),              /* Horizontal GRAM Address Set */
-  UCG_C14(  0x02b, 0x000, 0x000, 0x000, 0x07f),              /* Vertical GRAM Address Set */
+  UCG_C14(  0x02a, 0x000, 0x000, 0x000, 0x04f),              /* Horizontal GRAM Address Set */
+  UCG_C14(  0x02b, 0x000, 0x000, 0x000, 0x09f),              /* Vertical GRAM Address Set */
   UCG_C10(  0x02c),               /* Write Data to GRAM */
 
   
@@ -82,30 +82,30 @@ static const ucg_pgm_uint8_t ucg_tft_128x128_st7735_init_seq[] = {
   UCG_END(),					/* end of sequence */
 };
 
-ucg_int_t ucg_dev_st7735_18x128x128(ucg_t *ucg, ucg_int_t msg, void *data)
+ucg_int_t ucg_dev_st7735_18x80x160(ucg_t *ucg, ucg_int_t msg, void *data)
 {
   switch(msg)
   {
     case UCG_MSG_DEV_POWER_UP:
       /* 1. Call to the controller procedures to setup the com interface */
-      if ( ucg_dev_ic_st7735S_18(ucg, msg, data) == 0 )
+      if ( ucg_dev_ic_st7735L_18(ucg, msg, data) == 0 )
 	return 0;
 
       /* 2. Send specific init sequence for this display module */
-      ucg_com_SendCmdSeq(ucg, ucg_tft_128x128_st7735_init_seq);
+      ucg_com_SendCmdSeq(ucg, ucg_tft_80x160_st7735_init_seq);
       
       return 1;
       
     case UCG_MSG_DEV_POWER_DOWN:
       /* let do power down by the conroller procedures */
-      return ucg_dev_ic_st7735S_18(ucg, msg, data);  
+      return ucg_dev_ic_st7735L_18(ucg, msg, data);  
     
     case UCG_MSG_GET_DIMENSION:
-      ((ucg_wh_t *)data)->w = 128;
-      ((ucg_wh_t *)data)->h = 128;
+      ((ucg_wh_t *)data)->w = 80;
+      ((ucg_wh_t *)data)->h = 160;
       return 1;
   }
   
   /* all other messages are handled by the controller procedures */
-  return ucg_dev_ic_st7735S_18(ucg, msg, data);  
+  return ucg_dev_ic_st7735L_18(ucg, msg, data);  
 }

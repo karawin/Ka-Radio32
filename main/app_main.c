@@ -636,11 +636,13 @@ void timerTask(void* p) {
 	gpio_set_level(gpioLed,0);	
 	cCur = FlashOff*10;
 	device = getDeviceSettings();
+	queue_event_t evt;
 	
 	while(1) {
 		// read and treat the timer queue events
-		queue_event_t evt;
-		while (xQueueReceive(event_queue, &evt, 1))
+//		int nb = uxQueueMessagesWaiting(event_queue);
+//		if (nb >29) printf(" %d\n",nb);
+		while (xQueueReceive(event_queue, &evt, 0))
 		{
 			switch (evt.type){
 					case TIMER_SLEEP:
@@ -666,7 +668,8 @@ void timerTask(void* p) {
 			if (ctime >= cCur)
 			{
 				gpioLed = getLedGpio();
-				taskYIELD();
+//				taskYIELD();
+
 				if (stateLed)
 				{
 					gpio_set_level(gpioLed,0);	
@@ -691,8 +694,8 @@ void timerTask(void* p) {
 //				ESP_LOGD("timerTask",striWATERMARK,uxTaskGetStackHighWaterMark( NULL ),xPortGetFreeHeapSize( ));
 			}
 			ctimeVol = 0;
-		}						
-//		taskYIELD();
+		}	
+	vTaskDelay(1);		
 	}
 //	printf("t0 end\n");
 	vTaskDelete( NULL ); // stop the task (never reached)
@@ -890,8 +893,8 @@ void app_main()
 	ESP_LOGI(TAG, "Volume set to %d",device->vol);
 		
 	
-// queue for events of the sleep / wake timers
-	event_queue = xQueueCreate(10, sizeof(queue_event_t));
+// queue for events of the sleep / wake and Ms timers
+	event_queue = xQueueCreate(30, sizeof(queue_event_t));
 	// led blinks
 	xTaskCreatePinnedToCore(timerTask, "timerTask",1900, NULL, PRIO_TIMER, &pxCreatedTask,CPU_TIMER); 
 	ESP_LOGI(TAG, "%s task: %x","t0",(unsigned int)pxCreatedTask);		

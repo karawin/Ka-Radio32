@@ -360,7 +360,7 @@ void drawTime()
 void drawScreen()
 {
   if (lcd_type == LCD_NONE) return;
-  //ESP_LOGV(TAG,"stateScreen: %d",stateScreen);
+//  ESP_LOGW(TAG,"stateScreen: %d, mTscreen: %d",stateScreen,mTscreen);
   if ((mTscreen != MTNODISPLAY)&&(!itLcdOut))
   {
   switch (stateScreen)
@@ -662,13 +662,13 @@ void encoderCompute(Encoder_t *enc,bool role)
 	}	else
 		// no event on button switch
 	{
-		typeScreen state;
-		if (role) state = sstation; else state = svolume;
-		if ((stateScreen  != state)&&(newValue != 0))
+		typeScreen estate;
+		if (role) estate = sstation; else estate = svolume;
+		if ((stateScreen  != estate)&&(newValue != 0))
 		{    
 			if(role) setRelVolume(newValue);else changeStation(newValue);
 		} 
-		if ((stateScreen  == state)&&(newValue != 0))
+		if ((stateScreen  == estate)&&(newValue != 0))
 		{    
 			if(role) changeStation(newValue); else setRelVolume(newValue);	
 		} 	
@@ -1061,7 +1061,7 @@ void task_addon(void *pvParams)
 			}
 		}
 
-		if (timerScroll >= 600) //
+		if (timerScroll >= 500) //
 		{
 			if (lcd_type != LCD_NONE) 
 			{
