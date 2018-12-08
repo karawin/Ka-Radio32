@@ -1,29 +1,6 @@
 <?php header("Access-Control-Allow-Origin: *"); ?>
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<title>Useful informations about KaRadio</title>
-		<style>
-			* { margin: 0; padding: 0; box-sizing: border-box; }
-			body { font: 12pt 'Noto Sans', Arial, Sans-Serif; }
-			article { margin: 1.5rem 1rem; }
-			article:first-of-type { margin-top: 0; }
-			ul { list-style: none; }
-			.content { margin-left: 2rem; }
-			.flex { display: flex; }
-			.flex form { margin-right: 4rem; }
-			p { margin: 0.5rem 0; }
-			#links a { color: #14A692; }
-			#playlists span { display: inline-block; width: 15rem; }
-			@media screen and (min-width: 64rem) {
-				html { background-color: #444; }
-				body { max-width: 64rem; margin: 0 auto; padding: 1rem; background-color: #fff; }
-			}
-		</style>
-		<base href="http://karadio.karawin.fr/" />
-		<base target="_blank" />
-	</head>
    <body>
 	   <article id="links">
 			<h1>Links</h1>
