@@ -909,43 +909,6 @@ void sysrotat(char* s)
 	free(device);	
 }
 
-/*
-// display or change the charset. 0:latin, 1:cyrillic
-void syscharset(char* s)
-{
-    char *t = strstr(s, parslashquote);
-	struct device_settings *device;
-
-	kprintf("##Charset: ");
-	if(t == NULL)
-	{
-		if (getCharset())
-			kprintf("Cyrillic#\n");
-		else
-			kprintf("Latin#\n");
-		return;
-	}
-	char *t_end  = strstr(t, parquoteslash);
-    if(t_end == NULL)
-    {
-		kprintf(stritCMDERROR);
-		return;
-    }	
-	uint8_t value = atoi(t+2);
-	device = getDeviceSettings();
-	if (value == 0)
-		device->options32 &= NT_CHARSET;
-	else 
-		device->options32 |= T_CHARSET;
-	setCharset(value);
-	saveDeviceSettings(device);	
-	if (getCharset())
-		kprintf("Cyrillic#\n");
-	else
-		kprintf("Latin#\n");
-	free(device);	
-}
-*/
 
 // Timer in seconds to switch off the lcd
 void syslcdout(char* s)
@@ -954,9 +917,10 @@ void syslcdout(char* s)
 	struct device_settings *device;
 	device = getDeviceSettings();
 	kprintf("##LCD out is ");
+	lcd_out = device->lcd_out; 
 	if(t == NULL)
 	{
-		kprintf("%d#\n",device->lcd_out);
+		kprintf("%d#\n",lcd_out);
 		free(device);
 		return;
 	}
@@ -979,13 +943,15 @@ void syslcdout(char* s)
 uint32_t getLcdOut()
 {
 	struct device_settings *device;
+	int increm = 0;
 	if (lcd_out == 0xFFFFFFFF)
 	{
 		device = getDeviceSettings();
 		lcd_out = device->lcd_out;
 		free (device);
 	} 
-	return lcd_out;	
+	if (lcd_out >0) increm++; //adjust
+	return lcd_out+increm;	
 }
 
 // mode of the led indicator. Blink or play/stop

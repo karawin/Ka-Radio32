@@ -33,7 +33,7 @@
 
 #define TAG  "addon"
 
-
+static void evtClearScreen();
 // second before time display in stop state
 #define DTIDLE  60
 
@@ -156,6 +156,7 @@ void wakeLcd()
 
 void sleepLcd()
 {
+	evtClearScreen();
 	// add the gpio switch off here
 	LedBacklightOff();
 }
@@ -456,10 +457,12 @@ static void evtStation(int16_t value)
 
 static void evtClearScreen()
 {
+	
+//	isColor?ucg_ClearScreen(&ucg):u8g2_ClearDisplay(&u8g2);
 	event_lcd_t evt;
 	evt.lcmd = eclrs;	
 	evt.lline = NULL;
-	xQueueSend(event_lcd,&evt, 0);	
+	xQueueSendToFront(event_lcd,&evt, 0);	
 }
 
 static void evtDrawScreen()
@@ -893,6 +896,11 @@ void task_lcd(void *pvParams)
 	
 	while (1)
 	{	
+		if (itLcdOut) // switch off the lcd
+		{
+			sleepLcd();
+		}
+		
 		if (event_lcd != NULL)
 		while (xQueueReceive(event_lcd, &evt, 0))
 		{ 
@@ -905,17 +913,19 @@ void task_lcd(void *pvParams)
 			{
 				case lmeta:
 					wakeLcd();	
+					drawScreen(); 
 					isColor?metaUcg(evt.lline):metaU8g2(evt.lline);
 					break;
 				case licy4:
 					isColor?icy4Ucg(evt.lline):icy4U8g2(evt.lline);
 					break;
 				case licy0:
-					wakeLcd();	
+					wakeLcd(); 					
 					isColor?icy0Ucg(evt.lline):icy0U8g2(evt.lline);
 					break;
 				case lstop:
-					wakeLcd();	
+					wakeLcd();
+					drawScreen(); 					
 					isColor?statusUcg(stopped):statusU8g2(stopped);
 					if (stateScreen != smain)
 					{
@@ -935,20 +945,23 @@ void task_lcd(void *pvParams)
 					isColor?playingUcg():playingU8g2();						  
 					break;
 				case lvol:
-					wakeLcd();	
 					// ignore it if the next is a lvol
 					if(xQueuePeek(event_lcd, &evt1, 0))
 						if (evt1.lcmd == lvol) break;
 					isColor?setVolumeUcg(volume):setVolumeU8g2(volume);
 					if (dvolume)
 						Screen(svolume); 
-					dvolume = true;
+					wakeLcd();
+					drawScreen(); 
+					dvolume = true;									
 					timerScreen = 0;					
 					break;
 				case lovol:
+					wakeLcd();
 					dvolume = false; // don't show volume on start station
 					break;
 				case estation:
+					wakeLcd();
 					changeStation((uint32_t)evt.lline);	
 					evt.lline = NULL;					
 					break;
@@ -1029,12 +1042,11 @@ void task_addon(void *pvParams)
 			itAskStime = false;
 		}
 
-		if (itLcdOut) // switch off the lcd
+/*		if (itLcdOut) // switch off the lcd
 		{
-			evtClearScreen();
 			sleepLcd();
 		}
-		
+*/		
 		if (timerScreen >= 3) // 3 sec timeout 
 		{
 			timerScreen = 0;
