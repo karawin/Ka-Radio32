@@ -1,18 +1,22 @@
 /*
+
   ucg_com_msg_api.c
   
   Universal uC Color Graphics Library
   
   Copyright (c) 2014, olikraus@gmail.com
   All rights reserved.
+
   Redistribution and use in source and binary forms, with or without modification, 
   are permitted provided that the following conditions are met:
+
   * Redistributions of source code must retain the above copyright notice, this list 
     of conditions and the following disclaimer.
     
   * Redistributions in binary form must reproduce the above copyright notice, this 
     list of conditions and the following disclaimer in the documentation and/or other 
     materials provided with the distribution.
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
   CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
   INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
@@ -26,6 +30,7 @@
   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+
 */
 
 #include "ucg.h"
@@ -195,7 +200,9 @@ void ucg_com_SendCmdDataSequence(ucg_t *ucg, uint16_t cnt, const uint8_t *byte_p
 }
 
 /*
+
 Command-Sequence Language
+
 CMD10		1x CMD Byte, 0x Argument Data Bytes
 CMD20		2x CMD Byte, 0x Argument Data Bytes
 CMD11		1x CMD Byte, 1x Argument Data Bytes
@@ -206,20 +213,28 @@ CMD13		1x CMD Byte, 3x Argument Data Bytes
 CMD23		2x CMD Byte, 3x Argument Data Bytes
 CMD14		1x CMD Byte, 4x Argument Data Bytes
 CMD24		2x CMD Byte, 4x Argument Data Bytes
+
 DATA1		1x Data Bytes
 DATA2		2x Data Bytes
 DATA3		3x Data Bytes
 DATA4		4x Data Bytes
 DATA5		5x Data Bytes
 DATA6		6x Data Bytes
+
 RST_LOW		Output 0 on reset line
 RST_HIGH		Output 1 on reset line
+
 CS_LOW		Output 0 on chip select line
 CS_HIGH		Output 1 on chip select line
+
 DLY_MS		Delay for specified amount of milliseconds (0..2000)
 DLY_US		Delay for specified amount of microconds (0..2000)
+
 Configuration
+
 CFG_CD(c,a)	Configure CMD/DATA line: "c" logic level CMD, "a" logic level CMD Args
+
+
 0000xxxx			End Marker
 0001xxxx			1x CMD Byte, 0..15 Argument Data Bytes
 0010xxxx			2x CMD Byte, 0..15 Argument Data Bytes
@@ -243,6 +258,7 @@ CFG_CD(c,a)	Configure CMD/DATA line: "c" logic level CMD, "a" logic level CMD Ar
 1111011x
 111110xx
 111111ca		CFG_CD(c,a)
+
 #define C10(c0)				0x010, (c0)
 #define C20(c0,c1)				0x020, (c0),(c1)
 #define C11(c0,a0)				0x011, (c0),(a0)
@@ -253,6 +269,7 @@ CFG_CD(c,a)	Configure CMD/DATA line: "c" logic level CMD, "a" logic level CMD Ar
 #define C23(c0,c1,a0,a1,a2)		0x023, (c0),(c1),(a0),(a1),(a2)
 #define C14(c0,a0,a1,a2,a3)		0x013, (c0),(a0),(a1),(a2),(a3)
 #define C24(c0,c1,a0,a1,a2,a3)	0x023, (c0),(c1),(a0),(a1),(a2),(a3)
+
 #define UCG_DATA()			0x070
 #define D1(d0)				0x071, (d0)
 #define D2(d0,d1)				0x072, (d0),(d1)
@@ -260,17 +277,22 @@ CFG_CD(c,a)	Configure CMD/DATA line: "c" logic level CMD, "a" logic level CMD Ar
 #define D4(d0,d1,d3,d4)			0x074, (d0),(d1),(d2),(d3)
 #define D5(d0,d1,d3,d4,d5)		0x075, (d0),(d1),(d2),(d3),(d5)
 #define D6(d0,d1,d3,d4,d5,d6)	0x076, (d0),(d1),(d2),(d3),(d5),(d6)
+
 #define DLY_MS(t)				0x080 | (((t)>>8)&15), (t)&255
 #define DLY_US(t)				0x090 | (((t)>>8)&15), (t)&255
+
   s: Shift right
   a: And mask
   o: Or mask
 #define UCG_VARX(s,a,o)		0x0a0 | ((s)&15), (a), (o)
 #define UCG_VARY(s,a,o)		0x0b0 | ((s)&15), (a), (o)
+
 #define RST(level)				0x0f0 | ((level)&1)
 #define CS(level)				0x0f4 | ((level)&1)
 #define CFG_CD(c,a)			0x0fc | (((c)&1)<<1) | ((a)&1)
+
 #define END()					0x00
+
 */
 
 static void ucg_com_SendCmdArg(ucg_t *ucg, const ucg_pgm_uint8_t *data, uint8_t cmd_cnt, uint8_t arg_cnt)
@@ -289,92 +311,96 @@ static void ucg_com_SendCmdArg(ucg_t *ucg, const ucg_pgm_uint8_t *data, uint8_t 
 //void ucg_com_SendCmdSeq(ucg_t *ucg, const ucg_pgm_uint8_t *data)
 void ucg_com_SendCmdSeq(ucg_t *ucg, const ucg_pgm_uint8_t *data)
 {
-	uint8_t b;
-	uint8_t bb;
-	uint8_t hi;
-	uint8_t lo;
+  uint8_t b;
+  uint8_t bb;
+  uint8_t hi;
+  uint8_t lo;
 
-	for(;;){
-		b = ucg_pgm_read(data);
-		//b = *data;
-		hi = (b) >> 4;
-		lo = (b) & 0x0f;
-		switch( hi ){
-			case 0:
-				return;		/* end marker */
-			case 1:
-			case 2:
-			case 3:
-				ucg_com_SendCmdArg(ucg, data+1, hi, lo);
-				data+=1+hi+lo;
-				break;
-			case 6:
-				ucg_com_SetCDLineStatus(ucg, (ucg->com_cfg_cd)&1 );
-				ucg_com_SendStringP(ucg, lo, data+1);
-				data+=1+lo;      
-				break;
-			case 7:	/* note: 0x070 is used to set data line status */
-				ucg_com_SetCDLineStatus(ucg, ((ucg->com_cfg_cd>>1)&1)^1 );
-				if ( lo > 0 )
-					ucg_com_SendStringP(ucg, lo, data+1);
-				data+=1+lo;      
-				break;
-			case 8:
-				data++;
-				b = ucg_pgm_read(data);
-				//b = *data;
-				ucg_com_DelayMilliseconds(ucg, (((uint16_t)lo)<<8) + b );
-				data++;
-				break;
-			case 9:
-				data++;
-				b = ucg_pgm_read(data);
-				//b = *data;
-				ucg_com_DelayMicroseconds(ucg, (((uint16_t)lo)<<8) + b );
-				data++;
-				break;
-			case 10:	// SET x Address XS XE
-				data++;
-				b = ucg_pgm_read(data);
-				data++;
-				bb = ucg_pgm_read(data);
-				data++;
-				//b = data[0];
-				//bb = data[1];
-				ucg_com_SetCDLineStatus(ucg, (ucg->com_cfg_cd)&1 );
-				ucg_com_SendByte(ucg, (((uint8_t)(((ucg->arg.pixel.pos.x+ucg->display_offset.x)>>lo)))&b)|bb );
-				//data+=2;
-				break;
-			case 11:
-				data++;
-				b = ucg_pgm_read(data);
-				data++;
-				bb = ucg_pgm_read(data);
-				data++;
-				//b = data[0];
-				//bb = data[1];
-				ucg_com_SetCDLineStatus(ucg, (ucg->com_cfg_cd)&1 );
-				ucg_com_SendByte(ucg, (((uint8_t)(((ucg->arg.pixel.pos.y+ucg->display_offset.y)>>lo)))&b)|bb );
-				//data+=2;
-				break;
-			case 15:
-				hi = lo >> 2;
-				lo &= 3;
-				switch(hi){
-			case 0:
-				ucg_com_SetResetLineStatus(ucg, lo&1);
-				break;
-			case 1:
-				ucg_com_SetCSLineStatus(ucg, lo&1);
-				break;
-			case 3:
-				ucg->com_cfg_cd = lo;
-				break;
-		}
-			data++;
-			break;
-		default:
-		return;
-		}  // switch 
-	} // for
+  for(;;)
+  {
+    b = ucg_pgm_read(data);
+    //b = *data;
+    hi = (b) >> 4;
+    lo = (b) & 0x0f;
+    switch( hi )
+    {
+      case 0:
+	return;		/* end marker */
+      case 1:
+      case 2:
+      case 3:
+	ucg_com_SendCmdArg(ucg, data+1, hi, lo);
+	data+=1+hi+lo;
+	break;
+      case 6:
+	ucg_com_SetCDLineStatus(ucg, (ucg->com_cfg_cd)&1 );
+	ucg_com_SendStringP(ucg, lo, data+1);
+	data+=1+lo;      
+	break;
+      case 7:	/* note: 0x070 is used to set data line status */
+	ucg_com_SetCDLineStatus(ucg, ((ucg->com_cfg_cd>>1)&1)^1 );
+	if ( lo > 0 )
+	  ucg_com_SendStringP(ucg, lo, data+1);
+	data+=1+lo;      
+	break;
+      case 8:
+	data++;
+	b = ucg_pgm_read(data);
+	//b = *data;
+	ucg_com_DelayMilliseconds(ucg, (((uint16_t)lo)<<8) + b );
+	data++;
+	break;
+      case 9:
+	data++;
+	b = ucg_pgm_read(data);
+	//b = *data;
+	ucg_com_DelayMicroseconds(ucg, (((uint16_t)lo)<<8) + b );
+	data++;
+	break;
+      case 10:
+	data++;
+	b = ucg_pgm_read(data);
+	data++;
+	bb = ucg_pgm_read(data);
+	data++;
+	//b = data[0];
+	//bb = data[1];
+	ucg_com_SetCDLineStatus(ucg, (ucg->com_cfg_cd)&1 );
+	ucg_com_SendByte(ucg, (((uint8_t)(((ucg->arg.pixel.pos.x)>>lo)))&b)|bb );
+	//data+=2;
+	break;
+      case 11:
+	data++;
+	b = ucg_pgm_read(data);
+	data++;
+	bb = ucg_pgm_read(data);
+	data++;
+	//b = data[0];
+	//bb = data[1];
+	ucg_com_SetCDLineStatus(ucg, (ucg->com_cfg_cd)&1 );
+	ucg_com_SendByte(ucg, (((uint8_t)(((ucg->arg.pixel.pos.y)>>lo)))&b)|bb );
+	//data+=2;
+	break;
+      case 15:
+	hi = lo >> 2;
+	lo &= 3;
+	switch(hi)
+	{
+	  case 0:
+	    ucg_com_SetResetLineStatus(ucg, lo&1);
+	    break;
+	  case 1:
+	    ucg_com_SetCSLineStatus(ucg, lo&1);
+	    break;
+	  case 3:
+	    ucg->com_cfg_cd = lo;
+	    break;
+	}
+	data++;
+	break;
+      default:
+	return;
+    }  
+  }
 }
+

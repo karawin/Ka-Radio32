@@ -389,7 +389,7 @@ struct _ucg_t
   
   /* offset, that is additionally added to UCG_VARX/UCG_VARY */
   /* seems to be required for the Nokia display */
-  // ucg_xy_t display_offset;
+   ucg_xy_t display_offset;
   
   /* data which is passed to the cb procedures */
   /* can be modified by the cb procedures (rotation, clipping, etc) */

@@ -914,8 +914,7 @@ void sysrotat(char* s)
 void syslcdout(char* s)
 {
     char *t = strstr(s, parslashquote);
-	struct device_settings *device;
-	device = getDeviceSettings();
+	struct device_settings *device = getDeviceSettings();
 	kprintf("##LCD out is ");
 	lcd_out = device->lcd_out; 
 	if(t == NULL)
@@ -942,11 +941,10 @@ void syslcdout(char* s)
 }
 uint32_t getLcdOut()
 {
-	struct device_settings *device;
 	int increm = 0;
 	if (lcd_out == 0xFFFFFFFF)
 	{
-		device = getDeviceSettings();
+		struct device_settings *device = getDeviceSettings();
 		lcd_out = device->lcd_out;
 		free (device);
 	} 

@@ -71,7 +71,7 @@ time_t timestamp = 0;
 static bool syncTime = false;
 static bool itAskTime = true; // update time with ntp if true
 static bool itAskStime = false; // start the time display
-static bool itLcdOut = false;
+static uint8_t itLcdOut = 0;
 //static bool itAskSsecond = false; // start the time display
 static bool state = false; // start stop on Ok key
 
@@ -146,19 +146,22 @@ uint16_t GetWidth()
 void wakeLcd()
 {
 	if (lcd_type == LCD_NONE) return;
-	timerLcdOut = getLcdOut();
-	if((isColor) && (itLcdOut))  mTscreen = MTNEW;
-	itLcdOut = false;
-	
 	// add the gpio switch on here gpioLedBacklight can be directly a GPIO_NUM_xx or declared in gpio.h
-	LedBacklightOn();
+	LedBacklightOn();	
+	timerLcdOut = getLcdOut(); // rearm the tempo
+	if((isColor) && (itLcdOut))  mTscreen = MTNEW;
+	itLcdOut = 0;
+	
+
 }
 
 void sleepLcd()
 {
-	evtClearScreen();
+	itLcdOut = 2;
 	// add the gpio switch off here
 	LedBacklightOff();
+	evtClearScreen();
+
 }
 
 void lcd_init(uint8_t Type)
@@ -231,7 +234,7 @@ IRAM_ATTR void ServiceAddon(void)
 		if (((timein % DTIDLE)==0)&&(!state)  ) {           
 			{itAskStime=true;timein = 0;} // start the time display
         } 
-		if (timerLcdOut == 1) itLcdOut = true;
+		if (timerLcdOut == 1) itLcdOut = 1;
 		if ((stateScreen == stime)||(stateScreen == smain)) { mTscreen = MTREFRESH; } // display time
 		if (!syncTime) itAskTime=true; // first synchro if not done
 		
@@ -670,10 +673,12 @@ void encoderCompute(Encoder_t *enc,bool role)
 		if ((stateScreen  != estate)&&(newValue != 0))
 		{    
 			if(role) setRelVolume(newValue);else changeStation(newValue);
+			wakeLcd();
 		} 
 		if ((stateScreen  == estate)&&(newValue != 0))
 		{    
-			if(role) changeStation(newValue); else setRelVolume(newValue);	
+			if(role) changeStation(newValue); else setRelVolume(newValue);
+			wakeLcd();			
 		} 	
 	}		
 }
@@ -896,7 +901,7 @@ void task_lcd(void *pvParams)
 	
 	while (1)
 	{	
-		if (itLcdOut) // switch off the lcd
+		if (itLcdOut==1) // switch off the lcd
 		{
 			sleepLcd();
 		}
@@ -913,7 +918,6 @@ void task_lcd(void *pvParams)
 			{
 				case lmeta:
 					wakeLcd();	
-					drawScreen(); 
 					isColor?metaUcg(evt.lline):metaU8g2(evt.lline);
 					break;
 				case licy4:
@@ -925,13 +929,11 @@ void task_lcd(void *pvParams)
 					break;
 				case lstop:
 					wakeLcd();
-					drawScreen(); 					
 					isColor?statusUcg(stopped):statusU8g2(stopped);
 					if (stateScreen != smain)
 					{
 						mTscreen= MTNEW;
 						stateScreen =  smain; 
-						drawScreen();
 					}
 					break;
 				case lnameset:
@@ -939,7 +941,6 @@ void task_lcd(void *pvParams)
 					Screen(smain);
 					mTscreen= MTNEW;
 					stateScreen =  smain; 
-					drawScreen();
 					break;
 				case lplay:
 					isColor?playingUcg():playingU8g2();						  
@@ -952,7 +953,6 @@ void task_lcd(void *pvParams)
 					if (dvolume)
 						Screen(svolume); 
 					wakeLcd();
-					drawScreen(); 
 					dvolume = true;									
 					timerScreen = 0;					
 					break;

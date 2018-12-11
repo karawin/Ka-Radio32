@@ -1,24 +1,19 @@
 /*
-
-  ucg_dev_tft_128x160_W_st7735.c
+  ucg_dev_tft_128x160_st7735.c
   
   ST7735 with 4-Wire SPI (SCK, SDI, CS, D/C and optional reset)
-
   Universal uC Color Graphics Library
   
   Copyright (c) 2014, olikraus@gmail.com
   All rights reserved.
-
   Redistribution and use in source and binary forms, with or without modification, 
   are permitted provided that the following conditions are met:
-
   * Redistributions of source code must retain the above copyright notice, this list 
     of conditions and the following disclaimer.
     
   * Redistributions in binary form must reproduce the above copyright notice, this 
     list of conditions and the following disclaimer in the documentation and/or other 
     materials provided with the distribution.
-
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
   CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
   INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
@@ -32,13 +27,12 @@
   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
-
 */
 
 #include "ucg.h"
 
 //static const uint8_t ucg_dev_ssd1351_128x128_init_seq[] PROGMEM = {
-static const ucg_pgm_uint8_t ucg_tft_128x160_W_st7735_init_seq[] = {
+static const ucg_pgm_uint8_t ucg_tft_128x160_st7735_init_seq[] = {
   UCG_CFG_CD(0,1),				/* DC=0 for command mode, DC=1 for data and args */
   UCG_RST(1),					
   UCG_CS(1),					/* disable chip */
@@ -60,7 +54,7 @@ static const ucg_pgm_uint8_t ucg_tft_128x160_W_st7735_init_seq[] = {
   //UCG_C10(0x21), 				/* inverted */
 
   UCG_C11(0x03a, 0x006), 		/* set pixel format to 18 bit */
- //UCG_C11(0x03a, 0x005), 		/* set pixel format to 16 bit */
+  //UCG_C11(0x03a, 0x005), 		/* set pixel format to 16 bit */
 
   //UCG_C12(0x0b1, 0x000, 0x01b), 	/* frame rate control (POR values) */
   //UCG_C10(0x28), 				/* display off */
@@ -72,12 +66,9 @@ static const ucg_pgm_uint8_t ucg_tft_128x160_W_st7735_init_seq[] = {
 
 
   UCG_C11( 0x036, 0x000),		/* memory control */
-//  UCG_C11( 0x036, 0x0C0),		/* memory control */
   
-//  UCG_C14(  0x02a, 0x000, 0x000, 0x000, 0x07f),              /* Horizontal GRAM Address Set */
-//  UCG_C14(  0x02b, 0x000, 0x000, 0x000, 0x09f),              /* Vertical GRAM Address Set */
-  UCG_C14(  0x02a, 0x000, 0x002, 0x000, 0x081),              /* Horizontal GRAM Address Set */
-  UCG_C14(  0x02b, 0x000, 0x001, 0x000, 0x0a0),              /* Vertical GRAM Address Set */
+  UCG_C14(  0x02a, 0x000, 0x000, 0x000, 0x083),              /* Horizontal GRAM Address Set */
+  UCG_C14(  0x02b, 0x000, 0x000, 0x000, 0x0A1),              /* Vertical GRAM Address Set */
   UCG_C10(  0x02c),               /* Write Data to GRAM */
 
   
@@ -85,31 +76,30 @@ static const ucg_pgm_uint8_t ucg_tft_128x160_W_st7735_init_seq[] = {
   UCG_END(),					/* end of sequence */
 };
 
-ucg_int_t ucg_dev_st7735_18x128x160_W(ucg_t *ucg, ucg_int_t msg, void *data)
+ucg_int_t ucg_dev_st7735_18x128x160(ucg_t *ucg, ucg_int_t msg, void *data)
 {
   switch(msg)
   {
     case UCG_MSG_DEV_POWER_UP:
       /* 1. Call to the controller procedures to setup the com interface */
-      if ( ucg_dev_ic_st7735W_18(ucg, msg, data) == 0 )
+      if ( ucg_dev_ic_st7735_18(ucg, msg, data) == 0 )
 	return 0;
 
       /* 2. Send specific init sequence for this display module */
-      ucg_com_SendCmdSeq(ucg, ucg_tft_128x160_W_st7735_init_seq);
+      ucg_com_SendCmdSeq(ucg, ucg_tft_128x160_st7735_init_seq);
       
       return 1;
       
     case UCG_MSG_DEV_POWER_DOWN:
       /* let do power down by the conroller procedures */
-      return ucg_dev_ic_st7735W_18(ucg, msg, data);  
+      return ucg_dev_ic_st7735_18(ucg, msg, data);  
     
     case UCG_MSG_GET_DIMENSION:
-		return ucg_dev_ic_st7735W_18(ucg, msg, data);
-//      ((ucg_wh_t *)data)->w = 128;
-//      ((ucg_wh_t *)data)->h = 160;
-//      return 1;
+      ((ucg_wh_t *)data)->w = 128;
+      ((ucg_wh_t *)data)->h = 160;
+      return 1;
   }
   
   /* all other messages are handled by the controller procedures */
-  return ucg_dev_ic_st7735W_18(ucg, msg, data);  
+  return ucg_dev_ic_st7735_18(ucg, msg, data);  
 }
