@@ -40,8 +40,16 @@ python /home/jp/esp/esp-idf/components/esptool_py/esptool/esptool.py --chip esp3
 ```
 Compared to an old version, it adds the declaration of the partition "hardware" which interests us.
 
-Rename the pattern.csv file with the name of your card, for example lolin32.csv  
+Rename the pattern.csv file with the name of your c
+ard, for example lolin32.csv  
 Beware: not comment line or empty line allowed in a csv file.
+
+#### WARNING:
+The declaration of gpio's is a not so easy task.  
+Any error results in an incorrect start of the software.  
+If the software does not start properly, please check your values.  
+A common mistake is to declare the same number for two functions.  
+See the log on the serial interface.
 
 -----------------------
 2/ Definition of gpio's
@@ -105,6 +113,9 @@ P_I2S_DATA		DATA
 
 ADC keyboard:  
 P_ADC			gpio32 to 39  or 255 if not used.  
+
+LCD Backlight:
+P_BACKLIGHT		GPIO of the hardware device.
 ```
 
 ---------------
@@ -131,7 +142,6 @@ If If P_ENC0_A is not 255 and P_ENC0_BTN = 255, the push button is disabled.
 If If P_ENC1_A is not 255 and P_ENC1_BTN = 255, the push button is disabled.  
 
 ### Buttons
-
 Two set of three buttons can be configured in place or with encoder(s). The only limit is the available gpio's.  
 Each set has functions equivalent to Encoder0 and Encoder1:  
 click on button A: Start/Stop playing  
@@ -141,22 +151,24 @@ held on button A: click on button B and C: volume down and up for set 1 (P_BTN1)
 If a set is not used, P_BTNx_A must be set to 255. In this case P_BTNx_B P_BTNx_C are disabled too.
 
 ### I2C
-
 If I2C is not used (ie no lcd or spi lcd) the gpio of the i2C can be reused elsewhere.
 
 ### VS1053b
-
 If not used P_XCS must be set to 255. Gpio of P_RST P_XDCS P_DREQ may be reused elsewhere.
 
 ### IR
-
 If IR remote control is not used P_IR_SIGNAL must be set to 255
 
 ### ADC keyboard
-
 If the ADC keyboard is missing, set P_ADC  to 255.
 
+### Lcd backlight
+Thanks to Vadim Polyakovsky  
+This external device turns off the LCD backlight in addition to the screen clear.    
+Usefull if a battery is used.  
+If the hardware device is missing, set it to 255
 
+![Screenshoot of download tool](http://karadio.karawin.fr/images/backlight.jpg)
 ---------------------
 3/ IR key definitions
 ---------------------

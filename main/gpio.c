@@ -249,6 +249,22 @@ void gpio_get_i2s(gpio_num_t *lrck ,gpio_num_t *bclk ,gpio_num_t *i2sdata )
 	close_partition(hardware_handle,hardware);	
 }
 
+void gpio_get_lcd_backlightl(gpio_num_t *lcdb)
+{
+	esp_err_t err;
+	nvs_handle hardware_handle;
+	// init default
+	*lcdb = PIN_LCD_BACKLIGHT;
+	
+	if (open_partition(hardware, "gpio_space",&hardware_handle)!= ESP_OK) return;
+	
+	err = nvs_get_u8(hardware_handle, "P_BACKLIGHT",(uint8_t *) lcdb);
+	if (err != ESP_OK) printf("gpio_get_lcd_backlightl error %d\n",err);
+
+	close_partition(hardware_handle,hardware);		
+}
+
+
 
 void gpio_get_ir_key(nvs_handle handle,const char *key, int32_t *out_value1 , int32_t *out_value2)
 {

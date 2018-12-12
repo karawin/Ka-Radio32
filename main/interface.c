@@ -142,7 +142,7 @@ A command error display:\n\
 }; 
 
 uint16_t currentStation = 0;
-static uint8_t led_gpio = 255;
+static uint8_t led_gpio = GPIO_NONE;
 static IRAM_ATTR uint32_t lcd_out = 0xFFFFFFFF;
 static esp_log_level_t s_log_default_level = CONFIG_LOG_BOOTLOADER_LEVEL;
 extern void wsVol(char* vol);
@@ -737,7 +737,7 @@ void sysledgpio(char* s)
 uint8_t getLedGpio()
 {
 	struct device_settings *device;
-	if (led_gpio == 255)
+	if (led_gpio == GPIO_NONE)
 	{
 		device = getDeviceSettings();
 		uint8_t ledgpio = device->led_gpio;

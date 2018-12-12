@@ -31,6 +31,7 @@ P_I2S_LRCK,data,u8,25
 P_I2S_BCLK,data,u8,26
 P_I2S_DATA,data,u8,27
 P_ADC,data,u8,255
+P_BACKLIGHT,data,u8,255
 custom_ir_space,namespace,,
 K_UP,data,string,0xFF0047 0xFF0040
 K_LEFT,data,string,0xFF0007

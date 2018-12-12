@@ -325,7 +325,7 @@ ucg_int_t ucg_dev_ic_ili9341_18(ucg_t *ucg, ucg_int_t msg, void *data)
     case UCG_MSG_DEV_POWER_UP:
       /* setup com interface and provide information on the clock speed */
       /* of the serial and parallel interface. Values are nanoseconds. */
-      return ucg_com_PowerUp(ucg, 100, 66);
+      return ucg_com_PowerUp(ucg, 80, 66);
     case UCG_MSG_DEV_POWER_DOWN:
       ucg_com_SendCmdSeq(ucg, ucg_ili9341_power_down_seq);
       return 1;

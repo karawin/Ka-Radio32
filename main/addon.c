@@ -178,7 +178,7 @@ void lcd_init(uint8_t Type)
 	{
 		lcd_initU8g2(&lcd_type);
 	}
-	vTaskDelay(2);
+	vTaskDelay(1);
 }
 
 
@@ -196,6 +196,7 @@ void lcd_state(const char* State)
 
 void lcd_welcome(const char* ip)
 {
+char Version[20];
 	if (lcd_type == LCD_NONE) return;
 	if (strlen(ip)==0) ClearBuffer();
     if (isColor) 
@@ -206,7 +207,8 @@ void lcd_welcome(const char* ip)
     else DrawString(10,2,"KaRadio32");
 	if (isColor) ucg_SetFont(&ucg,ucg_font_6x10_tf);
 	else u8g2_SetFont(&u8g2,u8g2_font_6x10_tf);
-	DrawString(2,24,"WiFi Webradio");
+	sprintf(Version,"Version %s R%s\n",RELEASE,REVISION);
+	DrawString(2,24,Version);
 	DrawColor(0,0,0,0);
 	DrawBox(2, 40, 128-30, 12);
 	DrawColor(1,255,255,255);
