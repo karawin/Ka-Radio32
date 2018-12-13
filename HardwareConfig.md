@@ -163,7 +163,9 @@ If IR remote control is not used P_IR_SIGNAL must be set to 255
 If the ADC keyboard is missing, set P_ADC  to 255.
 
 ### Lcd backlight
-Thanks to Vadim Polyakovsky  
+Thanks to Vadim Polyakovsky:
+> A small optional schematics update which allows to switch LCD backlight on and off in case of battery powered KaRadio. The switching off timeout in x sec could be defined by sys.lcdout("x") terminal command. The display and its' backlight will wake up automatically in case of new meta, encoder or IR event. This way the battery life on one charge will be extended. Obviously not needed for OLED displays and wall plug power socket operation. A software support is done by Jean-Pierre in the new custom.c file. A GPIO number could be chosen among not used ones and defined respectively. Enjoy!
+ 
 This external device turns off the LCD backlight in addition to the screen clear.    
 Usefull if a battery is used.  
 If the hardware device is missing, set it to 255
@@ -218,6 +220,8 @@ Save the csv file.
 ------------------------
 4/ Generating the bin
 ------------------------
+Some samples are in the boards directory.   
+
 Start the command  
 `./nvs_partition_generator.sh yourname[.csv]`  
 to generate build/yourname.bin
@@ -236,7 +240,11 @@ done
 ------------
 5/ Flash the bin
 ------------
-With ESP DOWNLOAD TOOL or esptool.py command at address 0x3a2000  
+With ESP DOWNLOAD TOOL   
+![Screenshoot of download tool](https://raw.githubusercontent.com/karawin/Ka-Radio32/master/images/downloadtool32.jpg)
+
+
+or esptool.py command at address 0x3a2000  
 
 It seems that there is a problem with this ESP DOWNLOAD TOOL for flashing the bin alone.  
 In case of problem, flash it with another bin (bootloader.bin or KaRadio32.bin) 
