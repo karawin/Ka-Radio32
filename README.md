@@ -190,11 +190,7 @@ You can configure the kind of display used in your configuration with the comman
 - if the AP is already know by the esp32, the default ip is given by dhcp.
 - a sample of stations list is on http://karadio.karawin.fr/WebStations.txt . Can be uploaded via the web page.        
 
-To flash your KaRadio32 you will need these files:
-
-- http://karadio.karawin.fr/KaRadio32.bin
-- http://karadio.karawin.fr/KaRadio32sup.zip
-
+To flash your KaRadio32 without generating it,you will need the files in the binaries directory:
 
 The tool to use is here :  
 http://espressif.com/en/support/download/other-tools  
