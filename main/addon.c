@@ -96,6 +96,8 @@ Encoder_t* encoder1 = NULL;
 Button_t* button0 = NULL;
 Button_t* button1 = NULL;
 
+struct tm* getDt() { return dt;}
+
 void* getEncoder(int num)
 {
 	if (num == 0) return (void*)encoder0;
@@ -167,6 +169,7 @@ void sleepLcd()
 void lcd_init(uint8_t Type)
 {	
 	lcd_type = Type;
+
 	// init the gpio for backlight
 	LedBacklightInit();
 	if (lcd_type == LCD_NONE) return;
@@ -179,6 +182,7 @@ void lcd_init(uint8_t Type)
 		lcd_initU8g2(&lcd_type);
 	}
 	vTaskDelay(1);
+//	dt=localtime(&timestamp);
 }
 
 
@@ -221,7 +225,7 @@ char Version[20];
 // call this every 1 millisecond via timer ISR
 //
 void (*serviceAddon)() = NULL;
-IRAM_ATTR void ServiceAddon(void)
+IRAM_ATTR  void ServiceAddon(void)
 {
 	timer1s++;
 	timerScroll++;
@@ -287,7 +291,7 @@ void Screen(typeScreen st){
 void drawFrame()
 {	
 	dt=localtime(&timestamp);
-	isColor?drawFrameUcg(mTscreen,dt):drawFrameU8g2(mTscreen,dt);
+	isColor?drawFrameUcg(mTscreen):drawFrameU8g2(mTscreen);
 }
 
 
@@ -357,7 +361,7 @@ void drawVolume()
 void drawTime()
 {
 	dt=localtime(&timestamp);
-	isColor?drawTimeUcg(mTscreen,dt,timein):drawTimeU8g2(mTscreen,dt,timein);	
+	isColor?drawTimeUcg(mTscreen,timein):drawTimeU8g2(mTscreen,timein);	
 }
 
 
@@ -529,21 +533,27 @@ void adcInit()
 }
 
 void adcLoop() {
-	int voltage,voltage0,voltage1;
-	
+	uint32_t voltage,voltage0,voltage1;
+	bool wasVol = false;
 	if (channel == GPIO_NONE) return;  // no gpio specified
 	
-	voltage0 =adc1_get_raw(channel); //
+	voltage0 = (adc1_get_raw(channel)+adc1_get_raw(channel)+adc1_get_raw(channel)+adc1_get_raw(channel))/4;
 	vTaskDelay(1);
-	voltage1 = adc1_get_raw(channel); 
-	voltage = (voltage0+voltage1)*110/819;
-	
+	voltage1 = (adc1_get_raw(channel)+adc1_get_raw(channel)+adc1_get_raw(channel)+adc1_get_raw(channel))/4;
+//	printf ("Volt0: %d, Volt1: %d\n",voltage0,voltage1);
+	voltage = (voltage0+voltage1)*110/(819);
+//	printf("Voltage: %d\n",voltage);
 	if (voltage <  20) return; // no panel
 
 	if (inside&&(voltage0 > 3700)) 
 	{
 		inside = false;
+		wasVol = false;
 		return;
+	}
+	if (voltage0 > 3700) 
+	{
+		wasVol = false;
 	}
 	if ((voltage0 >3700) || (voltage1 >3700)) return; // must be two valid voltage	
 	
@@ -552,24 +562,30 @@ void adcLoop() {
 	if ((voltage >400) && (voltage < 590)) // volume +
 	{
 		setRelVolume(+5);
+		wasVol = true;
 		ESP_LOGD(TAG,"Volume+ : %i",voltage);
 	}
 	else if ((voltage >730) && (voltage < 830)) // volume -
 	{
 		setRelVolume(-5);
+		wasVol = true;
 		ESP_LOGD(TAG,"Volume- : %i",voltage);
 	}	
-		else if ((voltage >838) && (voltage < 985)) // station+
+		else if ((voltage >900) && (voltage < 985)) // station+
 		{
-			evtStation(1);
-//			changeStation(+1);
-			ESP_LOGD(TAG,"station+: %i",voltage);
+			if (!wasVol)
+			{
+				evtStation(1);
+				ESP_LOGD(TAG,"station+: %i",voltage);
+			}
 		}	
-		else if ((voltage >590) && (voltage < 710)) // station-
+		else if ((voltage >620) && (voltage < 710)) // station-
 		{
-			evtStation(-1);
-//			changeStation(-1);
-			ESP_LOGD(TAG,"station-: %i",voltage);
+			if (!wasVol)
+			{
+				evtStation(-1);
+				ESP_LOGD(TAG,"station-: %i",voltage);
+			}
 		}	
 	if (!inside)
 	{	
@@ -884,7 +900,7 @@ void customKeyInit()
 }
 
 // indirect call to service
-void multiService()
+IRAM_ATTR void multiService()
 {
 	if (isEncoder0) service(encoder0);
 	if (isEncoder1) service(encoder1);

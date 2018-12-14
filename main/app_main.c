@@ -104,7 +104,7 @@ void start_network();
 static bool wifiInitDone = false;
 static EventGroupHandle_t wifi_event_group ;
 xQueueHandle event_queue;
-static wifi_mode_t mode;
+
 //xSemaphoreHandle print_mux;
 static uint16_t FlashOn = 5,FlashOff = 5;
 bool ledStatus = true; // true: normal blink, false: led on when playing
@@ -114,23 +114,17 @@ static uint8_t clientIvol = 0;
 //ip
 static char localIp[20];
 
-
 // disable 1MS timer interrupt
-void noInterrupt1Ms()
-{
-	timer_disable_intr(TIMERGROUP1MS, msTimer);
-}
+IRAM_ATTR void noInterrupt1Ms() {timer_disable_intr(TIMERGROUP1MS, msTimer);}
 // enable 1MS timer interrupt
-void interrupt1Ms()
-{
-	timer_enable_intr(TIMERGROUP1MS, msTimer);
-}
-void noInterrupts()
-{noInterrupt1Ms();}
+IRAM_ATTR void interrupt1Ms() {timer_enable_intr(TIMERGROUP1MS, msTimer);}
+IRAM_ATTR void noInterrupts() {noInterrupt1Ms();}
+IRAM_ATTR void interrupts() {interrupt1Ms();}
 
-void interrupts()
-{interrupt1Ms();}
-char* getIp() { return (localIp);}
+IRAM_ATTR char* getIp() {return (localIp);}
+IRAM_ATTR uint8_t getIvol() {return clientIvol;}
+IRAM_ATTR void setIvol( uint8_t vol) {clientIvol = vol;}
+IRAM_ATTR output_mode_t get_audio_output_mode() { return audio_output_mode;}
 
 /*
 IRAM_ATTR void   microsCallback(void *pArg) {
@@ -256,23 +250,8 @@ timer_config_t config;
 	ESP_ERROR_CHECK(timer_start(TIMERGROUP1mS, microsTimer));*/
 }
 
-
-output_mode_t get_audio_output_mode() 
-{ return audio_output_mode;}
-
-
-
 //////////////////////////////////////////////////////////////////
 
-uint8_t getIvol()
-{
-	return clientIvol;
-}
-
-void setIvol( uint8_t vol)
-{
-	clientIvol = vol;
-}
 
 // Renderer config creation
 static renderer_config_t *create_renderer_config()
@@ -402,6 +381,7 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
 static void start_wifi()
 {
     ESP_LOGI(TAG, "starting wifi");
+	wifi_mode_t mode;
 	struct device_settings *device;	
 	char ssid[32]; 
 	char pass[64];
@@ -453,8 +433,7 @@ static void start_wifi()
 				esp_wifi_set_mode(WIFI_MODE_AP) ;
 		}
 		
-		ESP_ERROR_CHECK(esp_wifi_get_mode(&mode))	
-			
+		ESP_ERROR_CHECK(esp_wifi_get_mode(&mode));				
 		if (mode == WIFI_MODE_AP)
 		{
 			wifi_config_t wifi_config = {
@@ -507,7 +486,7 @@ static void start_wifi()
 void start_network(){
 	struct device_settings *device;	
 	tcpip_adapter_ip_info_t info;
-	
+	wifi_mode_t mode;	
 	ip4_addr_t ipAddr;
 	ip4_addr_t mask;
 	ip4_addr_t gate;
@@ -540,7 +519,7 @@ void start_network(){
 	IPADDR2_COPY(&info.gw,&gate);
 	IPADDR2_COPY(&info.netmask,&mask);	
 	
-	
+	ESP_ERROR_CHECK(esp_wifi_get_mode(&mode));		
 	if (mode == WIFI_MODE_AP)
 	{
 			xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT,false, true, 3000);

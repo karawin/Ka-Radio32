@@ -1,6 +1,6 @@
 /******************************************************************************
  * 
- * Copyright 2017 karawin (http://www.karawin.fr)
+ * Copyright 2018 karawin (http://www.karawin.fr)
  *
 *******************************************************************************/
 
@@ -33,10 +33,10 @@
 
 #include "esp_wifi.h"
 
-char parslashquote[] = {"(\""};
-char parquoteslash[] = {"\")"};
-char msgsys[] = {"##SYS."};
-char msgcli[] = {"##CLI."};
+const char parslashquote[] = {"(\""};
+const char parquoteslash[] = {"\")"};
+const char msgsys[] = {"##SYS."};
+const char msgcli[] = {"##CLI."};
 
 const char stritWIFISTATUS[]  = {"#WIFI.STATUS#\nIP: %d.%d.%d.%d\nMask: %d.%d.%d.%d\nGateway: %d.%d.%d.%d\n##WIFI.STATUS#\n"};
 const char stritWIFISTATION[]  = {"#WIFI.STATION#\nSSID: %s\nPASSWORD: %s\n##WIFI.STATION#\n"};

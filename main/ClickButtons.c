@@ -74,7 +74,7 @@ Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C)
 // call this every 1 millisecond via timer ISR
 //
 //void (*serviceEncoder)() = NULL;
-void serviceBtn(Button_t *enc)
+IRAM_ATTR void serviceBtn(Button_t *enc)
 {
   // handle enc->button
   //

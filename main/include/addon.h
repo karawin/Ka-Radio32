@@ -80,7 +80,7 @@ typedef struct {
 extern xQueueHandle event_ir;
 extern u8g2_t u8g2;
 extern ucg_t ucg;
-void (*serviceEncoder)();
+//IRAM_ATTR  void (*serviceEncoder)();
 void task_addon(void *pvParams);
 void task_lcd(void *pvParams);
 void lcd_init(uint8_t Type);
@@ -93,5 +93,6 @@ int16_t getFuturNum();
 void addonDt();
 void wakeLcd();
 void* getEncoder(int num);
+struct tm* getDt();
 
 #endif

@@ -160,7 +160,10 @@ If not used P_XCS must be set to 255. Gpio of P_RST P_XDCS P_DREQ may be reused 
 If IR remote control is not used P_IR_SIGNAL must be set to 255
 
 ### ADC keyboard
-If the ADC keyboard is missing, set P_ADC  to 255.
+If the ADC keyboard is missing, set P_ADC  to 255.  
+Compatible with https://github.com/…/Ka-…/blob/master/Hardware/controles.pdf and the one found at https://www.drive2.ru/b/487463808323813881/  
+The stop button is replaced with "Toggle Time/Infos" and "start replaced with "Start/Stop"  
+The ESP32 ADC can be sensitive to noise leading to large discrepancies in ADC readings. To minimize noise, users may connect a 0.1uF capacitor to the ADC input pad in use
 
 ### Lcd backlight
 Thanks to Vadim Polyakovsky:

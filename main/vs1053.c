@@ -43,9 +43,7 @@ int vsVersion = -1; // the version of the chip
 
 const char strvI2S[] = {"I2S Speed: %d\n"};
 
-	gpio_num_t xcs;
 	gpio_num_t rst;
-	gpio_num_t xdcs;
 	gpio_num_t dreq;
 
 static spi_device_handle_t vsspi;  // the device handle of the vs1053 spi
@@ -57,6 +55,7 @@ void VS1053_spi_init(){
 	gpio_num_t miso;
 	gpio_num_t mosi;
 	gpio_num_t sclk;
+
 	uint8_t spi_no; // the spi bus to use
 	
 	gpio_get_spi_bus(&spi_no,&miso,&mosi,&sclk);	
@@ -83,6 +82,9 @@ bool VS1053_HW_init()
 	gpio_num_t miso;
 	gpio_num_t mosi;
 	gpio_num_t sclk;
+	gpio_num_t xcs;
+	gpio_num_t xdcs;
+	
 	uint8_t spi_no; // the spi bus to use
 	
 	gpio_get_spi_bus(&spi_no,&miso,&mosi,&sclk);	

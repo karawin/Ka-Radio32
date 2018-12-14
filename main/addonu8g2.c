@@ -1,6 +1,6 @@
 /******************************************************************************
  * 
- * Copyright 2017 karawin (http://www.karawin.fr)
+ * Copyright 2018 karawin (http://www.karawin.fr)
  *
 *******************************************************************************/
 
@@ -49,8 +49,7 @@ static uint16_t yy;		//Height of screen
 static uint16_t x ;		//Width
 static uint16_t z ;		// an internal offset for y
 
-//static struct tm *dt;
-static char strsec[30]; 
+static struct tm *dt;
 static uint16_t volume;
 
 static char station[BUFLEN]; //received station
@@ -264,6 +263,11 @@ static void screenBottomU8g2()
 //TIME
 	if (yy != 32) // not enough room
 	{
+		char strsec[30]; 		
+		if (getDdmm())
+			sprintf(strsec,"%02d-%02d-%04d  %02d:%02d:%02d",dt->tm_mday,dt->tm_mon+1,dt->tm_year+1900, dt->tm_hour, dt->tm_min,dt->tm_sec);
+		else 
+			sprintf(strsec,"%02d-%02d-%04d  %02d:%02d:%02d",dt->tm_mon+1,dt->tm_mday,dt->tm_year+1900, dt->tm_hour, dt->tm_min,dt->tm_sec);	
 		setfont8(small);
 		u8g2_DrawUTF8(&u8g2,x/2-(u8g2_GetUTF8Width(&u8g2,strsec)/2),yy-y-3,strsec);  
 	}	
@@ -298,15 +302,10 @@ void eraseSlashes(char * str) {
 
 ////////////////////////////////////////
 // draw all lines
-void drawFrameU8g2(uint8_t mTscreen,struct tm *dt)
+void drawFrameU8g2(uint8_t mTscreen)
 {
-	u8g2_ClearBuffer(&u8g2);
-	if (getDdmm())
-		sprintf(strsec,"%02d-%02d-%04d  %02d:%02d:%02d",dt->tm_mday,dt->tm_mon+1,dt->tm_year+1900, dt->tm_hour, dt->tm_min,dt->tm_sec);
-	else 
-		sprintf(strsec,"%02d-%02d-%04d  %02d:%02d:%02d",dt->tm_mon+1,dt->tm_mday,dt->tm_year+1900, dt->tm_hour, dt->tm_min,dt->tm_sec);
-
-	
+	if (dt == NULL) {dt = getDt();}
+	u8g2_ClearBuffer(&u8g2);	
     setfont8(text);
     u8g2_SetDrawColor(&u8g2, 1);
     y = getFontLineSpacing();
@@ -412,7 +411,7 @@ void drawVolumeU8g2(uint8_t mTscreen)
   screenBottomU8g2(); 
 }
 
-void drawTimeU8g2(uint8_t mTscreen,struct tm *dt,unsigned timein)
+void drawTimeU8g2(uint8_t mTscreen,unsigned timein)
 {
   char strdate[23];
   char strtime[20];

@@ -123,7 +123,7 @@ bool getHalfStep(Encoder_t *enc)
 // call this every 1 millisecond via timer ISR
 //
 //void (*serviceEncoder)() = NULL;
-void service(Encoder_t *enc)
+IRAM_ATTR void service(Encoder_t *enc)
 {
   bool moved = false;
   

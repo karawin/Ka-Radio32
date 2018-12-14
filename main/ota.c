@@ -49,10 +49,8 @@ static char ota_write_data[BUFFSIZE + 1] = { 0 };
 static char text[BUFFSIZE + 1] = { 0 };
 /* an image total length*/
 static int binary_file_length = 0;
-// the get request
-static char http_request[80] = {0};
-/*the header*/
-static char header[BUFFSIZE + 1] = { 0 };
+
+
 static int  reclen = 0;
 	
 /*read buffer by byte still delim ,return read bytes counts*/
@@ -107,6 +105,8 @@ static bool read_past_http_header(char text[], int total_len, esp_ota_handle_t u
 *******************************************************************************/
 static void ota_task(void *pvParameter)
 {
+	// the get request
+	char http_request[80] = {0};
 	struct hostent *serv ;
 	int sockfd;
 	struct sockaddr_in dest;	
@@ -191,7 +191,10 @@ static void ota_task(void *pvParameter)
             ESP_LOGE(TAG, "Error: receive data error! errno=%d", errno);
 			kprintf("Error: receive data error! errno=%d\n", errno);
             goto exit;
-        } else if (buff_len > 0 && !resp_body_start) { /*deal with response header*/
+        } else if (buff_len > 0 && !resp_body_start) 
+		{ /*deal with response header*/
+			/*the header*/
+			char header[BUFFSIZE + 1] = { 0 };
 			strncat(header,text,buff_len);
             resp_body_start = read_past_http_header(text, buff_len, update_handle);
 			if (resp_body_start)
