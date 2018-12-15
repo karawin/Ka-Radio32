@@ -310,10 +310,8 @@ static void init_hardware()
         ESP_LOGE(TAG, "\nSPI RAM chip fail!");
         esp_restart();
     }
-
     ESP_LOGI(TAG, "hardware initialized");
 }
-
 
 
 /* event handler for pre-defined wifi events */
@@ -938,22 +936,23 @@ void app_main()
 	//start tasks of KaRadio32
 	xTaskCreatePinnedToCore(uartInterfaceTask, "uartInterfaceTask", 2400, NULL, PRIO_UART, &pxCreatedTask,CPU_UART); 
 	ESP_LOGI(TAG, "%s task: %x","uartInterfaceTask",(unsigned int)pxCreatedTask);
-	
+	vTaskDelay(1);
 	xTaskCreatePinnedToCore(clientTask, "clientTask", 3000, NULL, PRIO_CLIENT, &pxCreatedTask,CPU_CLIENT); 
 	ESP_LOGI(TAG, "%s task: %x","clientTask",(unsigned int)pxCreatedTask);	
-	
+	vTaskDelay(1);
     xTaskCreatePinnedToCore(serversTask, "serversTask", 3000, NULL, PRIO_SERVER, &pxCreatedTask,CPU_SERVER); 
 	ESP_LOGI(TAG, "%s task: %x","serversTask",(unsigned int)pxCreatedTask);	
-	
+	vTaskDelay(1);
 	xTaskCreatePinnedToCore (task_addon, "task_addon", 2200, NULL, PRIO_ADDON, &pxCreatedTask,CPU_ADDON);  
 	ESP_LOGI(TAG, "%s task: %x","task_addon",(unsigned int)pxCreatedTask);	
-	
+
 /*	if (RDA5807M_detection())
 	{
 		xTaskCreatePinnedToCore(rda5807Task, "rda5807Task", 2500, NULL, 3, &pxCreatedTask,1);  //
 		ESP_LOGI(TAG, "%s task: %x","rda5807Task",(unsigned int)pxCreatedTask);
 	}
 */	
+	vTaskDelay(10);
 	printf("Init ");
 	for (int i=0;i<10;i++)
 	{

@@ -357,14 +357,19 @@ void drawFrameU8g2(uint8_t mTscreen)
 //////////////////////////
 void drawTTitleU8g2(char* ttitle)
 { 
+  char strIp[23];
 	setfont8(middle);
     uint16_t xxx = (x/2)-(u8g2_GetUTF8Width(&u8g2,ttitle)/2);
     u8g2_SetDrawColor(&u8g2, 1);
     u8g2_DrawBox(&u8g2,0,0,x,getFontLineSpacing()+1); 
     u8g2_SetDrawColor(&u8g2, 0);
-    u8g2_DrawUTF8(&u8g2,xxx,1,ttitle);
-	
+    u8g2_DrawUTF8(&u8g2,xxx,1,ttitle);	
     u8g2_SetDrawColor(&u8g2, 1);
+	
+    // draw ip
+	setfont8(small);
+	sprintf(strIp,"IP: %s", getIp());
+	u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,strIp)/2),yy-getFontLineSpacing(),strIp);   	
 }
 //////////////////////////
 void drawNumberU8g2(uint8_t mTscreen,char* irStr)
@@ -374,8 +379,7 @@ void drawNumberU8g2(uint8_t mTscreen,char* irStr)
   drawTTitleU8g2(ststr);   
   setfont8(large);
   uint16_t xxx = (x/2)-(u8g2_GetUTF8Width(&u8g2,irStr)/2); 
-  u8g2_DrawUTF8(&u8g2,xxx,yy/3, irStr);        
-  screenBottomU8g2();  
+  u8g2_DrawUTF8(&u8g2,xxx,yy/3, irStr);          
 }
 //////////////////////////
 void drawStationU8g2(uint8_t mTscreen,char* snum,char* ddot)
@@ -391,8 +395,7 @@ void drawStationU8g2(uint8_t mTscreen,char* snum,char* ddot)
         len = (x/2)-(u8g2_GetUTF8Width(&u8g2,ddot)/2);
         if (len <0) len = 0;
         u8g2_DrawUTF8(&u8g2,len,yy/3+4+y, ddot);
-  }
-  screenBottomU8g2(); 	
+  }	
 }
 
 
@@ -407,8 +410,7 @@ void drawVolumeU8g2(uint8_t mTscreen)
   drawTTitleU8g2(vlstr) ;  
   setfont8(large);  
   uint16_t xxx = (x/2)-(u8g2_GetUTF8Width(&u8g2,aVolume)/2);     
-  u8g2_DrawUTF8(&u8g2,xxx,yy/3,aVolume);
-  screenBottomU8g2(); 
+  u8g2_DrawUTF8(&u8g2,xxx,(yy/3)+6,aVolume);
 }
 
 void drawTimeU8g2(uint8_t mTscreen,unsigned timein)
@@ -424,12 +426,7 @@ void drawTimeU8g2(uint8_t mTscreen,unsigned timein)
     sprintf(strtime,"%02d:%02d:%02d", dt->tm_hour, dt->tm_min,dt->tm_sec);
     drawTTitleU8g2(strdate); 
     setfont8(large);	
-    u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,strtime)/2),(yy/3)+4,strtime); 
-    // draw ip
-	setfont8(small);
-	sprintf(strdate,"IP: %s", getIp());
-	u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,strdate)/2),yy-getFontLineSpacing(),strdate);   
-	
+    u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,strtime)/2),(yy/3)+6,strtime); 
 }
 
 

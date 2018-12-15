@@ -66,14 +66,14 @@ extern uint32_t wakeDelay;
 #define TIMER_1mS	3
 
 // Tasks priority
-#define PRIO_MAD 		6
+#define PRIO_MAD 		7
 #define PRIO_VS1053 	4
 #define PRIO_RMT		7
 #define PRIO_UART		2
 #define PRIO_CLIENT		4
 #define PRIO_SERVER		3
 #define PRIO_ADDON		5
-#define PRIO_LCD		4
+#define PRIO_LCD		6
 #define PRIO_SUBSERV	3
 #define PRIO_TIMER		1
 #define PRIO_OTA		10
