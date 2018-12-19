@@ -155,8 +155,11 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
     {
         ESP_LOGD(TAG, "changing sample rate from %d to %d", renderer_instance->sample_rate, buf_desc->sample_rate);
         uint32_t rate = buf_desc->sample_rate * renderer_instance->sample_rate_modifier;
-        i2s_set_sample_rates(renderer_instance->i2s_num, rate);
-//		i2s_set_clk(renderer_instance->i2s_num, rate, I2S_BITS_PER_SAMPLE_16BIT, I2S_CHANNEL_STEREO);
+       res =  i2s_set_sample_rates(renderer_instance->i2s_num, rate);
+//		res = i2s_set_clk(renderer_instance->i2s_num, rate, I2S_BITS_PER_SAMPLE_16BIT, I2S_CHANNEL_STEREO);
+		if (res != ESP_OK) {
+			ESP_LOGE(TAG, "i2s_set_clk error %d",res);
+		}
         renderer_instance->sample_rate = buf_desc->sample_rate;
     }
 
@@ -192,7 +195,8 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 		}			
 	}
 //-------------------------
-/*ESP_LOGW(TAG, "I2S CHECK:  buf_desc->bit_depth %d, renderer_instance->bit_depth %d, buf_desc->buffer_format %d, PCM_INTERLEAVED %d, buf_desc->num_channels %d (2), renderer_instance->output_mode %d, DAC_BUILT_IN %d ",buf_desc->bit_depth,renderer_instance->bit_depth,buf_desc->buffer_format,PCM_INTERLEAVED,buf_desc->num_channels,renderer_instance->output_mode,DAC_BUILT_IN);*/
+/*ESP_LOGV(TAG, "I2S CHECK:  buf_desc->bit_depth %d, renderer_instance->bit_depth %d, buf_desc->buffer_format %d, PCM_INTERLEAVED %d, buf_desc->num_channels %d (2), renderer_instance->output_mode %d, DAC_BUILT_IN %d ",buf_desc->bit_depth,renderer_instance->bit_depth,buf_desc->buffer_format,PCM_INTERLEAVED,buf_desc->num_channels,renderer_instance->output_mode,DAC_BUILT_IN);
+*/
     // formats match, we can write the whole block
     if (buf_desc->bit_depth == renderer_instance->bit_depth
             && buf_desc->buffer_format == PCM_INTERLEAVED
@@ -246,9 +250,12 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
     TickType_t max_wait = 20 / portTICK_PERIOD_MS; // portMAX_DELAY = bad idea
 	//mult = mult>>12;  // for sample on 8 bits 0 to 16
 	
-	outBuf8 = malloc(buf_len);
-	if (outBuf8 == NULL) return;
-	
+	outBuf8 = malloc(buf_len*(2/buf_desc->num_channels));
+	if (outBuf8 == NULL) 
+	{
+		ESP_LOGE(TAG, "malloc buf failed len:%d ",buf_len);
+		return;
+	}
 	outBuf32 =(uint32_t*)outBuf8;
 	outBuf64 = (uint64_t*)outBuf8;
 
@@ -300,14 +307,14 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
         ptr_l += stride;
     }
 	
-    size_t bytes_left = buf_len;
+    size_t bytes_left = buf_len*(2/buf_desc->num_channels);
     size_t bytes_written = 0;
     while(bytes_left > 0 && renderer_status != STOPPED) {
         res = i2s_write(renderer_instance->i2s_num, (const char*) outBuf8, bytes_left,& bytes_written, max_wait);
 		if (res != ESP_OK) {
 				ESP_LOGE(TAG, "i2s_write error %d",res);
 		}
-		if (bytes_written != buf_len)ESP_LOGI(TAG, "written: %d, len: %d",bytes_written,bytes_left);
+		if (bytes_written != buf_len*(2/buf_desc->num_channels))ESP_LOGI(TAG, "written: %d, len: %d",bytes_written,bytes_left);
         bytes_left -= bytes_written;
         buf += bytes_written;
     }
