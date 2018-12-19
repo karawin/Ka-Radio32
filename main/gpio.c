@@ -10,6 +10,7 @@
 #include "gpio.h"
 #include "nvs_flash.h"
 #include "esp_log.h"
+#include "app_main.h"
 
 #define hardware "hardware"
 
@@ -130,9 +131,17 @@ void gpio_get_encoder0(gpio_num_t *enca, gpio_num_t *encb, gpio_num_t *encbtn)
 	esp_err_t err;
 	nvs_handle hardware_handle;
 	// init default
-	*enca = PIN_ENC0_A;
-	*encb= PIN_ENC0_B;
-	*encbtn= PIN_ENC0_BTN;
+	if (bigSram()) // default is not compatible (gpio 16 & 17)
+	{
+		*enca = GPIO_NONE;
+		*encb= GPIO_NONE;
+		*encbtn= GPIO_NONE;	
+	} else
+	{
+		*enca = PIN_ENC0_A;
+		*encb= PIN_ENC0_B;
+		*encbtn= PIN_ENC0_BTN;
+	}
 	
 	if (open_partition(hardware, "gpio_space",&hardware_handle)!= ESP_OK) return;
 	
@@ -148,9 +157,17 @@ void gpio_get_encoder1(gpio_num_t *enca, gpio_num_t *encb, gpio_num_t *encbtn)
 	esp_err_t err;
 	nvs_handle hardware_handle;
 	// init default
-	*enca = PIN_ENC1_A;
-	*encb= PIN_ENC1_B;
-	*encbtn= PIN_ENC1_BTN;
+	if (bigSram())
+	{
+		*enca = GPIO_NONE;
+		*encb= GPIO_NONE;
+		*encbtn= GPIO_NONE;	
+	} else
+	{
+		*enca = PIN_ENC1_A;
+		*encb= PIN_ENC1_B;
+		*encbtn= PIN_ENC1_BTN;
+	}
 	
 	if (open_partition(hardware, "gpio_space",&hardware_handle)!= ESP_OK) return;
 	
