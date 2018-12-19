@@ -35,7 +35,7 @@ device1,66,0,0x3a1000,4K,
 hardware,data,nvs,0x3a2000,8K,
 *******************************************************************************
 Partition flashing command:
-python /home/jp/esp/esp-idf/components/esptool_py/esptool/esptool.py --chip esp32 --port com5 --baud 460800 --before default_reset --after hard_reset write_flash 0x800
+python /home/jp/esp/esp-idf/components/esptool_py/esptool/esptool.py --chip esp32 --port com5 --baud 460800 --before default_reset --after hard_reset write_flash 0x8000 /home/jp/esp/Ka-Radio32/build/partitions.bin
 ************************************************ *****************************
 ```
 Compared to an old version, it adds the declaration of the partition "hardware" which interests us.
@@ -118,10 +118,9 @@ LCD Backlight:
 P_BACKLIGHT		GPIO of the hardware device.
 ```
 
----------------
+-------------------
 ## Special cases:
----------------
-
+-------------------
 ### SPI bus
 
 K_SPI,data,u8,2  

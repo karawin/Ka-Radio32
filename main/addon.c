@@ -345,9 +345,7 @@ void drawStation()
   } while (playable == false); 
 	
   //drawTTitle(ststr);   
-
   isColor?drawStationUcg(mTscreen,sNum,ddot):drawStationU8g2(mTscreen,sNum,ddot);
-   
   free (si);
 }
 
@@ -623,7 +621,8 @@ void adcLoop() {
 	{
 		Button state1 = getButtons(enc,1);
 		Button state2 = getButtons(enc,2);
-			newValue=((state1!=Open)?5:0)+((state2!=Open)?-5:0); // sstation take + or - in any value
+//		ESP_LOGD(TAG,"Button1: %i, Button2: %i",state1,state2);	
+		newValue=((state1!=Open)?5:0)+((state2!=Open)?-5:0); // sstation take + or - in any value
 		typeScreen estate;
 		if (role) estate = sstation; else estate = svolume;
 		if ((stateScreen  != estate)&&(newValue != 0))
@@ -928,11 +927,10 @@ void task_lcd(void *pvParams)
 		if (event_lcd != NULL)
 		while (xQueueReceive(event_lcd, &evt, 0))
 		{ 
-//			wakeLcd();	
-/*			if (evt.lcmd != lmeta)
-				ESP_LOGW(TAG,"event_lcd: %x",(int)evt.lcmd);
+			if (evt.lcmd != lmeta)
+				ESP_LOGV(TAG,"event_lcd: %x",(int)evt.lcmd);
 			else
-				ESP_LOGW(TAG,"event_lcd: %x  %s",(int)evt.lcmd,evt.lline);*/
+				ESP_LOGV(TAG,"event_lcd: %x  %s",(int)evt.lcmd,evt.lline);
 			switch(evt.lcmd)
 			{
 				case lmeta:
@@ -981,11 +979,12 @@ void task_lcd(void *pvParams)
 					dvolume = false; // don't show volume on start station
 					break;
 				case estation:
-//					wakeLcd();
+					wakeLcd();
+					if(xQueuePeek(event_lcd, &evt1, 0))
+						if (evt1.lcmd == estation) {evt.lline = NULL;break;}
 					Screen(sstation);
-					wakeLcd();					
 					changeStation((uint32_t)evt.lline);	
-					evt.lline = NULL;					
+					evt.lline = NULL;	// just a number			
 					break;
 				case eclrs:
 					isColor?ucg_ClearScreen(&ucg):u8g2_ClearDisplay(&u8g2);

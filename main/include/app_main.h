@@ -65,7 +65,7 @@ extern uint32_t wakeDelay;
 #define TIMER_1MS	2
 #define TIMER_1mS	3
 
-// Tasks priority
+/* // Tasks priority
 #define PRIO_MAD 		7
 #define PRIO_VS1053 	4
 #define PRIO_RMT		7
@@ -88,6 +88,32 @@ extern uint32_t wakeDelay;
 #define CPU_LCD			1
 #define CPU_SUBSERV		0
 #define CPU_TIMER		1
+ */
+
+
+// Tasks priority
+#define PRIO_MAD 		7
+#define PRIO_VS1053 	4
+#define PRIO_RMT		6
+#define PRIO_UART		2
+#define PRIO_CLIENT		4
+#define PRIO_SERVER		3
+#define PRIO_ADDON		5
+#define PRIO_LCD		6
+#define PRIO_SUBSERV	3
+#define PRIO_TIMER		11
+#define PRIO_OTA		10
+
+// CPU for task
+#define CPU_MAD			1  // internal decoder and vs1053
+#define CPU_RMT			1
+#define CPU_UART		0
+#define CPU_CLIENT		1
+#define CPU_SERVER		0
+#define CPU_ADDON		1
+#define CPU_LCD			0
+#define CPU_SUBSERV		0
+#define CPU_TIMER		0
 
 #define TEMPO_SAVE_VOL	10000
 
@@ -101,7 +127,7 @@ output_mode_t get_audio_output_mode() ;
 
 uint8_t getIvol();
 void setIvol( uint8_t vol);
-
+bool bigSram();
 
 void sleepCallback(void *pArg);
 void wakeCallback(void *pArg);
@@ -114,7 +140,6 @@ void interrupt1Ms();
 void noInterrupts();
 void interrupts();
 char* getIp();
-
 
 
 #endif /* MAIN_INCLUDE_APP_MAIN_H_ */

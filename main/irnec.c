@@ -195,6 +195,7 @@ static int nec_parse_items(rmt_item32_t* item, int item_num, uint16_t* addr, uin
  */
 static bool nec_rx_init()
 {
+	esp_err_t err = ESP_OK;
 	gpio_num_t ir;
 	gpio_get_ir_signal(&ir);
 	if (ir == GPIO_NONE) return false; //no IR needed
@@ -207,8 +208,9 @@ static bool nec_rx_init()
     rmt_rx.rx_config.filter_en = true;
     rmt_rx.rx_config.filter_ticks_thresh = 100;
     rmt_rx.rx_config.idle_threshold = rmt_item32_tIMEOUT_US / 10 * (RMT_TICK_10_US);
-    rmt_config(&rmt_rx);
-    rmt_driver_install(rmt_rx.channel, 1000, 0);
+    ESP_ERROR_CHECK(rmt_config(&rmt_rx));
+    err = rmt_driver_install(rmt_rx.channel, 1000, 0);
+	if (err != ESP_OK) {ESP_LOGE(NEC_TAG,"Rrmt_driver_install failed %x",err); return false;}
 	return true;
 }
 

@@ -199,7 +199,8 @@ void setfont(sizefont size)
 								case Cyrillic: ucg_SetFont(&ucg,ucg_font_crox5h );break; 
 								case Greek:ucg_SetFont(&ucg,ucg_font_helvR18_gr );break;
 								default:
-								case Latin:ucg_SetFont(&ucg,ucg_font_inr33_mf );break;
+								//case Latin:ucg_SetFont(&ucg,ucg_font_inr33_mf );break;
+								case Latin:ucg_SetFont(&ucg,ucg_font_inb19_tf );break;
 							}
 //			charset?ucg_SetFont(&ucg,ucg_font_crox5h ):ucg_SetFont(&ucg,ucg_font_inr33_mf);
 			break;
@@ -644,6 +645,8 @@ void drawStationUcg(uint8_t mTscreen,char* snum,char* ddot)
   char ststr[] = {"Station"};
   int16_t len;
   LANG scharset;
+  	scharset = charset;
+	charset = Latin;
     switch (mTscreen){
       case 1:  
 		TTitleStr[0] = 0;        
@@ -652,23 +655,23 @@ void drawStationUcg(uint8_t mTscreen,char* snum,char* ddot)
       case 2:   
         ucg_SetColor(&ucg,0,CBLACK); 
         ucg_DrawBox(&ucg,0,HHeader,x,yy);     
-        setfont(middle);
+ //       setfont(middle);
         ucg_SetColor(&ucg,0,CBODY);
 //        ddot = strstr(sline,":");
         if (ddot != NULL)
         {
-		  scharset = charset;
-		  charset = Latin;
+
 		  removeUtf8(ddot);
+		  setfont(middle);
           ucg_DrawString(&ucg,(x/2)-(ucg_GetStrWidth(&ucg,snum)/2),yy/3,0,snum);
           len = (x/2)-(ucg_GetStrWidth(&ucg,ddot)/2);
           if (len <0) len = 0;
           ucg_DrawString(&ucg,len,yy/3 + ucg_GetFontAscent(&ucg)+y,0, ddot);
-		  charset = scharset;
         }
         break;
       default:; 
     } 	
+	charset = scharset;
 
 //  screenBottomUcg(); 	
 }

@@ -244,6 +244,7 @@ void saveDeviceSettingsVolume(struct device_settings *settings) {
 	ESP_LOGD(TAG,"saveDeviceSettingsVolume");
 	if (xSemaphoreTake(muxDevice, 0) == pdFALSE) return; // not important. An other one in progress
 	ESP_ERROR_CHECK(esp_partition_erase_range(DEVICE,0,DEVICE->size));
+	vTaskDelay(1);
 	ESP_ERROR_CHECK(esp_partition_write(DEVICE,0,settings,DEVICE->size));
 	xSemaphoreGive(muxDevice);
 	

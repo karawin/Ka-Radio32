@@ -840,7 +840,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			pathParse(aua);
 			char* adhcp = getParameterFromResponse("dhcp=", data, data_size);
 			char* adhcp2 = getParameterFromResponse("dhcp2=", data, data_size);
-			ESP_LOGV(TAG,"wifi received  valid:%s,val:%d, ssid:%s, pasw:%s, aip:%s, amsk:%s, agw:%s, adhcp:%s, aua:%s",valid,val,ssid,pasw,aip,amsk,agw,adhcp,aua);
+//			ESP_LOGV(TAG,"wifi received  valid:%s,val:%d, ssid:%s, pasw:%s, aip:%s, amsk:%s, agw:%s, adhcp:%s, aua:%s",valid,val,ssid,pasw,aip,amsk,agw,adhcp,aua);
 			if (val) {
 				changed = true;
 				ip_addr_t valu;

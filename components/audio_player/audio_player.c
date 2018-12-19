@@ -15,10 +15,10 @@
 #include "esp_system.h"
 #include "esp_log.h"
 
+#include "fdk_aac_decoder.h"
 //#include "helix_aac_decoder.h"
 //#include "libfaad_decoder.h"
 #include "mp3_decoder.h"
-//#include "controls.h"
 #include "webclient.h"
 #include "vs1053.h"
 #include "app_main.h"
@@ -56,16 +56,40 @@ static int start_decoder_task(player_t *player)
  /*       case AUDIO_MP4:
             task_func = libfaac_decoder_task;
             task_name = (char*)"libfaac_decoder_task";
-            stack_depth = 54000; //55000
+            stack_depth = 55000;
             break;
-
+*/
+/*
+		case AUDIO_AAC:
+        case OCTET_STREAM: // probably .aac
+			if (!bigSram())
+			{
+            ESP_LOGW(TAG, "aac mime not supported type: %d", player->media_stream->content_type);
+			spiRamFifoReset();
+            return -1;				
+			}
+		
+            task_func = fdkaac_decoder_task;
+            task_name = (char*)"fdkaac_decoder_task";
+            stack_depth = 7000; //6144; 
+            break;
+*/			
+/*
 		case AUDIO_AAC:
         case OCTET_STREAM: // probably .aac
             task_func = helixaac_decoder_task;
             task_name = (char*)"helixaac_decoder_task";
-            stack_depth = 3000; //6144; //6144
+            stack_depth = 6144; //6144; //6144
             break;
-*/			
+*/
+/*				
+        case AUDIO_AAC:
+        case OCTET_STREAM: // probably .aac
+            task_func = libfaac_decoder_task;
+            task_name = "libfaac_decoder_task";
+            stack_depth = 55000;
+            break;
+*/
         default:
             ESP_LOGW(TAG, "unknown mime type: %d", player->media_stream->content_type);
 			spiRamFifoReset();
@@ -83,7 +107,7 @@ static int start_decoder_task(player_t *player)
 		player->decoder_status = RUNNING;
 	}
 	
-		ESP_LOGD(TAG, "created decoder task: %s", task_name);
+		ESP_LOGD(TAG, "decoder task created: %s", task_name);
 
     return 0;
 }
@@ -98,10 +122,8 @@ int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read,
     // don't bother consuming bytes if stopped
     if(player->command == CMD_STOP) {
 		//audio_player_stop();
-//		clientDisconnect("C_Play stop"); 
 		clientSilentDisconnect();
-		
-        //player->decoder_command = CMD_STOP;
+       //player->decoder_command = CMD_STOP;
         return -1;
     }
 
@@ -114,8 +136,9 @@ int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read,
 	uint8_t fill_level = (bytes_in_buf * 100) / spiRamFifoLen();
 
 	// seems 4k is enough to prevent initial buffer underflow
-	uint8_t min_fill_lvl = player->buffer_pref == BUF_PREF_FAST ? 40 : 90;
-	bool buffer_ok = fill_level > min_fill_lvl;
+//	uint8_t min_fill_lvl = player->buffer_pref == BUF_PREF_FAST ? 40 : 90;
+//	bool buffer_ok = fill_level > min_fill_lvl;
+	bool buffer_ok = (bytes_in_buf > (20*1024));
 	if (player->decoder_status != RUNNING && buffer_ok) {
 
 		// buffer is filled, start decoder
@@ -161,15 +184,12 @@ void audio_player_start()
 
 void audio_player_stop()
 { 
-    //if (get_audio_output_mode() != VS1053)
-	{
 		player_instance->decoder_command = CMD_STOP;
 		player_instance->command = CMD_STOP;
 		player_instance->media_stream->eof = true;
 		if (get_audio_output_mode() != VS1053)renderer_stop();
 		player_instance->command = CMD_NONE;
 		player_status = STOPPED;
-	}
 	
 }
 

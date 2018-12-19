@@ -41,17 +41,25 @@ static long fifoOvfCnt, fifoUdrCnt;
 //Re-define a bunch of things so we use the internal buffer
 #undef SPIRAMSIZE
 //allocate enough for about one mp3 frame
-#define SPIRAMSIZE (42*1024)
-
-static  char fakespiram[SPIRAMSIZE];
+//#define SPIRAMSIZE (42*1024)
+//static  char fakespiram[SPIRAMSIZE];
+static  char *fakespiram;
 #define spiRamInit() while(0)
 #define spiRamTest() 1
 #define spiRamWrite(pos, buf, n) memcpy(&fakespiram[pos], buf, n)
 #define spiRamRead(pos, buf, n) memcpy(buf, &fakespiram[pos], n)
 #endif
 
+static unsigned SPIRAMSIZE = (42*1024);
+
+void setSPIRAMSIZE(unsigned size)
+{
+	SPIRAMSIZE = size;
+}
+
 //Initialize the FIFO
 int spiRamFifoInit() {
+	fakespiram = malloc(SPIRAMSIZE);
 	fifoRpos=0;
 	fifoWpos=0;
 	fifoFill=0;

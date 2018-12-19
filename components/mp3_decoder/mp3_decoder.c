@@ -63,6 +63,7 @@ static enum mad_flow input(struct mad_stream *stream, buffer_t *buf, player_t *p
 
         // Calculate amount of bytes we need to fill buffer.
         bytes_to_read = min(buf_free_capacity(buf), spiRamFifoFill());
+//		bytes_to_read = min(buf_free_capacity_after_purge(buf), spiRamFifoFill());
 
         // Can't take anything?
         if (bytes_to_read == 0) {
@@ -75,7 +76,9 @@ static enum mad_flow input(struct mad_stream *stream, buffer_t *buf, player_t *p
             //Wait until there is enough data in the buffer. This only happens when the data feed
             //rate is too low, and shouldn't normally be needed!
             ESP_LOGD(TAG, "Buffer underflow, need %d bytes.", buf_free_capacity(buf));
-            buf_underrun_cnt++;
+//           ESP_LOGD(TAG, "Buffer underflow, need %d bytes.", buf_free_capacity_after_purge(buf));
+ 
+			buf_underrun_cnt++;
             //We both silence the output as well as wait a while by pushing silent samples into the i2s system.
             //This waits for about 200mS
             renderer_zero_dma_buffer();
@@ -128,7 +131,7 @@ void mp3_decoder_task(void *pvParameters)
 
     buf_underrun_cnt = 0;
 
-    ESP_LOGD(TAG, "MAD: Decoder start.");
+    ESP_LOGD(TAG, "Decoder start.");
 
     //Initialize mp3 parts
     mad_stream_init(stream);
@@ -204,6 +207,7 @@ void set_dac_sample_rate(int rate)
 /* render callback for the libmad synth */
 void render_sample_block(short *sample_buff_ch0, short *sample_buff_ch1, int num_samples, unsigned int num_channels)
 {
+	mad_buffer_fmt.num_channels = num_channels;
     uint32_t len = num_samples * sizeof(short) * num_channels;
     render_samples((char*) sample_buff_ch0, len, &mad_buffer_fmt);
     return;

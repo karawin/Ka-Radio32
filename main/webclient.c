@@ -903,7 +903,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 						{
 							clen = recvfrom(sockfd, pdata+len, 9, 0,NULL,NULL); 
 							lc+=clen;len+=clen;
-							ESP_LOGV(TAG,"more:%d, lc:%d\n",clen,lc);
+							//ESP_LOGV(TAG,"more:%d, lc:%d\n",clen,lc);
 						} //security to be sure to receive the new length
 						
 //	printf("leni0:%d, inpdata:%x, chunked:%d  cchunk:%d, lc:%d, \n",len,inpdata,chunked,cchunk, lc );
@@ -1084,7 +1084,7 @@ ESP_LOGD(TAG,"mt2 len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,cle
 }
 
 
-//IRAM_ATTR uint32_t pad;
+
 uint8_t bufrec[RECEIVE+20];
 static  char useragent[50];
 
@@ -1103,7 +1103,7 @@ void clientTask(void *pvParams) {
 	
 	vTaskDelay(300);	
 
-//	bufrec = incmalloc(RECEIVE+10);
+//	bufrec = incmalloc(2*RECEIVE+10);
 //	useragent = incmalloc(50);
 	
 	device = getDeviceSettings();
