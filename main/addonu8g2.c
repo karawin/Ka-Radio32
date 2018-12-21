@@ -17,6 +17,7 @@
 #include "logo.h"
 #include "interface.h"
 #include "eeprom.h"
+#include "addoncommon.h"
 /*==========================================*/
 //#include "u8g2-karadio32_fonts.h"
 extern const uint8_t u8g2_font_4x6_t_latcyr[] U8G2_FONT_SECTION("u8g2_font_4x6_t_latcyr");
@@ -41,42 +42,10 @@ extern const uint8_t u8g2_font_10x20_t_latcyr[] U8G2_FONT_SECTION("u8g2_font_10x
 #define VOLUME    5
 #define TIME      6
 
-#define BUFLEN  256
+#undef LINES
 #define LINES	5
 
-static uint16_t y ;		//Height of a line
-static uint16_t yy;		//Height of screen
-static uint16_t x ;		//Width
-static uint16_t z ;		// an internal offset for y
 
-static struct tm *dt;
-static uint16_t volume;
-
-static char station[BUFLEN]; //received station
-static char title[BUFLEN];	// received title
-static char nameset[BUFLEN]; // the local name of the station
-
-static char* lline[LINES] ; // array of ptr of n lines 
-static uint8_t  iline[LINES] ; //array of index for scrolling
-static uint8_t  tline[LINES] ;
-static uint8_t  mline[LINES] ; // mark to display
-
-static char nameNum[5] ; // the number of the current station
-static char genre[BUFLEN/2]; // the local name of the station
-
-
-/*static uint8_t charset = false;
-
-////////////////////////////////////////
-uint8_t getCharset()
-{
-	return charset;
-}
-void setCharset(uint8_t cy)
-{
-	charset = cy;
-}
-*/
 ////////////////////////////////////////
 typedef enum sizefont  {small, text,middle,large} sizefont;
 void setfont8(sizefont size)

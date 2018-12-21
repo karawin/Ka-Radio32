@@ -29,7 +29,7 @@ int telnetclients[NBCLIENTT];
 static char brec[256];
 static char iac[3];
 static bool inIac = false; // if in negociation
-static char *obrec;
+static char *obrec;  //precedent received command
 static uint16_t irec;
 static uint8_t iiac;
 xSemaphoreHandle sTELNET = NULL;

@@ -33,11 +33,11 @@ fd_set readfds;
  * @param length size_t
  * @param output char*
  */
- 
+/* 
 void *inwmalloc(size_t n)
 {
 	void* ret;
-//printf ("ws Malloc of %d,  Heap size: %d\n",n,xPortGetFreeHeapSize( ));
+	ESP_LOGV(TAG,"ws Malloc of %d,  Heap size: %d",n,xPortGetFreeHeapSize( ));
 	ret = malloc(n);
 		if (ret == NULL) printf(strwMALLOC,n);
 //	printf ("ws Malloc after of %d bytes ret:%x  Heap size: %d\n",n,ret,xPortGetFreeHeapSize( ));
@@ -46,9 +46,9 @@ void *inwmalloc(size_t n)
 void inwfree(void *p,const char* from)
 {
 	if (p != NULL) free(p);
-//	printf ("ws free of %x,  from %s             Heap size: %d\n",p,from,xPortGetFreeHeapSize( ));
+	ESP_LOGV(TAG,"ws free of %x,  from %s             Heap size: %d",(unsigned int)p,from,xPortGetFreeHeapSize( ));
 } 
- 
+*/ 
 void base64_encode_local(uint8_t * data, size_t length, char* output) {
 //    size_t size = ((length * 1.6f) + 1);
     if(output) {
@@ -200,8 +200,6 @@ bool sendFrame(int socket, wsopcode_t opcode, uint8_t * payload , size_t length 
     uint8_t headerSize;
     uint8_t * headerPtr;
     uint8_t * payloadPtr = payload;
-//remove    bool useInternBuffer = false;
-//remove    bool ret = true;
 
     // calculate header Size
 //	printf("websocket len: %d  payload: %s\n",length,payload);
@@ -328,10 +326,6 @@ void websocketparsedata(int socket, char* buf, int len)
     }
 	payload[header.payloadLen] = 0x00;	   
 	
-/*	
-	if (header.opCode == WSop_text)
-		printf("ws parsedata data  socket:%d, opcode: %d,  payload:%s   len:%d\n",socket,header.opCode,payload,header.payloadLen);
-*/
 // ok payload is unmasked now.	
         switch(header.opCode) {
             case WSop_text:
@@ -367,7 +361,7 @@ void websocketwrite(int socket, char* buf, int len)
 void websocketbroadcast(char* buf, int len)
 {
 	int i ;
-	ESP_LOGD(TAG,"websocketbroadcast: %s",buf);
+	ESP_LOGV(TAG,"websocketbroadcast: %s",buf);
 	for (i = 0;i<NBCLIENT;i++)	
 		if (iswebsocket( webserverclients[i].socket))
 		{
@@ -379,7 +373,7 @@ void websocketbroadcast(char* buf, int len)
 void websocketlimitedbroadcast(int socket,char* buf, int len)
 {
 	int i ;
-	ESP_LOGD(TAG,"websocketlimitedbroadcast: %s",buf);
+	ESP_LOGV(TAG,"websocketlimitedbroadcast: %s",buf);
 	for (i = 0;i<NBCLIENT;i++)	
 		if (iswebsocket( webserverclients[i].socket))
 		{
@@ -392,52 +386,29 @@ void websocketlimitedbroadcast(int socket,char* buf, int len)
 void websocketAccept(int wsocket,char* bufin,int buflen)
 {
 int32_t recbytes = 0;
-char *buf = NULL;
 /*	struct timeval timeout;      
     timeout.tv_sec = 1; 
     timeout.tv_usec = 0;	*/
-	buf = (char *)inwmalloc(MAXDATA);	
+	char buf[150];
 	bufin[buflen] = 0;
-//printf("ws write accept request entry soc: %d\n",wsocket);
-    if (buf == NULL)
-	{
-		vTaskDelay(100); // wait a while and retry
-		buf = (char *)inwmalloc(MAXDATA);	
-	}
-	if (buf != NULL)
-	{
-/*		if (setsockopt (wsocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0)
-				printf(strwSOCKET,"setsockopt",errno);*/
 		if ((!iswebsocket(wsocket ))&&(websocketnewclient(wsocket))) 
 		{
 			recbytes = decodeHttpMessage (bufin, buf);
 			buf[recbytes+1] = 0;
-//printf("ws write accept request:\n \"%s\" len:%d  socket: %d\n",buf,recbytes,wsocket);
 			write(wsocket, buf, strlen(buf));  // reply to accept	
 		}
-		inwfree(buf,"websAccept");
-	} 
-//else printf("ws write accept request fails\n");
-		
 }
 
 int websocketRead(int conn)
 {
-	char *buf = NULL;
-	buf = (char *)inwmalloc(MAXDATA);
+	char buf[MAXDATA];
 	int32_t recbytes = 0;
-    if (buf == NULL)
-	{
-		vTaskDelay(100); // wait a while and retry
-		buf = (char *)inwmalloc(MAXDATA);	
-	}	
 	if (buf != NULL)
 	{
 		recbytes = read(conn , buf, MAXDATA);
 		if (recbytes < 0) {
 			if ((errno != EAGAIN )&&(errno != 0 ))
 			{
-				inwfree(buf,"websRead");
 				if ((errno != 104 /*ECONNRESET*/ )&&(errno != 113 /*EHOSTUNREACH*/ ))
 				{
 					printf (strwSOCKET,"read", errno);
@@ -448,10 +419,8 @@ int websocketRead(int conn)
 		}
 		if (recbytes > 0)
 		{
-			buf = realloc(buf,recbytes+1);
 			websocketparsedata(conn, buf, recbytes);
 		}
-		inwfree(buf,"websRead");	
 	}
 	return recbytes;
 }

@@ -19,7 +19,7 @@
 #include "logo.h"
 #include "interface.h"
 #include "eeprom.h"
-
+#include "addoncommon.h"
 #define TAG  "addonucg"
 
 extern const ucg_fntpgm_uint8_t ucg_font_crox1c[] UCG_FONT_SECTION("ucg_font_crox1c");
@@ -82,29 +82,11 @@ extern const ucg_fntpgm_uint8_t ucg_font_helvR18_gr[] UCG_FONT_SECTION("ucg_font
 #define VOLUME    7
 #define TIME      8
 
-#define BUFLEN  256
-#define LINES	9
 
-static uint16_t y ;		//Height of a line
-static uint16_t yy;		//Height of screen
-static uint16_t x ;		//Width
-static uint16_t z ;		// an internal offset for y
+
+
+
 static uint16_t HHeader= 40;
-
-static struct tm *dt;
-static uint16_t volume;
-
-static char station[BUFLEN]; //received station
-static char title[BUFLEN];	// received title
-static char nameset[BUFLEN]; // the local name of the station
-
-static char* lline[LINES] ; // array of ptr of n lines 
-static uint8_t  iline[LINES] ; //array of index for scrolling
-static uint8_t  tline[LINES] ;
-static uint8_t  mline[LINES] ; // mark to display
-
-static char nameNum[5] ; // the number of the current station
-static char genre[BUFLEN/2]; // the local name of the station
 
 static char TTitleStr[15];
 static char TTimeStr[15];

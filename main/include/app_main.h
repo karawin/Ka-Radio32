@@ -112,7 +112,7 @@ extern uint32_t wakeDelay;
 #define CPU_SERVER		0
 #define CPU_ADDON		1
 #define CPU_LCD			0
-#define CPU_SUBSERV		0
+#define CPU_SUBSERV		1
 #define CPU_TIMER		0
 
 #define TEMPO_SAVE_VOL	10000

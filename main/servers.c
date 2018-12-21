@@ -16,7 +16,7 @@
 #include "interface.h"
 #include "app_main.h"
 
-#define stack  4200
+#define stack  4400
 #define TAG	"servers"
 
 #define  strsTELNET  "Servers Telnet Socket fails %s errno: %d"
@@ -42,7 +42,7 @@ void serversTask(void* pvParams) {
 	int  client_sock;
 	socklen_t sin_size;
 	
-	semclient = xSemaphoreCreateCounting(5,5); 
+	semclient = xSemaphoreCreateCounting(4,4); 
 	semfile = xSemaphoreCreateCounting(1,1); 
 	
 	portBASE_TYPE uxHighWaterMark;

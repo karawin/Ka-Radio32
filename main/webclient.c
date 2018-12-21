@@ -1086,7 +1086,7 @@ ESP_LOGD(TAG,"mt2 len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,cle
 
 
 uint8_t bufrec[RECEIVE+20];
-static  char useragent[50];
+static  char useragent[40];
 
 void clientTask(void *pvParams) { 
 	portBASE_TYPE uxHighWaterMark;
@@ -1104,7 +1104,6 @@ void clientTask(void *pvParams) {
 	vTaskDelay(300);	
 
 //	bufrec = incmalloc(2*RECEIVE+10);
-//	useragent = incmalloc(50);
 	
 	device = getDeviceSettings();
 	if (device != NULL)

@@ -740,15 +740,16 @@ uint8_t getLedGpio()
 	if (led_gpio == GPIO_NONE)
 	{
 		device = getDeviceSettings();
-		uint8_t ledgpio = device->led_gpio;
-		if (ledgpio == 0) {
-			ledgpio = GPIO_LED;
-			device->led_gpio = ledgpio;
-			led_gpio = ledgpio;
-			saveDeviceSettings(device);
-		}
-		free (device);
-		return ledgpio;	
+		if (device != NULL)
+		{
+			led_gpio = device->led_gpio;
+			if (led_gpio == 0) {
+				led_gpio = GPIO_LED;
+				device->led_gpio = led_gpio;
+				saveDeviceSettings(device);
+			}
+			free (device);
+		} 
 	} 
 	return led_gpio;	
 }
