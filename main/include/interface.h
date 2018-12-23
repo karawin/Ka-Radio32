@@ -17,7 +17,7 @@
 
 
 #define RELEASE "1.6"
-#define REVISION "00"
+#define REVISION "1"
 
 uint32_t checkUart(uint32_t speed);
 extern unsigned short adcdiv;	
@@ -43,6 +43,7 @@ void setDdmm(uint8_t dm);
 uint8_t getDdmm();
 void setRotat(uint8_t dm);
 uint8_t getRotat();
+void setHostname(char* s);
 
 #define kprintf(fmt, ...) do {    \
         printf(fmt, ##__VA_ARGS__);   \

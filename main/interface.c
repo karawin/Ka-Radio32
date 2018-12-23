@@ -1022,6 +1022,19 @@ void heapSize()
 	kprintf("%sHEAP: %d #\n",msgsys,hps);
 }
 
+// set hostname in mDNS
+void setHostname(char* s)
+{
+		ESP_ERROR_CHECK(mdns_service_remove("_http", "_tcp"));
+		ESP_ERROR_CHECK(mdns_service_remove("_telnet", "_tcp"));
+		vTaskDelay(10);
+		ESP_ERROR_CHECK(mdns_hostname_set(s));
+		ESP_ERROR_CHECK(mdns_instance_name_set(s));
+		vTaskDelay(10);
+		ESP_ERROR_CHECK(mdns_service_add(NULL, "_http", "_tcp", 80, NULL, 0));	
+		ESP_ERROR_CHECK(mdns_service_add(NULL, "_telnet", "_tcp", 23, NULL, 0));	
+}
+
 //display or change the hostname and services
 void hostname(char* s)
 {
@@ -1057,15 +1070,8 @@ void hostname(char* s)
 			device->hostname[(t_end-t)*sizeof(char)] = 0;
 		}
 		saveDeviceSettings(device);	
-		ESP_ERROR_CHECK(mdns_service_remove("_http", "_tcp"));
-		ESP_ERROR_CHECK(mdns_service_remove("_telnet", "_tcp"));
-		vTaskDelay(1);
+		setHostname(device->hostname);
 		kprintf("##SYS.HOST#: %s.local\n  IP:%s #\n",device->hostname,getIp());
-		ESP_ERROR_CHECK(mdns_hostname_set(device->hostname));
-		ESP_ERROR_CHECK(mdns_instance_name_set(device->hostname));
-		vTaskDelay(1);
-		ESP_ERROR_CHECK(mdns_service_add(NULL, "_http", "_tcp", 80, NULL, 0));	
-		ESP_ERROR_CHECK(mdns_service_add(NULL, "_telnet", "_tcp", 23, NULL, 0));
 		free(hn);
 	}
 	free(device);	

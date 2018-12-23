@@ -529,6 +529,7 @@ function wifi(valid) {
 			document.getElementById('gw2').value = arr["gw2"];
 			chkip(document.getElementById('gw2'));
 			document.getElementById('ua').value = arr["ua"];
+			document.getElementById('host').value = arr["host"];
 			if (arr["dhcp"] == "1")
 				document.getElementById("dhcp").setAttribute("checked","");
 			else
@@ -555,6 +556,7 @@ function wifi(valid) {
 	+"&msk2=" + document.getElementById('mask2').value
 	+"&gw2=" + document.getElementById('gw2').value
 	+"&ua=" + encodeURIComponent(document.getElementById('ua').value) 
+	+"&host=" + encodeURIComponent(document.getElementById('host').value) 
 	+"&dhcp=" + document.getElementById('dhcp').checked
 	+"&dhcp2=" + document.getElementById('dhcp2').checked+"&");
 }
