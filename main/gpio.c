@@ -33,7 +33,7 @@ esp_err_t open_partition(const char *partition_label, const char *namespace,nvs_
 {
 	esp_err_t err;	
 	err = nvs_flash_init_partition(partition_label);
-	if (err != ESP_OK) {ESP_LOGE(TAG,"Hardware partition not found"); return err;}
+	if (err != ESP_OK) {ESP_LOGW(TAG,"Hardware partition not found"); return err;}
 	err = nvs_open_from_partition(partition_label, namespace,
 		NVS_READONLY, handle);
 	if (err != ESP_OK) 
@@ -65,7 +65,7 @@ void gpio_get_spi_bus(uint8_t *spi_no,gpio_num_t *miso,gpio_num_t *mosi,gpio_num
 	err |= nvs_get_u8(hardware_handle, "P_MISO",(uint8_t *) miso);
 	err |=nvs_get_u8(hardware_handle, "P_MOSI",(uint8_t *) mosi);
 	err |=nvs_get_u8(hardware_handle, "P_CLK", (uint8_t *)sclk);
-	if (err != ESP_OK) printf("gpio_get_spi_bus error %d\n",err);
+	if (err != ESP_OK) ESP_LOGW(TAG,"gpio_get_spi_bus error %d",err);
 	close_partition(hardware_handle,hardware);
 }
 
@@ -86,7 +86,7 @@ void gpio_get_vs1053(gpio_num_t * xcs,gpio_num_t *rst,gpio_num_t *xdcs,gpio_num_
 	err |=nvs_get_u8(hardware_handle, "P_RST",(uint8_t *) rst);
 	err |=nvs_get_u8(hardware_handle, "P_XDCS", (uint8_t *)xdcs);
 	err |=nvs_get_u8(hardware_handle, "P_DREQ", (uint8_t *)dreq);
-	if (err != ESP_OK) printf("gpio_get_vs1053 error %d\n",err);
+	if (err != ESP_OK) ESP_LOGW(TAG,"gpio_get_vs1053 error %d",err);
 	close_partition(hardware_handle,hardware);	
 }
 
@@ -104,7 +104,7 @@ void gpio_get_button0(gpio_num_t *enca, gpio_num_t *encb, gpio_num_t *encc)
 	err = nvs_get_u8(hardware_handle, "P_BTN0_A",(uint8_t *) enca);
 	err |=nvs_get_u8(hardware_handle, "P_BTN0_B",(uint8_t *) encb);
 	err |=nvs_get_u8(hardware_handle, "P_BTN0_C", (uint8_t *)encc);
-	if (err != ESP_OK) printf("gpio_get_button0 error %d\n",err);
+	if (err != ESP_OK) ESP_LOGW(TAG,"gpio_get_button0 error %d",err);
 
 	close_partition(hardware_handle,hardware);		
 }
@@ -122,7 +122,7 @@ void gpio_get_button1(gpio_num_t *enca, gpio_num_t *encb, gpio_num_t *encc)
 	err = nvs_get_u8(hardware_handle, "P_BTN1_A",(uint8_t *) enca);
 	err |=nvs_get_u8(hardware_handle, "P_BTN1_B",(uint8_t *) encb);
 	err |=nvs_get_u8(hardware_handle, "P_BTN1_C", (uint8_t *)encc);
-	if (err != ESP_OK) printf("gpio_get_button1 error %d\n",err);
+	if (err != ESP_OK) ESP_LOGW(TAG,"gpio_get_button1 error %d",err);
 
 	close_partition(hardware_handle,hardware);		
 }
@@ -148,7 +148,7 @@ void gpio_get_encoder0(gpio_num_t *enca, gpio_num_t *encb, gpio_num_t *encbtn)
 	err = nvs_get_u8(hardware_handle, "P_ENC0_A",(uint8_t *) enca);
 	err |=nvs_get_u8(hardware_handle, "P_ENC0_B",(uint8_t *) encb);
 	err |=nvs_get_u8(hardware_handle, "P_ENC0_BTN", (uint8_t *)encbtn);
-	if (err != ESP_OK) printf("gpio_get_encoder0 error %d\n",err);
+	if (err != ESP_OK) ESP_LOGW(TAG,"gpio_get_encoder0 error %d",err);
 
 	close_partition(hardware_handle,hardware);		
 }
@@ -174,7 +174,7 @@ void gpio_get_encoder1(gpio_num_t *enca, gpio_num_t *encb, gpio_num_t *encbtn)
 	err = nvs_get_u8(hardware_handle, "P_ENC1_A",(uint8_t *) enca);
 	err |=nvs_get_u8(hardware_handle, "P_ENC1_B",(uint8_t *) encb);
 	err |=nvs_get_u8(hardware_handle, "P_ENC1_BTN", (uint8_t *)encbtn);
-	if (err != ESP_OK) printf("gpio_get_encoder1 error %d\n",err);
+	if (err != ESP_OK) ESP_LOGW(TAG,"gpio_get_encoder1 error %d",err);
 
 	close_partition(hardware_handle,hardware);		
 }
@@ -193,7 +193,7 @@ void gpio_get_i2c(gpio_num_t *scl,gpio_num_t *sda,gpio_num_t *rsti2c)
 	err = nvs_get_u8(hardware_handle, "P_I2C_SCL",(uint8_t *) scl);
 	err |=nvs_get_u8(hardware_handle, "P_I2C_SDA",(uint8_t *) sda);
 	err |=nvs_get_u8(hardware_handle, "P_I2C_RST", (uint8_t *)rsti2c);
-	if (err != ESP_OK) printf("gpio_get_i2c error %d\n",err);
+	if (err != ESP_OK) ESP_LOGW(TAG,"gpio_get_i2c error %d",err);
 
 	close_partition(hardware_handle,hardware);		
 }
@@ -212,7 +212,7 @@ void gpio_get_spi_lcd(gpio_num_t *cs ,gpio_num_t *a0,gpio_num_t *rstlcd)
 	err = nvs_get_u8(hardware_handle, "P_LCD_CS",(uint8_t *) cs);
 	err |=nvs_get_u8(hardware_handle, "P_LCD_A0",(uint8_t *) a0);
 	err |=nvs_get_u8(hardware_handle, "P_LCD_RST", (uint8_t *)rstlcd);
-	if (err != ESP_OK) printf("gpio_get_spi_lcd error %d\n",err);
+	if (err != ESP_OK) ESP_LOGW(TAG,"gpio_get_spi_lcd error %d",err);
 
 	close_partition(hardware_handle,hardware);			
 }
@@ -227,7 +227,7 @@ void gpio_get_ir_signal(gpio_num_t *ir)
 	if (open_partition(hardware, "gpio_space",&hardware_handle)!= ESP_OK) return;
 	
 	err = nvs_get_u8(hardware_handle, "P_IR_SIGNAL",(uint8_t *) ir);
-	if (err != ESP_OK) printf("gpio_get_ir_signal error %d\n",err);
+	if (err != ESP_OK) ESP_LOGW(TAG,"gpio_get_ir_signal error %d",err);
 
 	close_partition(hardware_handle,hardware);		
 }
@@ -242,7 +242,7 @@ void gpio_get_adc(adc1_channel_t  *channel)
 	if (open_partition(hardware, "gpio_space",&hardware_handle)!= ESP_OK) return;
 	
 	err = nvs_get_u8(hardware_handle, "P_ADC",(uint8_t *) channel);
-	if (err != ESP_OK) printf("gpio_get_adc error %d\n",err);
+	if (err != ESP_OK)ESP_LOGW(TAG,"gpio_get_adc error %d",err);
 
 	close_partition(hardware_handle,hardware);		
 }
@@ -261,7 +261,7 @@ void gpio_get_i2s(gpio_num_t *lrck ,gpio_num_t *bclk ,gpio_num_t *i2sdata )
 	err = nvs_get_u8(hardware_handle, "P_I2S_LRCK",(uint8_t *) lrck);
 	err |=nvs_get_u8(hardware_handle, "P_I2S_BCLK",(uint8_t *) bclk);
 	err |=nvs_get_u8(hardware_handle, "P_I2S_DATA", (uint8_t *)i2sdata);
-	if (err != ESP_OK) printf("gpio_get_i2s error %d\n",err);
+	if (err != ESP_OK) ESP_LOGW(TAG,"gpio_get_i2s error %d",err);
 
 	close_partition(hardware_handle,hardware);	
 }
@@ -276,7 +276,7 @@ void gpio_get_lcd_backlightl(gpio_num_t *lcdb)
 	if (open_partition(hardware, "gpio_space",&hardware_handle)!= ESP_OK) return;
 	
 	err = nvs_get_u8(hardware_handle, "P_BACKLIGHT",(uint8_t *) lcdb);
-	if (err != ESP_OK) printf("gpio_get_lcd_backlightl error %d\n",err);
+	if (err != ESP_OK) ESP_LOGW(TAG,"gpio_get_lcd_backlightl error %d",err);
 
 	close_partition(hardware_handle,hardware);		
 }

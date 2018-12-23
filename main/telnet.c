@@ -5,6 +5,9 @@
 	quick and dirty telnet inplementation for wifi webradio
 	minimal implementaion for log and command
 */
+#define TAG "TELNET"
+#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
@@ -19,7 +22,7 @@
 
 
 //const char strtMALLOC1[] = {"Telnet %s malloc fails\n"};
-const char strtSOCKET[]  = {"Telnet Socket fails %s errno: %d\n"};
+#define strtSOCKET	"Telnet Socket fails %s errno: %d"
 const char strtWELCOME[]  ={"Karadio telnet\n> "};
 
 
@@ -162,10 +165,10 @@ void telnetNego(int tsocket)
 void telnetCommand(int tsocket)
 {
 	if (irec == 0) return;
-//printf("%sHEAPd0: %d #\n","##SYS.",xPortGetFreeHeapSize( ));	
+	ESP_LOGV(TAG,"%sHEAPd0: %d #\n","##SYS.",xPortGetFreeHeapSize( ));	
 	brec[irec] = 0x0;
 	write(tsocket,"\n> ",1);
-//	printf("%s\n",brec);
+	ESP_LOGV(TAG,"brec: %s\n",brec);
 	obrec = realloc(obrec,strlen(brec)+1);
 	strcpy(obrec,brec); // save old command
 	checkCommand(irec, brec);
@@ -194,7 +197,7 @@ int telnetRead(int tsocket)
 			{
 				if (errno != ECONNRESET )
 				{
-					printf (strtSOCKET,"read", errno);	
+					ESP_LOGE(TAG,strtSOCKET,"read", errno);	
 				} 
 			} 
 			free(buf);

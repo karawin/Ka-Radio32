@@ -339,7 +339,7 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
 	case SYSTEM_EVENT_STA_CONNECTED:
 		xEventGroupSetBits(wifi_event, CONNECTED_AP);
 		wifiInitDone = true;
-		ESP_LOGE(TAG, "\nWifi connected");
+		ESP_LOGI(TAG, "Wifi connected");
 		
 		break;
 
@@ -603,7 +603,7 @@ void start_network(){
 		tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, "karadio32");	
 	}
 	free(device);	
-	lcd_state("IP found");
+	lcd_welcome(localIp,"IP found");
 }
 
 
@@ -816,7 +816,7 @@ void app_main()
 	ESP_LOGI(TAG, "Hardware init done...");
 	//ESP_LOGE(TAG,"Corrupt1 %d",heap_caps_check_integrity(MALLOC_CAP_DMA,1));
 	
-	ESP_LOGE(TAG,"LCD Type %d",device->lcd_type);
+	ESP_LOGI(TAG,"LCD Type %d",device->lcd_type);
 	//lcd rotation
 	setRotat((device->options32)&T_ROTAT) ;	
 	
@@ -876,7 +876,8 @@ void app_main()
 	ESP_LOGI(TAG, "SDK %s",esp_get_idf_version());
 	ESP_LOGI(TAG, "Heap size: %d",xPortGetFreeHeapSize());
 
-	lcd_welcome("");
+	lcd_welcome("","");
+	lcd_welcome("","STOPPED");
 	
 	// volume
 	setIvol( device->vol);
@@ -941,8 +942,7 @@ void app_main()
 	//	bt_speaker_start(create_renderer_config());
 	
 	// LCD Display infos
-    lcd_welcome(localIp);
-	lcd_state("Started");
+    lcd_welcome(localIp,"STARTED");
 	vTaskDelay(10);
     ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
 
@@ -965,14 +965,8 @@ void app_main()
 		ESP_LOGI(TAG, "%s task: %x","rda5807Task",(unsigned int)pxCreatedTask);
 	}
 */	
-	vTaskDelay(10);
-	printf("Init ");
-	for (int i=0;i<10;i++)
-	{
-		printf(".");
-		vTaskDelay(10);// wait tasks init
-	}
-	printf(" Done\n");
+	vTaskDelay(60);// wait tasks init
+	ESP_LOGI(TAG," Init Done");
 	
 	// led mode
 	if(device->options & T_LED) ledStatus = false;

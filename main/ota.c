@@ -139,7 +139,7 @@ static void ota_task(void *pvParameter)
 	// prepare connection to the server
 	serv =(struct hostent*)gethostbyname("karadio.karawin.fr");
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if(sockfd >= 0) ;//{printf("WebClient Socket created\n"); }
+	if(sockfd >= 0) {ESP_LOGI(TAG,"WebClient Socket created"); }
 	else {ESP_LOGE(TAG,"socket create errno: %d",errno); goto exit;}
 	bzero(&dest, sizeof(dest));	
     dest.sin_family = AF_INET;

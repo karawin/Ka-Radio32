@@ -140,7 +140,7 @@ void setfont8(sizefont size)
 		}
 		break;
 		default:
-		printf("Default for size %d\n",size);
+		ESP_LOGE(TAG,"Default for size %d",size);
 	}
 }
 
@@ -245,7 +245,7 @@ static void screenBottomU8g2()
 // draw the screen from buffer
 void drawLinesU8g2()
 {
-u8g2_SendBuffer(&u8g2); 
+//u8g2_SendBuffer(&u8g2); 
 }
 
 
@@ -274,52 +274,52 @@ void eraseSlashes(char * str) {
 void drawFrameU8g2(uint8_t mTscreen)
 {
 	if (dt == NULL) {dt = getDt();}
-	u8g2_ClearBuffer(&u8g2);	
-    setfont8(text);
-    u8g2_SetDrawColor(&u8g2, 1);
-    y = getFontLineSpacing();
-    u8g2_SetFontRefHeightText(&u8g2); 
-	{
-		u8g2_DrawHLine(&u8g2,0,((yy==32)?3:4*y) - (y/2)-1,x);
-		u8g2_DrawBox(&u8g2,0,0,x-1,y);
-	}
-    for (int i = 0;i < LINES;i++)
-    {
-		if (i == 0){
-			u8g2_SetDrawColor(&u8g2, 0);
-		}
-		else {
-			if (i >=3) z = y/2+2 ; else z = 1;
-			u8g2_SetDrawColor(&u8g2, 1);
-		}
-		
-		int zz = y*i;
-		if (yy==32)
+	u8g2_ClearBuffer(&u8g2);
+	u8g2_FirstPage(&u8g2);
+	do {	
+		setfont8(text);
+		u8g2_SetDrawColor(&u8g2, 1);
+		y = getFontLineSpacing();
+		u8g2_SetFontRefHeightText(&u8g2); 
 		{
-			if ((i==STATION2)||(i==TITLE2)) continue;
-			if (i==TITLE1) zz = y*GENRE;
+			u8g2_DrawHLine(&u8g2,0,((yy==32)?3:4*y) - (y/2)-1,x);
+			u8g2_DrawBox(&u8g2,0,0,x-1,y);
 		}
-		
-		if (lline[i] != NULL)
+		for (int i = 0;i < LINES;i++)
 		{
-			//Max
-			eraseSlashes(lline[i]);
-			if (i == 0) 
-			{      
-//				printf("DRAW: len= %d,STR= %s\n",u8g2_GetUTF8Width(&u8g2,lline[i]+iline[i]),lline[i]+iline[i]);		
-				if (nameNum[0] ==0)  u8g2_DrawUTF8(&u8g2,1,0,lline[i]+iline[i]);
-				else 
-				{
-					u8g2_DrawUTF8(&u8g2,1,0,nameNum);
-					u8g2_DrawUTF8(&u8g2,u8g2_GetUTF8Width(&u8g2,nameNum)-1,0,lline[i]+iline[i]);
-				}
-			}      
-			else u8g2_DrawUTF8(&u8g2,0,zz+z,lline[i]+iline[i]);
+			if (i == 0){
+				u8g2_SetDrawColor(&u8g2, 0);
+			}
+			else {
+				if (i >=3) z = y/2+2 ; else z = 1;
+				u8g2_SetDrawColor(&u8g2, 1);
+			}		
+			int zz = y*i;
+			if (yy==32)
+			{
+				if ((i==STATION2)||(i==TITLE2)) continue;
+				if (i==TITLE1) zz = y*GENRE;
+			}		
+			if (lline[i] != NULL)
+			{
+				//Max
+				eraseSlashes(lline[i]);
+				if (i == 0) 
+				{      
+//					printf("DRAW: len= %d,STR= %s\n",u8g2_GetUTF8Width(&u8g2,lline[i]+iline[i]),lline[i]+iline[i]);		
+					if (nameNum[0] ==0)  u8g2_DrawUTF8(&u8g2,1,0,lline[i]+iline[i]);
+					else 
+					{
+						u8g2_DrawUTF8(&u8g2,1,0,nameNum);
+						u8g2_DrawUTF8(&u8g2,u8g2_GetUTF8Width(&u8g2,nameNum)-1,0,lline[i]+iline[i]);
+					}
+				}      
+				else u8g2_DrawUTF8(&u8g2,0,zz+z,lline[i]+iline[i]);
+			}
+			vTaskDelay(1);
 		}
-
-    }
-    screenBottomU8g2();
-	   
+		screenBottomU8g2();
+	} while ( u8g2_NextPage(&u8g2) );	   
 }
 
 
@@ -345,10 +345,14 @@ void drawNumberU8g2(uint8_t mTscreen,char* irStr)
 {
   char ststr[] = {"Number"};
   u8g2_ClearBuffer(&u8g2);
-  drawTTitleU8g2(ststr);   
-  setfont8(large);
-  uint16_t xxx = (x/2)-(u8g2_GetUTF8Width(&u8g2,irStr)/2); 
-  u8g2_DrawUTF8(&u8g2,xxx,yy/3, irStr);          
+  u8g2_FirstPage(&u8g2);
+  do {	
+	drawTTitleU8g2(ststr);   
+	setfont8(large);
+	uint16_t xxx = (x/2)-(u8g2_GetUTF8Width(&u8g2,irStr)/2); 
+	u8g2_DrawUTF8(&u8g2,xxx,yy/3, irStr); 
+	vTaskDelay(1);
+  } while ( u8g2_NextPage(&u8g2) );	     
 }
 //////////////////////////
 void drawStationU8g2(uint8_t mTscreen,char* snum,char* ddot)
@@ -356,15 +360,19 @@ void drawStationU8g2(uint8_t mTscreen,char* snum,char* ddot)
   int16_t len;
   char ststr[] = {"Station"};
   u8g2_ClearBuffer(&u8g2);
-  drawTTitleU8g2(ststr);   
-  if (ddot != NULL)
-  {
+  u8g2_FirstPage(&u8g2);
+  do {	
+	drawTTitleU8g2(ststr);   
+	if (ddot != NULL)
+	{
 		setfont8(middle);
-        u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,snum)/2),yy/3-2, snum);
-        len = (x/2)-(u8g2_GetUTF8Width(&u8g2,ddot)/2);
-        if (len <0) len = 0;
+		u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,snum)/2),yy/3-2, snum);
+		len = (x/2)-(u8g2_GetUTF8Width(&u8g2,ddot)/2);
+		if (len <0) len = 0;
         u8g2_DrawUTF8(&u8g2,len,yy/3+4+y, ddot);
-  }	
+		vTaskDelay(1);
+	}	
+  } while ( u8g2_NextPage(&u8g2) );	     
 }
 
 
@@ -375,11 +383,16 @@ void drawVolumeU8g2(uint8_t mTscreen)
   char aVolume[4];
 //  volume = atoi(aVolume);
   sprintf(aVolume,"%d",volume);
+  
   u8g2_ClearBuffer(&u8g2);
-  drawTTitleU8g2(vlstr) ;  
-  setfont8(large);  
-  uint16_t xxx = (x/2)-(u8g2_GetUTF8Width(&u8g2,aVolume)/2);     
-  u8g2_DrawUTF8(&u8g2,xxx,(yy/3)+6,aVolume);
+  u8g2_FirstPage(&u8g2);
+  do {	
+	drawTTitleU8g2(vlstr) ;  
+	setfont8(large);  
+	uint16_t xxx = (x/2)-(u8g2_GetUTF8Width(&u8g2,aVolume)/2);     
+	u8g2_DrawUTF8(&u8g2,xxx,(yy/3)+6,aVolume);
+	vTaskDelay(1);
+  } while ( u8g2_NextPage(&u8g2) );	     
 }
 
 void drawTimeU8g2(uint8_t mTscreen,unsigned timein)
@@ -388,6 +401,8 @@ void drawTimeU8g2(uint8_t mTscreen,unsigned timein)
   char strtime[20];
 //  printf("DRAW TIME U8G2  mtscreen : %d\n",mTscreen);
 	u8g2_ClearBuffer(&u8g2);
+  u8g2_FirstPage(&u8g2);
+  do {	
 	if (getDdmm())
 		sprintf(strdate,"%02d-%02d-%04d", dt->tm_mday, dt->tm_mon+1,  dt->tm_year+1900);
     else
@@ -396,6 +411,8 @@ void drawTimeU8g2(uint8_t mTscreen,unsigned timein)
     drawTTitleU8g2(strdate); 
     setfont8(large);	
     u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,strtime)/2),(yy/3)+6,strtime); 
+	vTaskDelay(1);
+  } while ( u8g2_NextPage(&u8g2) );	     
 }
 
 
@@ -520,35 +537,35 @@ void lcd_initU8g2(uint8_t *lcd_type)
 	
 	switch (*lcd_type){
 	case LCD_I2C_SH1106:
-		u8g2_Setup_sh1106_i2c_128x64_noname_f(
+		u8g2_Setup_sh1106_i2c_128x64_noname_2(
 			&u8g2,
 			rotat,
 			u8g2_esp32_i2c_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
 		break;
 	case LCD_I2C_SSD1306NN:
-		u8g2_Setup_ssd1306_i2c_128x64_noname_f(
+		u8g2_Setup_ssd1306_i2c_128x64_noname_2(
 			&u8g2,
 			rotat,
 			u8g2_esp32_i2c_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
 		break;		
 	case LCD_I2C_SSD1306:
-		u8g2_Setup_ssd1306_i2c_128x64_vcomh0_f(
+		u8g2_Setup_ssd1306_i2c_128x64_vcomh0_2(
 			&u8g2,
 			rotat,
 			u8g2_esp32_i2c_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
 		break;		
 	case LCD_I2C_SSD1309:	
-		u8g2_Setup_ssd1309_i2c_128x64_noname2_f(
+		u8g2_Setup_ssd1309_i2c_128x64_noname2_2(
 			&u8g2,
 			rotat,
 			u8g2_esp32_i2c_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
 		break;	
 	case LCD_I2C_SSD1325:	
-		u8g2_Setup_ssd1325_i2c_nhd_128x64_f(
+		u8g2_Setup_ssd1325_i2c_nhd_128x64_2(
 			&u8g2,
 			rotat,
 			u8g2_esp32_i2c_byte_cb,
@@ -556,14 +573,14 @@ void lcd_initU8g2(uint8_t *lcd_type)
 
 		break;	
 	case LCD_I2C_SSD1309NN:	
-		u8g2_Setup_ssd1309_i2c_128x64_noname0_f(
+		u8g2_Setup_ssd1309_i2c_128x64_noname0_2(
 			&u8g2,
 			rotat,
 			u8g2_esp32_i2c_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
 		break;		
 	case LCD_I2C_SSD1306UN:
-		u8g2_Setup_ssd1306_i2c_128x32_univision_f(
+		u8g2_Setup_ssd1306_i2c_128x32_univision_2(
 			&u8g2,
 			rotat,
 			u8g2_esp32_i2c_byte_cb,
@@ -571,70 +588,70 @@ void lcd_initU8g2(uint8_t *lcd_type)
 		break;
 //B/W spi
 	case LCD_SPI_SSD1306NN:	
-		u8g2_Setup_ssd1306_128x64_noname_f(
+		u8g2_Setup_ssd1306_128x64_noname_2(
 			&u8g2,
 			rotat,
 			u8g2_esp32_spi_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;			
 	case LCD_SPI_SSD1306:	
-		u8g2_Setup_ssd1306_128x32_univision_f(
+		u8g2_Setup_ssd1306_128x32_univision_2(
 			&u8g2,
 			rotat,
 			u8g2_esp32_spi_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;	
 	case LCD_SPI_SSD1309:	
-		u8g2_Setup_ssd1309_128x64_noname2_f(
+		u8g2_Setup_ssd1309_128x64_noname2_2(
 			&u8g2,
 			rotat,
 			u8g2_esp32_spi_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;	
 	case LCD_SPI_SSD1309NN:
-		u8g2_Setup_ssd1309_128x64_noname0_f(
+		u8g2_Setup_ssd1309_128x64_noname0_2(
 			&u8g2,
 			rotat,
 			u8g2_esp32_spi_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;		
 	case LCD_SPI_ST7565_ZOLEN:	
-		u8g2_Setup_st7565_zolen_128x64_f(
+		u8g2_Setup_st7565_zolen_128x64_2(
 			&u8g2,
 			rotat,
 			u8g2_esp32_spi_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;		
 	case LCD_SPI_SSD1322_NHD:	
-		u8g2_Setup_ssd1322_nhd_256x64_f(
+		u8g2_Setup_ssd1322_nhd_256x64_2(
 			&u8g2,
 			rotat,
 			u8g2_esp32_spi_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;	
 	case LCD_SPI_IL3820_V2:	//E Paper
-		u8g2_Setup_il3820_v2_296x128_f(
+		u8g2_Setup_il3820_v2_296x128_2(
 			&u8g2,
 			rotat,
 			u8g2_esp32_spi_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;	
 	case LCD_SPI_SSD1607:	//E Paper
-		u8g2_Setup_ssd1607_200x200_f(
+		u8g2_Setup_ssd1607_200x200_2(
 			&u8g2,
 			rotat,
 			u8g2_esp32_spi_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;	
 	case LCD_SPI_LS013B7DH03:	
-		u8g2_Setup_ls013b7dh03_128x128_f(
+		u8g2_Setup_ls013b7dh03_128x128_2(
 			&u8g2,
 			rotat,
 			u8g2_esp32_spi_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;	
 	case LCD_SPI_ST7920:	
-		u8g2_Setup_st7920_s_128x64_f(
+		u8g2_Setup_st7920_s_128x64_2(
 			&u8g2,
 			rotat,
 			u8g2_esp32_spi_byte_cb,
@@ -647,7 +664,7 @@ void lcd_initU8g2(uint8_t *lcd_type)
 		u8g2_esp32_hal.sda  = sda;
 		u8g2_esp32_hal.scl  = scl;
 		u8g2_esp32_hal_init(u8g2_esp32_hal);
-		u8g2_Setup_sh1106_128x64_noname_f(
+		u8g2_Setup_sh1106_128x64_noname_2(
 			&u8g2,
 			rotat,
 			u8g2_esp32_i2c_byte_cb,
@@ -665,14 +682,17 @@ void lcd_initU8g2(uint8_t *lcd_type)
 		yy = u8g2.height;
 		x  = u8g2.width;
 		z = 0;
+  u8g2_FirstPage(&u8g2);
+  do {	
 		u8g2_SetFontPosTop(&u8g2);
 		setfont8(text);
 		y = getFontLineSpacing();
 		if (yy>= logo_height)
 			 u8g2_DrawXBM( &u8g2,x/2-logo_width/2, yy/2-logo_height/2, logo_width, logo_height, logo_bits);
 		else u8g2_DrawXBM( &u8g2,x/2-logo_width/2, 0, logo_width, logo_height, logo_bits);
-		u8g2_SendBuffer(&u8g2);
-		printf("X: %d, YY: %d, Y: %d\n",x,yy,y);
+ } while ( u8g2_NextPage(&u8g2) );	    
+// u8g2_SendBuffer(&u8g2);
+		ESP_LOGI(TAG,"X: %d, YY: %d, Y: %d\n",x,yy,y);
 		vTaskDelay(100);
 //		z = 0; 	
 	}

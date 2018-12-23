@@ -126,7 +126,7 @@ int i = 0;
 //		printf("erase All done\n");
 		free(buffer);
 	} else	
-		printf("erase All fails\n");
+		ESP_LOGE(TAG,"erase All fails");
 	
 }
 

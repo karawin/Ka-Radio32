@@ -95,8 +95,7 @@ static void respKo(int conn)
 
 static void serveFile(char* name, int conn)
 {
-#define PART 1024
-
+#define PART 1460
 	int length;
 	int progress,part,gpart;
 	char buf[150];
@@ -1085,8 +1084,6 @@ static bool httpServerHandleConnection(int conn, char* buf, uint16_t buflen) {
 
 #define RECLEN	768
 #define DRECLEN (RECLEN*2)
-
-
 // Server child task to handle a request from a browser.
 void serverclientTask(void *pvParams) {
 	struct timeval timeout; 

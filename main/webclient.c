@@ -44,8 +44,8 @@ static char parEmpty[] = {" "};
 const char CLIPLAY[]  = {"##CLI.PLAYING#%c%c"};
 const char CLISTOP[]  = {"##CLI.STOPPED# from %s\n"};
 
-const char strcMALLOC[]  = {"Client: incmalloc fails for %d\n"};
-const char strcMALLOC1[]  = {"%s malloc fails\n"};
+#define strcMALLOC  	"Client: incmalloc fails for %d"
+#define strcMALLOC1  	"%s malloc fails"
 
 /* TODO:
 	- METADATA HANDLING
@@ -68,7 +68,7 @@ void *incmalloc(size_t n)
 	void* ret;	
 //printf ("Client malloc of %d %d,  Heap size: %d\n",n,((n / 32) + 1) * 32,xPortGetFreeHeapSize( ));
 	ret = malloc(n);
-	if (ret == NULL) printf(strcMALLOC,n);
+	if (ret == NULL) ESP_LOGV(TAG,strcMALLOC,n);
 //	if (n <4) printf("Client: incmalloc size:%d\n",n);	
 	ESP_LOGV(TAG,"Client malloc after of %d bytes ret:%x  Heap size: %d",n,(int)ret,xPortGetFreeHeapSize( ));
 	return ret;
@@ -222,13 +222,16 @@ bool clientParsePlaylist(char* s)
    return false;
   }
 }
+
 //---------------------------------------
+// add escape char to the string
 static char* stringify(char* str,int len)
 {
+#define MORE	20
 //		if ((strchr(str,'"') == NULL)&&(strchr(str,'/') == NULL)) return str;
         if (len == 0) return str;
-		char* new = incmalloc(len+20);
-		int nlen = len+20;
+		char* new = incmalloc(len+MORE);
+		int nlen = len+MORE;
 		if (new != NULL)
 		{
 			ESP_LOGV(TAG,"stringify: enter: len:%d  \"%s\"",len,str);
@@ -256,9 +259,9 @@ static char* stringify(char* str,int len)
 				} */
 				else new[j++] =(str)[i] ;
 				
-				if ( j+20> nlen) 
+				if ( j+MORE> nlen) 
 				{
-					nlen +=20;
+					nlen +=MORE;
 					new = realloc(new,nlen); // some room
 				}
 			}
@@ -269,7 +272,7 @@ static char* stringify(char* str,int len)
 			return new;		
 		} else 
 		{
-			printf(strcMALLOC1,"stringify");
+			ESP_LOGV(TAG,strcMALLOC1,"stringify");
 		}	
 		return str;
 }
@@ -311,16 +314,18 @@ static void removePartOfString(char* origine, const char* remove)
 static void clientSaveMetadata(char* s,int len)
 {
 		char* t_end = NULL;
-		char* t ,*tt;
+		char* t ;
 		bool found = false;
-		if ((len == 0)||(s==NULL)) printf("clientSaveMetadata:  len:%d\n",len); 
-		if ((len > 256) ||(s == NULL) || (len == 0))
+		if ((len == 0)||(s==NULL)) ESP_LOGV(TAG,"clientSaveMetadata:  len:%d",len); 
+		if ((len > 256) ||(s == NULL) || (len == 0)) // if not valid
 		{
 			if (header.members.mArr[METADATA] != NULL)
-			incfree(header.members.mArr[METADATA],"metad");
-			header.members.mArr[METADATA] = NULL;
+			incfree(header.members.mArr[METADATA],"metad");  // clear the old one
+			header.members.mArr[METADATA] = NULL;  // and exit
 			return;
 		}
+		
+		//remove all but title
 		t = s;
 		len = strlen(t);
 		ESP_LOGV(TAG,"clientSaveMetadata:  len:%d   char:%s",len,s);
@@ -369,37 +374,32 @@ static void clientSaveMetadata(char* s,int len)
 		{
 			if (len >=2) len-=2; 
 		}
-
+		// the expurged str
 		ESP_LOGV(TAG,"clientSaveMetadata0:  len:%d   char:%s",strlen(t),t);
 
-// see if it is !=
-		tt = NULL;
-		if (t != NULL) 
-		{ 
-			tt = incmalloc((len+3)*sizeof(char));
-			if (tt != NULL)
-			{
-				strcpy(tt,t);
-				tt = stringify(tt,len); 
-			}
-		}
-		if  ((header.members.mArr[METADATA] == NULL)||((header.members.mArr[METADATA] != NULL)&&(t!= NULL)&&(strcmp(tt,header.members.mArr[METADATA]) != 0)))
+// see if meta is != of the old one
+		char* tt;
+		tt = incmalloc((len+3)*sizeof(char));
+		if (tt != NULL)
 		{
-		
+			strcpy(tt,t);
+			tt = stringify(tt,len); // to compare we need to stringify
+		}
+		if  ((header.members.mArr[METADATA] == NULL)||
+			((header.members.mArr[METADATA] != NULL)&&(t!= NULL)&&(strcmp(tt,header.members.mArr[METADATA]) != 0)))
+		{
+			incfree(tt,"");
 			if (header.members.mArr[METADATA] != NULL)
-				incfree(header.members.mArr[METADATA],"metad");
+				incfree(header.members.mArr[METADATA],"metad"); //clear the old one
 			header.members.mArr[METADATA] = (char*)incmalloc((len+3)*sizeof(char));
 			if(header.members.mArr[METADATA] == NULL) 
-			{	printf(strcMALLOC1,"metad");
-				incfree(tt,"");
+			{	ESP_LOGV(TAG,strcMALLOC1,"metad");
 				return;
 			}
 
 			strcpy(header.members.mArr[METADATA], t);
 //			dump((uint8_t*)(header.members.mArr[METADATA]),strlen(header.members.mArr[METADATA]));
 			header.members.mArr[METADATA] = stringify(header.members.mArr[METADATA],len);
-//			dump((uint8_t*)(header.members.mArr[METADATA]),strlen(header.members.mArr[METADATA]));
-
 			clientPrintMeta(); 
 			while ((header.members.mArr[METADATA][strlen(header.members.mArr[METADATA])-1] == ' ')||
 				(header.members.mArr[METADATA][strlen(header.members.mArr[METADATA])-1] == '\r')||
@@ -414,16 +414,15 @@ static void clientSaveMetadata(char* s,int len)
 				t_end = header.members.mArr[METADATA];
 			else	
 				t_end = (header.members.single.name ==NULL)?(char*)"":header.members.single.name;
-		
+//		
 			char* title = incmalloc(strlen(t_end)+15);
-			if (title != NULL)
+			if (title != NULL) // broadcast to all websockets
 			{
 				sprintf(title,"{\"meta\":\"%s\"}",t_end); 
 				websocketbroadcast(title, strlen(title));
 				incfree(title,"title");
-			} else printf(strcMALLOC1,"Title"); 
+			} else ESP_LOGV(TAG,strcMALLOC1,"Title"); 
 		}
-		incfree(tt,"");
 }	
 
 // websocket: next station
@@ -505,7 +504,7 @@ static void wsHeaders()
 		((header.members.single.metadata ==NULL)?0:strlen(header.members.single.metadata))
 		;
 	char* wsh = incmalloc(json_length+1);
-	if (wsh == NULL) {printf(strcMALLOC1,"wsHeader");return;}
+	if (wsh == NULL) {ESP_LOGV(TAG,strcMALLOC1,"wsHeader");return;}
 	sprintf(wsh,"{\"wsicy\":{\"curst\":\"%s\",\"descr\":\"%s\",\"meta\":\"%s\",\"name\":\"%s\",\"bitr\":\"%s\",\"url1\":\"%s\",\"not1\":\"%s\",\"not2\":\"%s\",\"genre\":\"%s\"}}",
 			currentSt,
 			(header.members.single.description ==NULL)?"":header.members.single.description,
@@ -566,7 +565,7 @@ static bool clientSaveOneHeader(const char* t, uint16_t len, uint8_t header_num)
 	tt = incmalloc((len+1)*sizeof(char));
 	if(tt == NULL)
 	{
-		printf(strcMALLOC1,"clientSOneH");
+		ESP_LOGV(TAG,strcMALLOC1,"clientSOneH");
 		return false;
 	}	
 	
@@ -818,7 +817,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 						t2 = strstr(pdata, "Internal Server Error"); 
 						if (t2 != NULL)
 						{
-							printf("Internal Server Error%c",0x0d);
+							ESP_LOGV(TAG,"Internal Server Error");
 							clientDisconnect("Internal Server Error");
 							cstatus = C_HEADER;
 							
@@ -911,8 +910,6 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 						if ((inpchr != NULL) &&(inpchr- (inpdata+cchunk) <16))
 							*inpchr = 0; // replace lf by a end of string
 						else {
-/*							printf("0D not found\n");
-							printf("len:%d, inpdata:%x, pdata:%x,chunked:%d  cchunk:%d, lc:%d, str:%s\n",len,inpdata,pdata,chunked,cchunk, lc,inpdata+cchunk );*/
 							clientDisconnect("chunk"); clientConnect();
 							lc = 0; 
 							break;
@@ -1219,7 +1216,6 @@ void clientTask(void *pvParams) {
 						clientDisconnect("try restart"); 
 						clientConnect();
 						playing=1; // force
-//						printf(CLIPLAY,0x0d,0x0a);
 					}	
 					else if ((!playing)&&(once == 1)){ // nothing played. Force the read of the buffer
 						// some data not played						

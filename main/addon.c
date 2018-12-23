@@ -185,40 +185,43 @@ void lcd_init(uint8_t Type)
 //	dt=localtime(&timestamp);
 }
 
-
-void lcd_state(const char* State)
-{
-	if (lcd_type == LCD_NONE) return;
-	DrawColor(0,0,0,0);
-	DrawBox(2, 40, 128-30, 12);
-	DrawColor(1,255,255,255);
-	if (isColor) ucg_SetFont( &ucg,ucg_font_6x10_tf);
-	else u8g2_SetFont( &u8g2,u8g2_font_6x10_tf);
-	DrawString(2,40,State);
-	if (!(isColor)) u8g2_SendBuffer(&u8g2);
-}
-
-void lcd_welcome(const char* ip)
+void lcd_welcome(const char* ip,const char*state)
 {
 char Version[20];
 	if (lcd_type == LCD_NONE) return;
-	if (strlen(ip)==0) ClearBuffer();
-    if (isColor) 
+	if ((strlen(ip)==0)&&(strlen(state)==0)) ClearBuffer();
+	if (isColor) 
+	{
 		ucg_SetFont(&ucg,ucg_font_helvR14_tf );
-	else  u8g2_SetFont(&u8g2,u8g2_font_helvR14_tf );
-	if (GetWidth() <=64)
-		DrawString(2,2,"KaRadio32");
-    else DrawString(10,2,"KaRadio32");
-	if (isColor) ucg_SetFont(&ucg,ucg_font_6x10_tf);
-	else u8g2_SetFont(&u8g2,u8g2_font_6x10_tf);
-	sprintf(Version,"Version %s R%s\n",RELEASE,REVISION);
-	DrawString(2,24,Version);
-	DrawColor(0,0,0,0);
-	DrawBox(2, 40, 128-30, 12);
-	DrawColor(1,255,255,255);
-	DrawString(2,40,stopped);
-	DrawString( DrawString(2,53,"IP")+18,53,ip);
-	if (!(isColor)) u8g2_SendBuffer(&u8g2);
+		if (GetWidth() <=64)
+			DrawString(2,2,"KaRadio32");
+		else DrawString(10,2,"KaRadio32");	
+		ucg_SetFont(&ucg,ucg_font_6x10_tf);
+		sprintf(Version,"Version %s R%s\n",RELEASE,REVISION);
+		DrawString(2,24,Version);
+		DrawColor(0,0,0,0);
+		DrawBox(2, 40, 128-30, 12);
+		DrawColor(1,255,255,255);
+		DrawString(2,40,state);
+		DrawString( DrawString(2,53,"IP")+18,53,ip);	
+	} else
+	{
+		u8g2_FirstPage(&u8g2);
+		do {	
+			u8g2_SetFont(&u8g2,u8g2_font_helvR14_tf );
+			if (GetWidth() <=64)
+				DrawString(2,2,"KaRadio32");
+			else DrawString(10,2,"KaRadio32");
+			u8g2_SetFont(&u8g2,u8g2_font_6x10_tf);
+			sprintf(Version,"Version %s R%s\n",RELEASE,REVISION);
+			DrawString(2,24,Version);
+			DrawColor(0,0,0,0);
+			DrawBox(2, 40, 128-30, 12);
+			DrawColor(1,255,255,255);
+			DrawString(2,40,state);
+			DrawString( DrawString(2,53,"IP")+18,53,ip);
+		} while ( u8g2_NextPage(&u8g2) );	    	
+	}
 }
 
  // ----------------------------------------------------------------------------
@@ -372,8 +375,8 @@ void drawScreen()
 //  ESP_LOGW(TAG,"stateScreen: %d, mTscreen: %d",stateScreen,mTscreen);
   if ((mTscreen != MTNODISPLAY)&&(!itLcdOut))
   {
-  switch (stateScreen)
-  {
+	switch (stateScreen)
+	{
     case smain:  // 
      drawFrame();
       break;
@@ -392,9 +395,8 @@ void drawScreen()
     default: 
 	  Screen(smain); 
 	  drawFrame();	  
-  }
-  if (!(isColor)) u8g2_SendBuffer(&u8g2);
-  mTscreen = MTNODISPLAY;
+	}
+	mTscreen = MTNODISPLAY;
   }   
 }
 
@@ -1039,8 +1041,6 @@ void task_addon(void *pvParams)
 	xTaskCreatePinnedToCore (task_lcd, "task_lcd", 2200, NULL, PRIO_LCD, &pxCreatedTask,CPU_LCD); 
 	ESP_LOGI(TAG, "%s task: %x","task_lcd",(unsigned int)pxCreatedTask);
 	vTaskDelay(1);	
-
-	if (!(isColor)) u8g2_SendBuffer(&u8g2);
 	wakeLcd();
 	
 	while (1)
@@ -1060,13 +1060,6 @@ void task_addon(void *pvParams)
 			itAskTime = false;
 		}	
 		
-/*		if (itAskStime) // time start the time display. Don't do that in interrupt.
-		{    
-			Screen(stime);
-			//drawScreen();
-			itAskStime = false;
-		}
-*/	
 		if (timerScreen >= 3) //  sec timeout transient screen
 		{
 			timerScreen = 0;

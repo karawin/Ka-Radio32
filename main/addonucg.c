@@ -237,7 +237,7 @@ void setfont(sizefont size)
 		}
 		break;
 		default:
-		printf("Default for size %d\n",size);
+		ESP_LOGE(TAG,"Default for size %d\n",size);
 	}
 	
 		if (yy <= 80)
@@ -978,7 +978,7 @@ void lcd_initUcg(uint8_t *lcd_type)
 		
 		HHeader = yy/5;		
 		
-		printf("X: %d, yy: %d, y: %d\n",x,yy,y);
+		ESP_LOGI(TAG,"X: %d, yy: %d, y: %d\n",x,yy,y);
 		z = 0; 
 }
 
