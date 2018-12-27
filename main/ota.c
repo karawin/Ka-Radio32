@@ -31,6 +31,8 @@
 #include "esp_system.h"
 #include "esp_log.h"
 #include "esp_ota_ops.h"
+#include "soc/timer_group_struct.h"
+#include "soc/timer_group_reg.h"
 
 #include "lwip/sockets.h"
 #include "lwip/dns.h"
@@ -51,7 +53,7 @@ static char text[BUFFSIZE + 1] = { 0 };
 static int binary_file_length = 0;
 
 
-static int  reclen = 0;
+static unsigned int  reclen = 0;
 	
 /*read buffer by byte still delim ,return read bytes counts*/
 static int read_until(char *buffer, char delim, int len)
@@ -111,8 +113,7 @@ static void ota_task(void *pvParameter)
 	int sockfd;
 	struct sockaddr_in dest;	
 	char* name = (char*)pvParameter; // name of the bin file to load
-	
-    
+    unsigned int cnt =0;
 	clientDisconnect("OTA");
 
 	//esp32: found a partition to flash
@@ -201,7 +202,7 @@ static void ota_task(void *pvParameter)
 			{
 				char* str = NULL;
 				str=strstr(header,"Content-Length:");
-				if (str!=NULL) reclen = atoi(str+15);
+				if (str!=NULL) reclen = atoi(str+15);				
 				ESP_LOGI(TAG, "must receive:%d bytes",reclen);
 				kprintf("must receive:%d bytes\n",reclen);
 			}
@@ -215,8 +216,12 @@ static void ota_task(void *pvParameter)
 				kprintf("Error: esp_ota_write failed! err=0x%x\n", err);
                 goto exit;
             }
+			vTaskDelay(1);			
             binary_file_length += buff_len;
-            ESP_LOGD(TAG, "Have written image length %d", binary_file_length);
+//            ESP_LOGI(TAG, "Have written image length %d  of  %d", binary_file_length,reclen);
+			cnt = (cnt+1) & 0x1F;
+			if (cnt ==0){
+			kprintf("Have written image length %d  of  %d\n", binary_file_length,reclen);}
 			if (binary_file_length >= reclen)
 			{
 				flag = false; // all received, exit
@@ -232,8 +237,12 @@ static void ota_task(void *pvParameter)
         } else {
             ESP_LOGE(TAG, "Unexpected recv result");
         }
-    }
 
+		TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
+		TIMERG0.wdt_feed=1;
+		TIMERG0.wdt_wprotect=0;
+	}
+	kprintf("\n");
     ESP_LOGI(TAG, "Total Write binary data length : %d", binary_file_length);
 	kprintf("Total Write binary data length : %d\n", binary_file_length);
 

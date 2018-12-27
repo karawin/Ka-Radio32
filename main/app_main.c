@@ -314,7 +314,7 @@ static void init_hardware()
 	if (bigRam)
 	{
 		setSPIRAMSIZE(420*1024);
-		ESP_LOGI(TAG, "\nSet Song buffer to 240k");
+		ESP_LOGI(TAG, "\nSet Song buffer to420k");
 	}
     if (!spiRamFifoInit()) {
         ESP_LOGE(TAG, "\nSPI RAM chip fail!");

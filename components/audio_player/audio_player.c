@@ -15,7 +15,7 @@
 #include "esp_system.h"
 #include "esp_log.h"
 
-//#include "fdk_aac_decoder.h"
+#include "fdk_aac_decoder.h"
 //#include "helix_aac_decoder.h"
 //#include "libfaad_decoder.h"
 #include "mp3_decoder.h"
@@ -59,7 +59,7 @@ static int start_decoder_task(player_t *player)
             stack_depth = 55000;
             break;
 */
-/*
+
 		case AUDIO_AAC:
         case OCTET_STREAM: // probably .aac
 			if (!bigSram())
@@ -73,7 +73,7 @@ static int start_decoder_task(player_t *player)
             task_name = (char*)"fdkaac_decoder_task";
             stack_depth = 7000; //6144; 
             break;
-*/			
+			
 /*
 		case AUDIO_AAC:
         case OCTET_STREAM: // probably .aac
@@ -138,7 +138,7 @@ int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read,
 	// seems 4k is enough to prevent initial buffer underflow
 //	uint8_t min_fill_lvl = player->buffer_pref == BUF_PREF_FAST ? 40 : 90;
 //	bool buffer_ok = fill_level > min_fill_lvl;
-	bool buffer_ok = (bytes_in_buf > (20*1024));
+	bool buffer_ok = (bytes_in_buf > (30*1024));
 	if (player->decoder_status != RUNNING && buffer_ok) {
 
 		// buffer is filled, start decoder

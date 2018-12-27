@@ -960,7 +960,6 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 // meta data computing
 		if (rest <0) 
 		{
-			taskYIELD();
 			ESP_LOGD(TAG,"clientReceiveCallback: pdata: %x, pdataend: %x, len: %d",(int)pdata,(int)pdata+len,len);
 			ESP_LOGD(TAG,"Negative enter len= %d, metad= %d  rest= %d   pdata= %x :\"%s\"",len,metad,rest,(int)pdata,pdata);
 			if (len>-rest)

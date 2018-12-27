@@ -473,7 +473,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 						}
 					}
 				}
-				if(getSParameterFromResponse(bassfreq,6,"bassfreq=", data, data_size)) {				
+				if(getSParameterFromResponse(treble,6,"treble=", data, data_size)) {				
 					if (device->treble != atoi(treble))
 					{ 
 						if (get_audio_output_mode() == VS1053)
