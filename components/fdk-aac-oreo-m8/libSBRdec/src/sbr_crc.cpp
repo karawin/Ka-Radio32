@@ -157,6 +157,10 @@ SbrCrcCheck (HANDLE_FDK_BITSTREAM hBs, /*!< handle to bit-buffer  */
              LONG NrBits)              /*!< max. CRC length       */
 {
   int crcResult = 1;
+  
+  //jpc
+  return 1;
+  
   ULONG NrCrcBits;
   ULONG crcCheckResult;
   LONG NrBitsAvailable;

@@ -14,7 +14,8 @@
 #include "freertos/task.h"
 #include "esp_system.h"
 #include "esp_log.h"
-//#include "esp_task_wdt.h"
+#include "soc/timer_group_struct.h"
+#include "soc/timer_group_reg.h"
 #include "driver/i2s.h"
 
 #include "common_buffer.h"
@@ -101,7 +102,7 @@ void fdkaac_decoder_task(void *pvParameters)
     const uint32_t flags = 0;
     uint32_t pcm_size = 0;
     bool first_frame = true;
-//	esp_task_wdt_add(NULL);
+
 //    ESP_LOGI(TAG, "(line %u) free heap: %u", __LINE__, esp_get_free_heap_size());
 
     while (!player->media_stream->eof) {
@@ -111,7 +112,13 @@ void fdkaac_decoder_task(void *pvParameters)
             fill_read_buffer(in_buf);
 			vTaskDelay(3);
         }
-//		esp_task_wdt_reset();
+		
+//		watchgog reset 
+		TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
+		TIMERG0.wdt_feed=1;
+		TIMERG0.wdt_wprotect=0;
+
+
         if(player->decoder_command == CMD_STOP) {
                 goto abort;
         }
@@ -156,10 +163,11 @@ void fdkaac_decoder_task(void *pvParameters)
             pcm_format.num_channels = mStreamInfo->numChannels;
             pcm_format.sample_rate = mStreamInfo->sampleRate;
         }
-
-        render_samples((char *) pcm_buf->base, pcm_size, &pcm_format);
 //		vTaskDelay(1);
 //		taskYIELD ();
+		
+        render_samples((char *) pcm_buf->base, pcm_size, &pcm_format);
+
 
         // ESP_LOGI(TAG, "fdk_aac_decoder stack: %d\n", uxTaskGetStackHighWaterMark(NULL));
         // ESP_LOGI(TAG, "%u free heap %u", __LINE__, esp_get_free_heap_size());

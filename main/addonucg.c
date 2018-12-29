@@ -467,7 +467,7 @@ void draw(int i)
 	uint16_t len,xpos,yyy; 
 
     if ( mline[i]) mline[i] =0;
-    if (i >=3) z = y/2 ; else z = 0;
+    if (i >=3) z = (y/2)+1 ; else z = 0;
     switch (i) {
         case STATIONNAME:
 		setfont(text);
@@ -531,9 +531,10 @@ void draw(int i)
         break;
         default:
           ucg_SetColori(&ucg,0,0,0); 
-          ucg_DrawBox(&ucg,0,y*i+z,x,y-ucg_GetFontDescent(&ucg)); 
+ //         ucg_DrawBox(&ucg,0,y*i+z,x,y-ucg_GetFontDescent(&ucg)); 
+          ucg_DrawBox(&ucg,0,y*i+z,x,y-1); 
           setColor(i);
-          if (lline[i] != NULL) ucg_DrawString(&ucg,0,y*i+z+1,0,lline[i]+iline[i]);                
+          if (lline[i] != NULL) ucg_DrawString(&ucg,0,y*i+z,0,lline[i]+iline[i]);                
    }      
 }
 
@@ -860,6 +861,9 @@ void namesetUcg(char* ici)
 	charset = Latin;
 	removeUtf8(nameset);
     lline[STATIONNAME] = nameset;
+	markDrawUcg(0);
+	iline[0] = 0;
+	tline[0] = 0;
 }
 
 // cli.playing

@@ -824,10 +824,6 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 						}
 						icyfound = 	clientParseHeader(pdata);
 						wsMonitor();											
-/*						if(header.members.single.bitrate != NULL) 
-							if (strcmp(header.members.single.bitrate,"320")==0)
-								 system_update_cpu_freq(SYS_CPU_160MHZ);
-							else system_update_cpu_freq(SYS_CPU_80MHZ);*/
 						if(header.members.single.metaint > 0) 
 							metad = header.members.single.metaint;
 						ESP_LOGD(TAG,"t1: 0x%x, cstatus: %d, icyfound: %d  metad:%d Metaint:%d\n", (int) t1,cstatus, icyfound,metad,  (header.members.single.metaint)); 
@@ -863,7 +859,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 				} else
 				{
 					t1 = NULL;
-					if (i++ > 5) {clientDisconnect("header1");break;}
+					if (i++ > 20) {clientDisconnect("header1");break;}
 					vTaskDelay(1); //avoid watchdog is infernal loop
 					len += recvfrom(sockfd, pdata+len, RECEIVE-len, 0,NULL,NULL);
 				}

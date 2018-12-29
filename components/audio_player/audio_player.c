@@ -138,15 +138,22 @@ int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read,
 	// seems 4k is enough to prevent initial buffer underflow
 //	uint8_t min_fill_lvl = player->buffer_pref == BUF_PREF_FAST ? 40 : 90;
 //	bool buffer_ok = fill_level > min_fill_lvl;
-	bool buffer_ok = (bytes_in_buf > (30*1024));
-	if (player->decoder_status != RUNNING && buffer_ok) {
 
+	if (player->decoder_status != RUNNING ) 
+	{
+		t = 0;
+		uint32_t trigger = (bigSram())? (70*1024):(20*1024);
+		bool buffer_ok = (bytes_in_buf > trigger);
+		if (buffer_ok)
+		{
 		// buffer is filled, start decoder
-		if (start_decoder_task(player) != 0) {
-			ESP_LOGE(TAG, "failed to start decoder task");
-			audio_player_stop();
-			clientDisconnect("unsupported mime type"); 
-			return -1;
+			ESP_LOGV(TAG,"trigger: %d",trigger);
+			if (start_decoder_task(player) != 0) {
+				ESP_LOGE(TAG, "failed to start decoder task");
+				audio_player_stop();
+				clientDisconnect("decoder failed"); 
+				return -1;
+			}
 		}
 	}
 
