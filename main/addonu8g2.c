@@ -181,11 +181,12 @@ void cleartitleU8g2(uint8_t froml)
 }
 
 // Mark the lines to draw
-void markDrawU8g2(int i)
+void markDrawResetU8g2(int i)
 {
   mline[i] = 1;
+  iline[i] = 0;
+  tline[i] = 0;
 }
-
 
 ////////////////////////////////////////
 // scroll each line
@@ -198,7 +199,7 @@ unsigned len ;
 	   if (tline[i]>0) 
 	   {
 	     if (tline[i] == 4) {iline[i]= 0;
-		 markDrawU8g2(i);}
+		 mline[i] = 1;;}
 	     tline[i]--;		 
 	   } 
 	   else
@@ -214,7 +215,7 @@ unsigned len ;
 					while (((*(lline[i]+iline[i])) & 0xc0) == 0x80) {
 						iline[i]++;
 					}
-					markDrawU8g2(i);
+					mline[i] = 1;;
 				}
 				else 
 					tline[i] = 6;
@@ -446,8 +447,16 @@ void metaU8g2(char* ici)
 //cli.icy4
 void icy4U8g2(char* ici)
 {
+	char newstation[BUFLEN];
+	 //move the STATION2 to STATION1S
+	 if ((station!= NULL)&& (lline[STATION2] != NULL))
+	 {  strcpy(newstation,lline[STATION1]);strcat(newstation," - ");  strcat(newstation,lline[STATION2]);
+		strcpy(lline[STATION1],newstation);
+		markDrawResetU8g2(STATION1);
+	 }
+	 
      strcpy(genre,ici+7);
-     lline[2] = genre;
+     lline[GENRE] = genre;
 }
 //cli.icy0
 void icy0U8g2(char* ici)
@@ -527,6 +536,7 @@ void lcd_initU8g2(uint8_t *lcd_type)
 		u8g2_esp32_hal.sda  = sda;
 		u8g2_esp32_hal.scl  = scl;
 		u8g2_esp32_hal.reset = rsti2c;
+		if ((sda == GPIO_NONE)||(scl == GPIO_NONE)) {*lcd_type = LCD_NONE; return;}
 	}
 	u8g2_esp32_hal_init(u8g2_esp32_hal);		
 	

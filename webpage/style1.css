@@ -182,6 +182,9 @@ div.LEFT {
 	position:relative;
 	text-align:left
 }
+
+ul#ordered li {float:none;text-align:left;}
+
 .tabs li {
 	float:left
 }

@@ -398,12 +398,12 @@ void removeUtf8(char *characters)
 }
 
 // Mark the lines to draw
-void markDrawUcg(int i)
+void markDrawResetUcg(int i)
 {
   mline[i] = 1;
+  iline[i] = 0;
+  tline[i] = 0;
 }
-
-
 ////////////////////////////////////////
 // scroll each line
 void scrollUcg()
@@ -420,7 +420,7 @@ setfont(text);
 				if ((tline[i] == 4) && (len > x)) 
 				{
 					iline[i]= 0;
-					markDrawUcg(i);//draw(i);
+					mline[i]=1;//draw(i);
 				}
 				tline[i]--;		 
 			} 
@@ -433,7 +433,7 @@ setfont(text);
 					len = iline[i];
 					while ((*(lline[i]+iline[i])!=' ')&&(*(lline[i]+iline[i])!='-')&&(iline[i]!= 0))iline[i]--;
 					if (iline[i]==0) iline[i]=len;     
-					markDrawUcg(i); //draw(i);
+					mline[i]=1; //draw(i);
 				}
 				else 
 					{tline[i] = 6;}
@@ -573,7 +573,7 @@ int i;
 		for (i=0;i<LINES;i++) draw(i);
 		// no break
 	case 2:	
-		markDrawUcg(TIME);
+		markDrawResetUcg(TIME);
 		drawLinesUcg();
 		break;
 	 default:;
@@ -824,9 +824,18 @@ void metaUcg(char* ici)
 //cli.icy4
 void icy4Ucg(char* ici)
 {
+	char newstation[BUFLEN];
+	 //move the STATION2 to STATION1S
+	 if ((station!= NULL)&& (lline[STATION2] != NULL))
+	 {  strcpy(newstation,lline[STATION1]);strcat(newstation," - ");  strcat(newstation,lline[STATION2]);
+		strcpy(lline[STATION1],newstation);
+		markDrawResetUcg(STATION1);
+	 }
+	 
 	 strcpy(genre,ici+7);
      removeUtf8(genre); 
-     lline[2] = genre;
+     lline[GENRE] = genre;
+	 markDrawResetUcg(GENRE);
 }
 //cli.icy0
 void icy0Ucg(char* ici)
@@ -861,9 +870,8 @@ void namesetUcg(char* ici)
 	charset = Latin;
 	removeUtf8(nameset);
     lline[STATIONNAME] = nameset;
-	markDrawUcg(0);
-	iline[0] = 0;
-	tline[0] = 0;
+	markDrawResetUcg(STATIONNAME);
+
 }
 
 // cli.playing

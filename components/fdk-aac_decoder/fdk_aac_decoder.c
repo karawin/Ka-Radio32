@@ -23,6 +23,8 @@
 #include "audio_player.h"
 #include "spiram_fifo.h"
 #include "m4a.h"
+
+
 #define TAG "fdkaac_decoder"
 
 
@@ -37,7 +39,6 @@ static const uint32_t INPUT_BUFFER_SIZE = 1024;
 void fdkaac_decoder_task(void *pvParameters)
 {
     // ESP_LOGI(TAG, "(line %u) free heap: %u", __LINE__, esp_get_free_heap_size());
-
     player_t *player = pvParameters;
     AAC_DECODER_ERROR err;
 

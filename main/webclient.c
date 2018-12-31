@@ -843,7 +843,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 						t1+= 4; 
 						if ( t2 != NULL) 
 						{
-							while (len -(t1-pdata)<8) {len += recv(sockfd, pdata+len, RECEIVE+8-len, 0); }
+							while (len -(t1-pdata)<8) {vTaskDelay(1);len += recv(sockfd, pdata+len, RECEIVE+8-len, 0); }
 							chunked = (uint32_t) strtol(t1, NULL, 16) +2;
 							if (strchr((t1),0x0A) != NULL)
 								*strchr(t1,0x0A) = 0;
@@ -896,6 +896,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 					{					
 						while (lc < cchunk+9) 
 						{
+							vTaskDelay(1);
 							clen = recvfrom(sockfd, pdata+len, 9, 0,NULL,NULL); 
 							lc+=clen;len+=clen;
 							//ESP_LOGV(TAG,"more:%d, lc:%d\n",clen,lc);
@@ -1084,7 +1085,7 @@ void clientTask(void *pvParams) {
 	portBASE_TYPE uxHighWaterMark;
 	struct timeval timeout; 
     timeout.tv_usec = 0;
-	timeout.tv_sec = 4; 
+	timeout.tv_sec = 3; 
 	int sockfd;
 	int bytes_read;
 	uint8_t cnterror;
@@ -1176,18 +1177,21 @@ void clientTask(void *pvParams) {
 					}
 //if (bytes_read < 1000 )  
 //	printf("Rec:%d\n%s\n",bytes_read,bufrec);					
+//	printf(" %d ",bytes_read);	fflush(stdout);				
 					if ( bytes_read > 0 )
 					{
+						cnterror = 0;
 						clientReceiveCallback(sockfd,(char*)bufrec, bytes_read);
 					}	
 					else 
 					{
 						ESP_LOGW(TAG,"No data in recv. Errno = %d",errno);
 						cnterror++;
-						vTaskDelay(100);
-						if ((errno == 128)||(cnterror >= 5)) break;
+						if (errno != 11) vTaskDelay(50); //timeout 
+						else vTaskDelay(3);
+						if ((errno == 128)||(cnterror >= 10)) break;
 					}
-					vTaskDelay(1);
+					vTaskDelay(3);
 					// if a stop is asked
 					if(xSemaphoreTake(sDisconnect, 0))
 						{ clearHeaders(); break;	}

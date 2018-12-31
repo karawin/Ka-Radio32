@@ -654,6 +654,8 @@ void encoderCompute(Encoder_t *enc,bool role)
 {	
 	int16_t newValue = - getValue(enc);
 	Button newButton = getButton(enc);
+	typeScreen estate;
+	if (role) estate = sstation; else estate = svolume;
    	// if an event on encoder switch	
 	if (newButton != Open)
 	{ 
@@ -667,22 +669,18 @@ void encoderCompute(Encoder_t *enc,bool role)
 		{   
 			timerScreen = 0; 
 			if (stateScreen!= (role?sstation:svolume))
-				role?evtStation(newValue):setRelVolume(newValue);				
+				role?evtStation(newValue):setRelVolume(newValue);
 		} 			
-	}	else
+	}	//else
 		// no event on button switch
 	{
-		typeScreen estate;
-		if (role) estate = sstation; else estate = svolume;
 		if ((stateScreen  != estate)&&(newValue != 0))
 		{    
 			if(role) setRelVolume(newValue);else evtStation(newValue);
-//			wakeLcd();
 		} 
 		if ((stateScreen  == estate)&&(newValue != 0))
 		{    
-			if(role) evtStation(newValue); else setRelVolume(newValue);
-//			wakeLcd();			
+			if(role) evtStation(newValue); else setRelVolume(newValue);			
 		} 	
 	}		
 }
