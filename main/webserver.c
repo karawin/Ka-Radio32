@@ -324,7 +324,7 @@ void websockethandle(int socket, wsopcode_t opcode, uint8_t * payload, size_t le
 	else if (strstr((char*)payload,"stopWake")!= NULL){stopWake();}
 	//monitor
 	else if (strstr((char*)payload,"monitor")!= NULL){wsMonitor();}
-	else if (strstr((char*)payload,"upgrade")!= NULL){update_firmware((char*)"KaRadio32");	}
+//	else if (strstr((char*)payload,"upgrade")!= NULL){update_firmware((char*)"KaRadio32");	}
 	else if (strstr((char*)payload,"theme")!= NULL){theme();}
 	else if (strstr((char*)payload,"wsrssi")!= NULL){rssi(socket);}
 }
@@ -687,6 +687,8 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 				vTaskDelay(4);
 			}
 		}
+	} else if(strcmp(name, "/upgrade") == 0) {
+		update_firmware((char*)"KaRadio32");
 	} else if(strcmp(name, "/icy") == 0)	
 	{	
 		ESP_LOGV(TAG,"icy vol");

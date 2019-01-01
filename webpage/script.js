@@ -497,7 +497,7 @@ function onRangeVolChange($value,$local) {
 	document.getElementById('vol_span').innerHTML = (value * -0.5) + " dB";
 	document.getElementById('vol_range').value = $value;
 	document.getElementById('vol1_range').value = $value;
-	if ($local &&websocket.readyState == websocket.OPEN) websocket.send("wsvol=" + $value+"&");
+//	if ($local &&websocket.readyState == websocket.OPEN) websocket.send("wsvol=" + $value+"&");
 //	else 
 		if ($local)	
 	{
@@ -838,7 +838,17 @@ function removeOptions(selectbox)
 
 function upgrade()
 {
-	if (websocket.readyState == websocket.OPEN) websocket.send("upgrade");	
+//	checkwebsocket();
+//	if (websocket.readyState == websocket.OPEN) websocket.send("upgrade");	
+//	else
+	try{
+		xhr = new XMLHttpRequest();
+		xhr.open("POST","upgrade",false);
+		xhr.setRequestHeader(content,ctype);
+		xhr.send();
+	} catch(e){console.log("error"+e);}	
+	
+	
 	alert("Rebooting to the new release\nPlease refresh the page in few seconds.");
 }
 function checkhistory()
