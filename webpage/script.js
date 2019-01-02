@@ -27,6 +27,7 @@ function openwebsocket(){
 		if (arr["monitor"]) playMonitor(arr["monitor"]); 
 		if (arr["wsstation"]) wsplayStation(arr["wsstation"]); 
 		if (arr["wsrssi"]) {document.getElementById('rssi').innerHTML = arr["wsrssi"]+' dBm';recrssi = 0;}
+		if (arr["upgrade"]) {document.getElementById('updatefb').innerHTML = arr["upgrade"];}
 	} catch(e){ console.log("error"+e);}
 }
 
@@ -838,9 +839,6 @@ function removeOptions(selectbox)
 
 function upgrade()
 {
-//	checkwebsocket();
-//	if (websocket.readyState == websocket.OPEN) websocket.send("upgrade");	
-//	else
 	try{
 		xhr = new XMLHttpRequest();
 		xhr.open("POST","upgrade",false);
@@ -848,8 +846,7 @@ function upgrade()
 		xhr.send();
 	} catch(e){console.log("error"+e);}	
 	
-	
-	alert("Rebooting to the new release\nPlease refresh the page in few seconds.");
+//	alert("Rebooting to the new release\nPlease refresh the page in few seconds.");
 }
 function checkhistory()
 {

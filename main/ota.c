@@ -40,6 +40,8 @@
 #include "interface.h"
 #include "webclient.h"
 #include "app_main.h"
+#include "websocket.h"
+
 #define BUFFSIZE 1024
 
 const char strupd[]  = {\
@@ -51,9 +53,38 @@ static char ota_write_data[BUFFSIZE + 1] = { 0 };
 static char text[BUFFSIZE + 1] = { 0 };
 /* an image total length*/
 static int binary_file_length = 0;
-
+static bool taskState = false;
 
 static unsigned int  reclen = 0;
+	
+
+/******************************************************************************
+ * FunctionName : wsUpgrade
+ * Description  : send the OTA feedback to websockets
+ * Parameters   : number to send as string
+ * Returns      : none
+*******************************************************************************/
+void wsUpgrade(const char* str,int count,int total)
+{
+	char answer[300];
+	if (strlen(str)!= 0)
+		sprintf(answer,"{\"upgrade\":\"%s\"}",str);
+	else		
+	{
+		int value = count*100/total;
+		memset(answer,0,300);
+		if (value == 100)
+			sprintf(answer,"{\"upgrade\":\"Done. Refresh the page.\"}");
+		else
+		if (value == 0)
+			sprintf(answer,"{\"upgrade\":\"Starting.\"}");
+		else
+			sprintf(answer,"{\"upgrade\":\"%d / %d\"}",value,100);
+	}
+	websocketbroadcast(answer, strlen(answer));
+}
+	
+	
 	
 /*read buffer by byte still delim ,return read bytes counts*/
 static int read_until(char *buffer, char delim, int len)
@@ -124,7 +155,7 @@ static void ota_task(void *pvParameter)
 
     ESP_LOGI(TAG, "Starting update ...");
 	kprintf("Starting update ...\n");
-
+	wsUpgrade( "",0,100);
     const esp_partition_t *configured = esp_ota_get_boot_partition();
     const esp_partition_t *running = esp_ota_get_running_partition();
 
@@ -141,12 +172,13 @@ static void ota_task(void *pvParameter)
 	serv =(struct hostent*)gethostbyname("karadio.karawin.fr");
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if(sockfd >= 0) {ESP_LOGI(TAG,"WebClient Socket created"); }
-	else {ESP_LOGE(TAG,"socket create errno: %d",errno); goto exit;}
+	else {ESP_LOGE(TAG,"socket create errno: %d",errno);wsUpgrade("Failed: socket errno", 0,100); goto exit;}
 	bzero(&dest, sizeof(dest));	
     dest.sin_family = AF_INET;
     dest.sin_port   = htons(80);
     dest.sin_addr.s_addr = inet_addr(inet_ntoa(*(struct in_addr*)(serv-> h_addr_list[0]))); // remote server ip
 	ESP_LOGI(TAG,"distant ip: %x   ADDR:%s\n", dest.sin_addr.s_addr, inet_ntoa(*(struct in_addr*)(serv-> h_addr_list[0])));
+
 	
 	/*---Connect to server---*/
 	if (connect(sockfd, (struct sockaddr*)&dest, sizeof(dest)) >= 0)
@@ -155,6 +187,8 @@ static void ota_task(void *pvParameter)
 	{
 		ESP_LOGE(TAG, "Connect to server failed! errno=%d", errno);
 		close(sockfd);
+		wsUpgrade("Connect to server failed!" , 0,100);
+		goto exit;
 	}
 	
 	
@@ -165,6 +199,7 @@ static void ota_task(void *pvParameter)
     res = send(sockfd, http_request, strlen(http_request), 0);
     if (res == -1) {
         ESP_LOGE(TAG, "Send GET request to server failed");
+		wsUpgrade("Send GET request to server failed" , 0,100);
         goto exit;
     } else {
         ESP_LOGI(TAG, "Send GET request to server succeeded");
@@ -174,10 +209,10 @@ static void ota_task(void *pvParameter)
     ESP_LOGI(TAG, "Writing to partition subtype %d at offset 0x%x",
              update_partition->subtype, update_partition->address);
     assert(update_partition != NULL);
-
     err = esp_ota_begin(update_partition, OTA_SIZE_UNKNOWN, &update_handle);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "esp_ota_begin failed, error=%d", err);
+		wsUpgrade("esp_ota_begin failed" , 0,100);
         goto exit;
     }
     ESP_LOGI(TAG, "esp_ota_begin succeeded");
@@ -191,6 +226,7 @@ static void ota_task(void *pvParameter)
         if (buff_len < 0) { /*receive error*/
             ESP_LOGE(TAG, "Error: receive data error! errno=%d", errno);
 			kprintf("Error: receive data error! errno=%d\n", errno);
+			wsUpgrade("Error: receive data error!" , 0,100);
             goto exit;
         } else if (buff_len > 0 && !resp_body_start) 
 		{ /*deal with response header*/
@@ -214,6 +250,7 @@ static void ota_task(void *pvParameter)
             if (err != ESP_OK) {
                 ESP_LOGE(TAG, "Error: esp_ota_write failed! err=0x%x", err);
 				kprintf("Error: esp_ota_write failed! err=0x%x\n", err);
+				wsUpgrade("Error: esp_ota_write failed!" , 0,100);
                 goto exit;
             }
 			vTaskDelay(1);			
@@ -221,10 +258,14 @@ static void ota_task(void *pvParameter)
 //            ESP_LOGI(TAG, "Have written image length %d  of  %d", binary_file_length,reclen);
 			cnt = (cnt+1) & 0x1F;
 			if (cnt ==0){
-			kprintf("Have written image length %d  of  %d\n", binary_file_length,reclen);}
+				kprintf("Have written image length %d  of  %d\n", binary_file_length,reclen);
+				wsUpgrade( "",binary_file_length,reclen);
+			}
 			if (binary_file_length >= reclen)
 			{
 				flag = false; // all received, exit
+				kprintf("Have written image length %d  of  %d\n", binary_file_length,reclen);
+				wsUpgrade("", binary_file_length,reclen);				
 				ESP_LOGI(TAG, "Connection closed, all packets received");
 				kprintf("\nConnection closed, all packets received\n");
 				close(sockfd);
@@ -249,12 +290,14 @@ static void ota_task(void *pvParameter)
     if (esp_ota_end(update_handle) != ESP_OK) {
         ESP_LOGE(TAG, "esp_ota_end failed!");
 		kprintf("esp_ota_end failed!\n");
+		wsUpgrade("esp_ota_end failed!" , 0,100);
         goto exit;
     }
     err = esp_ota_set_boot_partition(update_partition);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "esp_ota_set_boot_partition failed! err=0x%x", err);
 		kprintf("esp_ota_set_boot_partition failed!\n");
+		wsUpgrade("esp_ota_set_boot_partition failed!" , 0,100);
         goto exit;
     }
     ESP_LOGI(TAG, "Prepare to restart system!");
@@ -263,6 +306,7 @@ static void ota_task(void *pvParameter)
     esp_restart();	
 	
 	exit:
+	taskState = false;
 	close(sockfd);
 	(void)vTaskDelete( NULL ); 	
 }
@@ -275,8 +319,16 @@ static void ota_task(void *pvParameter)
 *******************************************************************************/
 void update_firmware(char* fname)
 {
-	xTaskHandle pxCreatedTask;
-	xTaskCreate(ota_task, "ota_task", 8192, fname, PRIO_OTA, &pxCreatedTask);
-	ESP_LOGI(TAG, "ota_task: %x",(unsigned int)pxCreatedTask);
+	if (!taskState)
+	{
+		taskState = true;
+		xTaskHandle pxCreatedTask;
+		xTaskCreate(ota_task, "ota_task", 8192, fname, PRIO_OTA, &pxCreatedTask);
+		ESP_LOGI(TAG, "ota_task: %x",(unsigned int)pxCreatedTask);
+	} else
+	{
+		ESP_LOGI(TAG, "ota_task: already running. Ignore");
+		wsUpgrade("Update already running. Ignored." , 0,100);
+	}
 
 }
