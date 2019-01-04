@@ -7,7 +7,8 @@ A template is given by the pattern.csv file
 The default configuration of the current software is in the standard_adb.csv file.  
 A csv file is interpreted by an utility to generate a bin file that must be flashed at address 0x3a2000 only one time per esp32
 
-The msys32 and esp-idf environment must be operational.
+The msys32 (the toolchain see https://docs.espressif.com/projects/esp-idf/en/stable/get-started/)   
+and https://github.com/karawin/Ka-Radio32 environment must be operational.
 
 ---------------
 1/ Prerequisite
