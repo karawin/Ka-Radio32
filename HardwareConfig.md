@@ -66,10 +66,10 @@ A value base 10 is mandatory for each P_.
 
 ```
 SPI Bus:  
-K_SPI    Select the used spi : 1: HSPI, 2: VSPI
-P_MISO			Master Input, Slave Output  
-P_MOSI			Master Output, Slave Input   Named Data or SDA or D1 for oled  
-P_CLK			Master clock  Named SCL or SCK or D0 for oled  
+K_SPI		Select the used spi : 1: HSPI, 2: VSPI
+P_MISO		Master Input, Slave Output  
+P_MOSI		Master Output, Slave Input   Named Data or SDA or D1 for oled  
+P_CLK		Master clock  Named SCL or SCK or D0 for oled  
 
 VS1053B:  
 P_XCS			XCS  
@@ -150,10 +150,11 @@ held on button A: click on button B and C: volume down and up for set 1 (P_BTN1)
 If a set is not used, P_BTNx_A must be set to 255. In this case P_BTNx_B P_BTNx_C are disabled too.
 
 ### I2C
-If I2C is not used (ie no lcd or spi lcd) the gpio of the i2C can be reused elsewhere.
+If I2C is not used (ie no lcd or spi lcd) the gpio of the i2C can be reused elsewhere.  
+To disable I2C even a I2C LCD is used: P_I2S_LRCK	and/or P_I2S_BCLK	must be set to 255  
 
 ### VS1053b
-If not used P_XCS must be set to 255. Gpio of P_RST P_XDCS P_DREQ may be reused elsewhere.
+If not used P_XCS must be set to 255. Gpio of P_RST P_XDCS P_DREQ may be reused elsewhere.  
 
 ### IR
 If IR remote control is not used P_IR_SIGNAL must be set to 255
