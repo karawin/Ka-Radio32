@@ -8,7 +8,6 @@
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-
 #include "ucg.h"
 
 #include "driver/gpio.h"
@@ -19,11 +18,16 @@
 #ifdef KaRadio32
 #include "gpio.h"
 #include "vs1053.h"
+
 #endif
+
+//#include "XPT2046_Touchscreen_calibrated.h"
 
 #define TAG  "ucg_hal"
 
-static spi_device_handle_t handle; // SPI handle.
+static spi_device_handle_t handle; // SPI handle of the spi lcd interface.
+static spi_device_handle_t t_handle; // SPI handle of the spi touch interface.XPT2046_Touchscreen ts = XPT2046_Touchscreen();
+
 DRAM_ATTR static ucg_esp32_hal_t ucg_esp32_hal; // HAL state data.
 static ucg_esp32_oneByte oneByte;
 static spi_transaction_t trans_desc;
@@ -86,6 +90,8 @@ void sendOneByte()
 	}
 }
 
+
+
 //IRAM_ATTR 
 void addOneByte(uint8_t bt)
 {
@@ -114,6 +120,8 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 				ucg_esp32_hal.cs == UCG_ESP32_HAL_UNDEFINED) {
 			break;
 		}
+		
+// init gpio DC and Reset
 		uint64_t bitmask = 0;
 		if (ucg_esp32_hal.dc != UCG_ESP32_HAL_UNDEFINED) {
 			bitmask = bitmask | (1<<ucg_esp32_hal.dc);
@@ -121,7 +129,17 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 		if (ucg_esp32_hal.reset != UCG_ESP32_HAL_UNDEFINED) {
 			bitmask = bitmask | (1<<ucg_esp32_hal.reset);
 		}
-
+		gpio_config_t gpioConfig;
+		gpioConfig.pin_bit_mask = bitmask;
+		gpioConfig.mode         = GPIO_MODE_OUTPUT;
+		gpioConfig.pull_up_en   = GPIO_PULLUP_DISABLE;
+		gpioConfig.pull_down_en = GPIO_PULLDOWN_DISABLE;
+		gpioConfig.intr_type    = GPIO_INTR_DISABLE;
+		ESP_ERROR_CHECK(gpio_config(&gpioConfig));		
+		gpio_set_level(ucg_esp32_hal.reset, 1);
+		gpio_set_level(ucg_esp32_hal.cs, 1);		
+		gpio_set_level(ucg_esp32_hal.dc, 0);		
+		
 #ifndef KaRadio32
 // init the spi master if not done elsewhere
  		  spi_bus_config_t bus_config;
@@ -133,18 +151,6 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 //done for vs1053
 		  ESP_ERROR_CHECK(spi_bus_initialize(KSPI, &bus_config, 1));
 #endif		
-		
-		gpio_config_t gpioConfig;
-		gpioConfig.pin_bit_mask = bitmask;
-		gpioConfig.mode         = GPIO_MODE_OUTPUT;
-		gpioConfig.pull_up_en   = GPIO_PULLUP_DISABLE;
-		gpioConfig.pull_down_en = GPIO_PULLDOWN_DISABLE;
-		gpioConfig.intr_type    = GPIO_INTR_DISABLE;
-		ESP_ERROR_CHECK(gpio_config(&gpioConfig));
-		
-		gpio_set_level(ucg_esp32_hal.reset, 0);
-		gpio_set_level(ucg_esp32_hal.cs, 0);		
-		gpio_set_level(ucg_esp32_hal.dc, 0);		
 		
 		spi_device_interface_config_t dev_config;
 		dev_config.address_bits     = 0;
@@ -161,8 +167,29 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 		dev_config.queue_size       = 1;
 		dev_config.pre_cb           = NULL;
 		dev_config.post_cb          = NULL;
-		ESP_LOGI(TAG, "... Adding device bus  Speed= %d.",dev_config.clock_speed_hz);
+		ESP_LOGI(TAG, "... Adding spi lcd bus  Speed= %d.",dev_config.clock_speed_hz);
 		ESP_ERROR_CHECK(spi_bus_add_device(ucg_esp32_hal.spi_no, &dev_config, &handle)); 
+		
+		//init touch device
+		if ((ucg_esp32_hal.t_cs != GPIO_NONE) && (ucg_esp32_hal.t_irq != GPIO_NONE))
+		{
+//			ts.begin(ucg_esp32_hal.t_cs,ucg_esp32_hal.t_irq);
+			gpio_set_level(ucg_esp32_hal.t_cs, 1);
+			// t_irq is an input
+			gpioConfig.mode         	= GPIO_MODE_INPUT;
+			gpioConfig.pin_bit_mask = (1<<ucg_esp32_hal.t_irq);
+			ESP_ERROR_CHECK(gpio_config(&gpioConfig));	
+			
+			dev_config.clock_speed_hz   = (20000000);
+			dev_config.spics_io_num     = ucg_esp32_hal.t_cs;
+			dev_config.flags            = SPI_DEVICE_NO_DUMMY;
+			dev_config.queue_size       = 1;
+			dev_config.pre_cb           = NULL;
+			dev_config.post_cb          = NULL;
+			ESP_LOGI(TAG, "... Adding touch spi bus  Speed= %d.",dev_config.clock_speed_hz);
+			ESP_ERROR_CHECK(spi_bus_add_device(ucg_esp32_hal.spi_no, &dev_config, &t_handle)); 		
+
+		}
 	}
 		break;
 

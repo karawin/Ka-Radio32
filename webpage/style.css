@@ -8,7 +8,6 @@ html,body {
 }
 #MAIN {
 	width:100%;
-	height:120%;
 	overflow:hidden;
 	margin:0px
 }
@@ -26,6 +25,7 @@ html,body {
 	padding-top:20px;
 	padding-bottom:5px;
 	background-color:#39c;
+	background-image: radial-gradient( #39c,#033069);
 	color:#f0f0ff;
 	font-size:22px;
 	line-height:25px;
@@ -84,7 +84,6 @@ div.LEFT {
 .CONTENT {
 	width:92%;
 	position:relative;
-	top:100px;
 	overflow:hidden;
 	min-height:calc(100% - 70px);
 	margin-left:auto;
@@ -93,7 +92,7 @@ div.LEFT {
 	padding-left:10px;
 	padding-right:10px;
 	padding-top: 30px;
-	background-color: #f8f8f8;
+	background-color: #f4f4f4;
 	box-shadow: 10px 5px 10px 0 #333,-10px 6px 10px 0 #333
 }
 
@@ -102,7 +101,6 @@ div.LEFT {
 	color:#f8f8f8;
 	background-color:#39c;
 	padding:4px 4px;
-	width:98%
 }
 .CONTENT p {
 	font-size:15px;

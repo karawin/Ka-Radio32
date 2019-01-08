@@ -325,7 +325,6 @@ void websockethandle(int socket, wsopcode_t opcode, uint8_t * payload, size_t le
 	else if (strstr((char*)payload,"stopWake")!= NULL){stopWake();}
 	//monitor
 	else if (strstr((char*)payload,"monitor")!= NULL){wsMonitor();}
-//	else if (strstr((char*)payload,"upgrade")!= NULL){update_firmware((char*)"KaRadio32");	}
 	else if (strstr((char*)payload,"theme")!= NULL){theme();}
 	else if (strstr((char*)payload,"wsrssi")!= NULL){rssi(socket);}
 }
@@ -893,13 +892,16 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 				infree(aua);
 			}
 			
-			if (host!=NULL) 
-			{
-				if ((strcmp(device->hostname,host) != 0)&&(strcmp(host,"undefined") != 0))
+			if (host!=NULL)
+			{ 
+				if (strlen(host) >0)
 				{
-					strcpy(device->hostname,host);
-					setHostname(host);
-					changed = true;
+					if ((strcmp(device->hostname,host) != 0)&&(strcmp(host,"undefined") != 0))
+					{
+						strcpy(device->hostname,host);
+						setHostname(host);
+						changed = true;
+					}	
 				}				
 				infree(host);
 			}

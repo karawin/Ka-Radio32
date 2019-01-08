@@ -281,22 +281,41 @@ void gpio_get_lcd_backlightl(gpio_num_t *lcdb)
 	close_partition(hardware_handle,hardware);		
 }
 
+void gpio_get_touch(gpio_num_t *cs ,gpio_num_t *irq)
+{
+	esp_err_t err;
+	nvs_handle hardware_handle;
+	// init default
+	*cs = PIN_TOUCH_CS;
+	*irq = PIN_TOUCH_IRQ;
+	
+	if (open_partition(hardware, "gpio_space",&hardware_handle)!= ESP_OK) return;
+	
+	err = nvs_get_u8(hardware_handle, "P_TOUCH_CS",(uint8_t *) cs);
+	err |=nvs_get_u8(hardware_handle, "P_TOUCH_IRQ",(uint8_t *) irq);
+	if (err != ESP_OK) ESP_LOGW(TAG,"gpio_get_touch error %d",err);
 
+	close_partition(hardware_handle,hardware);			
+}
 
-void gpio_get_ir_key(nvs_handle handle,const char *key, int32_t *out_value1 , int32_t *out_value2)
+bool gpio_get_ir_key(nvs_handle handle,const char *key, int32_t *out_value1 , int32_t *out_value2)
 {
 	// init default
+	bool ret = false; 
 	*out_value1 = 0;
 	*out_value2 = 0;
 	size_t required_size;
 	nvs_get_str(handle, key, NULL, &required_size);
-	if (required_size >0)
+	if (required_size >1)
 	{
 		char* string = malloc(required_size);
 		nvs_get_str(handle, key, string, &required_size);	
-		sscanf(string,"%x %x",out_value1,out_value2);
+		ret = sscanf(string,"%x %x",out_value1,out_value2);
+//		ESP_LOGV(TAG,"String \"%s\"\n Required size: %d",string,required_size);
 		free (string);
+		ret = true;
 	}
-	ESP_LOGV(TAG,"Key: %s, value1: %x, value2: %x\n",key,*out_value1,*out_value2);	
+	ESP_LOGV(TAG,"Key: %s, value1: %x, value2: %x, ret: %d\n",key,*out_value1,*out_value2,ret);	
 	
+	return ret;
 }

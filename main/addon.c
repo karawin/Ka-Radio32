@@ -84,6 +84,7 @@ typedef enum {KEY_UP,KEY_LEFT,KEY_OK,KEY_RIGHT,KEY_DOWN,
 		KEY_STAR,KEY_DIESE,KEY_INFO, KEY_MAX} customKey_t;
 		
 static uint32_t customKey[KEY_MAX][2]; 
+static bool isCustomKey = false;
 
 static bool isEncoder0 = true;
 static bool isEncoder1 = true;
@@ -747,8 +748,10 @@ event_ir_t evt;
 		uint32_t evtir = ((evt.addr)<<8)|(evt.cmd&0xFF);
 		ESP_LOGI(TAG,"IR event: Channel: %x, ADDR: %x, CMD: %x = %X, REPEAT: %d",evt.channel,evt.addr,evt.cmd, evtir,evt.repeat_flag );
 		
-		if (irCustom(evtir,evt.repeat_flag)) break;;
-		
+		if (isCustomKey){
+			if (irCustom(evtir,evt.repeat_flag)) break;
+		}
+		else{ // no predefined keys
 		switch(evtir)
 		{
 		case 0xDF2047:
@@ -829,7 +832,8 @@ event_ir_t evt;
 		break;
 		default:;
 		/*SERIALX.println(F(" other button   "));*/
-		}// End Case			
+		}// End Case
+		}		
 	}
 }
  
@@ -876,10 +880,11 @@ void customKeyInit()
 	for (index = KEY_UP; index < KEY_MAX;index++)
 	{
 		// get the key in the nvs
-		gpio_get_ir_key(handle,klab[index],(int*)&(customKey[index][0]),(int*)&(customKey[index][1]));
+		isCustomKey |= gpio_get_ir_key(handle,klab[index],(int*)&(customKey[index][0]),(int*)&(customKey[index][1]));
+		ESP_LOGV(TAG," isCustomKey is %d for %d",isCustomKey,index);
 		taskYIELD();
 	}
-	
+	ESP_LOGI(TAG," isCustomKey is %d",isCustomKey);
 	close_partition(handle,hardware);	
 }
 
@@ -1029,12 +1034,12 @@ void task_addon(void *pvParams)
 	//ir
 	// queue for events of the IR nec rx
 	event_ir = xQueueCreate(5, sizeof(event_ir_t));
-	ESP_LOGI(TAG,"event_ir: %x",(int)event_ir);
+	ESP_LOGD(TAG,"event_ir: %x",(int)event_ir);
 	// queue for events of the lcd
 	event_lcd = xQueueCreate(20, sizeof(event_lcd_t));
-	ESP_LOGI(TAG,"event_lcd: %x",(int)event_lcd);	
+	ESP_LOGD(TAG,"event_lcd: %x",(int)event_lcd);	
 	
-	xTaskCreatePinnedToCore(rmt_nec_rx_task, "rmt_nec_rx_task", 2148, NULL, PRIO_RMT, pxCreatedTask,CPU_RMT);
+	xTaskCreatePinnedToCore(rmt_nec_rx_task, "rmt_nec_rx_task", 2148, NULL, PRIO_RMT, &pxCreatedTask,CPU_RMT);
 	ESP_LOGI(TAG, "%s task: %x","rmt_nec_rx_task",(unsigned int)pxCreatedTask);		;
 	xTaskCreatePinnedToCore (task_lcd, "task_lcd", 2200, NULL, PRIO_LCD, &pxCreatedTask,CPU_LCD); 
 	ESP_LOGI(TAG, "%s task: %x","task_lcd",(unsigned int)pxCreatedTask);

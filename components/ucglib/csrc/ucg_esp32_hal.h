@@ -24,6 +24,8 @@ typedef struct {
 	gpio_num_t cs;
 	gpio_num_t reset;
 	gpio_num_t dc;
+	gpio_num_t t_cs;  // touch cs
+	gpio_num_t t_irq; //touch irq
 } ucg_esp32_hal_t ;
 
 //cumul one byte entries

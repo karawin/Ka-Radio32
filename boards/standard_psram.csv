@@ -35,7 +35,7 @@ P_BACKLIGHT,data,u8,255
 custom_ir_space,namespace,,
 K_UP,data,string,
 K_LEFT,data,string,
-K_OK,data,string,
+K_OK,data,string,0
 K_RIGHT,data,string,
 K_DOWN,data,string,
 K_0,data,string,

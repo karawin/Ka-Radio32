@@ -309,17 +309,6 @@ static void init_hardware()
 	if (VS1053_HW_init()) // init spi
 		VS1053_Start();
 	
-    //Initialize the SPI RAM chip communications and see if it actually retains some bytes. If it
-    //doesn't, warn user.
-	if (bigRam)
-	{
-		setSPIRAMSIZE(420*1024);
-		ESP_LOGI(TAG, "\nSet Song buffer to420k");
-	}
-    if (!spiRamFifoInit()) {
-        ESP_LOGE(TAG, "\nSPI RAM chip fail!");
-        esp_restart();
-    }
     ESP_LOGI(TAG, "hardware initialized");
 }
 
@@ -855,6 +844,24 @@ void app_main()
 	}
 	
 
+	    //Initialize the SPI RAM chip communications and see if it actually retains some bytes. If it
+    //doesn't, warn user.
+	if (bigRam)
+	{
+		setSPIRAMSIZE(420*1024);  // room in psram
+		ESP_LOGI(TAG, "Set Song buffer to 420k");
+	} else
+	{
+		if (audio_output_mode == VS1053)
+		setSPIRAMSIZE(50*1024);		// more free heap
+		ESP_LOGI(TAG, "Set Song buffer to 50k");			
+	}
+	
+    if (!spiRamFifoInit()) {
+        ESP_LOGE(TAG, "SPI RAM chip fail!");
+        esp_restart();
+    }
+	
 	ESP_LOGI(TAG, "audio_output_mode %d\nOne of I2S=0, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053",audio_output_mode);
 
 	setCurrentStation( device->currentstation);

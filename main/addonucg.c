@@ -901,6 +901,8 @@ void lcd_initUcg(uint8_t *lcd_type)
 	gpio_num_t cs;
 	gpio_num_t a0;
 	gpio_num_t rstlcd;
+	gpio_num_t t_cs;
+	gpio_num_t t_irq;
 	dt = getDt();
 	uint8_t rotat = getRotat();
 	ESP_LOGI(TAG,"lcd init  type: %d",*lcd_type);
@@ -910,6 +912,7 @@ void lcd_initUcg(uint8_t *lcd_type)
 	if (*lcd_type & LCD_SPI) // Color SPI
 	{
 		gpio_get_spi_bus(&spi_no,&miso,&mosi,&sclk);
+		gpio_get_touch(&t_cs ,&t_irq);
 		gpio_get_spi_lcd(&cs ,&a0,&rstlcd);
 		ucg_esp32_hal.spi_no   = spi_no;
 		ucg_esp32_hal.clk   = sclk;
@@ -917,6 +920,8 @@ void lcd_initUcg(uint8_t *lcd_type)
 		ucg_esp32_hal.cs    = cs;
 		ucg_esp32_hal.dc    = a0;
 		ucg_esp32_hal.reset = rstlcd;
+		ucg_esp32_hal.t_cs    = t_cs;
+		ucg_esp32_hal.t_irq    = t_irq;
 	} else //Color I2c (never seen this one)
 	{
 		gpio_get_i2c(&scl,&sda,&rsti2c);
