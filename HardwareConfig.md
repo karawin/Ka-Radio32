@@ -7,13 +7,41 @@ A template is given by the pattern.csv file
 The default configuration of the current software is in the standard_adb.csv file.  
 A csv file is interpreted by an utility to generate a bin file that must be flashed at address 0x3a2000 only one time per esp32
 
-The msys32 (the toolchain see https://docs.espressif.com/projects/esp-idf/en/stable/get-started/)   
-and https://github.com/karawin/Ka-Radio32 environment must be operational.
-
 ---------------
 1/ Prerequisite
 ---------------
-First, make sure you have an updated partitions.bin file.
+Toolchain Setup
+--------------------
+The quick setup is to download the Windows all-in-one toolchain & MSYS2 zip file from dl.espressif.com:
+
+https://dl.espressif.com/.../esp32_win32_msys2...
+
+- Unzip the zip file to C:\ (or some other location, but this guide assumes C:\) and it will create an msys32 directory with a pre-prepared environment.
+
+- Open a MSYS2 MINGW32 terminal window by running C:\msys32\mingw32.exe. Create a directory named "esp" that is a default location to develop ESP32 applications. To do so, run the following shell command: mkdir -p ~/esp
+- Type : cd ~/esp to move the newly created directory. If there are no error messages you are done with this step.
+
+- Type : git clone -b v3.1.2 --recursive https://github.com/espressif/esp-idf.git
+
+- Create a new script file in C:/msys32/etc/profile.d/ directory. Name it export_idf_path.sh
+Identify the path to ESP-IDF directory. It is specific to your system configuration and may look something like C:\msys32\home\"your-user-name"\esp\esp-idf
+Add this to the above created script file: export IDF_PATH="C:/msys32/home/"your-user-name/esp/esp-idf"
+Save the script file.
+
+- Close MSYS2 window and open it again. Check if IDF_PATH is set, by typing: printenv IDF_PATH
+The path previously entered in the script file should be printed out.
+  
+- Type : pip install --upgrade setuptools  
+- Type : python -m pip install --upgrade pip
+- Type : pip install future
+- Type : pacman -S mingw-w64-i686-python2-cryptography
+- Type : pip install cryptography
+
+- Place the Ka-Radio32-master files in "your-user-name"/esp folder. Find it at https://github.com/karawin/Ka-Radio32
+---
+  
+Second  make sure you have an updated partitions.bin file.  
+Find it at "your-user-name"/esp/Ka-Radio32/tree/master/binaries  
 This file contains the system partitions:
 ```
 $ make partition_table
@@ -55,7 +83,7 @@ See the log on the serial interface.
 -----------------------
 2/ Definition of gpio's
 -----------------------
-Edit this file to enter your gpio definitions.  
+Edit the csv file to enter your gpio definitions.  
 See gpio.h for the default values if missing in the csv file.  
 Only modify the lines beginning with P_ by modifying only the last number.  
 for example:  
@@ -65,20 +93,20 @@ Do this for all P_ lines.
 Never change the string "P_XXXX, data,u8,"  
 A value base 10 is mandatory for each P_.  
 
-```
-SPI Bus:  
-K_SPI		Select the used spi : 1: HSPI, 2: VSPI
-P_MISO		Master Input, Slave Output  
+Definition of the lines in csv  
+- SPI Bus:  
+K_SPI		Select the used spi : 1: HSPI, 2: VSPI  
+P_MISO		Master Input, Slave Output    
 P_MOSI		Master Output, Slave Input   Named Data or SDA or D1 for oled  
 P_CLK		Master clock  Named SCL or SCK or D0 for oled  
 
-VS1053B:  
+- VS1053B:  
 P_XCS			XCS  
 P_RST			RST  
 P_XDCS			XDCS  
 P_DREQ			P_DREQ  
 
-ENCODERS 0 & 1:  
+- ENCODERS 0 & 1:  
 P_ENC0_A			pin A clk  
 P_ENC0_B			pin B Data  
 P_ENC0_BTN			pin SW  
@@ -86,7 +114,7 @@ P_ENC1_A			pin A clk
 P_ENC1_B			pin B Data  
 P_ENC1_BTN			pin SW  
 
-BUTTONS PANEL 0 & 1 of three buttons (switch to gnd):  
+- BUTTONS PANEL 0 & 1 of three buttons (switch to gnd):  
 P_BTN0_A		click:start/stop, double click:toggle, help: station  
 P_BTN0_B		click: +  
 P_BTN0_C		click: -  
@@ -94,30 +122,30 @@ P_BTN1_A		start/stop, toggle, volume
 P_BTN1_B		+  
 P_BTN1_C		-  
 
-Bus I2C (Oled & Lcd):  
+- Bus I2C (Oled & Lcd):  
 P_I2C_SCL		SCL or SCK  
 P_I2C_SDA		SDA  
 P_I2C_RST		RST if any  
 
-LCD on SPI bus:  
+- LCD on SPI bus:  
 P_LCD_CS		CS  
 P_LCD_A0		A0 or D/C or DC  
 P_LCD_RST		RST or RES  
 
-Infrared remote:  
+- Infrared remote:  
 P_IR_SIGNAL		ir Y Signal  
 
-I2S bus:  
+- I2S bus:  
 P_I2S_LRCK		LRCK  
 P_I2S_BCLK		BCLK  
 P_I2S_DATA		DATA  
 
-ADC keyboard:  
-P_ADC			gpio32 to 39  or 255 if not used.  
+- ADC keyboard:  
+P_ADC			gpio32 to 39  or 255 if not used. 
 
-LCD Backlight:
+- LCD Backlight:   
 P_BACKLIGHT		GPIO of the hardware device.
-```
+
 
 -------------------
 ## Special cases:
@@ -226,19 +254,20 @@ Save the csv file.
 ------------------------
 Some samples are in the boards directory.   
 
-Start the command  
-`./nvs_partition_generator.sh yourname[.csv]`  
-to generate build/yourname.bin
+Build the bin file
+------------------
+1. Place the Ka-Radio32-master files in "your-user-name"/esp folder
+2. Place your modified csv file in the Ka-Radio32-master/boards folder
 
-For example  
-`  ./nvs_partition_generator.sh standard_adb`  
+3. Return to the msys32 window and navigate to the Ka-Radio32-master/boards folder
 
-generates the build/standard_adb.bin file from the standard_adb.csv file
-```
-$ ./nvs_partition_generator.sh standard_adb
-python ../esp-idf/components/nvs_flash/nvs_partition_generator/nvs_partition_gen.py standard_adb.csv build/standard_adb.bin 8KB
-done
-```
+4. Start the command : ./nvs_partition_generator.sh yourname[.csv] to generate build/yourname.bin
+
+Result :   
+MINGW32 ~/esp/Ka-Radio32-master/boards  
+$ ./nvs_partition_generator.sh modified_adb  
+python ./nvs_partition_gen.py modified_adb.csv build/modified_adb.bin 0x2000  
+done  
 
 
 ------------
