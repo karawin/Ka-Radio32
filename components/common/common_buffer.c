@@ -99,7 +99,8 @@ void buf_move_remaining_bytes_to_front(buffer_t *buf)
 size_t fill_read_buffer(buffer_t *buf)
 {
     buf_move_remaining_bytes_to_front(buf);
-    size_t bytes_to_read = min(buf_free_capacity(buf), spiRamFifoFill());
+	unsigned fsize = spiRamFifoFill();
+    size_t bytes_to_read = min(buf_free_capacity(buf), fsize);
 
     if (bytes_to_read > 0) {
         spiRamFifoRead((char *) buf->fill_pos, bytes_to_read);
