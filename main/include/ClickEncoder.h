@@ -39,7 +39,7 @@ typedef gpio_mode_t pinMode_t;
 #undef HIGH
 #define HIGH 1
 #define digitalRead(x) gpio_get_level((gpio_num_t)x)
-
+#ifndef __have__ClickButton_h__
   typedef enum Button_e {
     Open = 0,
     Closed,    
@@ -49,6 +49,7 @@ typedef gpio_mode_t pinMode_t;
     Clicked,
     DoubleClicked   
   } Button;
+#endif
 
   typedef struct {
   int8_t pinA;

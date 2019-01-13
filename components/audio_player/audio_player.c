@@ -121,9 +121,7 @@ int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read,
     player_t *player = user_data;
     // don't bother consuming bytes if stopped
     if(player->command == CMD_STOP) {
-		//audio_player_stop();
 		clientSilentDisconnect();
-       //player->decoder_command = CMD_STOP;
         return -1;
     }
 

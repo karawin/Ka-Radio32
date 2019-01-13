@@ -5,6 +5,7 @@
 *******************************************************************************/
 #ifndef ADDONUCG_H_
 #define ADDONUCG_H_
+#include "XPT2046_Touchscreen_calibrated.h"
 void playingUcg();
 void namesetUcg(char* ici);
 void statusUcg(const char* label);
@@ -23,6 +24,7 @@ void drawTimeUcg(uint8_t mTscreen,unsigned timein);
 void lcd_initUcg(uint8_t* lcd_type);
 void setVolumeUcg(uint16_t vol);
 void drawLinesUcg();
+bool getaPoint(TS_Point* tp);
 
 
 #endif /* ADDONUCG_H_ */

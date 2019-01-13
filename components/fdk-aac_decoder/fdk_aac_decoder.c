@@ -22,7 +22,7 @@
 #include "aacdecoder_lib.h"
 #include "audio_player.h"
 #include "spiram_fifo.h"
-#include "m4a.h"
+//#include "m4a.h"
 
 
 #define TAG "fdkaac_decoder"
@@ -53,8 +53,9 @@ void fdkaac_decoder_task(void *pvParameters)
     pcm_format_t pcm_format = {.buffer_format = PCM_INTERLEAVED};
 
     /* select bitstream format */
-    if (player->media_stream->content_type == AUDIO_MP4) {
-
+    if (player->media_stream->content_type == AUDIO_MP4)
+		{
+/*
         demux_res_t demux_res;
         stream_t input_stream;
         memset(&demux_res, 0, sizeof(demux_res));
@@ -69,8 +70,8 @@ void fdkaac_decoder_task(void *pvParameters)
             ESP_LOGI(TAG, "qtmovie_read success");
         }
 
-        /* create decoder instance */
-        handle = aacDecoder_Open(TT_MP4_RAW, /* num layers */1);
+        //create decoder instance 
+        handle = aacDecoder_Open(TT_MP4_RAW,1); // num layers 
         if (handle == NULL) {
             ESP_LOGE(TAG, "malloc failed %d", __LINE__);
             goto cleanup;
@@ -84,7 +85,8 @@ void fdkaac_decoder_task(void *pvParameters)
             ESP_LOGE(TAG, "aacDecoder_ConfigRaw error %d", err);
             goto cleanup;
         }
-
+		*/
+		goto cleanup;
     } else {
         /* create decoder instance */
         handle = aacDecoder_Open(TT_MP4_ADTS, /* num layers */1);

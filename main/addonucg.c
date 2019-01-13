@@ -20,6 +20,7 @@
 #include "interface.h"
 #include "eeprom.h"
 #include "addoncommon.h"
+
 #define TAG  "addonucg"
 
 extern const ucg_fntpgm_uint8_t ucg_font_crox1c[] UCG_FONT_SECTION("ucg_font_crox1c");
@@ -54,6 +55,7 @@ extern const ucg_fntpgm_uint8_t ucg_font_6x13_gr[] UCG_FONT_SECTION("ucg_font_6x
 extern const ucg_fntpgm_uint8_t ucg_font_9x16_gr[] UCG_FONT_SECTION("ucg_font_9x16_gr");
 extern const ucg_fntpgm_uint8_t ucg_font_helvR14_gr[] UCG_FONT_SECTION("ucg_font_helvR14_gr");
 extern const ucg_fntpgm_uint8_t ucg_font_helvR18_gr[] UCG_FONT_SECTION("ucg_font_helvR18_gr");
+extern const ucg_fntpgm_uint8_t ucg_font_ncenR14_gr[] UCG_FONT_SECTION("ucg_font_ncenR14_gr");
 
 
 #define ucg_SetColori(a,b,c,d) ucg_SetColor(a,0,b,c,d)
@@ -94,6 +96,7 @@ static char TTimeStr[15];
 typedef enum Lang {Latin,Cyrillic,Greek} LANG; 
 static LANG charset = Latin;  // latin or cyrillic
 
+
 ////////////////////////////////////////
 typedef enum sizefont  {small, text,middle,large} sizefont;
 void setfont(sizefont size)
@@ -128,7 +131,7 @@ void setfont(sizefont size)
 			case 320:
 			switch (charset){ 	
 								case Cyrillic: ucg_SetFont(&ucg,ucg_font_crox5h );break; 
-								case Greek:ucg_SetFont(&ucg,ucg_font_helvR18_gr );break;
+								case Greek:ucg_SetFont(&ucg,ucg_font_helvR14_gr );break;
 								default:
 								case Latin:ucg_SetFont(&ucg,ucg_font_inr16_mf );break;
 							}
@@ -901,8 +904,8 @@ void lcd_initUcg(uint8_t *lcd_type)
 	gpio_num_t cs;
 	gpio_num_t a0;
 	gpio_num_t rstlcd;
-	gpio_num_t t_cs;
-	gpio_num_t t_irq;
+//	gpio_num_t t_cs;
+//	gpio_num_t t_irq;
 	dt = getDt();
 	uint8_t rotat = getRotat();
 	ESP_LOGI(TAG,"lcd init  type: %d",*lcd_type);
@@ -912,7 +915,6 @@ void lcd_initUcg(uint8_t *lcd_type)
 	if (*lcd_type & LCD_SPI) // Color SPI
 	{
 		gpio_get_spi_bus(&spi_no,&miso,&mosi,&sclk);
-		gpio_get_touch(&t_cs ,&t_irq);
 		gpio_get_spi_lcd(&cs ,&a0,&rstlcd);
 		ucg_esp32_hal.spi_no   = spi_no;
 		ucg_esp32_hal.clk   = sclk;
@@ -920,8 +922,6 @@ void lcd_initUcg(uint8_t *lcd_type)
 		ucg_esp32_hal.cs    = cs;
 		ucg_esp32_hal.dc    = a0;
 		ucg_esp32_hal.reset = rstlcd;
-		ucg_esp32_hal.t_cs    = t_cs;
-		ucg_esp32_hal.t_irq    = t_irq;
 	} else //Color I2c (never seen this one)
 	{
 		gpio_get_i2c(&scl,&sda,&rsti2c);
@@ -982,7 +982,8 @@ void lcd_initUcg(uint8_t *lcd_type)
 			ucg_SetRotate270(&ucg);
 		else 
 			ucg_SetRotate90(&ucg);	
-		
+
+	
 		ucg_SetFontPosTop(&ucg);
 		x  = ucg_GetWidth(&ucg);
 		

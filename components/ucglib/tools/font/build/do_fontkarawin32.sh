@@ -32,6 +32,7 @@ rm ../karadio32/ucg_karadio32_fonts.c
 ./do_fontkar.sh 9x16_gr
 ./do_fontkar.sh helvR14_gr
 ./do_fontkar.sh helvR18_gr
+./do_fontkar.sh ncenR14_gr
 
 echo "Generate ucg_karadio32_fonts.c"
 cat ../karadio32/*.c >> ../karadio32/ucg_karadio32_fonts.c

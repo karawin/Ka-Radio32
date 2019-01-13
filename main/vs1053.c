@@ -13,7 +13,7 @@
   * @{
   */
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
-
+#define CHUNK	32
 #include "vs1053.h"
 #include "gpio.h"
 #include "eeprom.h"
@@ -66,8 +66,9 @@ void VS1053_spi_init(){
 	gpio_num_t sclk;
 
 	uint8_t spi_no; // the spi bus to use
-	if(!vsSPI) vSemaphoreCreateBinary(vsSPI);
-	if(!hsSPI) vSemaphoreCreateBinary(hsSPI);
+//	if(!vsSPI) vSemaphoreCreateBinary(vsSPI);
+	if(!vsSPI) vsSPI=xSemaphoreCreateMutex();
+	if(!hsSPI) hsSPI=xSemaphoreCreateMutex();;
 	
 	gpio_get_spi_bus(&spi_no,&miso,&mosi,&sclk);	
 	if(spi_no > 2) return; //Only VSPI and HSPI are valid spi modules. 	
@@ -199,7 +200,7 @@ void VS1053_WriteRegister(uint8_t addressbyte, uint8_t highbyte, uint8_t lowbyte
 	t.tx_data[0] = highbyte;
 	t.tx_data[1] = lowbyte;		
     t.length= 16;
-	while(VS1053_checkDREQ() == 0);
+	while(VS1053_checkDREQ() == 0)taskYIELD ();
 	spi_take_semaphore(vsSPI);
 //    ESP_ERROR_CHECK(spi_device_transmit(vsspi, &t));  //Transmit!
     ret = spi_device_transmit(vsspi, &t);  //Transmit!
@@ -219,7 +220,7 @@ void VS1053_WriteRegister16(uint8_t addressbyte, uint16_t value)
 	t.tx_data[0] = (value>>8)&0xff;	
 	t.tx_data[1] = value&0xff;		
     t.length= 16;
-	while(VS1053_checkDREQ() == 0);
+	while(VS1053_checkDREQ() == 0)taskYIELD ();
 	spi_take_semaphore(vsSPI);	
 //    ESP_ERROR_CHECK(spi_device_transmit(vsspi, &t));  //Transmit!	
     ret = spi_device_transmit(vsspi, &t);  //Transmit!	
@@ -233,20 +234,17 @@ uint16_t VS1053_ReadRegister(uint8_t addressbyte){
 	uint16_t result;
     spi_transaction_t t;
 	esp_err_t ret;
-	uint32_t* data = heap_caps_malloc(4, MALLOC_CAP_DMA);
-//    uint16_t data= 0;
     memset(&t, 0, sizeof(t));       //Zero out the transaction
-	t.length=16;   
+	t.length=16;  
+	t.flags |= SPI_TRANS_USE_RXDATA	;
 	t.cmd = VS_READ_COMMAND;
 	t.addr = addressbyte;
-    t.rx_buffer=data;
-	while(VS1053_checkDREQ() == 0)taskYIELD ();
+	while(VS1053_checkDREQ() == 0) taskYIELD ();
 	spi_take_semaphore(vsSPI);
-//	ESP_ERROR_CHECK(spi_device_transmit(vsspi, &t));  //Transmit!
 	ret = spi_device_transmit(vsspi, &t);  //Transmit!
-	if (ret != ESP_OK) ESP_LOGE(TAG,"err: %d, VS1053_ReadRegister(%d), read: %d",ret,addressbyte,*data);
-	result =  (((*data&0xFF)<<8) | ((*data>>8)&0xFF)) ; 
-	free (data);
+	if (ret != ESP_OK) ESP_LOGE(TAG,"err: %d, VS1053_ReadRegister(%d), read: %d",ret,addressbyte,(uint32_t)*t.rx_data);
+	result =  (((t.rx_data[0]&0xFF)<<8) | ((t.rx_data[1])&0xFF)) ; 
+//	ESP_LOGI(TAG,"VS1053_ReadRegister data: %d %d %d %d",t.rx_data[0],t.rx_data[1],t.rx_data[2],t.rx_data[3]);
 	spi_give_semaphore(vsSPI);
 	while(VS1053_checkDREQ() == 0);
 	return result;
@@ -393,7 +391,7 @@ int VS1053_SendMusicBytes(uint8_t* music, uint16_t quantity){
 //		if(VS1053_checkDREQ()) 
 		{
 			int t = quantity;
-			if(t > 32) t = 32;	
+			if(t > CHUNK) t = CHUNK;	
 			VS1053_spi_write_char(hvsspi, &music[oo], t);
 			oo += t;
 			quantity -= t;
@@ -630,7 +628,7 @@ void VS1053_flush_cancel(uint8_t mode) {  // 0 only fillbyte  1 before play    2
 	y = 0;
 	while (VS1053_ReadRegister(SPI_MODE)& SM_CANCEL)
 	{	  
-		if (mode == 1) VS1053_SendMusicBytes( buf, 32); //1
+		if (mode == 1) VS1053_SendMusicBytes( buf, CHUNK); //1
 		else vTaskDelay(1); //2  
 //		printf ("Wait CANCEL clear\n");
 		if (y++ > 200) 
@@ -642,10 +640,10 @@ void VS1053_flush_cancel(uint8_t mode) {  // 0 only fillbyte  1 before play    2
 	VS1053_WriteRegister(SPI_WRAMADDR,MaskAndShiftRight(para_endFillByte,0xFF00,8), (para_endFillByte & 0x00FF) );
 	endFillByte = (int8_t) VS1053_ReadRegister(SPI_WRAM) & 0xFF;
 	for (y = 0; y < 513; y++) buf[y] = endFillByte;	
-	for ( y = 0; y < 4; y++)	VS1053_SendMusicBytes( buf, 513); // 4*513 = 2052
+	for ( y = 0; y < 5; y++)	VS1053_SendMusicBytes( buf, 512); // 4*513 = 2052
   } else
   {
-	for ( y = 0; y < 4; y++)	VS1053_SendMusicBytes( buf, 513); // 4*513 = 2052
+	for ( y = 0; y < 5; y++)	VS1053_SendMusicBytes( buf, 512); // 4*513 = 2052
   }	  
 }
 
@@ -666,8 +664,15 @@ void vsTask(void *pvParams) {
             break;
         }				
 		//size = bufferRead(b, VSTASKBUF);
-		size = min(VSTASKBUF, spiRamFifoFill());			
-		if (size >0)
+		unsigned fsize = spiRamFifoFill();
+		size = min(VSTASKBUF, fsize);
+/*		if (size > 	VSTASKBUF)
+		{
+			ESP_LOGE(TAG, "Decoder vs1053 size: %d, fsize: %d, VSTASKBUF: %d .\n",size,fsize,VSTASKBUF );	
+			size = 	VSTASKBUF;
+		}
+*/		
+		if (size > 0)
 		{
 			spiRamFifoRead((char*)b, size);
 			s = 0; 			

@@ -54,17 +54,17 @@ void gpio_get_spi_bus(uint8_t *spi_no,gpio_num_t *miso,gpio_num_t *mosi,gpio_num
 	esp_err_t err;
 	nvs_handle hardware_handle;
 	// init default
-	*miso = PIN_NUM_MISO;	
-	*mosi = PIN_NUM_MOSI;	
-	*sclk = PIN_NUM_CLK;
-	*spi_no = VSPI_HOST;
+	if (miso != NULL)*miso = PIN_NUM_MISO;	
+	if (mosi != NULL)*mosi = PIN_NUM_MOSI;	
+	if (sclk != NULL)*sclk = PIN_NUM_CLK;
+	if (spi_no != NULL)*spi_no = VSPI_HOST;
 	
 	if (open_partition(hardware, "gpio_space",&hardware_handle)!= ESP_OK) return;
-	
-	err = nvs_get_u8(hardware_handle, "K_SPI",(uint8_t *) spi_no);
-	err |= nvs_get_u8(hardware_handle, "P_MISO",(uint8_t *) miso);
-	err |=nvs_get_u8(hardware_handle, "P_MOSI",(uint8_t *) mosi);
-	err |=nvs_get_u8(hardware_handle, "P_CLK", (uint8_t *)sclk);
+	err = ESP_OK;
+	if (spi_no != NULL)err = nvs_get_u8(hardware_handle, "K_SPI",(uint8_t *) spi_no);
+	if (miso != NULL) err |= nvs_get_u8(hardware_handle, "P_MISO",(uint8_t *) miso);
+	if (mosi != NULL)err |=nvs_get_u8(hardware_handle, "P_MOSI",(uint8_t *) mosi);
+	if (sclk != NULL)err |=nvs_get_u8(hardware_handle, "P_CLK", (uint8_t *)sclk);
 	if (err != ESP_OK) ESP_LOGW(TAG,"gpio_get_spi_bus error %d",err);
 	close_partition(hardware_handle,hardware);
 }
@@ -310,7 +310,7 @@ bool gpio_get_ir_key(nvs_handle handle,const char *key, int32_t *out_value1 , in
 	{
 		char* string = malloc(required_size);
 		nvs_get_str(handle, key, string, &required_size);	
-		ret = sscanf(string,"%x %x",out_value1,out_value2);
+		sscanf(string,"%x %x",out_value1,out_value2);
 //		ESP_LOGV(TAG,"String \"%s\"\n Required size: %d",string,required_size);
 		free (string);
 		ret = true;

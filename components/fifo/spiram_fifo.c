@@ -21,21 +21,24 @@
 
 #include "spiram_fifo.h"
 #include "spiram.h"
+//#include "esp_heap_trace.h"
+#include "esp_heap_caps.h"
 //#include "playerconfig.h"
 #define FAKE_SPI_BUFF
 
-#define SPIREADSIZE 32
+#define SPIREADSIZE 1024
 
 static unsigned fifoRpos;
 static unsigned fifoWpos;
 static unsigned fifoFill;
-static xSemaphoreHandle semCanRead;
-static xSemaphoreHandle semCanWrite;
+//static xSemaphoreHandle semCanRead;
+//static xSemaphoreHandle semCanWrite;
 static xSemaphoreHandle mux;
 static long fifoOvfCnt, fifoUdrCnt;
 
 //Low watermark where we restart the reader thread.
-#define FIFO_LOWMARK (16*1024)
+//#define FIFO_LOWMARK (16*1024)
+#define FIFO_LOWMARK (512)
 
 #ifdef FAKE_SPI_BUFF
 //Re-define a bunch of things so we use the internal buffer
@@ -65,8 +68,8 @@ int spiRamFifoInit() {
 	fifoFill=0;
 	fifoOvfCnt=0;
 	fifoUdrCnt=0;
-	vSemaphoreCreateBinary(semCanRead);
-	vSemaphoreCreateBinary(semCanWrite);
+//	vSemaphoreCreateBinary(semCanRead);
+//	vSemaphoreCreateBinary(semCanWrite);
 	mux=xSemaphoreCreateMutex();
 	spiRamInit();
 	return (spiRamTest());
@@ -79,26 +82,29 @@ void spiRamFifoReset() {
 	fifoFill=0;
 	fifoOvfCnt=0;
 	fifoUdrCnt=0;
-	xSemaphoreGive(semCanWrite);
-	xSemaphoreTake(semCanRead, portMAX_DELAY);
+//	xSemaphoreGive(semCanWrite);
+//	xSemaphoreTake(semCanRead, portMAX_DELAY);
 	xSemaphoreGive(mux);
 }
 
 //Read bytes from the FIFO
 void spiRamFifoRead(char *buff, unsigned len) {
-	unsigned n;
+//	unsigned n;
 	while (len > 0) {
-		n = len;
+//		heap_caps_check_integrity_all(true) ;
+		unsigned n = len;
+//		unsigned fifomFill;
+		if (xSemaphoreTake(mux, portMAX_DELAY))
+		{
 		if (n>SPIREADSIZE) n=SPIREADSIZE;			//don't read more than SPIREADSIZE
 		if (n>(SPIRAMSIZE-fifoRpos)) n = SPIRAMSIZE - fifoRpos; //don't read past end of buffer
-		xSemaphoreTake(mux, portMAX_DELAY);
 		if (fifoFill < n) {
 //			printf("FIFO empty.\n");
 			//Drat, not enough data in FIFO. Wait till there's some written and try again.
 			fifoUdrCnt++;
 			xSemaphoreGive(mux);
-			if (fifoFill < FIFO_LOWMARK) xSemaphoreTake(semCanRead, portMAX_DELAY);
-			vTaskDelay(1);
+//			if (fifomFill < FIFO_LOWMARK) xSemaphoreTake(semCanRead, portMAX_DELAY);
+			vTaskDelay(20);
 		} else {
 			//Read the data.
 			spiRamRead(fifoRpos, buff, n);
@@ -108,17 +114,19 @@ void spiRamFifoRead(char *buff, unsigned len) {
 			fifoRpos += n;
 			if (fifoRpos>=SPIRAMSIZE) fifoRpos=0;
 			xSemaphoreGive(mux);
-			xSemaphoreGive(semCanWrite); //Indicate writer thread there's some free room in the fifo
+//			xSemaphoreGive(semCanWrite); //Indicate writer thread there's some free room in the fifo
 		}
+		} else {printf("spiRamFifoRead MUX take failed\n"); }
 	}
 }
 
 //Write bytes to the FIFO
 void spiRamFifoWrite(const char *buff, unsigned buffLen) {
-	unsigned n;
+//	unsigned n;
 	while (buffLen > 0) {
-		n = buffLen;
-
+		unsigned n = buffLen;
+		if (xSemaphoreTake(mux, portMAX_DELAY))
+		{
 		// don't read more than SPIREADSIZE
 		if (n > SPIREADSIZE) n = SPIREADSIZE;
 
@@ -127,15 +135,14 @@ void spiRamFifoWrite(const char *buff, unsigned buffLen) {
 			n = SPIRAMSIZE - fifoWpos;
 		}
 
-		xSemaphoreTake(mux, portMAX_DELAY);
 		if ((SPIRAMSIZE - fifoFill) < n) {
             // printf("FIFO full.\n");
 			// Drat, not enough free room in FIFO. Wait till there's some read and try again.
 			fifoOvfCnt++;
 			xSemaphoreGive(mux);
-			xSemaphoreTake(semCanWrite, portMAX_DELAY);
+//			xSemaphoreTake(semCanWrite, portMAX_DELAY);
 			//taskYIELD();
-			vTaskDelay(1);
+			vTaskDelay(20);
 		} else {
 			// Write the data.
 			spiRamWrite(fifoWpos, buff, n);
@@ -145,18 +152,20 @@ void spiRamFifoWrite(const char *buff, unsigned buffLen) {
 			fifoWpos += n;
 			if (fifoWpos >= SPIRAMSIZE) fifoWpos = 0;
 			xSemaphoreGive(mux);
-			xSemaphoreGive(semCanRead); // Tell reader thread there's some data in the fifo.
+//			xSemaphoreGive(semCanRead); // Tell reader thread there's some data in the fifo.
 		}
+		} else {printf(" spiRamFifoWrite MUX take failed\n"); }
 	}
 }
 
 //Get amount of bytes in use
 unsigned spiRamFifoFill() {
-	int ret;
+//	unsigned ret;
 	xSemaphoreTake(mux, portMAX_DELAY);
-	ret=fifoFill;
+	unsigned ret=fifoFill;
 	xSemaphoreGive(mux);
 	return ret;
+
 }
 
 unsigned spiRamFifoFree() {
@@ -168,17 +177,17 @@ unsigned spiRamFifoLen() {
 }
 
 long spiRamGetOverrunCt() {
-	long ret;
+//	long ret;
 	xSemaphoreTake(mux, portMAX_DELAY);
-	ret=fifoOvfCnt;
+	 long ret=fifoOvfCnt;
 	xSemaphoreGive(mux);
 	return ret;
 }
 
 long spiRamGetUnderrunCt() {
-	long ret;
+//	long ret;
 	xSemaphoreTake(mux, portMAX_DELAY);
-	ret=fifoUdrCnt;
+	long ret=fifoUdrCnt;
 	xSemaphoreGive(mux);
 	return ret;
 }
