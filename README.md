@@ -10,6 +10,17 @@ Adding a vs1053 board, all stations can be played.
 Compatible with esp8266 KaRadio addons.  
 - Serial or telnet commands : https://github.com/karawin/Ka-Radio32/blob/master/Interface.md
 
+### New
+A new android application is born  
+  
+- KaRadio Remote Control by Vassilis Serasidis on google Play.
+
+It is an easy and fast WiFi remote control for your KaRadio or KaRadio32 hardware.  
+With this android app you can select the WebRadio station you want to play, set the volume and get the station information such as Station name, Genre, Bit rate, Meta data and more.   
+Found it at
+https://play.google.com/store/apps/details…
+
+Thanks Vassilis.
 ## Added features
 Work with i2s, internal DAC or a vs1053.  
 Output mode set in Setting panel on web page of KaraDio32 :
