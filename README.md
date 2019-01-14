@@ -18,7 +18,7 @@ A new android application is born
 It is an easy and fast WiFi remote control for your KaRadio or KaRadio32 hardware.  
 With this android app you can select the WebRadio station you want to play, set the volume and get the station information such as Station name, Genre, Bit rate, Meta data and more.   
 Found it at
-https://play.google.com/store/apps/details…
+https://play.google.com/store/apps/details?id=com.serasidis.karadio.rc
 
 Thanks Vassilis.
 ## Added features
