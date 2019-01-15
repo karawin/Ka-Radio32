@@ -21,8 +21,6 @@
 
 #endif
 
-#include "XPT2046_Touchscreen_calibrated.h"
-
 #define TAG  "ucg_hal"
 
 static spi_device_handle_t handle; // SPI handle of the spi lcd interface.

@@ -110,7 +110,7 @@ bool VS1053_HW_init()
 		return false;
 	}
 	spi_device_interface_config_t devcfg={
-        .clock_speed_hz=1500000,               //Clock out at x MHz
+        .clock_speed_hz=2000000,               //Clock out at x MHz
 		.command_bits = 8,
 		.address_bits = 8,
 		.dummy_bits = 0,

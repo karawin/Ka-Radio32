@@ -1,175 +1,195 @@
-0x40096941 in uxListRemove (pxItemToRemove=0x3ffb2b20)
-    at C:/msys32/home/jp/esp/esp-idf/components/freertos/list.c:214
-214             pxItemToRemove->pxNext->pxPrevious = pxItemToRemove->pxPrevious;
-(gdb) bt
-#0  0x40096941 in uxListRemove (pxItemToRemove=0x3ffb2b20)
-    at C:/msys32/home/jp/esp/esp-idf/components/freertos/list.c:214
-#1  0x40094e96 in xTaskPriorityDisinherit (pxMutexHolder=0x3ffb2b18)
-    at C:/msys32/home/jp/esp/esp-idf/components/freertos/tasks.c:4145
-#2  0x400954a1 in prvCopyDataToQueue (pxQueue=0x3ffb16ec,
-    pvItemToQueue=<optimized out>, xPosition=0)
-    at C:/msys32/home/jp/esp/esp-idf/components/freertos/queue.c:1875
-#3  0x400958f3 in xQueueGenericSend (xQueue=0x3ffb16ec, pvItemToQueue=0x0,
-    xTicksToWait=0, xCopyPosition=0)
-    at C:/msys32/home/jp/esp/esp-idf/components/freertos/queue.c:742
-#4  0x4014ee54 in spiRamFifoRead (buff=0x3ffb2b4c "\\\037▒?vsTask", len=611)
-    at C:/msys32/home/jp/esp/Ka-Radio32/components/fifo/spiram_fifo.c:113
-#5  0x400df8da in vsTask (pvParams=0x3ffb4ccc)
-    at C:/msys32/home/jp/esp/Ka-Radio32/main/vs1053.c:670
-#6  0x40094f7c in vPortTaskWrapper (pxCode=0x400df890 <vsTask>,
-    pvParameters=0x3ffb4ccc)
-    at C:/msys32/home/jp/esp/esp-idf/components/freertos/port.c:143
+uint16_t IRAM_ATTR touch_get_data(uint8_t type)
+{
+	esp_err_t ret;
+	spi_nodma_transaction_t t;
+	memset(&t, 0, sizeof(t));            //Zero out the transaction
+	uint8_t rxdata[2] = {0};
 
-	
-	
-	
-Remote debugging using com5
-is_free (block=0x8448a080)
-    at C:/msys32/home/jp/esp/esp-idf/components/heap/multi_heap.c:131
-131         return block->header & BLOCK_FREE_FLAG;	
-(gdb) bt
-#0  is_free (block=0x8448a080)
-    at C:/msys32/home/jp/esp/esp-idf/components/heap/multi_heap.c:131
-#1  multi_heap_malloc_impl (heap=0x3ffe4350, size=1692)
-    at C:/msys32/home/jp/esp/esp-idf/components/heap/multi_heap.c:432
-#2  0x40084b5c in heap_caps_malloc (size=1692, caps=6144)
-    at C:/msys32/home/jp/esp/esp-idf/components/heap/heap_caps.c:110
-#3  0x40084c09 in heap_caps_malloc_prefer (size=1692, num=0)
-    at C:/msys32/home/jp/esp/esp-idf/components/heap/heap_caps.c:188
-#4  0x40088a9c in wifi_malloc (size=1692)
-    at C:/msys32/home/jp/esp/esp-idf/components/esp32/wifi_os_adapter.c:61
-#5  0x4013429a in esf_buf_alloc ()
-#6  0x4013e74c in wdevProcessRxSucDataAll ()
-#7  0x4008be64 in ppTask ()
-#8  0x40094f7c in vPortTaskWrapper (pxCode=0x4008bd30 <ppTask>,
-    pvParameters=0x0)
-    at C:/msys32/home/jp/esp/esp-idf/components/freertos/port.c:143
+	if (spi_nodma_device_select(ts_spi, 0)) return 0;
 
+	// send command byte & receive 2 byte response
+    t.rxlength=8*2;
+    t.rx_buffer=&rxdata;
+	t.command = type;
 
-	
-	0x40096941 in uxListRemove (pxItemToRemove=0x3ffb2b38)
-    at C:/msys32/home/jp/esp/esp-idf/components/freertos/list.c:214
-214             pxItemToRemove->pxNext->pxPrevious = pxItemToRemove->pxPrevious;
-(gdb) bt
-#0  0x40096941 in uxListRemove (pxItemToRemove=0x3ffb2b38)
-    at C:/msys32/home/jp/esp/esp-idf/components/freertos/list.c:214
-#1  0x40094e96 in xTaskPriorityDisinherit (pxMutexHolder=0x3ffb2b30)
-    at C:/msys32/home/jp/esp/esp-idf/components/freertos/tasks.c:4145
-#2  0x400954a1 in prvCopyDataToQueue (pxQueue=0x3ffb16ec,
-    pvItemToQueue=<optimized out>, xPosition=0)
-    at C:/msys32/home/jp/esp/esp-idf/components/freertos/queue.c:1875
-#3  0x400958f3 in xQueueGenericSend (xQueue=0x3ffb16ec, pvItemToQueue=0x0,
-    xTicksToWait=0, xCopyPosition=0)
-    at C:/msys32/home/jp/esp/esp-idf/components/freertos/queue.c:742
-#4  0x4014ee5d in spiRamFifoRead (buff=0x3ffb2b7c "(+▒?\003", len=156)
-    at C:/msys32/home/jp/esp/Ka-Radio32/components/fifo/spiram_fifo.c:114
-#5  0x400df8da in vsTask (pvParams=0x3ffe6d2c)
-    at C:/msys32/home/jp/esp/Ka-Radio32/main/vs1053.c:670
-#6  0x40094f7c in vPortTaskWrapper (pxCode=0x400df890 <vsTask>,
-    pvParameters=0x3ffe6d2c)
-    at C:/msys32/home/jp/esp/esp-idf/components/freertos/port.c:143
+	ret = spi_nodma_transfer_data(ts_spi, &t);    // Transmit using direct mode
 
-	
-	
-	is_free (block=0x93eb524d)
-    at C:/msys32/home/jp/esp/esp-idf/components/heap/multi_heap.c:131
-131         return block->header & BLOCK_FREE_FLAG;
-(gdb) bt
-#0  is_free (block=0x93eb524d)
-    at C:/msys32/home/jp/esp/esp-idf/components/heap/multi_heap.c:131
-#1  multi_heap_malloc_impl (heap=0x3ffae6e0, size=40)
-    at C:/msys32/home/jp/esp/esp-idf/components/heap/multi_heap.c:432
-#2  0x40096c8a in multi_heap_malloc (heap=0x3ffae6e0, size=24)
-    at C:/msys32/home/jp/esp/esp-idf/components/heap/multi_heap_poisoning.c:191
-#3  0x40084b9c in heap_caps_malloc (size=24, caps=6144)
-    at C:/msys32/home/jp/esp/esp-idf/components/heap/heap_caps.c:110
-#4  0x40084bc9 in heap_caps_malloc_default (size=24)
-    at C:/msys32/home/jp/esp/esp-idf/components/heap/heap_caps.c:139
-#5  0x400850cf in trace_malloc (size=24, caps=0, mode=TRACE_MALLOC_DEFAULT)
-    at C:/msys32/home/jp/esp/esp-idf/components/heap/heap_trace.c:328
-#6  0x400852c8 in __wrap_malloc (size=24)
-    at C:/msys32/home/jp/esp/esp-idf/components/heap/heap_trace.c:396
-#7  0x4015d294 in mem_malloc (size=24)
-    at C:/msys32/home/jp/esp/esp-idf/components/lwip/lwip/src/core/mem.c:124
-#8  0x4015cfa6 in do_memp_malloc_pool (desc=<optimized out>)
-    at C:/msys32/home/jp/esp/esp-idf/components/lwip/lwip/src/core/memp.c:301
-#9  0x4015d014 in memp_malloc (type=<optimized out>)
-    at C:/msys32/home/jp/esp/esp-idf/components/lwip/lwip/src/core/memp.c:398
-#10 0x40157843 in pbuf_alloc (layer=<optimized out>, length=<optimized out>,
-    type=PBUF_REF)
-    at C:/msys32/home/jp/esp/esp-idf/components/lwip/lwip/src/core/pbuf.c:386
-#11 0x401658ab in wlanif_input (netif=0x3ffdfe60, buffer=0x3ffed980,
-    len=1490, eb=0x3ffed8f0)
-    at C:/msys32/home/jp/esp/esp-idf/components/lwip/port/esp32/netif/wlanif.c:165
-#12 0x40103825 in tcpip_adapter_sta_input (buffer=0x3ffed980, len=1490,
-    eb=0x3ffed8f0)
-    at C:/msys32/home/jp/esp/esp-idf/components/tcpip_adapter/tcpip_adapter_lwip.c:1096
-#13 0x4012e395 in sta_input ()
-#14 0x4012f270 in sta_rx_cb ()
-#15 0x40139e5c in ppRxPkt ()
-#16 0x4008bf6d in ppTask ()
-#17 0x400950c4 in vPortTaskWrapper (pxCode=0x4008be78 <ppTask>,
-    pvParameters=0x0)
-    at C:/msys32/home/jp/esp/esp-idf/components/freertos/port.c:143
+	spi_nodma_device_deselect(ts_spi);
 
-	
-	
-	
-Remote debugging using com5
-0x40093cd6 in vTaskSwitchContext ()
-    at C:/msys32/home/jp/esp/esp-idf/components/freertos/tasks.c:2850
-2850                                            listGET_OWNER_OF_NEXT_ENTRY( pxTCB, &( pxReadyTasksLists[ uxDynamicTopReady ] ) );
-(gdb) bt
-#0  0x40093cd6 in vTaskSwitchContext ()
-    at C:/msys32/home/jp/esp/esp-idf/components/freertos/tasks.c:2850
-#1  0x40096173 in _frxt_dispatch ()
-    at C:/msys32/home/jp/esp/esp-idf/components/freertos\portasm.S:406
-#2  0x40096204 in vPortYield ()
-    at C:/msys32/home/jp/esp/esp-idf/components/freertos\portasm.S:555
-Backtrace stopped: previous frame identical to this frame (corrupt stack?)
+	if (ret) return 0;
+
+	return (((uint16_t)(rxdata[0] << 8) | (uint16_t)(rxdata[1])) >> 4);
+}
 
 
 
+// ============= Touch panel functions =========================================
 
-Remote debugging using com5
-uxListRemove (pxItemToRemove=0x3ffee220)
-    at C:/msys32/home/jp/esp/esp-idf/components/freertos/list.c:218
-218             if( pxList->pxIndex == pxItemToRemove )
-(gdb) bt
-#0  uxListRemove (pxItemToRemove=0x3ffee220)
-    at C:/msys32/home/jp/esp/esp-idf/components/freertos/list.c:218
-#1  0x40094ad4 in vTaskPlaceOnEventList (pxEventList=0x3ffb18cc,
-    xTicksToWait=4294967295)
-    at C:/msys32/home/jp/esp/esp-idf/components/freertos/tasks.c:2936
-#2  0x40095e7b in xQueueGenericReceive (xQueue=0x3ffb18a8,
-    pvBuffer=0x3ffedc64, xTicksToWait=4294967295, xJustPeeking=0)
-    at C:/msys32/home/jp/esp/esp-idf/components/freertos/queue.c:1589
-#3  0x40088a2c in spi_device_get_trans_result (handle=0x3ffb17d4,
-    trans_desc=0x3ffedc9c, ticks_to_wait=4294967295)
-    at C:/msys32/home/jp/esp/esp-idf/components/driver/spi_master.c:1230
-#4  0x40088a5b in spi_device_transmit (handle=0x3ffb17d4,
-    trans_desc=0x3ffedcd8)
-    at C:/msys32/home/jp/esp/esp-idf/components/driver/spi_master.c:1253
-#5  0x400df167 in VS1053_spi_write_char (ivsspi=0x3ffb17d4,
-    cbyte=0x3ffedd5c "bC\016▒▒\217▒0͛\023▒▒▒▒▒\017P▒▒پP▒Y▒a▒▒{▒▒▒\027'▒▒▒\030Ԋ▒\377▒▒D▒\017▒▒D▒\003▒▒@▒▒\b▒{z$%▒\032▒\017▒kD<\"`▒▒▒X▒▒▒▒▒\377▒h/k'\021▒▒▒▒▒ɸ▒▒pl▒;\200▒s\nl▒▒i▒ɋ▒▒▒4%▒▒0\022\024▒@7▒▒h\v▒▒Z\026▒▒▒1\004▒▒\030ңlމl▒▒▒▒.▒▒ٴ▒▒▒▒`▒▒▒0▒7\200▒dX▒`4▒\220h▒▒Ь\"\030\006\f\006\065▒T\rB▒▒▒q\215"...,
-    len=32) at C:/msys32/home/jp/esp/Ka-Radio32/main/vs1053.c:184
-#6  0x400df43c in VS1053_SendMusicBytes (
-    music=0x3ffedd5c "bC\016▒▒\217▒0͛\023▒▒▒▒▒\017P▒▒پP▒Y▒a▒▒{▒▒▒\027'▒▒▒\030Ԋ▒\377▒▒D▒\017▒▒D▒\003▒▒@▒▒\b▒{z$%▒\032▒\017▒kD<\"`▒▒▒X▒▒▒▒▒\377▒h/k'\021▒▒▒▒▒ɸ▒▒pl▒;\200▒s\nl▒▒i▒ɋ▒▒▒4%▒▒0\022\024▒@7▒▒h\v▒▒Z\026▒▒▒1\004▒▒\030ңlމl▒▒▒▒.▒▒ٴ▒▒▒▒`▒▒▒0▒7\200▒dX▒`4▒\220h▒▒Ь\"\030\006\f\006\065▒T\rB▒▒▒q\215"...,
-    quantity=1848) at C:/msys32/home/jp/esp/Ka-Radio32/main/vs1053.c:395
-#7  0x400df972 in vsTask (pvParams=0x3ffe7d90)
-    at C:/msys32/home/jp/esp/Ka-Radio32/main/vs1053.c:674
-#8  0x400950f0 in vPortTaskWrapper (pxCode=0x400df914 <vsTask>,
-    pvParameters=0x3ffe7d90)
-    at C:/msys32/home/jp/esp/esp-idf/components/freertos/port.c:143
+//-----------------------------------------------
+static int tp_get_data(uint8_t type, int samples)
+{
+	int n, result, val = 0;
+	uint32_t i = 0;
+	uint32_t vbuf[18];
+	uint32_t minval, maxval, dif;
 
-	
-	
-CORRUPT HEAP: Bad tail at 0x3ffee13c. Expected 0xbaad5678 got 0x0600f444
-assertion "next > (intptr_t)block" failed: file "C:/msys32/home/jp/esp/esp-idf/components/heap/multi_heap.c", line 124, function: get_next_block
-abort() was called at PC 0x400ec877 on core 1
+    if (samples < 3) samples = 1;
+    if (samples > 18) samples = 18;
 
-Backtrace: 0x40091916:0x3ffedb70 0x40091b8d:0x3ffedb90 0x400ec877:0x3ffedbb0 0x4009765f:0x3ffedbe0 0x400d77c3:0x3ffedc10 0x400d77e9:0x3ffedc30 0x4014ee3b:0x3ffedc50 0x400df953:0x3ffedc70 0x400950ed:0x3ffee0b0
+    // one dummy read
+    result = touch_get_data(type);
+
+    // read data
+	while (i < 10) {
+    	minval = 5000;
+    	maxval = 0;
+		// get values
+		for (n=0;n<samples;n++) {
+		    result = touch_get_data(type);
+			if (result < 0) break;
+
+			vbuf[n] = result;
+			if (result < minval) minval = result;
+			if (result > maxval) maxval = result;
+		}
+		if (result < 0) break;
+		dif = maxval - minval;
+		if (dif < 40) break;
+		i++;
+    }
+	if (result < 0) return -1;
+
+	if (samples > 2) {
+		// remove one min value
+		for (n = 0; n < samples; n++) {
+			if (vbuf[n] == minval) {
+				vbuf[n] = 5000;
+				break;
+			}
+		}
+		// remove one max value
+		for (n = 0; n < samples; n++) {
+			if (vbuf[n] == maxval) {
+				vbuf[n] = 5000;
+				break;
+			}
+		}
+		for (n = 0; n < samples; n++) {
+			if (vbuf[n] < 5000) val += vbuf[n];
+		}
+		val /= (samples-2);
+	}
+	else val = vbuf[0];
+
+    return val;
+}
+
+//=============================================
+bool tft_read_touch(int *x, int* y, uint8_t raw)
+{
+	int result = -1;
+    int32_t X=0, Y=0, tmp;
+
+    *x = 0;
+    *y = 0;
+
+    result = tp_get_data(0xB0, 3);
+	if (result > 50)  {
+		// tp pressed
+		result = tp_get_data(0xD0, 10);
+		if (result >= 0) {
+			X = result;
+
+			result = tp_get_data(0x90, 10);
+			if (result >= 0) Y = result;
+		}
+	}
+
+	if (result <= 50) return false;
+
+	if (raw) {
+		*x = X;
+		*y = Y;
+		return true;
+	}
+
+	int xleft   = (tp_calx >> 16) & 0x3FFF;
+	int xright  = tp_calx & 0x3FFF;
+	int ytop    = (tp_caly >> 16) & 0x3FFF;
+	int ybottom = tp_caly & 0x3FFF;
+
+	int width = ILI9341_WIDTH;
+	int height = ILI9341_HEIGHT;
+	if (tft_disp_type == DISP_TYPE_ILI9488) {
+		width = ILI9488_WIDTH;
+		height = ILI9488_HEIGHT;
+	}
+
+	if (((xright - xleft) != 0) && ((ybottom - ytop) != 0)) {
+		X = ((X - xleft) * height) / (xright - xleft);
+		Y = ((Y - ytop) * width) / (ybottom - ytop);
+	}
+	else return 0;
+
+	if (X < 0) X = 0;
+	if (X > height-1) X = height-1;
+	if (Y < 0) Y = 0;
+	if (Y > width-1) Y = width-1;
+
+	switch (orientation) {
+		case PORTRAIT:
+			tmp = X;
+			X = width - Y - 1;
+			Y = tmp;
+			break;
+		case PORTRAIT_FLIP:
+			tmp = X;
+			X = Y;
+			Y = height - tmp - 1;
+			break;
+		case LANDSCAPE_FLIP:
+			X = height - X - 1;
+			Y = width - Y - 1;
+			break;
+	}
+
+	*x = X;
+	*y = Y;
+	return true;
+}
 
 
-	
-	
+
+#if USE_TOUCH
+		if ( tft_read_touch(&tx, &ty, 1)) {
+			printf(" Touched at (%d,%d) [row TS values]\r\n",tx,ty);
+		}
+#endif
+
+
+
+#if USE_TOUCH
+			// Get touch status
+			_fg = TFT_YELLOW;
+			TFT_setFont(DEFAULT_FONT, NULL);
+			if ( tft_read_touch(&tx, &ty, 0)) {
+				// Touched
+				sprintf(buffer, "TOUCH at %d,%d", tx,ty);
+				_fg = TFT_YELLOW;
+				TFT_setFont(DEFAULT_FONT, NULL);
+				TFT_print(buffer, CENTER, 58);
+			}
+			else TFT_fillRect(50, 58, _width-50, tft_getfontheight(), TFT_BLACK);
+#endif
+
+
+#if USE_TOUCH
+	spi_nodma_device_interface_config_t tsdevcfg={
+        .clock_speed_hz=2500000,                //Clock out at 2.5 MHz
+        .mode=0,                                //SPI mode 2
+        .spics_io_num=PIN_NUM_TCS,              //Touch CS pin
+		.spics_ext_io_num=-1,                   //Not using the external CS
+		.command_bits=8,                        //1 byte command
+		.queue_size = 1,
+    };
+#endif

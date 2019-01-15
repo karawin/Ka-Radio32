@@ -28,7 +28,7 @@
 #include "eeprom.h"
 #include "addonu8g2.h"
 #include "addonucg.h"
-#include "XPT2046_Touchscreen_calibrated.h"
+#include "xpt2046.h"
 
 #include "esp_adc_cal.h"
 
@@ -97,9 +97,6 @@ Encoder_t* encoder0 = NULL;
 Encoder_t* encoder1 = NULL;
 Button_t* button0 = NULL;
 Button_t* button1 = NULL;
-
-static XPT2046_Touchscreen* ts;
-//static bool isTouchEnabled = false;
 
 struct tm* getDt() { return dt;}
 
@@ -893,6 +890,7 @@ void customKeyInit()
 }
 
 // touch loop
+/*
 static TS_Point tp;
 bool  getaPoint(TS_Point* tp)
 {
@@ -905,20 +903,19 @@ if(ts != NULL)
 	}
 }
 return false;	
-}
+}*/
 void touchLoop()
 {
-if(ts != NULL)
-{
+int tx,ty;
 	if (isColor)
 	{
-		if (getaPoint(&tp))
-		{
-			ESP_LOGI(TAG,"Touch X: %d, Y: %d, Z: %d",tp.x,tp.y,tp.z);
+		if ( xpt_read_touch(&tx, &ty, 0)) {
+			ESP_LOGI(TAG,"tx: %d, ty: %d",tx,ty);
 		}
 	}
 }
-}
+
+
 // indirect call to service
 IRAM_ATTR void multiService()
 {
@@ -1079,16 +1076,15 @@ void task_addon(void *pvParams)
 	vTaskDelay(1);	
 	wakeLcd();
 	
-/*	
+	
 	//init touch device	if any		
-	gpio_get_touch(&t_cs ,&t_irq);
+/*	gpio_get_touch(&t_cs ,&t_irq);
 	if ((lcd_type & LCD_SPI)&&(t_cs != GPIO_NONE) && (t_irq != GPIO_NONE))
 	{
 		uint8_t spi_no;
 		gpio_get_spi_bus(&spi_no,NULL,NULL,NULL);
-		ts =XPT2046_Touchscreen_init(spi_no, t_cs, t_irq);
-//		isTouchEnabled = true;
-		gpio_intr_enable(ts->tirq);
+		xpt_init(spi_no, t_cs, t_irq);
+
 	}
 */	
 	
@@ -1098,7 +1094,7 @@ void task_addon(void *pvParams)
 		encoderLoop(); // compute the encoder
 		buttonsLoop(); // compute the buttons
 		irLoop();  // compute the ir		
-		touchLoop();
+//		touchLoop();
 		if (itAskTime) // time to ntp. Don't do that in interrupt.
 		{			
 			if (ntp_get_time(&dt) )
