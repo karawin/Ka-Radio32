@@ -32,6 +32,8 @@ P_I2S_BCLK,data,u8,255
 P_I2S_DATA,data,u8,255
 P_ADC,data,u8,255
 P_BACKLIGHT,data,u8,14
+P_JOY_0,data,u8,34
+P_JOY_1,data,u8,35
 custom_ir_space,namespace,,
 K_UP,data,string,
 K_LEFT,data,string,
