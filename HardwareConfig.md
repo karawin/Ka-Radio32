@@ -122,6 +122,10 @@ P_BTN1_A		start/stop, toggle, volume
 P_BTN1_B		+  
 P_BTN1_C		-  
 
+- JOYSTICK 0 & 1  
+P_JOY_0			Volume control  	
+P_JOY_1		
+	
 - Bus I2C (Oled & Lcd):  
 P_I2C_SCL		SCL or SCK  
 P_I2C_SDA		SDA  
@@ -131,6 +135,10 @@ P_I2C_RST		RST if any
 P_LCD_CS		CS  
 P_LCD_A0		A0 or D/C or DC  
 P_LCD_RST		RST or RES  
+
+- LCD CONTROL  
+P_LCD_TYPE		Type of lcd (see addon.h file)  
+P_LCD_ROTA		Control the rotation of the LCD, 0 no rotation, 1: rotation  
 
 - Infrared remote:  
 P_IR_SIGNAL		ir Y Signal  
@@ -146,23 +154,44 @@ P_ADC			gpio32 to 39  or 255 if not used.
 - LCD Backlight:   
 P_BACKLIGHT		GPIO of the hardware device.
 
+- TOUCH SCREEN:  
+P_TOUCH_CS		GPIO of the t_cs pin of the touch or 255 if no screen  
+  Other pins are t_clk, t_din, t_do respectively the spi clk, mosi, miso. T_irq is not used.  
+
+- LED GPIO  
+P_LED_GPIO		GPIO of the status led  
 
 -------------------
 ## Special cases:
 -------------------
+### Some special GPIO
+- GPIOs 34 to 39 are input only pins.  
+These pins don’t have internal pull-ups or pull-down resistors.  
+They can’t be used as outputs, so use these pins only as inputs or ADC usage.  
+   
+- Digital to Analog Converter (DAC)  
+There are 2 x 8 bits DAC channels on the ESP32 to convert digital signals into analog voltage signal outputs.  
+These are the DAC channels:  
+-    DAC1 (GPIO25)  
+-    DAC2 (GPIO26)
+
+	
 ### SPI bus
 
 K_SPI,data,u8,2  
-   2 is the spi VSPI_HOST (default)  
-   1 is the spi HSPI_HOST  
-   The spi bus is initialized in any case. It used for the vs1053 and/or the LCD if needed.
+- 1 is the spi HSPI_HOST  
+- 2 is the spi VSPI_HOST (default)  
+   The spi bus is initialized in any case. It used for the vs1053 and/or the LCD if needed.  
+   Prefered gpio for the spi bus (IOMUX):  
+   HSPI: SCLK=14, MISO=12, MOSI=13  
+   VSPI: SCLK=18, MISO=19, MOSI=23  
    
 
 ### Encoders
 
 Two encoders maximun are supported, each with different actions:  
 Encoder0: the volume control and stations change when pushed and held,  
-Encoder1: the station control and volume change when pushed and heldi.  
+Encoder1: the station control and volume change when pushed and held.  
 
 If P_ENC0_A = 255 the encoder (P_ENC0_A, P_ENC0_B, P_ENC0_BTN) is disabled (not used, the gpio's may be reused elsewhere).    
 If P_ENC1_A = 255 the encoder (P_ENC1_A, P_ENC1_B, P_ENC1_BTN) is disabled (not used, the gpio's may be reused elsewhere).  
@@ -178,6 +207,16 @@ held on button A: click on button B and C: volume down and up for set 1 (P_BTN1)
 
 If a set is not used, P_BTNx_A must be set to 255. In this case P_BTNx_B P_BTNx_C are disabled too.
 
+### Joystick
+A joystick is a set of two buttons but both cannot be pushed at the same time.  
+The GPIO must be an ADC one, i.e gpio32 to 39  or 255 if not used.   
+Joystick 0  controls the volume,  
+Joystick 1 controls the station choice.  
+Botton 0 is 3.3 V  
+Button 1 is 3.3/2 V  
+An example of joystick:  
+![Screenshoot of joystick](http://karadio.karawin.fr/images/joystick.jpg)
+
 ### I2C
 If I2C is not used (ie no lcd or spi lcd) the gpio of the i2C can be reused elsewhere.  
 To disable I2C even a I2C LCD is used: P_I2S_LRCK	and/or P_I2S_BCLK	must be set to 255  
@@ -190,6 +229,7 @@ If IR remote control is not used P_IR_SIGNAL must be set to 255
 
 ### ADC keyboard
 If the ADC keyboard is missing, set P_ADC  to 255.  
+GPIO pin must be gpio32 to 39  or 255 if not used.   
 Compatible with https://github.com/…/Ka-…/blob/master/Hardware/controles.pdf and the one found at https://www.drive2.ru/b/487463808323813881/  
 The stop button is replaced with "Toggle Time/Infos" and "start replaced with "Start/Stop"  
 The ESP32 ADC can be sensitive to noise leading to large discrepancies in ADC readings. To minimize noise, users may connect a 0.1uF capacitor to the ADC input pad in use
@@ -202,7 +242,20 @@ This external device turns off the LCD backlight in addition to the screen clear
 Usefull if a battery is used.  
 If the hardware device is missing, set it to 255
 
-![Screenshoot of download tool](http://karadio.karawin.fr/images/backlight.jpg)
+![Screenshoot of backlight](http://karadio.karawin.fr/images/backlight.jpg)  
+
+### TOUCH SCREEN
+P_TOUCH_CS  of the t_cs pin of the touch or 255 if no screen.  
+Other pins are t_clk, t_din, t_do respectively the spi clk, mosi, miso. T_irq is not used.  
+The screen must be calibrated with the command sys.cali[brate]  
+The screen is divided in 5 zones:  
+- Center: Start/Stop
+- Top: Volume+
+- Bottom: Volume-
+- Left: Station-
+- Bottom: Station+
+
+
 ---------------------
 3/ IR key definitions
 ---------------------
