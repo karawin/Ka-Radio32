@@ -8,25 +8,22 @@
 // Timer-based rotary encoder logic by Peter Dannegger
 // http://www.mikrocontroller.net/articles/Drehgeber
 //
-// Modified for ESP32 IDF
-// (c) 2017 KaRadio
+// Modified for  IDF
+// (c) 2019 KaRadio
 // ----------------------------------------------------------------------------
 
-#ifndef __have__ClickButton_h__
-#define __have__ClickButton_h__
+#ifndef __have__ClickJoystick_h__
+#define __have__ClickJoystick_h__
 
 #include "driver/gpio.h"
+#include "esp_adc_cal.h"
+
 // ---Button defaults-------------------------------------------------------------
 #define ENC_BUTTONINTERVAL    10  // check enc->button every x milliseconds, also debouce time
 #define BTN_DOUBLECLICKTIME  600  // second click within 400ms
 #define BTN_HOLDTIME        1000  // report held button after 1s
 
 // ----------------------------------------------------------------------------
-
-
-
-
-// 
 
 // ----------------------------------------------------------------------------
 typedef gpio_mode_t pinMode_t;
@@ -38,7 +35,10 @@ typedef gpio_mode_t pinMode_t;
 #define LOW 0
 #undef HIGH
 #define HIGH 1
+#undef MIDDLE
+#define MIDDLE 2
 #define digitalRead(x) gpio_get_level((gpio_num_t)x)
+#define NBBUTTONS	2
 
 #ifndef __have__ClickEncoder_h__
   typedef enum Buttons_e {
@@ -53,22 +53,26 @@ typedef gpio_mode_t pinMode_t;
 #endif
 
   typedef struct {
-  int8_t pinBTN[3];
+//  int8_t pinBTN;
+  adc1_channel_t  channel ;
   
   bool pinsActive;
   
-  volatile Button button[3];
+  volatile Button button[NBBUTTONS];
   bool doubleClickEnabled;
   bool buttonHeldEnabled;
-  uint16_t keyDownTicks[3] ;
-  uint16_t doubleClickTicks[3] ; 
-  unsigned long lastButtonCheck[3];
-  } Button_t;	  
+  uint16_t keyDownTicks[NBBUTTONS] ;
+  uint16_t doubleClickTicks[NBBUTTONS] ; 
+  unsigned long lastButtonCheck[NBBUTTONS];
+  } Joystick_t;	  
   
   
-  Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C );
-  void serviceBtn(Button_t *enc); 
-  Button getButtons(Button_t *enc,uint8_t index);
+  Joystick_t* ClickJoystickInit(int8_t A );
+  void serviceJoystick(Joystick_t *enc); 
+  Button getJoystick(Joystick_t *enc,uint8_t index);
+  
+
+
 // ----------------------------------------------------------------------------
 
-#endif // __have__ClickButton_h__
+#endif // __have__ClickJoystick_h__

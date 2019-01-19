@@ -43,7 +43,7 @@ const char strsID[]  = {"getstation, no id or Wrong id %d\n"};
 const char strsRAUTO[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:13\r\n\r\n{\"rauto\":\"%c\"}"};
 const char strsICY[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:%d\r\n\r\n{\"curst\":\"%s\",\"descr\":\"%s\",\"name\":\"%s\",\"bitr\":\"%s\",\"url1\":\"%s\",\"not1\":\"%s\",\"not2\":\"%s\",\"genre\":\"%s\",\"meta\":\"%s\",\"vol\":\"%s\",\"treb\":\"%s\",\"bass\":\"%s\",\"tfreq\":\"%s\",\"bfreq\":\"%s\",\"spac\":\"%s\",\"auto\":\"%c\"}"};
 const char strsWIFI[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:%d\r\n\r\n{\"ssid\":\"%s\",\"pasw\":\"%s\",\"ssid2\":\"%s\",\"pasw2\":\"%s\",\
-\"ip\":\"%s\",\"msk\":\"%s\",\"gw\":\"%s\",\"ip2\":\"%s\",\"msk2\":\"%s\",\"gw2\":\"%s\",\"ua\":\"%s\",\"dhcp\":\"%s\",\"dhcp2\":\"%s\",\"mac\":\"%s\",\"host\":\"%s\"}"};
+\"ip\":\"%s\",\"msk\":\"%s\",\"gw\":\"%s\",\"ip2\":\"%s\",\"msk2\":\"%s\",\"gw2\":\"%s\",\"ua\":\"%s\",\"dhcp\":\"%s\",\"dhcp2\":\"%s\",\"mac\":\"%s\",\"host\":\"%s\",\"tzo\":\"%s\"}"};
 const char strsGSTAT[]  = {"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %d\r\n\r\n{\"Name\":\"%s\",\"URL\":\"%s\",\"File\":\"%s\",\"Port\":\"%d\",\"ovol\":\"%d\"}"};
 
 static int8_t clientOvol = 0;
@@ -805,7 +805,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 	{
 		bool val = false;
 		char tmpip[16],tmpmsk[16],tmpgw[16];
-		char tmpip2[16],tmpmsk2[16],tmpgw2[16];
+		char tmpip2[16],tmpmsk2[16],tmpgw2[16],tmptzo[10];
 		struct device_settings *device;
 		changed = false;		
 		if(data_size > 0) {
@@ -823,6 +823,8 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			pathParse(aua);
 			char* host = getParameterFromResponse("host=", data, data_size);
 			pathParse(host);
+			char* tzo = getParameterFromResponse("tzo=", data, data_size);
+			pathParse(tzo);
 
 			
 //			ESP_LOGV(TAG,"wifi received  valid:%s,val:%d, ssid:%s, pasw:%s, aip:%s, amsk:%s, agw:%s, adhcp:%s, aua:%s",valid,val,ssid,pasw,aip,amsk,agw,adhcp,aua);
@@ -905,7 +907,19 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 				}				
 				infree(host);
 			}
-			
+			if (tzo!=NULL)
+			{ 
+				if (strlen(tzo) >0)
+				{
+					if (strcmp(host,"undefined") != 0)
+					{
+						device->tzoffset= atoi(tzo);
+						addonDt();
+						changed = true;
+					}	
+				}				
+				infree(tzo);
+			}			
 			
 			if (changed)
 			{
@@ -916,13 +930,14 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			char adhcp[4],adhcp2[4];	
 			esp_wifi_get_mac(WIFI_IF_STA,macaddr);		
 			int json_length ;
-			json_length =95+ 39+ 10+
+			json_length =95+ 39+ 10+9+
 			strlen(device->ssid1) +
 			strlen(device->pass1) +
 			strlen(device->ssid2) +
 			strlen(device->pass2) +
 			strlen(device->ua)+
 			strlen(device->hostname)+
+			sprintf(tmptzo,"%d",device->tzoffset)+
 			sprintf(tmpip,"%d.%d.%d.%d",device->ipAddr1[0], device->ipAddr1[1],device->ipAddr1[2], device->ipAddr1[3])+
 			sprintf(tmpmsk,"%d.%d.%d.%d",device->mask1[0], device->mask1[1],device->mask1[2], device->mask1[3])+
 			sprintf(tmpgw,"%d.%d.%d.%d",device->gate1[0], device->gate1[1],device->gate1[2], device->gate1[3])+
@@ -944,7 +959,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			else {			
 				sprintf(buf, strsWIFI,
 				json_length,
-				device->ssid1,device->pass1,device->ssid2,device->pass2,tmpip,tmpmsk,tmpgw,tmpip2,tmpmsk2,tmpgw2,device->ua,adhcp,adhcp2,macstr,device->hostname);
+				device->ssid1,device->pass1,device->ssid2,device->pass2,tmpip,tmpmsk,tmpgw,tmpip2,tmpmsk2,tmpgw2,device->ua,adhcp,adhcp2,macstr,device->hostname,tmptzo);
 				ESP_LOGV(TAG,"wifi Buf len:%d\n%s",strlen(buf),buf);
 				write(conn, buf, strlen(buf));
 				infree(buf);

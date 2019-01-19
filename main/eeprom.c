@@ -20,26 +20,10 @@
 //#include "spi_flash.h"
 //#include <esp_libc.h>
 #include "interface.h"
-/*
-#define ICACHE_STORE_TYPEDEF_ATTR 
-#define ICACHE_STORE_ATTR 
-#define ICACHE_RAM_ATTR 
 
-#define EEPROM_START	0x3E0000 // Last 128k of flash (32Mbits or 4 MBytes)
-#define EEPROM_START1	0x3D0000 // Last 128k of flash (32Mbits or 4 MBytes)
-
-#define EEPROM_SIZE		0xFFFF	 // until xffff , 
-#define NBOLDSTATIONS	192
-*/
 #define NBSTATIONS		255
 const static char *TAG = "eeprom";
 static xSemaphoreHandle muxDevice;
-//const char streMSG[]   = {"Warning %s malloc low memory\n"};
-//const char saveStationPos[]  = {"saveStation fails pos=%d\n"};
-//const char getStationPos[]  = {"getStation fails pos=%d\n"};
-//const char streERASE[]  = {"erase setting1 (only one time) \n"};
-//const char streGETDEVICE[]  = {"getDeviceSetting%d fails\n"};
-//const char streSETDEVICE[]  = {"saveDeviceSetting%d:  null\n"};
 
 const esp_partition_t * DEVICE;
 const esp_partition_t * DEVICE1;
@@ -123,7 +107,7 @@ int i = 0;
 //			eeSetClear(4096*i,buffer);
 			vTaskDelay(1); // avoid watchdog
 		}
-//		printf("erase All done\n");
+		kprintf("#erase All done##\n");
 		free(buffer);
 	} else	
 		ESP_LOGE(TAG,"erase All fails");

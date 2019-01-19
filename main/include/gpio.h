@@ -61,6 +61,11 @@
 #define PIN_BTN1_B   GPIO_NONE		
 #define PIN_BTN1_C 	 GPIO_NONE		
 
+// Joystick (2 buttons emulation on ADC)
+//--------------------------------------
+#define PIN_JOY_0	GPIO_NONE
+#define PIN_JOY_1	GPIO_NONE
+
 // I2C lcd (and rda5807 if lcd is i2c or LCD_NONE)
 //------------------------------------------------
 #define PIN_I2C_SCL GPIO_NUM_14
@@ -115,7 +120,7 @@
 void gpio_output_conf(gpio_num_t gpio);
 
 // get the hardware partition infos
-esp_err_t open_partition(const char *partition_label, const char *namespace,nvs_handle *handle);
+esp_err_t open_partition(const char *partition_label, const char *namespace,nvs_open_mode open_mode,nvs_handle *handle);
 void close_partition(nvs_handle handle,const char *partition_label);
 void gpio_get_spi_bus(uint8_t *spi_no,gpio_num_t *miso,gpio_num_t *mosi,gpio_num_t *sclk);
 void gpio_get_vs1053(gpio_num_t * xcs,gpio_num_t *rst,gpio_num_t *xdcs,gpio_num_t *dreq);
@@ -123,6 +128,8 @@ void gpio_get_encoder0(gpio_num_t *enca, gpio_num_t *encb, gpio_num_t *encbtn);
 void gpio_get_encoder1(gpio_num_t *enca, gpio_num_t *encb, gpio_num_t *encbtn);
 void gpio_get_button0(gpio_num_t *enca, gpio_num_t *encb, gpio_num_t *encc);
 void gpio_get_button1(gpio_num_t *enca, gpio_num_t *encb, gpio_num_t *encc);
+void gpio_get_joystick0(gpio_num_t *enca);
+void gpio_get_joystick1(gpio_num_t *enca);
 void gpio_get_i2c(gpio_num_t *scl,gpio_num_t *sda,gpio_num_t *rsti2c);
 void gpio_get_spi_lcd(gpio_num_t *cs ,gpio_num_t *a0,gpio_num_t *rstlcd);
 void gpio_get_ir_signal(gpio_num_t *ir);
@@ -130,5 +137,11 @@ void gpio_get_adc(adc1_channel_t  *channel);
 void gpio_get_lcd_backlightl(gpio_num_t *lcdb);
 void gpio_get_i2s(gpio_num_t *lrck ,gpio_num_t *bclk ,gpio_num_t *i2sdata );
 bool gpio_get_ir_key(nvs_handle handle,const char *key, int32_t *out_value1 , int32_t *out_value2);
-void gpio_get_touch(gpio_num_t *cs ,gpio_num_t *irq);
+void gpio_get_touch(gpio_num_t *cs);
+void gpio_get_ledgpio(gpio_num_t *enca);
+void gpio_set_ledgpio(gpio_num_t enca);
+void gpio_get_lcd_info(uint8_t *enca,uint8_t* rt);
+void gpio_set_lcd_info(uint8_t enca, uint8_t rt);
+uint8_t gpioToChannel(uint8_t gpio);
+
 #endif

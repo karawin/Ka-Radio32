@@ -12,6 +12,7 @@
 
 #include "ClickEncoder.h"
 #include "ClickButtons.h"
+#include "ClickJoystick.h"
 #include "app_main.h"
 #include "gpio.h"
 #include "webclient.h"
@@ -49,7 +50,7 @@ xQueueHandle event_lcd = NULL;
 u8g2_t u8g2; // a structure which will contain all the data for one display
 ucg_t  ucg;
 static uint8_t lcd_type;
-
+static xTaskHandle  pxTaskLcd;
 // list of screen
 typedef  enum typeScreen {smain,svolume,sstation,snumber,stime,snull} typeScreen ;
 static typeScreen stateScreen = snull;
@@ -91,12 +92,16 @@ static bool isEncoder0 = true;
 static bool isEncoder1 = true;
 static bool isButton0 = true;
 static bool isButton1 = true;
+static bool isJoystick0 = true;
+static bool isJoystick1 = true;
 void Screen(typeScreen st); 
 static void evtDrawScreen();
 Encoder_t* encoder0 = NULL;
 Encoder_t* encoder1 = NULL;
 Button_t* button0 = NULL;
 Button_t* button1 = NULL;
+Joystick_t* joystick1 = NULL;
+Joystick_t* joystick0 = NULL;
 
 struct tm* getDt() { return dt;}
 
@@ -145,6 +150,13 @@ uint16_t GetWidth()
 	  return ucg_GetWidth(&ucg);
 
   return u8g2.width;
+}
+uint16_t GetHeight()
+{
+  if (isColor)
+	  return ucg_GetHeight(&ucg);
+
+  return u8g2.height;
 }
 
 void wakeLcd()
@@ -504,12 +516,7 @@ static void toggletime()
 
 static adc1_channel_t  channel = GPIO_NONE;
 static bool inside = false;
-uint8_t gpioToChannel(uint8_t gpio)
-{
-	if (gpio == GPIO_NONE) return GPIO_NONE;
-	if (gpio >= 38) return (gpio-36);
-	else return (gpio-28);	
-}
+
 void adcInit()
 {
 	gpio_get_adc(&channel);	
@@ -595,16 +602,37 @@ void adcLoop() {
 	}
 }
 
-
+//-----------------------
+ // Compute the Buttons
+ //----------------------
+ void joystickCompute(Joystick_t *enc,bool role)
+ {
+	int16_t newValue = 0;
+	{
+		Button state1 = getJoystick(enc,0);
+		Button state2 = getJoystick(enc,1);
+//		ESP_LOGD(TAG,"Button1: %i, Button2: %i",state1,state2);	
+		newValue=((state1!=Open)?5:0)+((state2!=Open)?-5:0); // sstation take + or - in any value
+		typeScreen estate;
+		if (role) estate = sstation; else estate = svolume;
+		if ((stateScreen  != estate)&&(newValue != 0))
+		{    
+			if(role) setRelVolume(newValue);else evtStation(-newValue);
+			ESP_LOGD(TAG,"Button1: %i, Button2: %i, value: %i",state1,state2,newValue);	
+		} 
+		if ((stateScreen  == estate)&&(newValue != 0))
+		{    
+			if(role) evtStation(-newValue); else setRelVolume(newValue);
+			ESP_LOGD(TAG,"Button1: %i, Button2: %i, value: %i",state1,state2,newValue);		
+		} 			
+	}	 
+ }
 
 //-----------------------
  // Compute the Buttons
  //----------------------
- 
  void buttonCompute(Button_t *enc,bool role)
 {	
-//	typeScreen stateS;
-//	if (role) stateS = sstation; else stateS = svolume;	
 	int16_t newValue = 0;
 	Button state0 = getButtons(enc,0);	
 	if (state0 != Open)
@@ -646,6 +674,8 @@ void buttonsLoop()
 // button1 = station control or volume when pushed
 	if (isButton0) buttonCompute(button0,VCTRL);
 	if (isButton1) buttonCompute(button1,SCTRL);
+	if (isJoystick0) joystickCompute(joystick0,VCTRL);
+	if (isJoystick1) joystickCompute(joystick1,SCTRL);
 }
 
 //-----------------------
@@ -838,7 +868,6 @@ event_ir_t evt;
 	}
 }
  
-
 void initButtonEncoder()
 {
 	struct device_settings *device;
@@ -864,6 +893,15 @@ void initButtonEncoder()
 	if (enca0 == GPIO_NONE) isButton0 = false; //no encoder	
 	if (isButton0)	button0 = ClickButtonsInit(enca0, encb0, encbtn0);	
 	if (isButton1)	button1 = ClickButtonsInit(enca1, encb1, encbtn1 );	
+	
+	gpio_get_joystick0(&enca0);
+	gpio_get_joystick1(&enca1);
+	if (enca0 == GPIO_NONE) isJoystick0 = false; //no encoder
+	if (enca1 == GPIO_NONE) isJoystick1 = false; //no encoder
+
+	if (isJoystick0)	joystick0 = ClickJoystickInit(enca0 );	
+	if (isJoystick1)	joystick1 = ClickJoystickInit(enca1);	
+	
 }
 
 
@@ -876,7 +914,7 @@ void customKeyInit()
 	const char *klab[] = {"K_UP","K_LEFT","K_OK","K_RIGHT","K_DOWN","K_0","K_1","K_2","K_3","K_4","K_5","K_6","K_7","K_8","K_9","K_STAR","K_DIESE","K_INFO"};
 	
 	memset(&customKey,0,sizeof(uint32_t)*2*KEY_MAX); // clear custom
-	if (open_partition(hardware, "custom_ir_space",&handle)!= ESP_OK) return;
+	if (open_partition(hardware, "custom_ir_space",NVS_READONLY,&handle)!= ESP_OK) return;
 		
 	for (index = KEY_UP; index < KEY_MAX;index++)
 	{
@@ -890,27 +928,35 @@ void customKeyInit()
 }
 
 // touch loop
-/*
-static TS_Point tp;
-bool  getaPoint(TS_Point* tp)
-{
-if(ts != NULL)
-{
-	if (touched(ts))
-	{
-		getPoint(ts,tp);
-		return true;
-	}
-}
-return false;	
-}*/
+
 void touchLoop()
 {
 int tx,ty;
-	if (isColor)
+	if (haveTouch())
 	{
 		if ( xpt_read_touch(&tx, &ty, 0)) {
-			ESP_LOGI(TAG,"tx: %d, ty: %d",tx,ty);
+			ESP_LOGD(TAG,"tx: %d, ty: %d",tx,ty);
+			uint16_t width = GetWidth();
+			uint16_t height = GetHeight();
+			uint16_t xdiv2 = width/2;
+			uint16_t xdiv6 = width/6;
+			uint16_t ydiv2 = height/2;
+			uint16_t ydiv6 = height/6;
+			uint16_t xl = xdiv2-xdiv6;
+			uint16_t xh = xdiv2+xdiv6;
+			uint16_t yl = ydiv2-ydiv6;
+			uint16_t yh = ydiv2+ydiv6;
+			if ((ty > yl) && (ty < yh))
+			{
+				if ((tx > xl) && (tx < xh)) startStop(); // center
+				else {
+					if (tx < xl) evtStation(-1); // 
+					else evtStation(+1);// evtStation(1);
+				}
+			} else 
+				if (ty < yl) setRelVolume(+5); 
+			else setRelVolume(-5); 
+			
 		}
 	}
 }
@@ -923,6 +969,8 @@ IRAM_ATTR void multiService()
 	if (isEncoder1) service(encoder1);
 	if (isButton0) serviceBtn(button0);
 	if (isButton1) serviceBtn(button1);
+	if (isJoystick0) serviceJoystick(joystick0);
+	if (isJoystick1) serviceJoystick(joystick1);
 	ServiceAddon();
 }
 //--------------------
@@ -1049,10 +1097,9 @@ void task_lcd(void *pvParams)
 // Main task of addon
 //------------------- 
 extern void rmt_nec_rx_task();
+
 void task_addon(void *pvParams)
 {
-	gpio_num_t t_cs;
-	gpio_num_t t_irq;
 	xTaskHandle pxCreatedTask;
 	customKeyInit();
 	initButtonEncoder();
@@ -1071,30 +1118,19 @@ void task_addon(void *pvParams)
 	
 	xTaskCreatePinnedToCore(rmt_nec_rx_task, "rmt_nec_rx_task", 2148, NULL, PRIO_RMT, &pxCreatedTask,CPU_RMT);
 	ESP_LOGI(TAG, "%s task: %x","rmt_nec_rx_task",(unsigned int)pxCreatedTask);		;
-	xTaskCreatePinnedToCore (task_lcd, "task_lcd", 2200, NULL, PRIO_LCD, &pxCreatedTask,CPU_LCD); 
-	ESP_LOGI(TAG, "%s task: %x","task_lcd",(unsigned int)pxCreatedTask);
+	xTaskCreatePinnedToCore (task_lcd, "task_lcd", 2200, NULL, PRIO_LCD, &pxTaskLcd,CPU_LCD); 
+	ESP_LOGI(TAG, "%s task: %x","task_lcd",(unsigned int)pxTaskLcd);
+	getTaskLcd(&pxTaskLcd); // give the handle to xpt
 	vTaskDelay(1);	
 	wakeLcd();
-	
-	
-	//init touch device	if any		
-/*	gpio_get_touch(&t_cs ,&t_irq);
-	if ((lcd_type & LCD_SPI)&&(t_cs != GPIO_NONE) && (t_irq != GPIO_NONE))
-	{
-		uint8_t spi_no;
-		gpio_get_spi_bus(&spi_no,NULL,NULL,NULL);
-		xpt_init(spi_no, t_cs, t_irq);
-
-	}
-*/	
 	
 	while (1)
 	{
 		adcLoop();  // compute the adc keyboard
 		encoderLoop(); // compute the encoder
-		buttonsLoop(); // compute the buttons
+		buttonsLoop(); // compute the buttons and joysticks
 		irLoop();  // compute the ir		
-//		touchLoop();
+		touchLoop();
 		if (itAskTime) // time to ntp. Don't do that in interrupt.
 		{			
 			if (ntp_get_time(&dt) )

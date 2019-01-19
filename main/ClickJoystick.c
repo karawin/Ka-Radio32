@@ -13,28 +13,35 @@
 #include <string.h>
 #include <stdio.h>
 #include <sys/time.h>
-#include "ClickButtons.h"
+#include "ClickJoystick.h"
 #include "app_main.h"
+#include "gpio.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "esp_log.h"
 
 // ----------------------------------------------------------------------------
 
-#define TAG "ClickButton"
-bool getPinStates(Button_t *enc,uint8_t index);  
+#define TAG "ClickJoystick"
+ void getJoyStates(Joystick_t *enc, bool *ps); 
 // ----------------------------------------------------------------------------
 
-//bool getpinsActives(Button_t *enc) {return enc->pinsActive;}
+//bool getpinsActives(Joystick_t *enc) {return enc->pinsActive;}
 
-Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C)
+Joystick_t* ClickJoystickInit(int8_t A)
 {
-	Button_t* enc = malloc(sizeof(Button_t));
-	enc->pinBTN[0] = A; 
-	enc->pinBTN[1] = B;
-	enc->pinBTN[2] = C;
-
-	enc->pinsActive = LOW; 
-	for (int i=0;i<3;i++)
+	Joystick_t* enc = malloc(sizeof(Joystick_t));
+	if (enc == NULL) return enc;
+	enc->channel = gpioToChannel(A); 
+	ESP_LOGD(TAG,"Joystick Channel: %i",enc->channel);
+	if (enc->channel != GPIO_NONE)
+	{
+		adc1_config_width(ADC_WIDTH_BIT_12);
+		adc1_config_channel_atten(enc->channel, ADC_ATTEN_DB_11);
+	}
+	
+	enc->pinsActive = HIGH; 
+	for (int i=0;i<NBBUTTONS;i++)
 	{
 		enc->button[i] = Open;
 		enc->keyDownTicks[i] = 0;
@@ -43,29 +50,6 @@ Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C)
 	}
 	enc->doubleClickEnabled = true; enc->buttonHeldEnabled = true;
 
-	gpio_config_t gpio_conf;
-	gpio_conf.mode = GPIO_MODE_INPUT;
-	gpio_conf.pull_up_en =  (enc->pinsActive == LOW) ?GPIO_PULLUP_ENABLE : GPIO_PULLUP_DISABLE;
-	gpio_conf.pull_down_en = (enc->pinsActive == LOW) ?GPIO_PULLDOWN_DISABLE : GPIO_PULLDOWN_ENABLE;
-	gpio_conf.intr_type = GPIO_INTR_DISABLE;	
-
-  if (enc->pinBTN[0] > 0) 
-  {
-	gpio_conf.pin_bit_mask = BIT(enc->pinBTN[0]);
-	gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<enc->pinBTN[0]));
-	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
-  }
-  if (enc->pinBTN[1] > 0) 
-  {
-	gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<enc->pinBTN[1]));
-	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
-  }
-  if (enc->pinBTN[2] > 0) 
-  {
-	gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<enc->pinBTN[2]));
-	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
-  }
-  
   return enc;
 }
 
@@ -73,23 +57,23 @@ Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C)
 // call this every 1 millisecond via timer ISR
 //
 //void (*serviceEncoder)() = NULL;
-IRAM_ATTR void serviceBtn(Button_t *enc)
+IRAM_ATTR void serviceJoystick(Joystick_t *enc)
 {
   // handle enc->button
   //
   unsigned long currentMillis = xTaskGetTickCount()* portTICK_PERIOD_MS;
-  
-  for(uint8_t i = 0; i < 3; i++) 
+  bool pinRead[NBBUTTONS];
+  getJoyStates(enc, pinRead);
+  for(uint8_t i = 0; i < NBBUTTONS; i++) 
   {
 	if (currentMillis < enc->lastButtonCheck[i]) enc->lastButtonCheck[i] = 0;        // Handle case when millis() wraps back around to zero
-	if ((enc->pinBTN[i] > 0 )        // check enc->button only, if a pin has been provided
-		&& ((currentMillis - enc->lastButtonCheck[i]) >= ENC_BUTTONINTERVAL))            // checking enc->button is sufficient every 10-30ms
+	if (((currentMillis - enc->lastButtonCheck[i]) >= ENC_BUTTONINTERVAL))            // checking enc->button is sufficient every 10-30ms
 	{ 
 		enc->lastButtonCheck[i] = currentMillis;
 
-		bool pinRead = getPinStates(enc,i);
+		
     
-		if (pinRead == enc->pinsActive) { // key is down
+		if (pinRead[i] == true) { // key is down
 			enc->keyDownTicks[i]++;
 			if ((enc->keyDownTicks[i] > (BTN_HOLDTIME / ENC_BUTTONINTERVAL)) && (enc->buttonHeldEnabled)) 
 			{
@@ -97,7 +81,7 @@ IRAM_ATTR void serviceBtn(Button_t *enc)
 			}
 		}
 
-		if (pinRead == !enc->pinsActive) { // key is now up
+		if (pinRead[i] == false) { // key is now up
 			if (enc->keyDownTicks[i] > 1) {               //Make sure key was down through 1 complete tick to prevent random transients from registering as click
 			if (enc->button[i] == Held) {
 				enc->button[i] = Released;
@@ -131,10 +115,11 @@ IRAM_ATTR void serviceBtn(Button_t *enc)
 }
 
 // ----------------------------------------------------------------------------
-Button getButtons(Button_t *enc,uint8_t index)
+Button getJoystick(Joystick_t *enc,uint8_t index)
 {
   noInterrupts();
   Button ret = enc->button[index];
+  if (ret != Open) ESP_LOGD(TAG,"getJoystick %d = %d",index,ret);
   if (enc->button[index] != Held && ret != Open) {
     enc->button [index]= Open; // reset
   }
@@ -144,12 +129,17 @@ Button getButtons(Button_t *enc,uint8_t index)
 
 
 
-bool getPinStates(Button_t *enc,uint8_t index) {
-  bool pinState;
+void getJoyStates(Joystick_t *enc, bool *ps) {
   {
-    pinState = digitalRead(enc->pinBTN[index]);
+	uint32_t voltage;
+	adc1_channel_t  chan = enc->channel;
+ //   pinState = digitalRead(enc->pinBTN[index]);
+	voltage = (adc1_get_raw(chan)+adc1_get_raw(chan))/2;
+//	voltage = (voltage)*110/(409);
+	if (voltage < 1000) {ps[0] = false; ps[1] = false;} 
+	if (voltage >3000) {ps[0] = true; ps[1] = false;} 
+	if ((voltage >= 1000)&&(voltage <= 3000)) {ps[0] = false; ps[1] = true;} 	
   }
-  return pinState;
 }
 
   

@@ -22,6 +22,7 @@
 #include "addon.h"
 #include "addonu8g2.h"
 #include "app_main.h"
+#include "xpt2046.h"
 //#include "rda5807Task.c"
 #include "ClickEncoder.h"
 #include "lwip/sockets.h"
@@ -130,6 +131,7 @@ sys.rotat(\"x\"): Change and display the lcd rotation option (reset needed). 0:n
 sys.henc0 or sys.henc1: Display the current step setting for the encoder. Normal= 4 steps/notch, Half: 2 steps/notch\
 sys.henc0(\"x\") with x=0 Normal, x=1 Half\
 sys.henc1(\"x\") with x=0 Normal, x=1 Half\
+sys.calibrate: start a touch screen calibration\
 ///////////\n\
   Other\n\
 ///////////\n\
@@ -142,7 +144,7 @@ A command error display:\n\
 }; 
 
 uint16_t currentStation = 0;
-static uint8_t led_gpio = GPIO_NONE;
+static gpio_num_t led_gpio = GPIO_NONE;
 static IRAM_ATTR uint32_t lcd_out = 0xFFFFFFFF;
 static esp_log_level_t s_log_default_level = CONFIG_LOG_BOOTLOADER_LEVEL;
 extern void wsVol(char* vol);
@@ -167,7 +169,8 @@ uint8_t getRotat()
 }
 void setRotat(uint8_t dm)
 {
-	rotat = dm;
+	if (dm == 0) rotat = 0;
+	else rotat = 1;
 }
 static bool autoWifi = true; // auto reconnect wifi if disconnected
 bool getAutoWifi(void)
@@ -323,6 +326,9 @@ void wifiConnect(char* cmd)
 	devset->current_ap = 1;
 	devset->dhcpEn1 = 1;
 	saveDeviceSettings(devset);
+	// test Save device to device1
+	copyDeviceSettings();
+	//
 	kprintf("#WIFI.CON#\n");
 	kprintf("\n##AP1: %s with dhcp on next reset#\n",devset->ssid1);
 	kprintf("##WIFI.CON#\n");
@@ -731,7 +737,9 @@ void sysledgpio(char* s)
 	led_gpio = value;
 	gpio_output_conf(value);
 	saveDeviceSettings(device);	
+	gpio_set_ledgpio(value); // write in nvs if any
 	kprintf("##Led GPIO is now %d\n",value);
+	led_gpio = GPIO_NONE;
 	free(device);	
 }
 uint8_t getLedGpio()
@@ -739,12 +747,12 @@ uint8_t getLedGpio()
 	struct device_settings *device;
 	if (led_gpio == GPIO_NONE)
 	{
+		gpio_get_ledgpio(&led_gpio);
 		device = getDeviceSettings();
 		if (device != NULL)
 		{
-			led_gpio = device->led_gpio;
-			if (led_gpio == 0) {
-				led_gpio = GPIO_LED;
+			if (led_gpio != device->led_gpio) 
+			{
 				device->led_gpio = led_gpio;
 				saveDeviceSettings(device);
 			}
@@ -776,6 +784,7 @@ void syslcd(char* s)
 	uint8_t value = atoi(t+2);
 	device->lcd_type = value; 
 	saveDeviceSettings(device);	
+	gpio_set_lcd_info(value,rotat );
 	kprintf("##LCD is in %d on next reset#\n",value);
 	free(device);	
 
@@ -902,6 +911,7 @@ void sysrotat(char* s)
 	else 
 		device->options32 |= T_ROTAT;
 	rotat = value;
+	gpio_set_lcd_info(device->lcd_type,rotat );
 	saveDeviceSettings(device);	
 	if (rotat)
 		kprintf("on#\n");
@@ -1217,6 +1227,7 @@ void checkCommand(int size, char* s)
 		else if(strcmp(tmp+4, "logd") == 0) 	setLogLevel(ESP_LOG_DEBUG); 
 		else if(strcmp(tmp+4, "logv") == 0) 	setLogLevel(ESP_LOG_VERBOSE); 
 		else if(strcmp(tmp+4, "dlog") == 0) 	displayLogLevel();
+		else if(strncmp(tmp+4, "cali",4) == 0) 	xpt_calibrate();
 		else if(startsWith(   "log",tmp+4)) 	; // do nothing
 		else if(startsWith (  "lcdo",tmp+4)) 	syslcdout(tmp); // lcdout timer to switch off the lcd
 		else if(startsWith (  "lcd",tmp+4)) 	syslcd(tmp);

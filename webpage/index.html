@@ -45,7 +45,7 @@
 			<div class="LEFT"><img title="Click on the logo to change the theme" onClick= "theme()" src="logo.png"></div>
 			<div class="RIGHT">
 			<a href="https://github.com/karawin/Ka-Radio32" target="_blank">KaraDio32</a><br/>
-			<a href="https://github.com/karawin/Ka-Radio32" target="_blank">V1.6 R4</a><br/>
+			<a href="https://github.com/karawin/Ka-Radio32" target="_blank">V1.7 R0</a><br/>
 			<div id="rssi" >0 dBm</div><br/>
 <!--			<a href="https://github.com/PiotrSperka/ESP8266-WebRadio" style="font-size:8px" target="_blank">From PiotrSperka</a> -->
 			</div>
@@ -225,13 +225,15 @@
 						<span class="bold">Gateway:</span>
 						<input id="gw" type="text" oninput="chkip(this)" /><input id="gw2" type="text" oninput="chkip(this)" />
 							</p>						
-					<h1>Network options &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="Validate" onclick="wifi(0)" /></h1>
+					<h1>Other options &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="Validate" onclick="wifi(0)" /></h1>
 						<p>						
 						<span class="bold">User Agent:</span>
 						<input id="ua" type="text" value="" />	<br/>					
 						<span class="bold">mDNS Hostname:</span>
 						<input id="host" type="text" value="" />
-						<span class="bold">.local</span>
+						<span class="bold">.local</span><br/>
+						<span class="bold">Time Zone:</span>
+						<input id="tzo" type="text" value="" />						
 						</p>
 					<h1>Update to: <span id="newrelease"></span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type=button value="Update now" onclick="upgrade()" />  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="updatefb"></span><br/>	</h1>
 						<p>

@@ -36,7 +36,7 @@ Copyright (C) 2017  KaraWin
 #include "esp_event_loop.h"
 #include "esp_log.h"
 #include "esp_ota_ops.h"
-#include "esp_heap_trace.h"
+//#include "esp_heap_trace.h"
 #include "nvs_flash.h"
 #include "driver/i2s.h"
 #include "driver/uart.h"
@@ -380,8 +380,8 @@ static void start_wifi()
     ESP_LOGI(TAG, "starting wifi");
 	wifi_mode_t mode;
 	struct device_settings *device;	
-	char ssid[32]; 
-	char pass[64];
+	char ssid[SSIDLEN]; 
+	char pass[PASSLEN];
 	device = getDeviceSettings();
 	
 	wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
@@ -805,10 +805,12 @@ void app_main()
 	ESP_LOGI(TAG, "Hardware init done...");
 	//ESP_LOGE(TAG,"Corrupt1 %d",heap_caps_check_integrity(MALLOC_CAP_DMA,1));
 	
+	uint8_t rt;
+	gpio_get_lcd_info(&device->lcd_type,&rt);
 	ESP_LOGI(TAG,"LCD Type %d",device->lcd_type);
 	//lcd rotation
-	setRotat((device->options32)&T_ROTAT) ;	
-	
+	setRotat(rt) ;	
+
 	lcd_init(device->lcd_type);
 	
 /*	
@@ -894,7 +896,7 @@ void app_main()
 // queue for events of the sleep / wake and Ms timers
 	event_queue = xQueueCreate(30, sizeof(queue_event_t));
 	// led blinks
-	xTaskCreatePinnedToCore(timerTask, "timerTask",1900, NULL, PRIO_TIMER, &pxCreatedTask,CPU_TIMER); 
+	xTaskCreatePinnedToCore(timerTask, "timerTask",2000, NULL, PRIO_TIMER, &pxCreatedTask,CPU_TIMER); 
 	ESP_LOGI(TAG, "%s task: %x","t0",(unsigned int)pxCreatedTask);		
 	
 	
