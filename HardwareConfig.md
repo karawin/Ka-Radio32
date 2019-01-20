@@ -207,8 +207,8 @@ held on button A: click on button B and C: volume down and up for set 1 (P_BTN1)
 
 If a set is not used, P_BTNx_A must be set to 255. In this case P_BTNx_B P_BTNx_C are disabled too.
 
-### Joystick
-A joystick is a set of two buttons but both cannot be pushed at the same time.  
+### D-pad
+A D-pad is a set of two buttons but both cannot be pushed at the same time.  
 The GPIO must be an ADC one, i.e gpio32 to 39  or 255 if not used.   
 Joystick 0  controls the volume,  
 Joystick 1 controls the station choice.  
