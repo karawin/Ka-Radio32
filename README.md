@@ -1,10 +1,8 @@
 ## STATE
-Release 1.6 Stable
+Release 1.7 Stable
 
 Works on any esp32 board.  
 See the boards directory for a list of pre-configured boards.
-
-See the feature on https://hackaday.io/project/11570-wifi-webradio-with-esp8266-and-vs1053.  
 - The esp32 adds the output on the internal dac or with i2s to an external dac but only mp3 stations can be played.  
 Adding a vs1053 board, all stations can be played.  
 Compatible with esp8266 KaRadio addons.  
@@ -21,7 +19,7 @@ Found it at
 https://play.google.com/store/apps/details?id=com.serasidis.karadio.rc
 
 Thanks Vassilis.
-## Added features
+## Added features from KaRadio
 Work with i2s, internal DAC or a vs1053.  
 Output mode set in Setting panel on web page of KaraDio32 :
 
@@ -29,29 +27,41 @@ Output mode set in Setting panel on web page of KaraDio32 :
 - I2SMERUS to connect a merus amplifier
 - DAC to use the built in DAC of the esp32
 - PDM to output a PDM (Pulse Density Modulation) stream
-- VS1053 to connect to a vs1053 board.
+- VS1053 to connect to a vs1053 board, I2S output of the vs1053 enabled.
+- all VS1053 tones control
 
-Others features :
+### Others features :
 
+- Interfaces available on serial, telnet and html
+- up to 255 editable stations.
+- Stations can be saved and restored from html in and from a file.
+- Hardware configuration file to adapt the standard delivery to all boards and addons you need.
 - mDNS support.
-- Latin, Cyrillic and Greek support.
-- 24 types of lcd or oled  B/W or Color supported.
+- wrover esp32 support. About 10 seconds of buffering, and soon A2DP support (sink and source)
+- Time Zone Offset support.
+- Latin, Cyrillic and Greek support on screen.
+- 28 types of lcd or oled  B/W or Color supported.
+- Programmable lcd backlight off timer.
+- Touch screen if the hardware supports it.
+- Two joysticks (set of two adc buttons), one for volume, one for stations.
 - Two max  rotary encoders. One for volume priority, one for station change priority.
 - Two max set of 3 buttons. One for volume priority, one for station change priority.
+- Rotary encoder and set of buttons support included. Common functions : play/stop, volume, station change, date time display.
 - ADC keyboard with 6 buttons.
 - NEC ir remote control.
-- Programmable lcd off timer
 - Date format DD:MM:YYYY or MM:DD:YYYY .
 - Remote IR support integrated. Nec protocol only.
-- Rotary encoder and set of buttons support included. Common functions : play/stop, volume, station change, date time display.
-
+- Two configurable access points .
+- OTA (Over The Air) update of the software.
+- many more configurable parameters. See 
+[Interfaces document](Interface.md )
 ## Configure the hardware and IR codes
 If the default configuration doesn't fit your needs, you can externally configure the software to fit your hardware and peripherals to suit your needs.  
-The configuration file is to be flashed only one time. After that, the standard delivery will become compatible with your hardware gpio use and peripherals configuration. A future standard OTA will automatically works.  
-See : https://github.com/karawin/Ka-Radio32/blob/master/HardwareConfig.md
+The configuration file is to be flashed only one time. After, the standard delivery will become compatible with your hardware gpio use and peripherals configuration. A future standard OTA will automatically works for your configuration.  
+See : [Hardware configuration partition](HardwareConfig.md)
 
 ## Build your own
-To build your own release, you must install the idf https://github.com/espressif/esp-idf and the toolchain.
+To build your own release if you want to do some improvments, you must install the idf https://github.com/espressif/esp-idf and the toolchain.
 
 To flash all build output, run 'make flash' or :
 
@@ -66,12 +76,14 @@ python /home/yourhome/esp/esp-idf/components/esptool_py/esptool/esptool.py \
 ```
 ### GPIO Definition 
 The default configuration is given below. It includes an encoder, an IR remote and a LCD or OLED.  
+To add or edit GPIO definitions and add or remove some devices, you may need a hardware configuration file. Some examples are in the boards directory.  
 See the file main/include/gpio.h and main/include/addon.h
 
 ```
-//-------------------------------//
-// Define GPIO used in KaRadio32 //
-//-------------------------------//
+//--------------------------------------//
+// Define GPIO used in KaRadio32        //
+// if no external configuration is used //
+//--------------------------------------//
 // Compatible ESP32 ADB
 // https://www.tindie.com/products/microwavemont/esp32-audio-developing-board-esp32-adb/
 // Default value, can be superseeded by the hardware partition.
@@ -118,11 +130,17 @@ See the file main/include/gpio.h and main/include/addon.h
 #define PIN_BTN1_B   GPIO_NONE		
 #define PIN_BTN1_C 	 GPIO_NONE		
 
+// Joystick (2 buttons emulation on ADC)
+//--------------------------------------
+#define PIN_JOY_0	GPIO_NONE
+#define PIN_JOY_1	GPIO_NONE
+
 // I2C lcd (and rda5807 if lcd is i2c or LCD_NONE)
 //------------------------------------------------
 #define PIN_I2C_SCL GPIO_NUM_14
 #define PIN_I2C_SDA GPIO_NUM_13
 #define PIN_I2C_RST	GPIO_NUM_2		// or not used
+
 
 // SPI lcd
 //---------
@@ -135,6 +153,7 @@ See the file main/include/gpio.h and main/include/addon.h
 //-----------
 #define PIN_IR_SIGNAL GPIO_NUM_21	// Remote IR source
 
+
 // I2S DAC or PDM output
 //-----------------------
 #define PIN_I2S_LRCK GPIO_NUM_25	// or Channel1
@@ -146,6 +165,9 @@ See the file main/include/gpio.h and main/include/addon.h
 
 // LCD backlight control
 #define PIN_LCD_BACKLIGHT	GPIO_NONE // the gpio to be used in custom.c 
+
+// touch screen  T_DO is MISO, T_DIN is MOSI, T_CLK is CLk of the spi bus
+#define PIN_TOUCH_CS	GPIO_NONE //Chip select T_CS
 
 ```
 ### LCD or oled declaration  
@@ -193,15 +215,15 @@ You can configure the kind of display used in your configuration with the comman
   
 
 ## First use
-- If the acces point of your router is not known, the webradio inits itself as an AP. Connect the wifi of your computer to the ssid "WifiKaRadio",  
+- If the access point of your router is not known, the webradio initialize itself as an AP. Connect the wifi of your computer to the ssid "WifiKaRadio",  
 - Browse to 192.168.4.1 to display the page, got to "setting" "Wifi" and configure your ssid ap, the password if any, the wanted IP or use dhcp if you know how to retrieve the dhcp given ip (terminal or scan of the network).
 - In the gateway field, enter the ip address of your router.
 - Validate. The equipment restart to the new configuration. Connect your wifi to your AP and browse to the ip given in configuration.
-- Congratulation, you can edit your own station list. Dont forget to save your stations list in case of problem or for new equipments.
+- Congratulation, you can edit your own station list. Don't forget to save your stations list in case of problem or for new equipments.
 - if the AP is already know by the esp32, the default ip is given by dhcp.
 - a sample of stations list is on http://karadio.karawin.fr/WebStations.txt . Can be uploaded via the web page.        
 
-To flash your KaRadio32 without generating it,you will need the files in the binaries directory:
+To flash your KaRadio32 without generating it, you will need the files in the binaries directory.
 
 The tool to use is here :  
 http://espressif.com/en/support/download/other-tools  
@@ -212,7 +234,9 @@ http://karadio.karawin.fr/karawin32Flash.jpg
 
 ![Screenshoot of download tool](https://raw.githubusercontent.com/karawin/Ka-Radio32/master/images/downloadtool32.jpg)
 
-### The scheme from tomasf71 :  
+### The scheme from tomasf71 : 
+Just an example of a realization.  
+ 
 ![Scheme](https://raw.githubusercontent.com/karawin/Ka-Radio32/master/images/schemekaradio32.jpg)
 
 ## Audio output

@@ -99,8 +99,6 @@
 
 // touch screen  T_DO is MISO, T_DIN is MOSI, T_CLK is CLk of the spi bus
 #define PIN_TOUCH_CS	GPIO_NONE //Chip select T_CS
-#define PIN_TOUCH_IRQ	GPIO_NONE //Interrupt T_IRQ
-
 
 // I2C rda5807 (if lcd is spi)
 // (removed)
@@ -140,8 +138,12 @@ bool gpio_get_ir_key(nvs_handle handle,const char *key, int32_t *out_value1 , in
 void gpio_get_touch(gpio_num_t *cs);
 void gpio_get_ledgpio(gpio_num_t *enca);
 void gpio_set_ledgpio(gpio_num_t enca);
-void gpio_get_lcd_info(uint8_t *enca,uint8_t* rt);
-void gpio_set_lcd_info(uint8_t enca, uint8_t rt);
+void option_get_lcd_info(uint8_t *enca,uint8_t* rt);
+void option_set_lcd_info(uint8_t enca, uint8_t rt);
+void option_get_ddmm(uint8_t *enca);
+void option_set_ddmm(uint8_t enca);
+void option_get_lcd_out(uint32_t *enca);
+void option_set_lcd_out(uint32_t enca);
 uint8_t gpioToChannel(uint8_t gpio);
 
 #endif

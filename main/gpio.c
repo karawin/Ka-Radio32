@@ -5,7 +5,7 @@
 *******************************************************************************/
 
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
-#define TAG "gpio"
+#define TAG "GPIO"
 #include "driver/gpio.h"
 #include "gpio.h"
 #include "nvs_flash.h"
@@ -93,36 +93,108 @@ void gpio_get_vs1053(gpio_num_t * xcs,gpio_num_t *rst,gpio_num_t *xdcs,gpio_num_
 }
 
 
-void gpio_get_lcd_info(uint8_t *enca,uint8_t* rt)
+void option_get_lcd_info(uint8_t *enca,uint8_t* rt)
 {
 	esp_err_t err;
 	nvs_handle hardware_handle;
+	uint8_t typ,rot;
 	// init default
 	struct device_settings* device = getDeviceSettings();
 	*enca = device->lcd_type;
 	*rt = ((device->options32)&T_ROTAT)?1:0;
 	free(device);
-	if (open_partition(hardware, "gpio_space",NVS_READONLY,&hardware_handle)!= ESP_OK) return;
+	if (open_partition(hardware, "option_space",NVS_READONLY,&hardware_handle)!= ESP_OK) return;
 	
-	err = nvs_get_u8(hardware_handle, "P_LCD_TYPE",(uint8_t *) enca);
-	err |= nvs_get_u8(hardware_handle, "P_LCD_ROTA",(uint8_t *) rt);
-	if (err != ESP_OK) ESP_LOGD(TAG,"gpio_get_lcd_info error 0x%x",err);
+	err = nvs_get_u8(hardware_handle, "O_LCD_TYPE",(uint8_t *) &typ);
+	err |= nvs_get_u8(hardware_handle, "O_LCD_ROTA",(uint8_t *) &rot);
+	if (typ != 255) *enca = typ;
+	if (rot != 255) *rt = rot;
+	if (*rt) *rt = 1;
+	if (err != ESP_OK) ESP_LOGD(TAG,"option_get_lcd_info error 0x%x",err);
 	close_partition(hardware_handle,hardware);		
 }
-void gpio_set_lcd_info(uint8_t enca, uint8_t rt)
+void option_set_lcd_info(uint8_t enca, uint8_t rt)
 {
 	esp_err_t err;
 	nvs_handle hardware_handle;
 
-	if (open_partition(hardware, "gpio_space",NVS_READWRITE,&hardware_handle)!= ESP_OK) return;
+	if (open_partition(hardware, "option_space",NVS_READWRITE,&hardware_handle)!= ESP_OK) return;
 	
-	err = nvs_set_u8(hardware_handle, "P_LCD_TYPE",enca);
-	err |= nvs_set_u8(hardware_handle, "P_LCD_ROTA",rt?1:0);
-	ESP_LOGW(TAG,"gpio_set_lcd_info after rt %d  %d",rt?1:0, rt);
-	if (err != ESP_OK) ESP_LOGD(TAG,"gpio_set_lcd_info error 0x%x",err);
+	err = nvs_set_u8(hardware_handle, "O_LCD_TYPE",enca);
+	err |= nvs_set_u8(hardware_handle, "O_LCD_ROTA",rt?1:0);
+	if (err != ESP_OK) ESP_LOGD(TAG,"option_set_lcd_info error 0x%x",err);
 
 	close_partition(hardware_handle,hardware);		
 }
+
+void option_get_ddmm(uint8_t *enca)
+{
+	esp_err_t err;
+	nvs_handle hardware_handle;
+	uint8_t dmm;
+	// init default
+	struct device_settings* device = getDeviceSettings();
+	*enca = ((device->options32)&T_DDMM)?1:0;;	
+	free(device);
+	
+	if (open_partition(hardware, "option_space",NVS_READONLY,&hardware_handle)!= ESP_OK) return;
+	
+	err = nvs_get_u8(hardware_handle, "O_DDMM_FLAG",(uint8_t *) &dmm);
+	if (dmm != 255) *enca = dmm;
+	if (*enca) *enca = 1;
+	if (err != ESP_OK) ESP_LOGD(TAG,"option_get_ddmm error 0x%x",err);
+	
+	close_partition(hardware_handle,hardware);		
+}
+void option_set_ddmm(uint8_t enca)
+{
+	esp_err_t err;
+	nvs_handle hardware_handle;
+
+	if (open_partition(hardware, "option_space",NVS_READWRITE,&hardware_handle)!= ESP_OK) return;
+	
+	err = nvs_set_u8(hardware_handle, "O_DDMM_FLAG",enca?1:0);
+	if (err != ESP_OK) ESP_LOGD(TAG,"option_set_ddmm error 0x%x",err);
+
+	close_partition(hardware_handle,hardware);		
+}
+
+void option_get_lcd_out(uint32_t *enca)
+{
+	esp_err_t err;
+	nvs_handle hardware_handle;
+	uint32_t lout;
+	// init default
+	struct device_settings* device = getDeviceSettings();
+	*enca = device->lcd_out;	
+	free(device);
+	
+	if (open_partition(hardware, "option_space",NVS_READONLY,&hardware_handle)!= ESP_OK) return;
+	
+	err = nvs_get_u32(hardware_handle, "O_LCD_OUT",(uint32_t *) &lout);
+	if (lout != 255) *enca = lout;
+	if (err != ESP_OK) ESP_LOGD(TAG,"option_get_lcd_out error 0x%x",err);
+	
+	close_partition(hardware_handle,hardware);		
+}
+void option_set_lcd_out(uint32_t enca)
+{
+	esp_err_t err;
+	nvs_handle hardware_handle;
+
+	if (open_partition(hardware, "option_space",NVS_READWRITE,&hardware_handle)!= ESP_OK) return;
+	
+	err = nvs_set_u8(hardware_handle, "O_LCD_OUT",enca);
+	if (err != ESP_OK) ESP_LOGD(TAG,"option_set_lcd_out error 0x%x",err);
+
+	close_partition(hardware_handle,hardware);		
+}
+
+
+
+
+
+
 
 void gpio_get_ledgpio(gpio_num_t *enca)
 {
@@ -332,7 +404,7 @@ void gpio_get_adc(adc1_channel_t  *channel)
 	
 	if (open_partition(hardware, "gpio_space",NVS_READONLY,&hardware_handle)!= ESP_OK) return;
 	
-	err = nvs_get_u8(hardware_handle, "P_ADC",(uint8_t *) channel);
+	err = nvs_get_u8(hardware_handle, "P_ADC_KBD",(uint8_t *) channel);
 	if (err != ESP_OK)ESP_LOGW(TAG,"gpio_get_adc error 0x%x",err);
 
 	close_partition(hardware_handle,hardware);		

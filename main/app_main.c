@@ -797,7 +797,9 @@ void app_main()
 	// log level
 	setLogLevel(device->trace_level);
 	//time display
-	setDdmm((device->options32)&T_DDMM);
+	uint8_t ddmm;
+	option_get_ddmm(&ddmm);	
+	setDdmm(ddmm?1:0);
 	//SPI init for the vs1053 and lcd if spi.
 	VS1053_spi_init();
 
@@ -806,7 +808,7 @@ void app_main()
 	//ESP_LOGE(TAG,"Corrupt1 %d",heap_caps_check_integrity(MALLOC_CAP_DMA,1));
 	
 	uint8_t rt;
-	gpio_get_lcd_info(&device->lcd_type,&rt);
+	option_get_lcd_info(&device->lcd_type,&rt);
 	ESP_LOGI(TAG,"LCD Type %d",device->lcd_type);
 	//lcd rotation
 	setRotat(rt) ;	

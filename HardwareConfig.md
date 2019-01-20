@@ -17,26 +17,20 @@ The quick setup is to download the Windows all-in-one toolchain & MSYS2 zip file
 https://dl.espressif.com/.../esp32_win32_msys2...
 
 - Unzip the zip file to C:\ (or some other location, but this guide assumes C:\) and it will create an msys32 directory with a pre-prepared environment.
-
 - Open a MSYS2 MINGW32 terminal window by running C:\msys32\mingw32.exe. Create a directory named "esp" that is a default location to develop ESP32 applications. To do so, run the following shell command: mkdir -p ~/esp
 - Type : cd ~/esp to move the newly created directory. If there are no error messages you are done with this step.
-
 - Type : git clone -b v3.1.2 --recursive https://github.com/espressif/esp-idf.git
-
 - Create a new script file in C:/msys32/etc/profile.d/ directory. Name it export_idf_path.sh
 Identify the path to ESP-IDF directory. It is specific to your system configuration and may look something like C:\msys32\home\"your-user-name"\esp\esp-idf
 Add this to the above created script file: export IDF_PATH="C:/msys32/home/"your-user-name/esp/esp-idf"
 Save the script file.
-
 - Close MSYS2 window and open it again. Check if IDF_PATH is set, by typing: printenv IDF_PATH
 The path previously entered in the script file should be printed out.
-  
 - Type : pip install --upgrade setuptools  
 - Type : python -m pip install --upgrade pip
 - Type : pip install future
 - Type : pacman -S mingw-w64-i686-python2-cryptography
 - Type : pip install cryptography
-
 - Place the Ka-Radio32-master files in "your-user-name"/esp folder. Find it at https://github.com/karawin/Ka-Radio32
 ---
   
@@ -80,102 +74,90 @@ If the software does not start properly, please check your values.
 A common mistake is to declare the same number for two functions.  
 See the log on the serial interface.
 
------------------------
-2/ Definition of gpio's
------------------------
-Edit the csv file to enter your gpio definitions.  
+------------------------------------
+2/ Definition of gpio's and options
+------------------------------------
+Edit the csv file to enter your gpio and options definitions.  
 See gpio.h for the default values if missing in the csv file.  
-Only modify the lines beginning with P_ by modifying only the last number.  
+Only modify the lines beginning with P_ or O_ by modifying only the last number.  
 for example:  
 P_MISO, data,u8,19  
 Change 19 to the desired number.  
-Do this for all P_ lines.  
+Do this for all P_ and O_lines.  
 Never change the string "P_XXXX, data,u8,"  
 A value base 10 is mandatory for each P_.  
 
+## GPIO
 Definition of the lines in csv  
-- SPI Bus:  
+- **SPI Bus:**  
 K_SPI		Select the used spi : 1: HSPI, 2: VSPI  
 P_MISO		Master Input, Slave Output    
 P_MOSI		Master Output, Slave Input   Named Data or SDA or D1 for oled  
 P_CLK		Master clock  Named SCL or SCK or D0 for oled  
-
-- VS1053B:  
+- **VS1053B:**  
 P_XCS			XCS  
 P_RST			RST  
 P_XDCS			XDCS  
 P_DREQ			P_DREQ  
-
-- ENCODERS 0 & 1:  
+- **ENCODERS 0 & 1:**  
 P_ENC0_A			pin A clk  
 P_ENC0_B			pin B Data  
 P_ENC0_BTN			pin SW  
 P_ENC1_A			pin A clk  
 P_ENC1_B			pin B Data  
 P_ENC1_BTN			pin SW  
-
-- BUTTONS PANEL 0 & 1 of three buttons (switch to gnd):  
+- **BUTTONS PANEL 0 & 1** of three buttons (switch to gnd):  
 P_BTN0_A		click:start/stop, double click:toggle, help: station  
 P_BTN0_B		click: +  
 P_BTN0_C		click: -  
 P_BTN1_A		start/stop, toggle, volume  
 P_BTN1_B		+  
 P_BTN1_C		-  
-
-- JOYSTICK 0 & 1  
+- **JOYSTICK 0 & 1**  
 P_JOY_0			Volume control  	
 P_JOY_1		
-	
-- Bus I2C (Oled & Lcd):  
+- **Bus I2C (Oled & Lcd):**  
 P_I2C_SCL		SCL or SCK  
 P_I2C_SDA		SDA  
 P_I2C_RST		RST if any  
-
-- LCD on SPI bus:  
+- **LCD on SPI bus:**  
 P_LCD_CS		CS  
 P_LCD_A0		A0 or D/C or DC  
 P_LCD_RST		RST or RES  
-
-- LCD CONTROL  
-P_LCD_TYPE		Type of lcd (see addon.h file)  
-P_LCD_ROTA		Control the rotation of the LCD, 0 no rotation, 1: rotation  
-
-- Infrared remote:  
+- **Infrared remote:**  
 P_IR_SIGNAL		ir Y Signal  
-
-- I2S bus:  
+- **I2S bus:**  
 P_I2S_LRCK		LRCK  
 P_I2S_BCLK		BCLK  
 P_I2S_DATA		DATA  
-
-- ADC keyboard:  
-P_ADC			gpio32 to 39  or 255 if not used. 
-
-- LCD Backlight:   
+- **ADC keyboard:**  
+P_ADC_KBD			gpio32 to 39  or 255 if not used. 
+- **LCD Backlight:**   
 P_BACKLIGHT		GPIO of the hardware device.
-
-- TOUCH SCREEN:  
+- **TOUCH SCREEN:**  
 P_TOUCH_CS		GPIO of the t_cs pin of the touch or 255 if no screen  
   Other pins are t_clk, t_din, t_do respectively the spi clk, mosi, miso. T_irq is not used.  
-
-- LED GPIO  
+- **LED GPIO**  
 P_LED_GPIO		GPIO of the status led  
 
+## OPTIONS
+- **LCD CONTROL**  
+P_LCD_TYPE		Type of lcd (see addon.h file).  
+P_LCD_ROTA		Control the rotation of the LCD, 0 no rotation, 1: rotation.  
+O_LCD_OUT 		The tempo to light off the screen in seconds. 0 is no tempo.   
+O_DDMM_FLAG		The format of the date to display 0:MMDD, 1:DDMM.  
 -------------------
 ## Special cases:
 -------------------
-### Some special GPIO
+### GPIO
 - GPIOs 34 to 39 are input only pins.  
 These pins don’t have internal pull-ups or pull-down resistors.  
 They can’t be used as outputs, so use these pins only as inputs or ADC usage.  
-   
 - Digital to Analog Converter (DAC)  
 There are 2 x 8 bits DAC channels on the ESP32 to convert digital signals into analog voltage signal outputs.  
 These are the DAC channels:  
 -    DAC1 (GPIO25)  
 -    DAC2 (GPIO26)
-
-	
 ### SPI bus
 
 K_SPI,data,u8,2  
@@ -230,7 +212,7 @@ If IR remote control is not used P_IR_SIGNAL must be set to 255
 ### ADC keyboard
 If the ADC keyboard is missing, set P_ADC  to 255.  
 GPIO pin must be gpio32 to 39  or 255 if not used.   
-Compatible with https://github.com/…/Ka-…/blob/master/Hardware/controles.pdf and the one found at https://www.drive2.ru/b/487463808323813881/  
+Compatible with https://github.com/karawin/Ka-Radio/blob/master/Hardware/controles.pdf and the one found at https://www.drive2.ru/b/487463808323813881/  
 The stop button is replaced with "Toggle Time/Infos" and "start replaced with "Start/Stop"  
 The ESP32 ADC can be sensitive to noise leading to large discrepancies in ADC readings. To minimize noise, users may connect a 0.1uF capacitor to the ADC input pad in use
 
@@ -255,6 +237,10 @@ The screen is divided in 5 zones:
 - Left: Station-
 - Bottom: Station+
 
+### OPTIONS
+If any options value is 255, the values defined by sys. command are unchanged.  
+If a sys. command changes the value in csv, the internal flashed bin of the csv is updated.  
+As long  the original bin is not flashed again, the internal value apply. 
 
 ---------------------
 3/ IR key definitions

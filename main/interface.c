@@ -161,7 +161,8 @@ uint8_t getDdmm()
 }
 void setDdmm(uint8_t dm)
 {
-	ddmm = dm;
+	if (dm == 0)ddmm= 0;
+	else ddmm = 1;
 }
 uint8_t getRotat()
 {
@@ -784,7 +785,7 @@ void syslcd(char* s)
 	uint8_t value = atoi(t+2);
 	device->lcd_type = value; 
 	saveDeviceSettings(device);	
-	gpio_set_lcd_info(value,rotat );
+	option_set_lcd_info(value,rotat );
 	kprintf("##LCD is in %d on next reset#\n",value);
 	free(device);	
 
@@ -817,8 +818,9 @@ void sysddmm(char* s)
 		device->options32 &= NT_DDMM;
 	else 
 		device->options32 |= T_DDMM;
-	ddmm = value;
+	ddmm = (value)?1:0;
 	saveDeviceSettings(device);	
+	option_set_ddmm(ddmm);
 	if (ddmm)
 		kprintf("##Time is DDMM#\n");
 	else
@@ -911,7 +913,7 @@ void sysrotat(char* s)
 	else 
 		device->options32 |= T_ROTAT;
 	rotat = value;
-	gpio_set_lcd_info(device->lcd_type,rotat );
+	option_set_lcd_info(device->lcd_type,rotat );
 	saveDeviceSettings(device);	
 	if (rotat)
 		kprintf("on#\n");
@@ -945,6 +947,7 @@ void syslcdout(char* s)
 	device->lcd_out = value; 
 	lcd_out = value;
 	saveDeviceSettings(device);	
+	option_set_lcd_out(lcd_out);
 	kprintf("%d#\n",value);
 	wakeLcd();
 	free(device);	
@@ -953,6 +956,7 @@ void syslcdout(char* s)
 uint32_t getLcdOut()
 {
 	int increm = 0;
+	option_get_lcd_out(&lcd_out);
 	if (lcd_out == 0xFFFFFFFF)
 	{
 		struct device_settings *device = getDeviceSettings();

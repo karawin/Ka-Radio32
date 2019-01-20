@@ -3,7 +3,9 @@
 This directory contains some samples of common boards found on the market.  
 They are to be modified to your needs and peripheral connected.  
 
-standard_adb.csv is the default description of the gpio used when no hardware partition is flashed.  
+standard_adb.csv is the default description of the gpio used when no hardware partition is flashed.
+
+standard_psram.bin  is the default description for a wrover cpu
 
 lolin32pro.csv is adapted to a wrover lolin or ttgo board.  
 
