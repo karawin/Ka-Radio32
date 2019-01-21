@@ -539,7 +539,7 @@ void adcLoop() {
 	voltage1 = (adc1_get_raw(channel)+adc1_get_raw(channel)+adc1_get_raw(channel)+adc1_get_raw(channel))/4;
 //	printf ("Volt0: %d, Volt1: %d\n",voltage0,voltage1);
 	voltage = (voltage0+voltage1)*105/(819);
-	if (voltage <  20) return; // no panel
+	if (voltage <  40) return; // no panel
 //	printf("Voltage: %d\n",voltage);
 
 	if (inside&&(voltage0 > 3700)) 

@@ -84,13 +84,14 @@ static void init_i2s(renderer_config_t *config)
 	gpio_num_t bclk;
 	gpio_num_t i2sdata;
 	gpio_get_i2s(&lrck ,&bclk ,&i2sdata );
-    i2s_pin_config_t pin_config = {
-            .bck_io_num = bclk,
-            .ws_io_num = lrck,
-            .data_out_num = i2sdata,
-            .data_in_num = I2S_PIN_NO_CHANGE
-    };
 
+	i2s_pin_config_t pin_config = {
+				.bck_io_num = bclk,
+				.ws_io_num = lrck,
+				.data_out_num = i2sdata,
+				.data_in_num = I2S_PIN_NO_CHANGE
+	};
+	
     if (i2s_driver_install(config->i2s_num, &i2s_config, 0, NULL) != ESP_OK)
 	{
 		i2s_config.intr_alloc_flags = ESP_INTR_FLAG_LEVEL1;
@@ -107,7 +108,8 @@ static void init_i2s(renderer_config_t *config)
         i2s_set_dac_mode(I2S_DAC_CHANNEL_BOTH_EN);
     }
     else {
-        i2s_set_pin(config->i2s_num, &pin_config);
+		if ((lrck!=255) && (bclk!=255) && (i2sdata!=255))
+			i2s_set_pin(config->i2s_num, &pin_config);
     }
 
     i2s_stop(config->i2s_num);

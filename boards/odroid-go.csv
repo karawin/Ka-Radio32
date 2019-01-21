@@ -25,13 +25,13 @@ P_I2C_SDA,data,u8,255
 P_I2C_RST,data,u8,255
 P_LCD_CS,data,u8,5
 P_LCD_A0,data,u8,21
-P_LCD_RST,data,u8,3
+P_LCD_RST,data,u8,255
 P_IR_SIGNAL,data,u8,255
 P_I2S_LRCK,data,u8,255
 P_I2S_BCLK,data,u8,255
 P_I2S_DATA,data,u8,255
 P_ADC_KBD,data,u8,255
-P_BACKLIGHT,data,u8,14
+P_BACKLIGHT,data,u8,255
 P_JOY_0,data,u8,35
 P_JOY_1,data,u8,34
 P_LED_GPIO,data,u8,2

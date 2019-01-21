@@ -907,19 +907,29 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 				}				
 				infree(host);
 			}
-			if (tzo!=NULL)
-			{ 
-				if (strlen(tzo) >0)
+			
+			if (tzo==NULL) 
+			{
+				tzo= inmalloc(10); 
+				sprintf(tmptzo,"%d",device->tzoffset);
+				strcpy(tzo,tmptzo);
+			}
+			else if (strlen(tzo) ==0)
+			{
+				free (tzo);
+				tzo= inmalloc(10); strcpy(tzo,"0");
+			}
+
+			if (strlen(tzo) >0)
+			{
+				if (strcmp(tzo,"undefined") != 0)
 				{
-					if (strcmp(host,"undefined") != 0)
-					{
-						device->tzoffset= atoi(tzo);
-						addonDt();
-						changed = true;
-					}	
-				}				
-				infree(tzo);
-			}			
+					device->tzoffset= atoi(tzo);
+					addonDt();
+					changed = true;
+				}	
+			}				
+			infree(tzo);			
 			
 			if (changed)
 			{

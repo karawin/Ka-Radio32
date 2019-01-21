@@ -166,7 +166,10 @@ void option_get_lcd_out(uint32_t *enca)
 	uint32_t lout;
 	// init default
 	struct device_settings* device = getDeviceSettings();
-	*enca = device->lcd_out;	
+	if (device->lcd_out==0)
+		*enca = 255;
+	else
+		*enca = device->lcd_out;	
 	free(device);
 	
 	if (open_partition(hardware, "option_space",NVS_READONLY,&hardware_handle)!= ESP_OK) return;
@@ -192,16 +195,15 @@ void option_set_lcd_out(uint32_t enca)
 
 
 
-
-
-
-
 void gpio_get_ledgpio(gpio_num_t *enca)
 {
 	esp_err_t err;
 	nvs_handle hardware_handle;
 	// init default
-	*enca = GPIO_LED;
+	struct device_settings* device = getDeviceSettings();
+	*enca = device->led_gpio;
+	free (device);
+	return;
 	if (open_partition(hardware, "gpio_space",NVS_READONLY,&hardware_handle)!= ESP_OK) return;
 	
 	err = nvs_get_u8(hardware_handle, "P_LED_GPIO",(uint8_t *) enca);

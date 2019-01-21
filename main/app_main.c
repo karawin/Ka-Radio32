@@ -608,8 +608,11 @@ void timerTask(void* p) {
 	
 	initTimers();
 	gpioLed = getLedGpio();
-	gpio_output_conf(gpioLed);
-	gpio_set_level(gpioLed,0);	
+	if (gpioLed != GPIO_NONE)
+	{
+		gpio_output_conf(gpioLed);
+		gpio_set_level(gpioLed,0);
+	}	
 	cCur = FlashOff*10;
 	device = getDeviceSettings();
 	queue_event_t evt;
@@ -644,16 +647,17 @@ void timerTask(void* p) {
 			if (ctime >= cCur)
 			{
 				gpioLed = getLedGpio();
+//				printf("LED GPIO: %d\n",gpioLed);
 //				taskYIELD();
 
 				if (stateLed)
 				{
-					gpio_set_level(gpioLed,0);	
+					if (gpioLed != GPIO_NONE) gpio_set_level(gpioLed,0);	
 					stateLed = false;
 					cCur = FlashOff*10;
 				} else
 				{
-					gpio_set_level(gpioLed,1);	
+					if (gpioLed != GPIO_NONE) gpio_set_level(gpioLed,1);	
 					stateLed = true;
 					cCur = FlashOn*10;										
 				}
@@ -796,6 +800,7 @@ void app_main()
 
 	// log level
 	setLogLevel(device->trace_level);
+//	setLogLevel(ESP_LOG_INFO);
 	//time display
 	uint8_t ddmm;
 	option_get_ddmm(&ddmm);	
@@ -898,7 +903,7 @@ void app_main()
 // queue for events of the sleep / wake and Ms timers
 	event_queue = xQueueCreate(30, sizeof(queue_event_t));
 	// led blinks
-	xTaskCreatePinnedToCore(timerTask, "timerTask",2000, NULL, PRIO_TIMER, &pxCreatedTask,CPU_TIMER); 
+	xTaskCreatePinnedToCore(timerTask, "timerTask",2100, NULL, PRIO_TIMER, &pxCreatedTask,CPU_TIMER); 
 	ESP_LOGI(TAG, "%s task: %x","t0",(unsigned int)pxCreatedTask);		
 	
 	
