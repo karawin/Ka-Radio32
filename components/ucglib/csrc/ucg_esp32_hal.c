@@ -139,7 +139,7 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 		gpioConfig.pull_down_en = GPIO_PULLDOWN_DISABLE;
 		gpioConfig.intr_type    = GPIO_INTR_DISABLE;
 		ESP_ERROR_CHECK(gpio_config(&gpioConfig));		
-		gpio_set_level(ucg_esp32_hal.reset, 1);
+		if (ucg_esp32_hal.reset != UCG_ESP32_HAL_UNDEFINED) gpio_set_level(ucg_esp32_hal.reset, 1);
 		gpio_set_level(ucg_esp32_hal.cs, 1);		
 		gpio_set_level(ucg_esp32_hal.dc, 0);		
 		
@@ -195,7 +195,7 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
       /* "arg" = 1: set the reset output line to 1 */
       /* "arg" = 0: set the reset output line to 0 */
 		sendOneByte();
-		gpio_set_level(ucg_esp32_hal.reset, arg);
+		if (ucg_esp32_hal.reset != UCG_ESP32_HAL_UNDEFINED) gpio_set_level(ucg_esp32_hal.reset, arg);
       break;
     case UCG_COM_MSG_CHANGE_CD_LINE:
 //	printf("C");

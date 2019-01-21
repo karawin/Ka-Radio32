@@ -134,7 +134,7 @@ void gpio_get_ir_signal(gpio_num_t *ir);
 void gpio_get_adc(adc1_channel_t  *channel);
 void gpio_get_lcd_backlightl(gpio_num_t *lcdb);
 void gpio_get_i2s(gpio_num_t *lrck ,gpio_num_t *bclk ,gpio_num_t *i2sdata );
-bool gpio_get_ir_key(nvs_handle handle,const char *key, int32_t *out_value1 , int32_t *out_value2);
+bool gpio_get_ir_key(nvs_handle handle,const char *key, uint32_t *out_value1 , uint32_t *out_value2);
 void gpio_get_touch(gpio_num_t *cs);
 void gpio_get_ledgpio(gpio_num_t *enca);
 void gpio_set_ledgpio(gpio_num_t enca);

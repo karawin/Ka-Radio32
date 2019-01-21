@@ -919,11 +919,10 @@ void customKeyInit()
 	for (index = KEY_UP; index < KEY_MAX;index++)
 	{
 		// get the key in the nvs
-		isCustomKey |= gpio_get_ir_key(handle,klab[index],(int*)&(customKey[index][0]),(int*)&(customKey[index][1]));
+		isCustomKey |= gpio_get_ir_key(handle,klab[index],(uint32_t*)&(customKey[index][0]),(uint32_t*)&(customKey[index][1]));
 		ESP_LOGV(TAG," isCustomKey is %d for %d",isCustomKey,index);
 		taskYIELD();
 	}
-	ESP_LOGI(TAG," isCustomKey is %d",isCustomKey);
 	close_partition(handle,hardware);	
 }
 
@@ -981,7 +980,7 @@ void task_lcd(void *pvParams)
 {
 	event_lcd_t evt ; // lcd event	
 	event_lcd_t evt1 ; // lcd event	
-	
+	ESP_LOGD(TAG, "task_lcd Started, LCD Type %d",lcd_type);
 	while (1)
 	{	
 		if (itLcdOut==1) // switch off the lcd

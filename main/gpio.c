@@ -14,6 +14,8 @@
 #include "eeprom.h"
 
 #define hardware "hardware"
+static xSemaphoreHandle muxnvs= NULL;
+
 
 // init a gpio as output
 void gpio_output_conf(gpio_num_t gpio)
@@ -32,15 +34,18 @@ void gpio_output_conf(gpio_num_t gpio)
 //
 esp_err_t open_partition(const char *partition_label, const char *namespace,nvs_open_mode open_mode,nvs_handle *handle)
 {
-	esp_err_t err;	
+	esp_err_t err;
+	if (muxnvs == NULL) muxnvs=xSemaphoreCreateMutex();	
+	xSemaphoreTake(muxnvs, portMAX_DELAY);
 	err = nvs_flash_init_partition(partition_label);
 	if (err != ESP_OK) {ESP_LOGW(TAG,"Hardware partition not found"); return err;}
-	err = nvs_open_from_partition(partition_label, namespace,
-		open_mode, handle);
+	err = nvs_open_from_partition(partition_label, namespace, open_mode, handle);
+//	ESP_ERROR_CHECK(nvs_open_from_partition(partition_label, namespace, open_mode, handle));
 	if (err != ESP_OK) 
 	{
-		ESP_LOGD(TAG,"Hardware namespace %s not found",namespace);
+		ESP_LOGD(TAG,"Hardware namespace %s not found, ERR: %x",namespace,err);
 		nvs_flash_deinit_partition(partition_label);	
+		xSemaphoreGive(muxnvs);
 	}	
 	return err;
 }
@@ -48,7 +53,8 @@ void close_partition(nvs_handle handle,const char *partition_label)
 {
 	nvs_commit(handle); // if a write is pending
 	nvs_close(handle);
-	nvs_flash_deinit_partition(partition_label);	
+	nvs_flash_deinit_partition(partition_label);
+	xSemaphoreGive(muxnvs);	
 }
 
 void gpio_get_spi_bus(uint8_t *spi_no,gpio_num_t *miso,gpio_num_t *mosi,gpio_num_t *sclk)
@@ -468,7 +474,7 @@ uint8_t gpioToChannel(uint8_t gpio)
 	else return (gpio-28);	
 }
 
-bool gpio_get_ir_key(nvs_handle handle,const char *key, int32_t *out_value1 , int32_t *out_value2)
+bool gpio_get_ir_key(nvs_handle handle,const char *key, uint32_t *out_value1 , uint32_t *out_value2)
 {
 	// init default
 	bool ret = false; 
@@ -485,7 +491,7 @@ bool gpio_get_ir_key(nvs_handle handle,const char *key, int32_t *out_value1 , in
 		free (string);
 		ret = true;
 	}
-	ESP_LOGV(TAG,"Key: %s, value1: %x, value2: %x, ret: %d\n",key,*out_value1,*out_value2,ret);	
+	ESP_LOGV(TAG,"Key: %s, value1: %x, value2: %x, ret: %d",key,*out_value1,*out_value2,ret);	
 	
 	return ret;
 }

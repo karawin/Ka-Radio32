@@ -909,7 +909,7 @@ void lcd_initUcg(uint8_t *lcd_type)
 //	gpio_num_t t_irq;
 	dt = getDt();
 	uint8_t rotat = getRotat();
-	ESP_LOGI(TAG,"lcd init  type: %d",*lcd_type);
+	ESP_LOGI(TAG,"lcd init  type: %d, Rotat: %d",*lcd_type, rotat);
 	if (*lcd_type == LCD_NONE) return;
 	
 	ucg_esp32_hal_t ucg_esp32_hal = UCG_ESP32_HAL_DEFAULT;
@@ -922,7 +922,7 @@ void lcd_initUcg(uint8_t *lcd_type)
 		ucg_esp32_hal.mosi  = mosi;
 		ucg_esp32_hal.cs    = cs;
 		ucg_esp32_hal.dc    = a0;
-		ucg_esp32_hal.reset = rstlcd;
+		if (rstlcd != GPIO_NONE) ucg_esp32_hal.reset = rstlcd;
 	} else //Color I2c (never seen this one)
 	{
 		gpio_get_i2c(&scl,&sda,&rsti2c);
