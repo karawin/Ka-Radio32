@@ -39,7 +39,7 @@ esp_err_t open_partition(const char *partition_label, const char *namespace,nvs_
 		open_mode, handle);
 	if (err != ESP_OK) 
 	{
-		ESP_LOGI(TAG,"Hardware namespace not found");
+		ESP_LOGD(TAG,"Hardware namespace %s not found",namespace);
 		nvs_flash_deinit_partition(partition_label);	
 	}	
 	return err;
@@ -203,7 +203,7 @@ void gpio_get_ledgpio(gpio_num_t *enca)
 	struct device_settings* device = getDeviceSettings();
 	*enca = device->led_gpio;
 	free (device);
-	return;
+
 	if (open_partition(hardware, "gpio_space",NVS_READONLY,&hardware_handle)!= ESP_OK) return;
 	
 	err = nvs_get_u8(hardware_handle, "P_LED_GPIO",(uint8_t *) enca);

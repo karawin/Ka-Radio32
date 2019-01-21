@@ -30,7 +30,7 @@
 #define STA2		2
 #define SSIDLEN		32
 #define PASSLEN		60 //64
-#define HOSTLEN		20
+#define HOSTLEN		24
 
 struct device_settings {
 	uint16_t cleared; 		// 0xAABB if initialized
@@ -73,7 +73,7 @@ struct device_settings {
 	uint8_t options32;	// bit0:0 = MMDD, 1 = DDMM  in the time display, bit1: 0= lcd without rotation  1 = lcd rotated 180
 						// bit 2: Half step of encoder0, bit3: Half step of encoder1
 	char hostname[HOSTLEN];
-	char filler[12]; 
+	char filler[8]; 
 
 };
 

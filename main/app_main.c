@@ -608,13 +608,18 @@ void timerTask(void* p) {
 	
 	initTimers();
 	gpioLed = getLedGpio();
+/*
+				device = getDeviceSettings();
+				printf("FIRST LED GPIO: %d, SSID:%d\n",gpioLed,device->current_ap);
+				free (device);
+*/				
 	if (gpioLed != GPIO_NONE)
 	{
 		gpio_output_conf(gpioLed);
 		gpio_set_level(gpioLed,0);
 	}	
 	cCur = FlashOff*10;
-	device = getDeviceSettings();
+
 	queue_event_t evt;
 	
 	while(1) {
@@ -647,7 +652,6 @@ void timerTask(void* p) {
 			if (ctime >= cCur)
 			{
 				gpioLed = getLedGpio();
-//				printf("LED GPIO: %d\n",gpioLed);
 //				taskYIELD();
 
 				if (stateLed)
@@ -667,18 +671,20 @@ void timerTask(void* p) {
 		
 		if (ctimeVol >= TEMPO_SAVE_VOL)
 		{
+			device = getDeviceSettings();
 			if (device->vol != getIvol()){ 			
 				device->vol = getIvol();
 //				taskYIELD();
 				saveDeviceSettingsVolume(device);
 //				ESP_LOGD("timerTask",striWATERMARK,uxTaskGetStackHighWaterMark( NULL ),xPortGetFreeHeapSize( ));
 			}
+			free (device);
 			ctimeVol = 0;
 		}	
 	vTaskDelay(1);		
 	}
 //	printf("t0 end\n");
-	free (device);
+	
 	vTaskDelete( NULL ); // stop the task (never reached)
 }
 
@@ -927,14 +933,12 @@ void app_main()
 		ESP_LOGI(TAG,"mDNS Init ok"); 
 	
 	//set hostname and instance name
-	if (strlen(device->hostname) == 0)
+	if ((strlen(device->hostname) == 0)||(strlen(device->hostname) > HOSTLEN)) 
 	{	
-		err = mdns_hostname_set("karadio32");
-		strcat(device->hostname,"karadio32");
-	} else
-	{	
-		err = mdns_hostname_set(device->hostname);
-	}	
+		strcpy(device->hostname,"karadio32");
+	} 	
+	ESP_LOGE(TAG,"mDNS Hostname: %s",device->hostname ); 
+	err = mdns_hostname_set(device->hostname);	
 	if (err) 
         ESP_LOGE(TAG,"Hostname Init failed: %d", err);	
 

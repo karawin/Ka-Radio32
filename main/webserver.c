@@ -900,8 +900,8 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 				{
 					if ((strcmp(device->hostname,host) != 0)&&(strcmp(host,"undefined") != 0))
 					{
-						strcpy(device->hostname,host);
-						setHostname(host);
+						strncpy(device->hostname,host,HOSTLEN-1);
+						setHostname(device->hostname);
 						changed = true;
 					}	
 				}				
