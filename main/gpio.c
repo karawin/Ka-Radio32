@@ -40,10 +40,9 @@ esp_err_t open_partition(const char *partition_label, const char *namespace,nvs_
 	err = nvs_flash_init_partition(partition_label);
 	if (err != ESP_OK) {ESP_LOGW(TAG,"Hardware partition not found"); return err;}
 	err = nvs_open_from_partition(partition_label, namespace, open_mode, handle);
-//	ESP_ERROR_CHECK(nvs_open_from_partition(partition_label, namespace, open_mode, handle));
 	if (err != ESP_OK) 
 	{
-		ESP_LOGD(TAG,"Hardware namespace %s not found, ERR: %x",namespace,err);
+		ESP_LOGW(TAG,"Hardware namespace %s not found, ERR: %x",namespace,err);
 		nvs_flash_deinit_partition(partition_label);	
 		xSemaphoreGive(muxnvs);
 	}	
