@@ -171,18 +171,14 @@ void option_get_lcd_out(uint32_t *enca)
 	uint32_t lout;
 	// init default
 	struct device_settings* device = getDeviceSettings();
-	if (device->lcd_out==0)
-		*enca = 255;
-	else
 		*enca = device->lcd_out;	
 	free(device);
 	
 	if (open_partition(hardware, "option_space",NVS_READONLY,&hardware_handle)!= ESP_OK) return;
 	
 	err = nvs_get_u32(hardware_handle, "O_LCD_OUT",(uint32_t *) &lout);
-	if (lout != 255) *enca = lout;
 	if (err != ESP_OK) ESP_LOGD(TAG,"option_get_lcd_out error 0x%x",err);
-	
+	else *enca = lout;
 	close_partition(hardware_handle,hardware);		
 }
 void option_set_lcd_out(uint32_t enca)
@@ -192,7 +188,7 @@ void option_set_lcd_out(uint32_t enca)
 
 	if (open_partition(hardware, "option_space",NVS_READWRITE,&hardware_handle)!= ESP_OK) return;
 	
-	err = nvs_set_u8(hardware_handle, "O_LCD_OUT",enca);
+	err = nvs_set_u32(hardware_handle, "O_LCD_OUT",enca);
 	if (err != ESP_OK) ESP_LOGD(TAG,"option_set_lcd_out error 0x%x",err);
 
 	close_partition(hardware_handle,hardware);		
