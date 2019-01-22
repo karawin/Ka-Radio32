@@ -145,9 +145,12 @@ void option_get_ddmm(uint8_t *enca)
 	if (open_partition(hardware, "option_space",NVS_READONLY,&hardware_handle)!= ESP_OK) return;
 	
 	err = nvs_get_u8(hardware_handle, "O_DDMM_FLAG",(uint8_t *) &dmm);
-	if (dmm != 255) *enca = dmm;
-	if (*enca) *enca = 1;
+
 	if (err != ESP_OK) ESP_LOGD(TAG,"option_get_ddmm error 0x%x",err);
+	else{
+		if (dmm != 255) *enca = dmm;
+		if (*enca) *enca = 1;		
+	}
 	
 	close_partition(hardware_handle,hardware);		
 }
