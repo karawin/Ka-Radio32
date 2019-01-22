@@ -619,6 +619,7 @@ void timerTask(void* p) {
 		gpio_set_level(gpioLed,0);
 	}	
 	cCur = FlashOff*10;
+	device = getDeviceSettings();
 
 	queue_event_t evt;
 	
@@ -671,20 +672,17 @@ void timerTask(void* p) {
 		
 		if (ctimeVol >= TEMPO_SAVE_VOL)
 		{
-			device = getDeviceSettings();
 			if (device->vol != getIvol()){ 			
 				device->vol = getIvol();
 //				taskYIELD();
 				saveDeviceSettingsVolume(device);
 //				ESP_LOGD("timerTask",striWATERMARK,uxTaskGetStackHighWaterMark( NULL ),xPortGetFreeHeapSize( ));
 			}
-			free (device);
 			ctimeVol = 0;
 		}	
-	vTaskDelay(1);		
+		vTaskDelay(1);		
 	}
-//	printf("t0 end\n");
-	
+	free (device);	
 	vTaskDelete( NULL ); // stop the task (never reached)
 }
 

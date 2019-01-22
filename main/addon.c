@@ -520,7 +520,6 @@ static bool inside = false;
 void adcInit()
 {
 	gpio_get_adc(&channel);	
-	channel = gpioToChannel(channel);
 	ESP_LOGD(TAG,"ADC Channel: %i",channel);
 	if (channel != GPIO_NONE)
 	{
@@ -868,7 +867,7 @@ event_ir_t evt;
 	}
 }
  
-void initButtonEncoder()
+void initButtonDevices()
 {
 	struct device_settings *device;
 	gpio_num_t enca0;
@@ -877,28 +876,23 @@ void initButtonEncoder()
 	gpio_num_t enca1;
 	gpio_num_t encb1;
 	gpio_num_t encbtn1;	
-	gpio_get_encoder0(&enca0, &encb0, &encbtn0);
-	gpio_get_encoder1(&enca1, &encb1, &encbtn1);
+	gpio_get_encoders(&enca0, &encb0, &encbtn0,&enca1, &encb1, &encbtn1);
 	if (enca1 == GPIO_NONE) isEncoder1 = false; //no encoder
 	if (enca0 == GPIO_NONE) isEncoder0 = false; //no encoder
-
 	device = getDeviceSettings();
 	if (isEncoder0)	encoder0 = ClickEncoderInit(enca0, encb0, encbtn0,((device->options32&T_ENC0)==0)?false:true );	
 	if (isEncoder1)	encoder1 = ClickEncoderInit(enca1, encb1, encbtn1,((device->options32&T_ENC1)==0)?false:true );	
 	free (device);
 	
-	gpio_get_button0(&enca0, &encb0, &encbtn0);
-	gpio_get_button1(&enca1, &encb1, &encbtn1);
+	gpio_get_buttons(&enca0, &encb0, &encbtn0,&enca1, &encb1, &encbtn1);
 	if (enca1 == GPIO_NONE) isButton1 = false; //no encoder
 	if (enca0 == GPIO_NONE) isButton0 = false; //no encoder	
 	if (isButton0)	button0 = ClickButtonsInit(enca0, encb0, encbtn0);	
 	if (isButton1)	button1 = ClickButtonsInit(enca1, encb1, encbtn1 );	
 	
-	gpio_get_joystick0(&enca0);
-	gpio_get_joystick1(&enca1);
+	gpio_get_joysticks(&enca0,&enca1);
 	if (enca0 == GPIO_NONE) isJoystick0 = false; //no encoder
 	if (enca1 == GPIO_NONE) isJoystick1 = false; //no encoder
-
 	if (isJoystick0)	joystick0 = ClickJoystickInit(enca0 );	
 	if (isJoystick1)	joystick1 = ClickJoystickInit(enca1);	
 	
@@ -1101,7 +1095,7 @@ void task_addon(void *pvParams)
 {
 	xTaskHandle pxCreatedTask;
 	customKeyInit();
-	initButtonEncoder();
+	initButtonDevices();
 	adcInit();
 	
 	serviceAddon = &multiService;		; // connect the 1ms interruption
