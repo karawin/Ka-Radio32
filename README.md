@@ -34,8 +34,10 @@ Output mode set in Setting panel on web page of KaraDio32 :
 
 - Interfaces available on serial, telnet and html
 - up to 255 editable stations.
+- Handles bitrates up to 320 kbps.
 - Stations can be saved and restored from html in and from a file.
 - Hardware configuration file to adapt the standard delivery to all boards and addons you need.
+- all configurable parameters automatically saved.
 - mDNS support.
 - wrover esp32 support. About 10 seconds of buffering, and soon A2DP support (sink and source)
 - Time Zone Offset support.
@@ -48,13 +50,13 @@ Output mode set in Setting panel on web page of KaraDio32 :
 - Two max set of 3 buttons. One for volume priority, one for station change priority.
 - Rotary encoder and set of buttons support included. Common functions : play/stop, volume, station change, date time display.
 - ADC keyboard with 6 buttons.
-- NEC ir remote control.
 - Date format DD:MM:YYYY or MM:DD:YYYY .
 - Remote IR support integrated. Nec protocol only.
 - Two configurable access points .
 - OTA (Over The Air) update of the software.
-- many more configurable parameters. See 
-[Interfaces document](Interface.md )
+- Uses a 40 kB (I2S), 50 kB (vs1053) or 420 Kb (wrover) queue to provide smooth playback.
+- many more configurable parameters. See [Interfaces document](Interface.md )  
+
 ## Configure the hardware and IR codes
 If the default configuration doesn't fit your needs, you can externally configure the software to fit your hardware and peripherals to suit your needs.  
 The configuration file is to be flashed only one time. After, the standard delivery will become compatible with your hardware gpio use and peripherals configuration. A future standard OTA will automatically works for your configuration.  
