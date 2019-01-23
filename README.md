@@ -23,12 +23,13 @@ Thanks Vassilis.
 Work with i2s, internal DAC or a vs1053.  
 Output mode set in Setting panel on web page of KaraDio32 :
 
-- I2S for connection to ac external DAC
+- I2S for connection to an external DAC
 - I2SMERUS to connect a merus amplifier
 - DAC to use the built in DAC of the esp32
 - PDM to output a PDM (Pulse Density Modulation) stream
 - VS1053 to connect to a vs1053 board, I2S output of the vs1053 enabled.
 - all VS1053 tones control
+- AAC decoding on I2S with a wrover cpu (4mB of external psram). Mp3 only on I2S with a wroom cpu.
 
 ### Others features :
 
