@@ -128,10 +128,10 @@ sys.host: display the hostname for mDNS\n\
 sys.host(\"your hostname\"): change and display the hostname for mDNS\n\
 sys.rotat: display the lcd rotation option\n\
 sys.rotat(\"x\"): Change and display the lcd rotation option (reset needed). 0:no rotation, 1: rotation\n\
-sys.henc0 or sys.henc1: Display the current step setting for the encoder. Normal= 4 steps/notch, Half: 2 steps/notch\
-sys.henc0(\"x\") with x=0 Normal, x=1 Half\
-sys.henc1(\"x\") with x=0 Normal, x=1 Half\
-sys.calibrate: start a touch screen calibration\
+sys.henc0 or sys.henc1: Display the current step setting for the encoder. Normal= 4 steps/notch, Half: 2 steps/notch\n\
+sys.henc0(\"x\") with x=0 Normal, x=1 Half\n\
+sys.henc1(\"x\") with x=0 Normal, x=1 Half\n\
+sys.cali[brate]: start a touch screen calibration\n\
 ///////////\n\
   Other\n\
 ///////////\n\
@@ -294,57 +294,49 @@ wifi_scan_config_t config = {
 void wifiConnect(char* cmd)
 {
 	int i;
-	struct device_settings* devset = getDeviceSettings();
-	for(i = 0; i < 32; i++) devset->ssid1[i] = 0;
-	for(i = 0; i < 64; i++) devset->pass1[i] = 0;	
+	for(i = 0; i < 32; i++) g_device->ssid1[i] = 0;
+	for(i = 0; i < 64; i++) g_device->pass1[i] = 0;	
 	char *t = strstr(cmd, parslashquote);
 	if(t == 0)
 	{
 		kprintf(stritCMDERROR);
-		free(devset);
 		return;
 	}
 	char *t_end  = strstr(t, "\",\"");
 	if(t_end == 0)
 	{
 		kprintf(stritCMDERROR);
-		free(devset);
 		return;
 	}
 	
-	strncpy( devset->ssid1, (t+2), (t_end-t-2) );
+	strncpy( g_device->ssid1, (t+2), (t_end-t-2) );
 	
 	t = t_end+3;
 	t_end = strstr(t, parquoteslash);
 	if(t_end == 0)
 	{
 		kprintf(stritCMDERROR);
-		free(devset);
 		return;
 	}
 	
-	strncpy( devset->pass1, t, (t_end-t)) ;
-	devset->current_ap = 1;
-	devset->dhcpEn1 = 1;
-	saveDeviceSettings(devset);
-	// test Save device to device1
+	strncpy( g_device->pass1, t, (t_end-t)) ;
+	g_device->current_ap = 1;
+	g_device->dhcpEn1 = 1;
+	saveDeviceSettings(g_device);
+	// test Save g_device to device1
 	copyDeviceSettings();
 	//
 	kprintf("#WIFI.CON#\n");
-	kprintf("\n##AP1: %s with dhcp on next reset#\n",devset->ssid1);
+	kprintf("\n##AP1: %s with dhcp on next reset#\n",g_device->ssid1);
 	kprintf("##WIFI.CON#\n");
-	free(devset);
 }
 
 void wifiConnectMem()
 {
-	
-	struct device_settings* devset = getDeviceSettings();
 	kprintf("#WIFI.CON#\n");
-	kprintf("##AP1: %s#",devset->ssid1);
-	kprintf("\n##AP2: %s#\n",devset->ssid2);
+	kprintf("##AP1: %s#",g_device->ssid1);
+	kprintf("\n##AP2: %s#\n",g_device->ssid2);
 	kprintf("##WIFI.CON#\n");
-	free(devset);
 }
 
 void wifiReConnect()
@@ -591,28 +583,23 @@ char* webList(int id)
 void sysI2S(char* s)
 {
     char *t = strstr(s, parslashquote);
-	struct device_settings *device;
-	device = getDeviceSettings();
 	if(t == NULL)
 	{
-		kprintf("\n##I2S speed: %d, 0=48kHz, 1=96kHz, 2=192kHz#\n",device->i2sspeed);
-		free(device);
+		kprintf("\n##I2S speed: %d, 0=48kHz, 1=96kHz, 2=192kHz#\n",g_device->i2sspeed);
 		return;
 	}
 	char *t_end  = strstr(t, parquoteslash);
     if(t_end == NULL)
     {
 		kprintf(stritCMDERROR);
-		free(device);
 		return;
     }	
 	uint8_t speed = atoi(t+2);
 	VS1053_I2SRate(speed);
 
-	device->i2sspeed = speed;
-	saveDeviceSettings(device);	
+	g_device->i2sspeed = speed;
+	saveDeviceSettings(g_device);	
 	kprintf("\n##I2S speed: %d, 0=48kHz, 1=96kHz, 2=192kHz#\n",speed);
-	free(device);
 }
 
 void sysUart(char* s)
@@ -636,18 +623,15 @@ void sysUart(char* s)
 			}	
 		}
 	}
-	struct device_settings *device;
-	device = getDeviceSettings();
 	if ((!empty)&&(t!=NULL))
 	{
 		uint32_t speed = atoi(t+2);
 		speed = checkUart(speed);
-		device->uartspeed= speed;
-		saveDeviceSettings(device);	
+		g_device->uartspeed= speed;
+		saveDeviceSettings(g_device);	
 		kprintf("Speed: %d\n",speed);
 	}
-	kprintf("\n%sUART= %d# on next reset\n",msgsys,device->uartspeed);	
-	free(device);
+	kprintf("\n%sUART= %d# on next reset\n",msgsys,g_device->uartspeed);	
 }
 
 void clientVol(char *s)
@@ -685,45 +669,37 @@ void clientVol(char *s)
 void syspatch(char* s)
 {
     char *t = strstr(s, parslashquote);
-	struct device_settings *device;
-	device = getDeviceSettings();
 	if(t == NULL)
 	{
-		if ((device->options & T_PATCH)!= 0)
+		if ((g_device->options & T_PATCH)!= 0)
 			kprintf("\n##VS1053 Patch is not loaded#%c",0x0d);
 		else
 			kprintf("\n##VS1053 Patch is loaded#%c",0x0d);
-		free(device);
 		return;
 	}
 	char *t_end  = strstr(t, parquoteslash);
     if(t_end == NULL)
     {
 		kprintf(stritCMDERROR);
-		free(device);
 		return;
     }	
 	uint8_t value = atoi(t+2);
 	if (value ==0) 
-		device->options |= T_PATCH; 
+		g_device->options |= T_PATCH; 
 	else 
-		device->options &= NT_PATCH; // 0 = load patch
+		g_device->options &= NT_PATCH; // 0 = load patch
 	
-	saveDeviceSettings(device);	
-	kprintf(stritPATCH,(device->options & T_PATCH)!= 0?"unloaded":"Loaded");
-	free(device);	
+	saveDeviceSettings(g_device);	
+	kprintf(stritPATCH,(g_device->options & T_PATCH)!= 0?"unloaded":"Loaded");
 }
 
 // the gpio to use for the led indicator
 void sysledgpio(char* s)
 {
     char *t = strstr(s, parslashquote);
-	struct device_settings *device;
-	device = getDeviceSettings();
 	if(t == NULL)
 	{
-		kprintf("##Led GPIO is %d#\n",device->led_gpio);
-		free(device);
+		kprintf("##Led GPIO is %d#\n",g_device->led_gpio);
 		return;
 	}
 	char *t_end  = strstr(t, parquoteslash);
@@ -731,33 +707,25 @@ void sysledgpio(char* s)
     if ((t_end == NULL)||(value >= GPIO_NUM_MAX))
     {
 		kprintf(stritCMDERROR);
-		free(device);
 		return;
     }	
-	device->led_gpio = value; 
+	g_device->led_gpio = value; 
 	led_gpio = value;
 	gpio_output_conf(value);
-	saveDeviceSettings(device);	
+	saveDeviceSettings(g_device);	
 	gpio_set_ledgpio(value); // write in nvs if any
 	kprintf("##Led GPIO is now %d\n",value);
 	led_gpio = GPIO_NONE;
-	free(device);	
 }
 uint8_t getLedGpio()
 {
-	struct device_settings *device;
 	if (led_gpio == GPIO_NONE)
 	{
 		gpio_get_ledgpio(&led_gpio);
-		device = getDeviceSettings();
-		if (device != NULL)
+		if (led_gpio != g_device->led_gpio) 
 		{
-			if (led_gpio != device->led_gpio) 
-			{
-				device->led_gpio = led_gpio;
-				saveDeviceSettings(device);
-			}
-			free (device);
+			g_device->led_gpio = led_gpio;
+			saveDeviceSettings(g_device);
 		} 
 	} 
 	return led_gpio;	
@@ -767,35 +735,28 @@ uint8_t getLedGpio()
 void syslcd(char* s)
 {
     char *t = strstr(s, parslashquote);
-	struct device_settings *device;
-	device = getDeviceSettings();
 	if(t == NULL)
 	{
-		kprintf("##LCD is %d#\n",device->lcd_type);
-		free(device);
+		kprintf("##LCD is %d#\n",g_device->lcd_type);
 		return;
 	}
 	char *t_end  = strstr(t, parquoteslash);
     if(t_end == NULL)
     {
 		kprintf(stritCMDERROR);
-		free(device);
 		return;
     }	
 	uint8_t value = atoi(t+2);
-	device->lcd_type = value; 
-	saveDeviceSettings(device);	
+	g_device->lcd_type = value; 
+	saveDeviceSettings(g_device);	
 	option_set_lcd_info(value,rotat );
 	kprintf("##LCD is in %d on next reset#\n",value);
-	free(device);	
-
 }
 
 // display or change the DDMM display mode
 void sysddmm(char* s)
 {
     char *t = strstr(s, parslashquote);
-	struct device_settings *device;
 
 	if(t == NULL)
 	{
@@ -813,33 +774,28 @@ void sysddmm(char* s)
 		return;
     }	
 	uint8_t value = atoi(t+2);
-	device = getDeviceSettings();
 	if (value == 0)
-		device->options32 &= NT_DDMM;
+		g_device->options32 &= NT_DDMM;
 	else 
-		device->options32 |= T_DDMM;
+		g_device->options32 |= T_DDMM;
 	ddmm = (value)?1:0;
-	saveDeviceSettings(device);	
+	saveDeviceSettings(g_device);	
 	option_set_ddmm(ddmm);
 	if (ddmm)
 		kprintf("##Time is DDMM#\n");
 	else
 		kprintf("##Time is MMDD#\n");
-	free(device);	
 }
 
 // get or set the encoder half resolution. Must be set depending of the hardware
 void syshenc(int nenc,char* s)
 {
     char *t = strstr(s, parslashquote);
-	struct device_settings *device;
 	Encoder_t *encoder;
 	bool encvalue;
 	encoder = (Encoder_t *)getEncoder(nenc);
 	if (encoder == NULL) {kprintf("Encoder not defined#\n"); return;}
-	device = getDeviceSettings();
-	uint8_t options32 = device->options32;
-	free (device);
+	uint8_t options32 = g_device->options32;
 	if (nenc == 0) encvalue = options32&T_ENC0;
 	else encvalue = options32&T_ENC1;
 	
@@ -861,35 +817,32 @@ void syshenc(int nenc,char* s)
 		return;
     }	
 	uint8_t value = atoi(t+2);
-	device = getDeviceSettings();
 	if (value == 0)
 	{
-		if (nenc ==0) device->options32 &= NT_ENC0;
-		else device->options32 &= NT_ENC1;
+		if (nenc ==0) g_device->options32 &= NT_ENC0;
+		else g_device->options32 &= NT_ENC1;
 	}
 	else 
 	{
-		if (nenc ==0) device->options32 |= T_ENC0;
-		else device->options32 |= T_ENC1;
+		if (nenc ==0) g_device->options32 |= T_ENC0;
+		else g_device->options32 |= T_ENC1;
 	}
 	setHalfStep(encoder, value);
-	if (nenc == 0) encvalue = device->options32&T_ENC0;
-	else encvalue = device->options32&T_ENC1;
+	if (nenc == 0) encvalue = g_device->options32&T_ENC0;
+	else encvalue = g_device->options32&T_ENC1;
 	if (encvalue)
 		kprintf("half ");
 	else
 		kprintf("normal ");
 	kprintf("#\n");
 	
-	saveDeviceSettings(device);	
-	free(device);		
+	saveDeviceSettings(g_device);	
 }
 
 // display or change the rotation lcd mode
 void sysrotat(char* s)
 {
     char *t = strstr(s, parslashquote);
-	struct device_settings *device;
 
 	kprintf("##Lcd rotation is ");
 	if(t == NULL)
@@ -907,19 +860,17 @@ void sysrotat(char* s)
 		return;
     }	
 	uint8_t value = atoi(t+2);
-	device = getDeviceSettings();
 	if (value == 0)
-		device->options32 &= NT_ROTAT;
+		g_device->options32 &= NT_ROTAT;
 	else 
-		device->options32 |= T_ROTAT;
+		g_device->options32 |= T_ROTAT;
 	rotat = value;
-	option_set_lcd_info(device->lcd_type,rotat );
-	saveDeviceSettings(device);	
+	option_set_lcd_info(g_device->lcd_type,rotat );
+	saveDeviceSettings(g_device);	
 	if (rotat)
 		kprintf("on#\n");
 	else
 		kprintf("off#\n");
-	free(device);	
 }
 
 
@@ -927,41 +878,35 @@ void sysrotat(char* s)
 void syslcdout(char* s)
 {
     char *t = strstr(s, parslashquote);
-	struct device_settings *device = getDeviceSettings();
 	kprintf("##LCD out is ");
-	lcd_out = device->lcd_out; 
+	lcd_out = g_device->lcd_out; 
 	if(t == NULL)
 	{
 		kprintf("%d#\n",lcd_out);
-		free(device);
 		return;
 	}
 	char *t_end  = strstr(t, parquoteslash);
     if(t_end == NULL)
     {
 		kprintf(stritCMDERROR);
-		free(device);
 		return;
     }	
 	uint8_t value = atoi(t+2);
-	device->lcd_out = value; 
+	g_device->lcd_out = value; 
 	lcd_out = value;
-	saveDeviceSettings(device);	
+	saveDeviceSettings(g_device);	
 	option_set_lcd_out(lcd_out);
 	kprintf("%d#\n",value);
 	wakeLcd();
-	free(device);	
-
 }
+
 uint32_t getLcdOut()
 {
 	int increm = 0;
 	option_get_lcd_out(&lcd_out);
 	if (lcd_out == 0xFFFFFFFF)
 	{
-		struct device_settings *device = getDeviceSettings();
-		lcd_out = device->lcd_out;
-		free (device);
+		lcd_out = g_device->lcd_out;
 	} 
 	if (lcd_out >0) increm++; //adjust
 	return lcd_out+increm;	
@@ -971,32 +916,26 @@ uint32_t getLcdOut()
 void sysled(char* s)
 {
     char *t = strstr(s, parslashquote);
-	struct device_settings *device;
-	device = getDeviceSettings();
 	extern bool ledStatus;
 	if(t == NULL)
 	{
-		kprintf("##Led is in %s mode#\n",((device->options & T_LED)== 0)?"Blink":"Play");
-		free(device);
+		kprintf("##Led is in %s mode#\n",((g_device->options & T_LED)== 0)?"Blink":"Play");
 		return;
 	}
 	char *t_end  = strstr(t, parquoteslash);
     if(t_end == NULL)
     {
 		kprintf(stritCMDERROR);
-		free(device);
 		return;
     }	
 	uint8_t value = atoi(t+2);
 	if (value !=0) 
-	{device->options |= T_LED; ledStatus = false; if (getState()) gpio_set_level(getLedGpio(),0);}
+	{g_device->options |= T_LED; ledStatus = false; if (getState()) gpio_set_level(getLedGpio(),0);}
 	else 
-	{device->options &= NT_LED; ledStatus =true;} // options:0 = ledStatus true = Blink mode
+	{g_device->options &= NT_LED; ledStatus =true;} // options:0 = ledStatus true = Blink mode
 	
-	saveDeviceSettings(device);	
+	saveDeviceSettings(g_device);	
 	kprintf("##LED is in %s mode#\n",(ledStatus)?"Blink":"Play");
-	free(device);
-	
 }
 
 
@@ -1005,27 +944,21 @@ void sysled(char* s)
 void tzoffset(char* s)
 {
 	char *t = strstr(s, parslashquote);
-	struct device_settings *device;
-	
-	device = getDeviceSettings();
 	if(t == NULL)
 	{
-		kprintf("##SYS.TZO#: %d\n",device->tzoffset);
-		free(device);
+		kprintf("##SYS.TZO#: %d\n",g_device->tzoffset);
 		return;
 	}
 	char *t_end  = strstr(t, parquoteslash);
     if(t_end == NULL)
     {
 		kprintf(stritCMDERROR);
-		free(device);
 		return;
     }	
 	uint8_t value = atoi(t+2);
-	device->tzoffset = value;	
-	saveDeviceSettings(device);	
-	kprintf("##SYS.TZO#: %d\n",device->tzoffset);
-	free(device);	
+	g_device->tzoffset = value;	
+	saveDeviceSettings(g_device);	
+	kprintf("##SYS.TZO#: %d\n",g_device->tzoffset);
 	addonDt(); // for addon, force the dt fetch
 }
 
@@ -1053,13 +986,9 @@ void setHostname(char* s)
 void hostname(char* s)
 {
 	char *t = strstr(s, parslashquote);
-	struct device_settings *device;
-	
-	device = getDeviceSettings();
 	if(t == NULL)
 	{
-		kprintf("##SYS.HOST#: %s.local\n  IP:%s #\n",device->hostname,getIp());
-		free(device);
+		kprintf("##SYS.HOST#: %s.local\n  IP:%s #\n",g_device->hostname,getIp());
 		return;
 	}
 	
@@ -1068,7 +997,6 @@ void hostname(char* s)
     if(t_end == NULL)
     {
 		kprintf(stritCMDERROR);
-		free(device);
 		return;
     }
 		
@@ -1076,20 +1004,18 @@ void hostname(char* s)
     if(hn != NULL)
     {
 		if (t_end-t ==0)
-			strcpy(	device->hostname, "karadio32");
+			strcpy(	g_device->hostname, "karadio32");
 		else
 		{	
 			if (t_end-t >= HOSTLEN) t_end = t+HOSTLEN;
-			strncpy(device->hostname,t,(t_end-t)*sizeof(char));
-			device->hostname[(t_end-t)*sizeof(char)] = 0;
+			strncpy(g_device->hostname,t,(t_end-t)*sizeof(char));
+			g_device->hostname[(t_end-t)*sizeof(char)] = 0;
 		}
-		saveDeviceSettings(device);	
-		setHostname(device->hostname);
-		kprintf("##SYS.HOST#: %s.local\n  IP:%s #\n",device->hostname,getIp());
+		saveDeviceSettings(g_device);	
+		setHostname(g_device->hostname);
+		kprintf("##SYS.HOST#: %s.local\n  IP:%s #\n",g_device->hostname,getIp());
 		free(hn);
 	}
-	free(device);	
-	
 }
 
 void displayLogLevel()
@@ -1126,16 +1052,10 @@ esp_log_level_t getLogLevel()
 
 void setLogLevel(esp_log_level_t level)
 {
-	struct device_settings *device;
-	device = getDeviceSettings();
 	esp_log_level_set("*", level);
 	s_log_default_level=level; 
-	if (device != NULL)
-	{
-		device->trace_level = level;
-		saveDeviceSettings(device);
-		free(device);
-	}	
+	g_device->trace_level = level;
+	saveDeviceSettings(g_device);
 	displayLogLevel();
 } 
 

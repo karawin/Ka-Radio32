@@ -19,14 +19,9 @@
 int8_t  applyTZ(struct tm *time) {
 
 	bool dst = false;
-	struct device_settings *device;
-	device = getDeviceSettings();
 	int8_t tzo = 0;
-	if (device != NULL)	 {
-		tzo = device->tzoffset;
-		free(device);
-	} 
-	
+	tzo = g_device->tzoffset;
+ 
 	// apply base timezone offset
 //	time->tm_hour += 1; // e.g. central europe
 	time->tm_hour += tzo;

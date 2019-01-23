@@ -26,7 +26,7 @@ P_I2C_RST,data,u8,2
 P_LCD_CS,data,u8,13
 P_LCD_A0,data,u8,14
 P_LCD_RST,data,u8,2
-P_IR_SIGNAL,data,u8,21
+P_IR_SIGNAL,data,u8,255
 P_I2S_LRCK,data,u8,25
 P_I2S_BCLK,data,u8,26
 P_I2S_DATA,data,u8,22

@@ -102,13 +102,8 @@ static void serveFile(char* name, int conn)
 	char *content;
 	if (strcmp(name,"/style.css") == 0)
 	{
-		struct device_settings *device;
-		device = getDeviceSettings();
-		if (device != NULL)	 {
-			if (device->options & T_THEME) strcpy(name , "/style1.css");
-//			printf("name: %s, theme:%d\n",name,device->options&T_THEME);
-			infree(device);
-		}
+			if (g_device->options & T_THEME) strcpy(name , "/style1.css");
+//			printf("name: %s, theme:%d\n",name,g_device->options&T_THEME);
 	}
 	struct servFile* f = findFile(name);
 	ESP_LOGV(TAG,"find %s at %x",name,(int)f);
@@ -281,20 +276,14 @@ static void rssi(int socket) {
 }
 // flip flop the theme indicator
 static void theme() {
-		struct device_settings *device;
-		device = getDeviceSettings();
-		if (device != NULL)	 {
-			if ((device->options&T_THEME)!=0) device->options&=NT_THEME; else device->options |= T_THEME;
-			saveDeviceSettings(device);
-			ESP_LOGV(TAG,"theme:%d",device->options&T_THEME);
-			infree(device);	
-		}
+	if ((g_device->options&T_THEME)!=0) g_device->options&=NT_THEME; else g_device->options |= T_THEME;
+	saveDeviceSettings(g_device);
+	ESP_LOGV(TAG,"theme:%d",g_device->options&T_THEME);
 }
 
 // treat the received message of the websocket
 void websockethandle(int socket, wsopcode_t opcode, uint8_t * payload, size_t length)
 {
-//	struct device_settings *device;
 	//wsvol
 	ESP_LOGV(TAG,"websocketHandle: %s",payload);
 	if (strstr((char*)payload,"wsvol=")!= NULL)
@@ -333,7 +322,6 @@ void websockethandle(int socket, wsopcode_t opcode, uint8_t * payload, size_t le
 void playStationInt(int sid) {
 	struct shoutcast_info* si;
 	char answer[24];
-	struct device_settings *device;
 	si = getStation(sid);
 
 	if(si != NULL &&si->domain && si->file) {
@@ -360,17 +348,12 @@ void playStationInt(int sid) {
 	infree(si);
 	sprintf(answer,"{\"wsstation\":\"%d\"}",sid);
 	websocketbroadcast(answer, strlen(answer));
-	device = getDeviceSettings();
-	if (device != NULL)
+	ESP_LOGI(TAG,"playstationInt: %d, g_device: %d",sid,g_device->currentstation);
+	if (g_device->currentstation != sid)
 	{
-		ESP_LOGI(TAG,"playstationInt: %d, device: %d",sid,device->currentstation);
-		if (device->currentstation != sid)
-		{
-			device->currentstation = sid;
-			setCurrentStation( sid);
-			saveDeviceSettings(device);
-		}
-		infree(device);
+		g_device->currentstation = sid;
+		setCurrentStation( sid);
+		saveDeviceSettings(g_device);
 	}
 }
 	
@@ -411,7 +394,6 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 	int i;
 	bool tst;
 	bool changed = false;
-	struct device_settings *device;
 	if(strcmp(name, "/instant_play") == 0) {
 		if(data_size > 0) {
 			char url[100];
@@ -457,70 +439,64 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			char bassfreq[6];
 			char treblefreq[6];
 			char spacial[6];
-			device = getDeviceSettings();
-			if (device != NULL)
-			{
-				changed = false;
-				if(getSParameterFromResponse(bass,6,"bass=", data, data_size)) {
-					
-					if (device->bass != atoi(bass))
-					{ 
-						if (get_audio_output_mode() == VS1053)
-						{
-							VS1053_SetBass(atoi(bass));
-							changed = true;
-							device->bass = atoi(bass); 
-						}
-					}
-				}
-				if(getSParameterFromResponse(treble,6,"treble=", data, data_size)) {				
-					if (device->treble != atoi(treble))
-					{ 
-						if (get_audio_output_mode() == VS1053)
-						{
-							VS1053_SetTreble(atoi(treble));
-							changed = true;
-							device->treble = atoi(treble); 
-						}
-					}
-				}
-				if(getSParameterFromResponse(bassfreq,6,"bassfreq=", data, data_size)) {					
-					if (device->freqbass != atoi(bassfreq))
-					{ 
-						if (get_audio_output_mode() == VS1053) 
-						{
-							VS1053_SetBassFreq(atoi(bassfreq));
-							changed = true;
-							device->freqbass = atoi(bassfreq); 
-						}
-					}
-				}
-				if(getSParameterFromResponse(treblefreq,6,"treblefreq=", data, data_size)) {					
-					if (device->freqtreble != atoi(treblefreq))
+			changed = false;
+			if(getSParameterFromResponse(bass,6,"bass=", data, data_size)) {		
+				if (g_device->bass != atoi(bass))
+				{ 
+					if (get_audio_output_mode() == VS1053)
 					{
-						if (get_audio_output_mode() == VS1053)
-						{
-							VS1053_SetTrebleFreq(atoi(treblefreq)); 
-							changed = true;
-							device->freqtreble = atoi(treblefreq); 
-						}
+						VS1053_SetBass(atoi(bass));
+						changed = true;
+						g_device->bass = atoi(bass); 
 					}
 				}
-				if(getSParameterFromResponse(spacial,6,"spacial=", data, data_size)) {					
-					if (device->spacial != atoi(spacial))
-					{
-							if (get_audio_output_mode() == VS1053) 
-							{	
-								VS1053_SetSpatial(atoi(spacial)); 
-								changed = true;
-								device->spacial = atoi(spacial); 
-							}
-					}
-				}
-				if (changed) 
-					saveDeviceSettings(device);
-				infree(device);
 			}
+			if(getSParameterFromResponse(treble,6,"treble=", data, data_size)) {				
+				if (g_device->treble != atoi(treble))
+				{ 
+					if (get_audio_output_mode() == VS1053)
+					{
+						VS1053_SetTreble(atoi(treble));
+						changed = true;
+						g_device->treble = atoi(treble); 
+					}
+				}
+			}
+			if(getSParameterFromResponse(bassfreq,6,"bassfreq=", data, data_size)) {					
+				if (g_device->freqbass != atoi(bassfreq))
+				{ 
+					if (get_audio_output_mode() == VS1053) 
+					{
+						VS1053_SetBassFreq(atoi(bassfreq));
+						changed = true;
+						g_device->freqbass = atoi(bassfreq); 
+					}
+				}
+			}
+			if(getSParameterFromResponse(treblefreq,6,"treblefreq=", data, data_size)) {					
+				if (g_device->freqtreble != atoi(treblefreq))
+				{
+					if (get_audio_output_mode() == VS1053)
+					{
+						VS1053_SetTrebleFreq(atoi(treblefreq)); 
+						changed = true;
+						g_device->freqtreble = atoi(treblefreq); 
+					}
+				}
+			}
+			if(getSParameterFromResponse(spacial,6,"spacial=", data, data_size)) {					
+				if (g_device->spacial != atoi(spacial))
+				{
+						if (get_audio_output_mode() == VS1053) 
+						{	
+							VS1053_SetSpatial(atoi(spacial)); 
+							changed = true;
+							g_device->spacial = atoi(spacial); 
+						}
+				}
+			}
+			if (changed) 
+				saveDeviceSettings(g_device);
 		}
 	} else if(strcmp(name, "/getStation") == 0) {
 		if(data_size > 0) {
@@ -649,34 +625,24 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 		if(data_size > 4) {
 			char * id = data+3;
 			data[data_size-1] = 0;
-			device = getDeviceSettings();
-			if (device != NULL)
+			if ((strcmp(id,"true"))&&(g_device->autostart==1))
 			{
-				if ((strcmp(id,"true"))&&(device->autostart==1))
-				{
-					device->autostart = 0;
-					ESP_LOGV(TAG,"autostart: %s, num:%d",id,device->autostart);
-					saveDeviceSettings(device);
-				}
-				else
-				if ((strcmp(id,"false"))&&(device->autostart==0))
-				{
-					device->autostart = 1;
-					ESP_LOGV(TAG,"autostart: %s, num:%d",id,device->autostart);
-					saveDeviceSettings(device);
-				}
-				infree(device);	
-			}			
+				g_device->autostart = 0;
+				ESP_LOGV(TAG,"autostart: %s, num:%d",id,g_device->autostart);
+				saveDeviceSettings(g_device);
+			}
+			else
+			if ((strcmp(id,"false"))&&(g_device->autostart==0))
+			{
+				g_device->autostart = 1;
+				ESP_LOGV(TAG,"autostart: %s, num:%d",id,g_device->autostart);
+				saveDeviceSettings(g_device);
+			}		
 		}
 	} else if(strcmp(name, "/rauto") == 0) {
 		char buf[strlen(strsRAUTO)+16];// = inmalloc( strlen(strsRAUTO)+16);
-		device = getDeviceSettings();
-		if (device != NULL)
-		{
-			sprintf(buf, strsRAUTO,(device->autostart)?'1':'0' );
-			write(conn, buf, strlen(buf));
-			infree(device);	
-		}				
+		sprintf(buf, strsRAUTO,(g_device->autostart)?'1':'0' );
+		write(conn, buf, strlen(buf));	
 	} else if(strcmp(name, "/stop") == 0) {
 		if (clientIsConnected())
 		{	
@@ -731,12 +697,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 		else 
 		{	
 			uint8_t vauto = 0;
-			device = getDeviceSettings();
-			if (device != NULL)
-			{
-				vauto = (device->autostart)?'1':'0' ;
-				infree(device);	
-			}
+			vauto = (g_device->autostart)?'1':'0' ;
 			sprintf(buf, strsICY,
 			json_length,
 			currentSt,
@@ -760,16 +721,8 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 	{		
 		bool val = false;
 		uint8_t cout;
-		struct device_settings *device;
 		changed = false;
 		if(data_size > 0) {
-			device = getDeviceSettings();
-			if (device ==NULL)
-			{
-				respKo(conn);
-				return;
-			}
-
 			char valid[6];			
 			if(getSParameterFromResponse(valid,6,"valid=", data, data_size))
 				if (strcmp(valid,"1")==0) val = true;
@@ -778,9 +731,9 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			cout = atoi(coutput);
 			if (val)
 			{
-				device->audio_output_mode = cout;
+				g_device->audio_output_mode = cout;
 				changed = true;
-				saveDeviceSettings(device);	
+				saveDeviceSettings(g_device);	
 			}
 			int json_length ;
 			json_length =15;
@@ -788,17 +741,16 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			char buf[110];			
 			sprintf(buf, "HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:%d\r\n\r\n{\"coutput\":\"%d\"}",
 			json_length,
-			device->audio_output_mode);
+			g_device->audio_output_mode);
 			ESP_LOGV(TAG,"hardware Buf len:%d\n%s",strlen(buf),buf);
 			write(conn, buf, strlen(buf));
 			if (val){
 				// set current_ap to the first filled ssid
-				ESP_LOGD(TAG,"audio_output_mode: %d",device->audio_output_mode);
+				ESP_LOGD(TAG,"audio_output_mode: %d",g_device->audio_output_mode);
 				copyDeviceSettings();
 				vTaskDelay(20);	
 				esp_restart();			
-			}	
-			infree(device);	
+			}		
 			return;
 		}		
 	} else if(strcmp(name, "/wifi") == 0)	
@@ -806,16 +758,8 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 		bool val = false;
 		char tmpip[16],tmpmsk[16],tmpgw[16];
 		char tmpip2[16],tmpmsk2[16],tmpgw2[16],tmptzo[10];
-		struct device_settings *device;
 		changed = false;		
 		if(data_size > 0) {
-			device = getDeviceSettings();
-			if (device ==NULL)
-			{
-				infree(device);
-				respKo(conn);
-				return;
-			}
 			char valid[5];
 			if(getSParameterFromResponse(valid,5,"valid=", data, data_size))
 				if (strcmp(valid,"1")==0) val = true;
@@ -848,47 +792,47 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 				changed = true;
 				ip_addr_t valu;
 				ipaddr_aton(aip, &valu);
-				memcpy(device->ipAddr1,&valu,sizeof(uint32_t));
+				memcpy(g_device->ipAddr1,&valu,sizeof(uint32_t));
 				ipaddr_aton(amsk, &valu);
-				memcpy(device->mask1,&valu,sizeof(uint32_t));
+				memcpy(g_device->mask1,&valu,sizeof(uint32_t));
 				ipaddr_aton(agw, &valu);
-				memcpy(device->gate1,&valu,sizeof(uint32_t));
+				memcpy(g_device->gate1,&valu,sizeof(uint32_t));
 				
 				ipaddr_aton(aip2, &valu);
-				memcpy(device->ipAddr2,&valu,sizeof(uint32_t));
+				memcpy(g_device->ipAddr2,&valu,sizeof(uint32_t));
 				ipaddr_aton(amsk2, &valu);
-				memcpy(device->mask2,&valu,sizeof(uint32_t));
+				memcpy(g_device->mask2,&valu,sizeof(uint32_t));
 				ipaddr_aton(agw2, &valu);
-				memcpy(device->gate2,&valu,sizeof(uint32_t));
+				memcpy(g_device->gate2,&valu,sizeof(uint32_t));
 				
 				if (getSParameterFromResponse(adhcp,4,"dhcp=", data, data_size))
 					if (strlen(adhcp)!=0) 
 					{if (strcmp(adhcp,"true")==0) 
-					device->dhcpEn1 = 1; else device->dhcpEn1 = 0;}
+					g_device->dhcpEn1 = 1; else g_device->dhcpEn1 = 0;}
 				if (getSParameterFromResponse(adhcp2,4,"dhcp2=", data, data_size))
 					if (strlen(adhcp2)!=0) 
 					{if (strcmp(adhcp2,"true")==0) 
-					device->dhcpEn2 = 1; else device->dhcpEn2 = 0;}
+					g_device->dhcpEn2 = 1; else g_device->dhcpEn2 = 0;}
 						
-				strcpy(device->ssid1,(ssid==NULL)?"":ssid);
-				strcpy(device->pass1,(pasw==NULL)?"":pasw);
-				strcpy(device->ssid2,(ssid2==NULL)?"":ssid2);
-				strcpy(device->pass2,(pasw2==NULL)?"":pasw2);	
+				strcpy(g_device->ssid1,(ssid==NULL)?"":ssid);
+				strcpy(g_device->pass1,(pasw==NULL)?"":pasw);
+				strcpy(g_device->ssid2,(ssid2==NULL)?"":ssid2);
+				strcpy(g_device->pass2,(pasw2==NULL)?"":pasw2);	
 
 				infree(ssid); infree(pasw);infree(ssid2); infree(pasw2);  
 				infree(aip);infree(amsk);infree(agw);
 				infree(aip2);infree(amsk2);infree(agw2);			
 			}
 
-			if ((device->ua!= NULL)&&(strlen(device->ua)==0))
+			if ((g_device->ua!= NULL)&&(strlen(g_device->ua)==0))
 			{
 				if (aua==NULL) {aua= inmalloc(12); strcpy(aua,"Karadio/1.6");}
 			}	
 			if (aua!=NULL) 
 			{
-				if ((strcmp(device->ua,aua) != 0)&&(strcmp(aua,"undefined") != 0))
+				if ((strcmp(g_device->ua,aua) != 0)&&(strcmp(aua,"undefined") != 0))
 				{
-					strcpy(device->ua,aua);
+					strcpy(g_device->ua,aua);
 					changed = true;
 				}				
 				infree(aua);
@@ -898,10 +842,10 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			{ 
 				if (strlen(host) >0)
 				{
-					if ((strcmp(device->hostname,host) != 0)&&(strcmp(host,"undefined") != 0))
+					if ((strcmp(g_device->hostname,host) != 0)&&(strcmp(host,"undefined") != 0))
 					{
-						strncpy(device->hostname,host,HOSTLEN-1);
-						setHostname(device->hostname);
+						strncpy(g_device->hostname,host,HOSTLEN-1);
+						setHostname(g_device->hostname);
 						changed = true;
 					}	
 				}				
@@ -911,7 +855,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			if (tzo==NULL) 
 			{
 				tzo= inmalloc(10); 
-				sprintf(tmptzo,"%d",device->tzoffset);
+				sprintf(tmptzo,"%d",g_device->tzoffset);
 				strcpy(tzo,tmptzo);
 			}
 			else if (strlen(tzo) ==0)
@@ -924,7 +868,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			{
 				if (strcmp(tzo,"undefined") != 0)
 				{
-					device->tzoffset= atoi(tzo);
+					g_device->tzoffset= atoi(tzo);
 					addonDt();
 					changed = true;
 				}	
@@ -933,7 +877,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			
 			if (changed)
 			{
-				saveDeviceSettings(device);	
+				saveDeviceSettings(g_device);	
 			}			
 			uint8_t macaddr[10]; // = inmalloc(10*sizeof(uint8_t));
 			char macstr[20]; // = inmalloc(20*sizeof(char));
@@ -941,21 +885,21 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			esp_wifi_get_mac(WIFI_IF_STA,macaddr);		
 			int json_length ;
 			json_length =95+ 39+ 10+9+
-			strlen(device->ssid1) +
-			strlen(device->pass1) +
-			strlen(device->ssid2) +
-			strlen(device->pass2) +
-			strlen(device->ua)+
-			strlen(device->hostname)+
-			sprintf(tmptzo,"%d",device->tzoffset)+
-			sprintf(tmpip,"%d.%d.%d.%d",device->ipAddr1[0], device->ipAddr1[1],device->ipAddr1[2], device->ipAddr1[3])+
-			sprintf(tmpmsk,"%d.%d.%d.%d",device->mask1[0], device->mask1[1],device->mask1[2], device->mask1[3])+
-			sprintf(tmpgw,"%d.%d.%d.%d",device->gate1[0], device->gate1[1],device->gate1[2], device->gate1[3])+
-			sprintf(adhcp,"%d",device->dhcpEn1)+
-			sprintf(tmpip2,"%d.%d.%d.%d",device->ipAddr2[0], device->ipAddr2[1],device->ipAddr2[2], device->ipAddr2[3])+
-			sprintf(tmpmsk2,"%d.%d.%d.%d",device->mask2[0], device->mask2[1],device->mask2[2], device->mask2[3])+
-			sprintf(tmpgw2,"%d.%d.%d.%d",device->gate2[0], device->gate2[1],device->gate2[2], device->gate2[3])+
-			sprintf(adhcp2,"%d",device->dhcpEn2)+
+			strlen(g_device->ssid1) +
+			strlen(g_device->pass1) +
+			strlen(g_device->ssid2) +
+			strlen(g_device->pass2) +
+			strlen(g_device->ua)+
+			strlen(g_device->hostname)+
+			sprintf(tmptzo,"%d",g_device->tzoffset)+
+			sprintf(tmpip,"%d.%d.%d.%d",g_device->ipAddr1[0], g_device->ipAddr1[1],g_device->ipAddr1[2], g_device->ipAddr1[3])+
+			sprintf(tmpmsk,"%d.%d.%d.%d",g_device->mask1[0], g_device->mask1[1],g_device->mask1[2], g_device->mask1[3])+
+			sprintf(tmpgw,"%d.%d.%d.%d",g_device->gate1[0], g_device->gate1[1],g_device->gate1[2], g_device->gate1[3])+
+			sprintf(adhcp,"%d",g_device->dhcpEn1)+
+			sprintf(tmpip2,"%d.%d.%d.%d",g_device->ipAddr2[0], g_device->ipAddr2[1],g_device->ipAddr2[2], g_device->ipAddr2[3])+
+			sprintf(tmpmsk2,"%d.%d.%d.%d",g_device->mask2[0], g_device->mask2[1],g_device->mask2[2], g_device->mask2[3])+
+			sprintf(tmpgw2,"%d.%d.%d.%d",g_device->gate2[0], g_device->gate2[1],g_device->gate2[2], g_device->gate2[3])+
+			sprintf(adhcp2,"%d",g_device->dhcpEn2)+
 			sprintf(macstr,MACSTR,MAC2STR(macaddr)
 			);
 
@@ -969,7 +913,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			else {			
 				sprintf(buf, strsWIFI,
 				json_length,
-				device->ssid1,device->pass1,device->ssid2,device->pass2,tmpip,tmpmsk,tmpgw,tmpip2,tmpmsk2,tmpgw2,device->ua,adhcp,adhcp2,macstr,device->hostname,tmptzo);
+				g_device->ssid1,g_device->pass1,g_device->ssid2,g_device->pass2,tmpip,tmpmsk,tmpgw,tmpip2,tmpmsk2,tmpgw2,g_device->ua,adhcp,adhcp2,macstr,g_device->hostname,tmptzo);
 				ESP_LOGV(TAG,"wifi Buf len:%d\n%s",strlen(buf),buf);
 				write(conn, buf, strlen(buf));
 				infree(buf);
@@ -977,20 +921,19 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 
 			if (val){
 				// set current_ap to the first filled ssid
-				ESP_LOGD(TAG,"currentAP: %d",device->current_ap);
-				if (device->current_ap == APMODE)
+				ESP_LOGD(TAG,"currentAP: %d",g_device->current_ap);
+				if (g_device->current_ap == APMODE)
 				{
-					if (strlen(device->ssid1)!= 0) device->current_ap = STA1;
+					if (strlen(g_device->ssid1)!= 0) g_device->current_ap = STA1;
 					else
-					if (strlen(device->ssid2)!= 0) device->current_ap = STA2;
-					saveDeviceSettings(device);
+					if (strlen(g_device->ssid2)!= 0) g_device->current_ap = STA2;
+					saveDeviceSettings(g_device);
 				}
-				ESP_LOGD(TAG,"currentAP: %d",device->current_ap);
+				ESP_LOGD(TAG,"currentAP: %d",g_device->current_ap);
 				copyDeviceSettings();	// save the current one			
 				vTaskDelay(50);	
 				esp_restart();			
 			}	
-			infree(device);
 			return;
 		}	
 	} else if(strcmp(name, "/clear") == 0)	

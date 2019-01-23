@@ -39,10 +39,11 @@ esp_err_t open_partition(const char *partition_label, const char *namespace,nvs_
 	xSemaphoreTake(muxnvs, portMAX_DELAY);
 	err = nvs_flash_init_partition(partition_label);
 	if (err != ESP_OK) {ESP_LOGW(TAG,"Hardware partition not found"); return err;}
+//	ESP_ERROR_CHECK(nvs_open_from_partition(partition_label, namespace, open_mode, handle));
 	err = nvs_open_from_partition(partition_label, namespace, open_mode, handle);
 	if (err != ESP_OK) 
 	{
-		ESP_LOGW(TAG,"Hardware namespace %s not found, ERR: %x",namespace,err);
+		ESP_LOGI(TAG,"Hardware namespace %s not found, ERR: %x",namespace,err);
 		nvs_flash_deinit_partition(partition_label);	
 		xSemaphoreGive(muxnvs);
 	}	
@@ -104,10 +105,8 @@ void option_get_lcd_info(uint8_t *enca,uint8_t* rt)
 	nvs_handle hardware_handle;
 	uint8_t typ,rot;
 	// init default
-	struct device_settings* device = getDeviceSettings();
-	*enca = device->lcd_type;
-	*rt = ((device->options32)&T_ROTAT)?1:0;
-	free(device);
+	*enca = g_device->lcd_type;
+	*rt = ((g_device->options32)&T_ROTAT)?1:0;
 	if (open_partition(hardware, "option_space",NVS_READONLY,&hardware_handle)!= ESP_OK) return;
 	
 	err = nvs_get_u8(hardware_handle, "O_LCD_TYPE",(uint8_t *) &typ);
@@ -138,9 +137,7 @@ void option_get_ddmm(uint8_t *enca)
 	nvs_handle hardware_handle;
 	uint8_t dmm;
 	// init default
-	struct device_settings* device = getDeviceSettings();
-	*enca = ((device->options32)&T_DDMM)?1:0;;	
-	free(device);
+	*enca = ((g_device->options32)&T_DDMM)?1:0;;	
 	
 	if (open_partition(hardware, "option_space",NVS_READONLY,&hardware_handle)!= ESP_OK) return;
 	
@@ -173,9 +170,7 @@ void option_get_lcd_out(uint32_t *enca)
 	nvs_handle hardware_handle;
 	uint32_t lout;
 	// init default
-	struct device_settings* device = getDeviceSettings();
-		*enca = device->lcd_out;	
-	free(device);
+		*enca = g_device->lcd_out;	
 	
 	if (open_partition(hardware, "option_space",NVS_READONLY,&hardware_handle)!= ESP_OK) return;
 	
@@ -204,9 +199,7 @@ void gpio_get_ledgpio(gpio_num_t *enca)
 	esp_err_t err;
 	nvs_handle hardware_handle;
 	// init default
-	struct device_settings* device = getDeviceSettings();
-	*enca = device->led_gpio;
-	free (device);
+	*enca = g_device->led_gpio;
 
 	if (open_partition(hardware, "gpio_space",NVS_READONLY,&hardware_handle)!= ESP_OK) return;
 	

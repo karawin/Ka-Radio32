@@ -30,8 +30,16 @@ P_IR_SIGNAL,data,u8,255
 P_I2S_LRCK,data,u8,25
 P_I2S_BCLK,data,u8,26
 P_I2S_DATA,data,u8,27
-P_ADC,data,u8,255
 P_BACKLIGHT,data,u8,255
+P_LED_GPIO,data,u8,4
+P_ADC_KBD,data,u8,255
+
+option_space,namespace,,
+O_LCD_TYPE,data,u8,255
+O_LCD_ROTA,data,u8,255
+O_LCD_OUT,data,u32,255
+O_DDMM_FLAG,data,u8,255
+
 custom_ir_space,namespace,,
 K_UP,data,string,0xFF0047 0xFF0040
 K_LEFT,data,string,0xFF0007

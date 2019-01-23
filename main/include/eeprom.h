@@ -75,7 +75,7 @@ struct device_settings {
 	char hostname[HOSTLEN];
 	char filler[8]; 
 
-};
+} Device_Settings;
 
 struct shoutcast_info {
 	char domain[73]; //url
@@ -84,6 +84,8 @@ struct shoutcast_info {
 	int8_t ovol; // offset volume
 	uint16_t port;	//port
 };
+
+extern struct device_settings* g_device;
 
 void partitions_init(void);
 void copyDeviceSettings();

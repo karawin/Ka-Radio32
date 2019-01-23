@@ -37,28 +37,16 @@ xTaskHandle handleTaskLcd;
 // ============= Touch panel functions =========================================
 void saveCalibration(uint32_t x, uint32_t y)
 {
-	struct device_settings *device;
-	device = getDeviceSettings();
-	if (device != NULL)
-	{
-		device->tp_calx = x ;
-		device->tp_caly = y ;
-		saveDeviceSettings(device);
-		free (device);
-		ESP_LOGI(TAG, "Calibration saved: X:%x, Y:%x",x,y);
-	}
+	g_device->tp_calx = x ;
+	g_device->tp_caly = y ;
+	saveDeviceSettings(g_device);
+	ESP_LOGI(TAG, "Calibration saved: X:%x, Y:%x",x,y);
 }
 void getCalibration()
 {
-	struct device_settings *device;
-	device = getDeviceSettings();
-	if (device != NULL)
-	{
-		if (device->tp_calx != 0) tp_calx = device->tp_calx;
-		if (device->tp_caly != 0) tp_caly = device->tp_caly;
-		free (device);
-		ESP_LOGI(TAG, "Calibration read: X:%x, Y:%x",tp_calx,tp_caly);
-	}
+	if (g_device->tp_calx != 0) tp_calx = g_device->tp_calx;
+	if (g_device->tp_caly != 0) tp_caly = g_device->tp_caly;
+	ESP_LOGI(TAG, "Calibration read: X:%x, Y:%x",tp_calx,tp_caly);
 }
 void setTouchSize(int w, int h) {width = w; height = h; }
 void getTouchSize(int* w, int* h) {*w=width; *h=height; }

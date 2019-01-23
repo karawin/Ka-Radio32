@@ -29,7 +29,7 @@ const esp_partition_t * DEVICE;
 const esp_partition_t * DEVICE1;
 const esp_partition_t * STATIONS;
 
-
+struct device_settings* g_device;
 
 void partitions_init(void)
 {
@@ -40,6 +40,7 @@ void partitions_init(void)
 	STATIONS = esp_partition_find_first(65,0,NULL);
 	if (STATIONS == NULL) ESP_LOGE(TAG, "STATIONS Partition not found");
 	muxDevice=xSemaphoreCreateMutex();
+	g_device = getDeviceSettings();  // allocate one for all
 }
 
 

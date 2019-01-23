@@ -43,7 +43,7 @@ int vsVersion = -1; // the version of the chip
 gpio_num_t rst;
 gpio_num_t dreq;
 
-static spi_device_handle_t vsspi;  // the device handle of the vs1053 spi
+static spi_device_handle_t vsspi;  // the evice handle of the vs1053 spi
 static spi_device_handle_t hvsspi;  // the device handle of the vs1053 spi high speed
 
 xSemaphoreHandle vsSPI = NULL;
@@ -311,8 +311,6 @@ void VS1053_HighPower(){
 
 
 void VS1053_Start(){
-	struct device_settings *device;
-	
 	ControlReset(SET);
 	vTaskDelay(50);
 	ControlReset(RESET);
@@ -350,36 +348,31 @@ void VS1053_Start(){
 	
 	VS1053_regtest();
 	
-	device = getDeviceSettings();
-	ESP_LOGI(TAG,"device: %x",(int)device);
-	if (device != NULL)
-	{	
+	ESP_LOGI(TAG,"g_device: %x",(int)g_device);
 	// enable I2C dac output of the vs1053
-		if (vsVersion == 4) // only 1053
-		{
-			VS1053_WriteRegister16(SPI_WRAMADDR, 0xc017); //
-			VS1053_WriteRegister16(SPI_WRAM, 0x00F0); //
-			VS1053_I2SRate(device->i2sspeed);	
+	if (vsVersion == 4) // only 1053
+	{
+		VS1053_WriteRegister16(SPI_WRAMADDR, 0xc017); //
+		VS1053_WriteRegister16(SPI_WRAM, 0x00F0); //
+		VS1053_I2SRate(g_device->i2sspeed);	
 
 	// plugin patch
-			if  ((device->options&T_PATCH)==0) 
-			{	
-				LoadUserCodes() ;	// vs1053b patch and admix
-//				VS1053_SetVolumeLine(-31);
-//				VS1053_Admix(false);
-			}
+		if  ((g_device->options&T_PATCH)==0) 
+		{	
+			LoadUserCodes() ;	// vs1053b patch and admix
+//			VS1053_SetVolumeLine(-31);
+//			VS1053_Admix(false);
 		}
-		vTaskDelay(10);
-		ESP_LOGI(TAG,"volume: %d",device->vol);
-		setIvol( device->vol);
-		VS1053_SetVolume( device->vol);	
-		VS1053_SetTreble(device->treble);
-		VS1053_SetBass(device->bass);
-		VS1053_SetTrebleFreq(device->freqtreble);
-		VS1053_SetBassFreq(device->freqbass);
-		VS1053_SetSpatial(device->spacial);
-		free(device);
 	}
+	vTaskDelay(10);
+	ESP_LOGI(TAG,"volume: %d",g_device->vol);
+	setIvol( g_device->vol);
+	VS1053_SetVolume( g_device->vol);	
+	VS1053_SetTreble(g_device->treble);
+	VS1053_SetBass(g_device->bass);
+	VS1053_SetTrebleFreq(g_device->freqtreble);
+	VS1053_SetBassFreq(g_device->freqbass);
+	VS1053_SetSpatial(g_device->spacial);
 }
 
 int VS1053_SendMusicBytes(uint8_t* music, uint16_t quantity){
@@ -653,7 +646,6 @@ void vsTask(void *pvParams) {
 #define VSTASKBUF	1024
 	portBASE_TYPE uxHighWaterMark;
 	uint8_t  b[VSTASKBUF];
-//	struct device_settings *device;
 	uint16_t size ,s;
 
 	player_t *player = pvParams;

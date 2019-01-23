@@ -1089,31 +1089,19 @@ void clientTask(void *pvParams) {
 	int sockfd;
 	int bytes_read;
 	uint8_t cnterror;
-//	char *useragent;
-	struct device_settings* device;
+
 	struct sockaddr_in dest;
-//	uint8_t *bufrec;
 	
 	vTaskDelay(300);	
 
-//	bufrec = incmalloc(2*RECEIVE+10);
-	
-	device = getDeviceSettings();
-	if (device != NULL)
+	strcpy(useragent,g_device->ua);
+	if (strlen(useragent) == 0) 
 	{
-		strcpy(useragent,device->ua);
-		if (strlen(useragent) == 0) 
-		{
-			strcpy(useragent,"Karadio/1.5");
-			strcpy(device->ua,useragent);
-		}	
-		free(device);
-	}
-	
+		strcpy(useragent,"Karadio/1.5");
+		strcpy(g_device->ua,useragent);
+	}	
 
 //	portBASE_TYPE uxHighWaterMark;
-//	clearHeaders();
-
 //	uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
 //	printf("watermark webclient:%d  heap:%d\n",uxHighWaterMark,xPortGetFreeHeapSize( ));
 	

@@ -869,7 +869,7 @@ event_ir_t evt;
  
 void initButtonDevices()
 {
-	struct device_settings *device;
+//	struct device_settings *device;
 	gpio_num_t enca0;
 	gpio_num_t encb0;
 	gpio_num_t encbtn0;
@@ -879,10 +879,8 @@ void initButtonDevices()
 	gpio_get_encoders(&enca0, &encb0, &encbtn0,&enca1, &encb1, &encbtn1);
 	if (enca1 == GPIO_NONE) isEncoder1 = false; //no encoder
 	if (enca0 == GPIO_NONE) isEncoder0 = false; //no encoder
-	device = getDeviceSettings();
-	if (isEncoder0)	encoder0 = ClickEncoderInit(enca0, encb0, encbtn0,((device->options32&T_ENC0)==0)?false:true );	
-	if (isEncoder1)	encoder1 = ClickEncoderInit(enca1, encb1, encbtn1,((device->options32&T_ENC1)==0)?false:true );	
-	free (device);
+	if (isEncoder0)	encoder0 = ClickEncoderInit(enca0, encb0, encbtn0,((g_device->options32&T_ENC0)==0)?false:true );	
+	if (isEncoder1)	encoder1 = ClickEncoderInit(enca1, encb1, encbtn1,((g_device->options32&T_ENC1)==0)?false:true );	
 	
 	gpio_get_buttons(&enca0, &encb0, &encbtn0,&enca1, &encb1, &encbtn1);
 	if (enca1 == GPIO_NONE) isButton1 = false; //no encoder
