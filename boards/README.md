@@ -7,7 +7,9 @@ standard_adb.csv is the default description of the gpio used when no hardware pa
 
 standard_psram.bin  is the default description for a wrover cpu
 
-lolin32pro.csv is adapted to a wrover lolin or ttgo board.  
+standard_touch.bin  is the default description for a wroom cpu with a touch screen
+
+lolin32pro.csv is adapted to a wrover lolin pro or ttgo board.  
 
 ttgot8.csv, ttgotm.csv,ttgov4.csv are for the correspondant boards.
 
