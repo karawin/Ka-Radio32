@@ -550,7 +550,7 @@ void drawLinesUcg()
 	setfont(text);
     for (int i=0;i<LINES;i++)
     {
-		taskYIELD();
+//		taskYIELD();
         if (mline[i]) draw(i); 
     }
 }

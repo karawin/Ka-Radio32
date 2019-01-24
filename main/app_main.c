@@ -108,6 +108,7 @@ xQueueHandle event_queue;
 //xSemaphoreHandle print_mux;
 static uint16_t FlashOn = 5,FlashOff = 5;
 bool ledStatus = true; // true: normal blink, false: led on when playing
+bool ledPolarity = false; // true: normal false: reverse
 player_t *player_config;
 static output_mode_t audio_output_mode; 
 static uint8_t clientIvol = 0;
@@ -637,23 +638,21 @@ void timerTask(void* p) {
 					default:
 					break;
 			}
-//			taskYIELD();
 		}
 		if (ledStatus)
 		{
 			if (ctime >= cCur)
 			{
 				gpioLed = getLedGpio();
-//				taskYIELD();
 
 				if (stateLed)
 				{
-					if (gpioLed != GPIO_NONE) gpio_set_level(gpioLed,0);	
+					if (gpioLed != GPIO_NONE) gpio_set_level(gpioLed,ledPolarity?1:0);	
 					stateLed = false;
 					cCur = FlashOff*10;
 				} else
 				{
-					if (gpioLed != GPIO_NONE) gpio_set_level(gpioLed,1);	
+					if (gpioLed != GPIO_NONE) gpio_set_level(gpioLed,ledPolarity?0:1);	
 					stateLed = true;
 					cCur = FlashOn*10;										
 				}
@@ -666,7 +665,6 @@ void timerTask(void* p) {
 			if (g_device->vol != getIvol())
 			{ 			
 				g_device->vol = getIvol();
-//				taskYIELD();
 				saveDeviceSettingsVolume(g_device);
 //				ESP_LOGD("timerTask",striWATERMARK,uxTaskGetStackHighWaterMark( NULL ),xPortGetFreeHeapSize( ));
 			}
@@ -975,6 +973,7 @@ void app_main()
 	
 	// led mode
 	if(g_device->options & T_LED) ledStatus = false;
+	if(g_device->options & T_LEDPOL) ledPolarity = true;
 	
 	//autostart	
 	setIvol( g_device->vol);

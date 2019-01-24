@@ -31,7 +31,7 @@ P_I2S_LRCK,data,u8,25
 P_I2S_BCLK,data,u8,26
 P_I2S_DATA,data,u8,27
 P_BACKLIGHT,data,u8,255
-P_LED_GPIO,data,u8,4
+P_LED_GPIO,data,u8,5
 P_ADC_KBD,data,u8,255
 
 option_space,namespace,,

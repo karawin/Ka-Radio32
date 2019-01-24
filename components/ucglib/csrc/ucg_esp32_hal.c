@@ -67,6 +67,7 @@ void sendOneByte()
 		
 	if (nb != 0)
 	{
+//		printf("O");
 //		spi_transaction_t trans_desc;
 		memset(&trans_desc,0,sizeof(spi_transaction_t));
 		
@@ -83,9 +84,6 @@ void sendOneByte()
 		trans_desc.tx_buffer = oneByte.data;
 		ESP_ERROR_CHECK(spi_device_transmit(handle, &trans_desc));							
 */		
-		
-		
-//		printf("O");
 	}
 }
 
@@ -95,14 +93,12 @@ void sendOneByte()
 void addOneByte(uint8_t bt)
 {
 	oneByte.data[oneByte.nb++] = bt;
-	if (oneByte.nb >ONEBYTEMAX-1) sendOneByte(); //security, but ucglib send a max of 4 bytes alone.
+	if (oneByte.nb > ONEBYTEMAXM1) sendOneByte(); //security, but ucglib send a max of 4 bytes alone.
 }
 
 
 int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 {
-  taskYIELD();
-
   switch(msg)
   {
     case UCG_COM_MSG_POWER_UP: 
@@ -129,9 +125,10 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 		if (ucg_esp32_hal.reset != UCG_ESP32_HAL_UNDEFINED) {
 			bitmask = bitmask | (1<<ucg_esp32_hal.reset);
 		}
-		if (ucg_esp32_hal.cs != UCG_ESP32_HAL_UNDEFINED) {
+/*		if (ucg_esp32_hal.cs != UCG_ESP32_HAL_UNDEFINED) {
 			bitmask = bitmask | (1<<ucg_esp32_hal.cs);
-		}		
+		}
+*/		
 		gpio_config_t gpioConfig;
 		gpioConfig.pin_bit_mask = bitmask;
 		gpioConfig.mode         = GPIO_MODE_OUTPUT;
@@ -140,7 +137,7 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 		gpioConfig.intr_type    = GPIO_INTR_DISABLE;
 		ESP_ERROR_CHECK(gpio_config(&gpioConfig));		
 		if (ucg_esp32_hal.reset != UCG_ESP32_HAL_UNDEFINED) gpio_set_level(ucg_esp32_hal.reset, 1);
-		gpio_set_level(ucg_esp32_hal.cs, 1);		
+//		gpio_set_level(ucg_esp32_hal.cs, 1);		
 		gpio_set_level(ucg_esp32_hal.dc, 0);		
 		
 #ifndef KaRadio32
@@ -239,7 +236,7 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 //		spi_transaction_t trans_desc;
 		memset(&trans_desc,0,sizeof(spi_transaction_t));
 		uint8_t* txbf;
-		uint8_t* txb = heap_caps_malloc(arg*2, MALLOC_CAP_DMA);
+		uint8_t* txb = heap_caps_malloc(arg, MALLOC_CAP_DMA);
 //		WORD_ALIGNED_ATTR void* txb = data;
 		if (txb == NULL) break;
 		txbf = txb;

@@ -109,8 +109,10 @@ bool VS1053_HW_init()
 		ESP_LOGE(TAG,"VS1053 not used");
 		return false;
 	}
+	uint32_t freq =spi_cal_clock(APB_CLK_FREQ, 1600000, 128, NULL);
+	ESP_LOGI(TAG,"VS1053 LFreq: %d",freq);
 	spi_device_interface_config_t devcfg={
-        .clock_speed_hz=2000000,               //Clock out at x MHz
+        .clock_speed_hz=freq,               //Clock out at x MHz
 		.command_bits = 8,
 		.address_bits = 8,
 		.dummy_bits = 0,
@@ -126,12 +128,13 @@ bool VS1053_HW_init()
 		.post_cb = NULL
 	};	
 	
-
 	//slow speed
 	ESP_ERROR_CHECK(spi_bus_add_device(spi_no, &devcfg, &vsspi));
 	
 	//high speed	
-	devcfg.clock_speed_hz = 6000000;
+	freq =spi_cal_clock(APB_CLK_FREQ, 6100000, 128, NULL);
+	ESP_LOGI(TAG,"VS1053 HFreq: %d",freq);
+	devcfg.clock_speed_hz = freq;
 	devcfg.spics_io_num= xdcs;               //XDCS pin
 	devcfg.command_bits = 0;
 	devcfg.address_bits = 0;
@@ -314,7 +317,7 @@ void VS1053_Start(){
 	ControlReset(SET);
 	vTaskDelay(50);
 	ControlReset(RESET);
-	vTaskDelay(100);	
+	vTaskDelay(150);	
 	//Check DREQ
 	if (VS1053_checkDREQ() == 0)
 	{
@@ -329,7 +332,7 @@ void VS1053_Start(){
 	VS1053_WriteRegister16(SPI_WRAM, 0x0003); //GPIO_DDR=3
 	VS1053_WriteRegister16(SPI_WRAMADDR, 0xc019); //address of GPIO_ODATA is 0xC019
 	VS1053_WriteRegister16(SPI_WRAM, 0x0000); //GPIO_ODATA=0
-	vTaskDelay(200);
+	vTaskDelay(100);
 	
 	int MP3Status = VS1053_ReadRegister(SPI_STATUSVS);
 	vsVersion = (MP3Status >> 4) & 0x000F; //Mask out only the four version bits
@@ -348,7 +351,6 @@ void VS1053_Start(){
 	
 	VS1053_regtest();
 	
-	ESP_LOGI(TAG,"g_device: %x",(int)g_device);
 	// enable I2C dac output of the vs1053
 	if (vsVersion == 4) // only 1053
 	{
@@ -364,7 +366,7 @@ void VS1053_Start(){
 //			VS1053_Admix(false);
 		}
 	}
-	vTaskDelay(10);
+	vTaskDelay(5);
 	ESP_LOGI(TAG,"volume: %d",g_device->vol);
 	setIvol( g_device->vol);
 	VS1053_SetVolume( g_device->vol);	

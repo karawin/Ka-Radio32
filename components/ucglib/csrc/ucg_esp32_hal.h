@@ -13,6 +13,7 @@
 
 #define UCG_ESP32_HAL_UNDEFINED (-1)
 #define ONEBYTEMAX 4
+#define ONEBYTEMAXM1 3
 typedef struct {
 #ifdef KaRadio32	
 	uint8_t spi_no;

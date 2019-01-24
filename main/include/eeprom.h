@@ -16,6 +16,8 @@
 #define NT_PATCH	0xFD
 #define T_LED		4
 #define NT_LED		0xFB
+#define T_LEDPOL	8
+#define NT_LEDPOL	0xF7
 #define T_DDMM		1
 #define NT_DDMM		0xFE
 #define T_ROTAT		2
@@ -59,7 +61,7 @@ struct device_settings {
 	uint8_t autostart; // 0: stopped, 1: playing
 	uint8_t i2sspeed; // 0 = 48kHz, 1 = 96kHz, 2 = 128kHz
 	uint32_t uartspeed; // serial baud
-	uint8_t options;  // bit0:0 theme ligth blue, 1 Dark brown, bit1: 0 patch load  1 no patch, bit2: O blink led  1 led on On play
+	uint8_t options;  // bit0:0 theme ligth blue, 1 Dark brown, bit1: 0 patch load  1 no patch, bit2: O blink led  1 led on On play, bit3:led polarity 0 normal 1 reverse 
 	char ua[39]; // user agent
 	int8_t tzoffset; //timezone offset
 	uint32_t sleepValue; 	

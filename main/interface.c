@@ -55,16 +55,16 @@ wifi.con(\"ssid\",\"password\"): Record the given AP ssid with password in AP1 f
 wifi.discon: disconnect the current ssid\n\
 wifi.station: the current ssid and password\n\
 wifi.status: give the current IP GW and mask\n\
-wifi.rssi: print the current rssi (power of the reception\n\n\
+wifi.rssi: print the rssi (power of the reception\n\n\
 //////////////////\n\
   Station Client commands\n\
 //////////////////\n\
-cli.url(\"url\"): the name or ip of the station to instant play\n\
-cli.path(\"/path\"): the path of the station to instant play\n\
-cli.port(\"xxxx\"): the port number of the station to instant play\n\
+cli.url(\"url\"): the name or ip of the station on instant play\n\
+cli.path(\"/path\"): the path of the station on instant play\n\
+cli.port(\"xxxx\"): the port number of the station on instant play\n\
 cli.instant: play the instant station\n\
 cli.start: start to play the current station\n\
-cli.play(\"xxx\"): play the xxx recorded station in the list (0 = stop)\n\
+cli.play(\"x\"): play the x recorded station in the list\n\
 "};
 
 const char stritHELP1[]  = {"\
@@ -73,8 +73,8 @@ cli.next: select the next station in the list and play it\
 cli.stop: stop the playing station or instant\n\
 cli.list: list all recorded stations\n\
 cli.list(\"x\"): list only one of the recorded stations. Answer with #CLI.LISTINFO#: followed by infos\n\
-cli.vol(\"xxx\"): set the volume to xxx with xxx from 0 to 254 (max volume)\n\
-cli.vol: ask for  the current volume. respond with ##CLI.VOL# xxx\n\
+cli.vol(\"x\"): set the volume to x with x from 0 to 254 (volume max)\n\
+cli.vol: display the current volume. respond with ##CLI.VOL# xxx\n\
 cli.vol-: Decrement the volume by 10 \n\
 cli.vol+: Increment the volume by 10 \n\
 Every vol command from uart or web or browser respond with ##CLI.VOL#: xxx\n\
@@ -84,54 +84,43 @@ cli.info: Respond with nameset, all icy, meta, volume and stae playing or stoppe
 //////////////////\n\
 sys.uart(\"x\"): Change the baudrate of the uart on the next reset.\n\
  Valid x are: 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 76880, 115200, 230400\n\
-sys.i2s: Display the current I2S speed"\
-};
+sys.i2s: Display the current I2S speed\n\
+"};
 
 const char stritHELP2[]  = {"\
-sys.i2s(\"x\"): Change and record the I2S clock speed of the vs1053 GPIO5 MCLK for the i2s interface to external dac.\n\
+sys.i2s(\"x\"): Change and record the I2S clock speed of the vs1053 GPIO5 MCLK of the i2s interface to external dac.\n\
 : 0=48kHz, 1=96kHz, 2=192kHz, other equal 0\n\
 sys.erase: erase all recorded configuration and stations.\n\
 sys.heap: show the ram heap size\n\
 sys.update: start an OTA (On The Air) update of the software\n\
-sys.prerelease: start an OTA of the next prerelease\n\
-sys.boot: reboot the webradio.\n\
-sys.patch(\"x\"): Change the status of the vs1053 patch at power on.\n\
-0 = Patch will not be loaded, 1 or up = Patch will be loaded (default) at power On \n\
-sys.patch: Display the vs1053 patch status\n\
-sys.led(\"x\"): Change the led indication:\n\
-1 = Led is in Play mode (lighted when a station is playing), 0 = Led is in Blink mode (default)\n\
-sys.led: Display the led indication status\n\
+sys.prerelease: start an OTA of the next release in alpha stage\n\
+sys.boot: reboot.\n\
+sys.patch and sys.patch(\"x\"): Display and Change the status of the vs1053 patch at power on.\n\
+ 0 = Patch will not be loaded, 1 or up = Patch will be loaded (default) at power On \n\
+sys.led and sys.led(\"x\"): Display and Change the led indication:\n\
+ 1 = Led is in Play mode (lighted when a station is playing), 0 = Led is in Blink mode (default)\n\
 sys.version: Display the Release and Revision numbers\n\
-sys.tzo(\"xx\"): Set the timezone offset of your country.\n\
+sys.tzo and sys.tzo(\"xx\"): Display and Set the timezone offset of your country.\n\
 "};
 
 const char stritHELP3[]  = {"\
-sys.tzo: Display the timezone offset\n\
 sys.date: Send a ntp request and Display the current locale time\n\
-:   Format ISO-8601 local time   https://www.w3.org/TR/NOTE-datetime\n\
-:   YYYY-MM-DDThh:mm:ssTZD (eg 2017-07-16T19:20:30+01:00)\n\
-sys.version: Display the release and Revision of KaraDio\n\
 sys.dlog: Display the current log level\n\
 sys.logx: Set log level to x with x=n for none, v for verbose, d for debug, i for info, w for warning, e for error\n\
 sys.log: do nothing apart a trace on uart (debug use)\n\
-sys.lcdout: Display the timer to switch off the lcd. 0= no timer\n\
-sys.lcdout(\"x\"): Timer in seconds to switch off the lcd. 0= no timer\n\
-sys.lcd: Display the current lcd type\n\
-sys.lcd(\"x\"): Change the lcd type to x on next reset\n\
-sys.ledgpio: Display the default Led GPIO\n\
-sys.ledgpio(\"x\"): Change the default Led GPIO (4) to x\n\
+sys.lcdout and sys.lcdout(\"x\"): Timer in seconds to switch off the lcd. 0= no timer\n\
+sys.lcd and sys.lcd(\"x\"): Display and Change the lcd type to x on next reset\n\
+sys.ledgpio and sys.ledgpio(\"x\"): Display and Change the default Led GPIO (4) to x\n\
 "};
+
 const char stritHELP4[]  = {"\
-sys.ddmm: display the date format\n\
-sys.ddmm(\"x\"): Change and display the date format. 0:MMDD, 1:DDMM\n\
-sys.host: display the hostname for mDNS\n\
-sys.host(\"your hostname\"): change and display the hostname for mDNS\n\
-sys.rotat: display the lcd rotation option\n\
-sys.rotat(\"x\"): Change and display the lcd rotation option (reset needed). 0:no rotation, 1: rotation\n\
+sys.ddmm and sys.ddmm(\"x\"):  Display and Change  the date format. 0:MMDD, 1:DDMM\n\
+sys.host and sys.host(\"your hostname\"): display and change the hostname for mDNS\n\
+sys.rotat and sys.rotat(\"x\"): Change and display the lcd rotation option (reset needed). 0:no rotation, 1: rotation\n\
 sys.henc0 or sys.henc1: Display the current step setting for the encoder. Normal= 4 steps/notch, Half: 2 steps/notch\n\
-sys.henc0(\"x\") with x=0 Normal, x=1 Half\n\
-sys.henc1(\"x\") with x=0 Normal, x=1 Half\n\
+sys.hencx(\"y\") with y=0 Normal, y=1 Half\n\
 sys.cali[brate]: start a touch screen calibration\n\
+sys.ledpola and sys.ledpola(\"x\"): dsiplay or set the polarity of the system led\n\
 ///////////\n\
   Other\n\
 ///////////\n\
@@ -938,6 +927,31 @@ void sysled(char* s)
 	kprintf("##LED is in %s mode#\n",(ledStatus)?"Blink":"Play");
 }
 
+// mode of the led indicator. polarity 0 or 1
+void sysledpol(char* s)
+{
+    char *t = strstr(s, parslashquote);
+	extern bool ledPolarity;
+	if(t == NULL)
+	{
+		kprintf("##Led polarity is %d#\n",((g_device->options & T_LEDPOL)== 0)?0:1);
+		return;
+	}
+	char *t_end  = strstr(t, parquoteslash);
+    if(t_end == NULL)
+    {
+		kprintf(stritCMDERROR);
+		return;
+    }	
+	uint8_t value = atoi(t+2);
+	if (value !=0) 
+	{g_device->options |= T_LEDPOL; ledPolarity = true; if (getState()) gpio_set_level(getLedGpio(),0);}
+	else 
+	{g_device->options &= NT_LEDPOL; ledPolarity =false;} // options:0 = ledPolarity 
+	
+	saveDeviceSettings(g_device);	
+	kprintf("##LED polarity is %d#\n",(ledPolarity)?1:0);
+}
 
 
 // display or change the tzo for ntp
@@ -1140,6 +1154,7 @@ void checkCommand(int size, char* s)
 		else if(strcmp(tmp+4, "prerelease") == 0) 	update_firmware((char*)"KaRadio32prv");
 		else if(startsWith (  "patch",tmp+4)) 	syspatch(tmp);
 		else if(startsWith (  "ledg",tmp+4)) 	sysledgpio(tmp); //ledgpio
+		else if(startsWith (  "ledpol",tmp+4)) 	sysledpol(tmp);
 		else if(startsWith (  "led",tmp+4)) 	sysled(tmp);
 		else if(strcmp(tmp+4, "date") == 0) 	ntp_print_time();
 		else if(strncmp(tmp+4, "vers",4) == 0) 	kprintf("Release: %s, Revision: %s\n",RELEASE,REVISION);
