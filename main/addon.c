@@ -199,41 +199,38 @@ void lcd_init(uint8_t Type)
 //	dt=localtime(&timestamp);
 }
 
+void in_welcome(const char* ip,const char*state,int y,char* Version)
+{
+	DrawString(2,2*y,Version);
+	DrawColor(0,0,0,0);
+	DrawBox(2, 4*y, GetWidth()-2, y);
+	DrawColor(1,255,255,255);
+	DrawString(2,4*y,state);
+	DrawString( DrawString(2,5*y,"IP:")+18,5*y,ip);	
+}		
+
 void lcd_welcome(const char* ip,const char*state)
 {
 char Version[20];
+	sprintf(Version,"Version %s R%s\n",RELEASE,REVISION);
 	if (lcd_type == LCD_NONE) return;
 	if ((strlen(ip)==0)&&(strlen(state)==0)) ClearBuffer();
 	if (isColor) 
 	{
-		ucg_SetFont(&ucg,ucg_font_helvR14_tf );
-		if (GetWidth() <=64)
-			DrawString(2,2,"KaRadio32");
-		else DrawString(10,2,"KaRadio32");	
-		ucg_SetFont(&ucg,ucg_font_6x10_tf);
-		sprintf(Version,"Version %s R%s\n",RELEASE,REVISION);
-		DrawString(2,24,Version);
-		DrawColor(0,0,0,0);
-		DrawBox(2, 40, 128-30, 12);
-		DrawColor(1,255,255,255);
-		DrawString(2,40,state);
-		DrawString( DrawString(2,53,"IP")+18,53,ip);	
+		setfont(2);
+		int y = - ucg_GetFontDescent(&ucg)+ ucg_GetFontAscent(&ucg) +3; //interline
+		DrawString(GetWidth()/4,2,"KaRadio32");	
+		setfont(1);
+		in_welcome(ip,state,y,Version);
 	} else
 	{
 		u8g2_FirstPage(&u8g2);
 		do {	
-			u8g2_SetFont(&u8g2,u8g2_font_helvR14_tf );
-			if (GetWidth() <=64)
-				DrawString(2,2,"KaRadio32");
-			else DrawString(10,2,"KaRadio32");
-			u8g2_SetFont(&u8g2,u8g2_font_6x10_tf);
-			sprintf(Version,"Version %s R%s\n",RELEASE,REVISION);
-			DrawString(2,24,Version);
-			DrawColor(0,0,0,0);
-			DrawBox(2, 40, 128-30, 12);
-			DrawColor(1,255,255,255);
-			DrawString(2,40,state);
-			DrawString( DrawString(2,53,"IP")+18,53,ip);
+			setfont8(2);
+			int y = (u8g2_GetAscent(&u8g2) - u8g2_GetDescent(&u8g2));
+			DrawString(GetWidth()/4,2,"KaRadio32");
+			setfont8(1);
+			in_welcome(ip,state,y,Version);
 		} while ( u8g2_NextPage(&u8g2) );	    	
 	}
 }

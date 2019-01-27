@@ -40,7 +40,7 @@ const char strsMALLOC[]  = {"WebServer inmalloc fails for %d\n"};
 const char strsMALLOC1[]  = {"WebServer %s malloc fails\n"};
 const char strsSOCKET[]  = {"WebServer Socket fails %s errno: %d\n"};
 const char strsID[]  = {"getstation, no id or Wrong id %d\n"};
-const char strsRAUTO[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:13\r\n\r\n{\"rauto\":\"%c\"}"};
+const char strsR13[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:13\r\n\r\n{\"%s\":\"%c\"}"};
 const char strsICY[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:%d\r\n\r\n{\"curst\":\"%s\",\"descr\":\"%s\",\"name\":\"%s\",\"bitr\":\"%s\",\"url1\":\"%s\",\"not1\":\"%s\",\"not2\":\"%s\",\"genre\":\"%s\",\"meta\":\"%s\",\"vol\":\"%s\",\"treb\":\"%s\",\"bass\":\"%s\",\"tfreq\":\"%s\",\"bfreq\":\"%s\",\"spac\":\"%s\",\"auto\":\"%c\"}"};
 const char strsWIFI[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:%d\r\n\r\n{\"ssid\":\"%s\",\"pasw\":\"%s\",\"ssid2\":\"%s\",\"pasw2\":\"%s\",\
 \"ip\":\"%s\",\"msk\":\"%s\",\"gw\":\"%s\",\"ip2\":\"%s\",\"msk2\":\"%s\",\"gw2\":\"%s\",\"ua\":\"%s\",\"dhcp\":\"%s\",\"dhcp2\":\"%s\",\"mac\":\"%s\",\"host\":\"%s\",\"tzo\":\"%s\"}"};
@@ -274,6 +274,8 @@ static void rssi(int socket) {
 	sprintf(answer,"{\"wsrssi\":\"%d\"}",rssi);
 	websocketwrite(socket,answer, strlen(answer));
 }
+
+
 // flip flop the theme indicator
 static void theme() {
 	if ((g_device->options&T_THEME)!=0) g_device->options&=NT_THEME; else g_device->options |= T_THEME;
@@ -640,9 +642,17 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			}		
 		}
 	} else if(strcmp(name, "/rauto") == 0) {
-		char buf[strlen(strsRAUTO)+16];// = inmalloc( strlen(strsRAUTO)+16);
-		sprintf(buf, strsRAUTO,(g_device->autostart)?'1':'0' );
+		char buf[strlen(strsR13)+16];// = inmalloc( strlen(strsRAUTO)+16);
+		sprintf(buf, strsR13,"rauto",(g_device->autostart)?'1':'0' );
 		write(conn, buf, strlen(buf));	
+		return;
+		
+	} else if(strcmp(name, "/theme") == 0) {
+		char buf[strlen(strsR13)+16];// = inmalloc( strlen(strsRAUTO)+16);
+		sprintf(buf, strsR13,"theme",(g_device->options & T_THEME)?'1':'0' );
+		write(conn, buf, strlen(buf));
+		return;
+		
 	} else if(strcmp(name, "/stop") == 0) {
 		if (clientIsConnected())
 		{	

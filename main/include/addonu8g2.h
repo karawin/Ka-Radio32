@@ -6,7 +6,7 @@
 *******************************************************************************/
 #ifndef ADDONU8G2_H_
 #define ADDONU8G2_H_
-
+void setfont8(int size);
 void playingU8g2();
 void namesetU8g2(char* ici);
 void statusU8g2(const char* label);

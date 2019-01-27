@@ -588,6 +588,7 @@ void start_network(){
 		tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, "karadio32");	
 	}
 	lcd_welcome(localIp,"IP found");
+	vTaskDelay(10);
 }
 
 
@@ -761,6 +762,7 @@ void app_main()
 	if (g_device->cleared != 0xAABB)
 	{	
 		ESP_LOGE(TAG,"Device config not ok. Try to restore");
+		free(g_device);
 		restoreDeviceSettings(); // try to restore the config from the saved one
 		g_device = getDeviceSettings();		
 		if (g_device->cleared != 0xAABB)
@@ -882,7 +884,7 @@ void app_main()
 	ESP_LOGI(TAG, "Heap size: %d",xPortGetFreeHeapSize());
 
 	lcd_welcome("","");
-	lcd_welcome("","STOPPED");
+	lcd_welcome("","STARTING");
 	
 	// volume
 	setIvol( g_device->vol);

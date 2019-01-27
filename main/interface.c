@@ -120,7 +120,7 @@ sys.rotat and sys.rotat(\"x\"): Change and display the lcd rotation option (rese
 sys.henc0 or sys.henc1: Display the current step setting for the encoder. Normal= 4 steps/notch, Half: 2 steps/notch\n\
 sys.hencx(\"y\") with y=0 Normal, y=1 Half\n\
 sys.cali[brate]: start a touch screen calibration\n\
-sys.ledpola and sys.ledpola(\"x\"): dsiplay or set the polarity of the system led\n\
+sys.ledpola and sys.ledpola(\"x\"): display or set the polarity of the system led\n\
 ///////////\n\
   Other\n\
 ///////////\n\

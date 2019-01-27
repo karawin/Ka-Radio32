@@ -2,8 +2,9 @@
 # Need python3. Install it with pacman -Sy python3
 echo style
 cp style.css style.ori
-gzip  style.css 
-mv style.css.gz style.css
+python3 ./css-html-js-minify.py style.css
+gzip  style.min.css 
+mv style.min.css.gz style.css
 xxd -i style.css > style
 #sed -i 's/\[\]/\[\]/g' style
 sed -i 's/unsigned/const/g' style
@@ -11,8 +12,9 @@ mv style.ori style.css
 
 echo style1
 cp style1.css style1.ori
-gzip  style1.css 
-mv style1.css.gz style1.css
+python3 ./css-html-js-minify.py style1.css
+gzip  style1.min.css 
+mv style1.min.css.gz style1.css
 xxd -i style1.css > style1
 #sed -i 's/\[\]/\[\]/g' style1
 sed -i 's/unsigned/const/g' style1
@@ -20,6 +22,7 @@ mv style1.ori style1.css
 
 echo script
 cp script.js script.ori
+#python3 ./css-html-js-minify.py script.js 
 gzip  script.js 
 mv script.js.gz script.js
 xxd -i script.js > script

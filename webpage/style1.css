@@ -6,6 +6,7 @@ html,body {
 	color:#ffffff;
 	background-color:#333333;
 }
+
 #MAIN {
 	width:100%;
 /*	height:120%;*/
@@ -406,7 +407,7 @@ border:1px solid #444;
 	top:53px;
 	left:0;
 	border-color:#185213;
-	border-top:solid 1px
+//	border-top:solid 1px
 }
 .tabs [id^="tab"]:checked+label {
 	top:0;
@@ -415,6 +416,7 @@ border:1px solid #444;
 	color:#EEE;
 	background:#918B69;
 	border-radius:5px
+	border-color:#9cc199;
 }
 .tabs [id^="tab"]:checked ~ [id^="tab-content"] {
 	display:block
@@ -424,7 +426,19 @@ table#stationsTable,table#stationsTable th,table#stationsTable td {
 	border-collapse:collapse;
 	width:100%;
 	overflow-x: hidden;
+	border-color:#6d6f6d;
 }
+
+table#stationsTable tr:nth-child(even)
+{
+	background-color: #151515;;
+}
+
+table#stationsTable tr:nth-child(odd)
+{
+	background-color: #0d0d0d;
+}
+
 a.page {
 	font-size:18pt!important;
 	margin-right:10px

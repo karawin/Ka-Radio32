@@ -1,13 +1,14 @@
 var content = "Content-type",
 	ctype = "application/x-www-form-urlencoded",
 	cjson = "application/json";
-var auto,intervalid , intervalrssi  ,recrssi = 0, timeid, websocket,urlmonitor , e, playing = false, curtab = "tab-content1",stchanged = false,maxStation = 255;
+var auto,intervalid , intervalrssi  ,recrssi = 0, timeid, websocket,urlmonitor , e, moniPlaying = false,editPlaying = false, editIndex= 0 ,curtab = "tab-content1",stchanged = false,maxStation = 255,themeIn = "0";
 const karadio = "Karadio32";
 
 function openwebsocket(){	
 	autoplay(); //to force the server socket to accept and open the web server client.
 	websocket = new WebSocket("ws://"+window.location.host+"/");
 	console.log("url:"+"ws://"+window.location.host+"/");
+
 
 	websocket.onmessage = function (event) {
 	try{	
@@ -33,12 +34,10 @@ function openwebsocket(){
 
 	websocket.onopen = function (event) {
 		console.log("Open, url:"+"ws://"+window.location.host+"/");
-//		console.log("onopen websocket: "+websocket);
 		if(window.timerID){ /* a setInterval has been fired */
 		window.clearInterval(window.timerID);
 		window.timerID=0;}
-		refresh();
-		
+		refresh();		
 	}
 	websocket.onclose = function (event) {
 		console.log("onclose code: "+event.code);
@@ -84,7 +83,7 @@ function wsplayStation($arr){
 function playMonitor($arr){
 	urlmonitor = "";
 	urlmonitor = $arr;	
-	if (playing)
+	if (moniPlaying)
 	{
 		monitor = document.getElementById("audio");	
 		if (urlmonitor.endsWith("/"))
@@ -103,7 +102,7 @@ function mplay(){
 	monitor.volume = document.getElementById("volm_range").value / 100;
 	while (monitor.networkState == 2);
 	monitor.play();
-	playing = true;	
+	moniPlaying = true;	
 	monitor.muted = false;
 }	
 
@@ -116,7 +115,7 @@ function mstop(){
 		monitor = document.getElementById("audio");	
 		monitor.muted = true;
 		monitor.src = 'http://karadio.karawin.fr/silence-1sec.mp3';
-		playing = false;
+		moniPlaying = false;
 }	
 function mpause(){
 		monitor = document.getElementById("audio");	
@@ -661,10 +660,51 @@ function autostart() {
 		xhr.send("&");		
 	} catch(e){console.log("error"+e);}	
 }
+//ask for the state of the theme
+function atheme() {
+	xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState == 4 && xhr.status == 200) {	
+			var arr = JSON.parse(xhr.responseText);
+			themeIn = arr["theme"]  ;			
+		}
+	}
+	try{		
+		xhr.open("POST","theme",false); // request auto state
+		xhr.setRequestHeader(content,ctype);
+		xhr.send("&");		
+	} catch(e){console.log("error"+e);}	
+}
 
 function Select() {
 	if (document.getElementById('aplay').checked)
 		 playStation() ;
+}
+
+function setEditBackground(tr) {
+		if (themeIn == '1')
+			tr.style.background =  "#1a3c56";
+		else
+			tr.style.background = "rgb(185, 213, 236)";
+}
+function playEditStation(tr) {
+	id = tr.cells[0].innerText;
+	if ((editPlaying)&&(editIndex== tr))
+	{
+		stopStation();
+		tr.style.background = "initial";
+		editPlaying = false;
+		editIndex = 0;
+	}
+	else{
+		if (editIndex != 0) editIndex.style.background = "initial";
+		wsplayStation(id); // select the station in the list
+		editPlaying = true;
+		editIndex = tr;
+//		getComputedStyle(element).getPropertyValue('--color-font-general');
+		setEditBackground(tr);
+		playStation() ; //play it 
+	}
 }
 
 function playStation() {
@@ -1046,6 +1086,7 @@ function stChanged()
 //Load the Stations table
 function loadStations() {
 	var new_tbody = document.createElement('tbody'),
+	idlist,select,
 	id = 0;
 	function cploadStations(id,arr) {
 			tr = document.createElement('TR'),
@@ -1056,10 +1097,12 @@ function loadStations() {
 			tr.ondrop=dragDrop;
 			tr.ondragover=allowDrop;
 			td.appendChild(document.createTextNode(id ));
+			td.setAttribute('onclick', 'playEditStation(this.parentNode);');
 			tr.appendChild(td);
 			for(key in arr){
 				td = document.createElement('TD');
 				td.style="word-break: break-all;overflow-wrap: break-word; word-wrap: break-word;";
+				td.setAttribute('onclick','playEditStation(this.parentNode);');
 				if(arr[key].length > 116) arr[key] = "Error";
 				td.appendChild(document.createTextNode(arr[key]));
 				tr.appendChild(td);
@@ -1068,8 +1111,16 @@ function loadStations() {
 //			td.innerHTML = "<div  onClick=\"editStation("+id+")\"> Edit</div>";
 			td.innerHTML = "<a href=\"javascript:void(0)\" onClick=\"editStation("+id+")\">Edit</a>";
 			tr.appendChild(td);
+			if (idlist === idstr){
+				setEditBackground(tr);
+				editIndex = tr;
+				editPlaying = true;
+			}
 			new_tbody.appendChild(tr);
 	}	
+	select = document.getElementById('stationsSelect');
+	idlist = select.options[select.selectedIndex].value.split(":");
+	idlist = idlist[0];	
 	for(id; id < maxStation; id++) {
 		idstr = id.toString();		
 		if (localStorage.getItem(idstr) != null)
@@ -1279,7 +1330,8 @@ document.addEventListener("DOMContentLoaded", function() {
 	wifi(0) ;
 	hardware(0);
 	autostart();
-	checkversion();
+	atheme();
+	checkversion(); 
 	setMainHeight(curtab);
 	promptworking("");
    	if (intervalrssi != 0)  window.clearTimeout(intervalrssi);
