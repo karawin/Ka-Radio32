@@ -18,7 +18,6 @@ function openwebsocket(){
 		{ document.getElementById('meta').innerHTML = karadio;setMainHeight(curtab);}
 		if (arr["meta"]) 
 			{	document.getElementById('meta').innerHTML = arr["meta"].replace(/\\/g,"");
-				//document.getElementById("CONTENT").style.marginTop = document.getElementById('HEADER').clientHeight+"px" ;
 				setMainHeight(curtab);
 			}
 		changeTitle(document.getElementById('meta').innerHTML);
@@ -487,7 +486,6 @@ function logValue(value) {
 //Log(128/(Midi Volume + 1)) * (-10) * (Max dB below 0/(-24.04))
 	var log = Number(value )+ 1;
 	var val= Math.round((Math.log10(255/log) * 105.54571334));
-//	console.log("Value= "+value+"   log de val="+log+" "+255/log +"  = "+Math.log10(255/log)  +"   new value= "+val );
 	return val;
 }
 
@@ -497,9 +495,7 @@ function onRangeVolChange($value,$local) {
 	document.getElementById('vol_span').innerHTML = (value * -0.5) + " dB";
 	document.getElementById('vol_range').value = $value;
 	document.getElementById('vol1_range').value = $value;
-//	if ($local &&websocket.readyState == websocket.OPEN) websocket.send("wsvol=" + $value+"&");
-//	else 
-		if ($local)	
+	if ($local)	
 	{
 		xhr = new XMLHttpRequest();
 		xhr.open("POST","soundvol",false);
@@ -1099,7 +1095,7 @@ function loadStations() {
 			td.appendChild(document.createTextNode(id ));
 			td.setAttribute('onclick', 'playEditStation(this.parentNode);');
 			tr.appendChild(td);
-			for(key in arr){
+/*			for(key in arr){
 				td = document.createElement('TD');
 				td.style="word-break: break-all;overflow-wrap: break-word; word-wrap: break-word;";
 				td.setAttribute('onclick','playEditStation(this.parentNode);');
@@ -1107,7 +1103,38 @@ function loadStations() {
 				td.appendChild(document.createTextNode(arr[key]));
 				tr.appendChild(td);
 			}
+*/
+// Name
+				td = document.createElement('TD');
+				td.style="word-break: break-all;overflow-wrap: break-word; word-wrap: break-word;";
+				td.setAttribute('onclick','playEditStation(this.parentNode);');
+				if(arr["Name"].length > 116) arr["Name"] = "Error";
+				td.appendChild(document.createTextNode(arr["Name"]));
+				tr.appendChild(td);
+// URL
+				td = document.createElement('TD');
+				td.style="word-break: break-all;overflow-wrap: break-word; word-wrap: break-word;";
+				td.setAttribute('onclick','playEditStation(this.parentNode);');
+				if (arr["Name"].length > 0)
+				{
+					if(arr["URL"].length > 116) arr["URL"] = "Error";
+					if(arr["File"].length > 116) arr["File"] = "Error";
+					if(arr["Port"].length > 116) arr["Port"] = "Error";
+					td.appendChild(document.createTextNode(arr["URL"] + ":" + arr["Port"] + arr["File"]));
+				} else
+					td.appendChild(document.createTextNode(""));
+				tr.appendChild(td);
+// Ovol
+				td = document.createElement('TD');
+				td.style="word-break: break-all;overflow-wrap: break-word; word-wrap: break-word;";
+				td.setAttribute('onclick','playEditStation(this.parentNode);');
+				if(arr["ovol"].length > 116) arr["ovol"] = "Error";
+				td.appendChild(document.createTextNode(arr["ovol"]));
+				tr.appendChild(td);
+
+// edit button			
 			td = document.createElement('TD');
+			td.style="text-align: center; vertical-align: middle;";
 //			td.innerHTML = "<div  onClick=\"editStation("+id+")\"> Edit</div>";
 			td.innerHTML = "<a href=\"javascript:void(0)\" onClick=\"editStation("+id+")\">Edit</a>";
 			tr.appendChild(td);
@@ -1338,3 +1365,25 @@ document.addEventListener("DOMContentLoaded", function() {
 	intervalrssi = 0;
 	intervalrssi = window.setInterval(wsaskrssi,5000 );
 });
+
+window.addEventListener("keydown", function (event) {
+  if (event.defaultPrevented) {
+    return; // Ne devrait rien faire si l'événement de la touche était déjà consommé.
+  }
+
+  switch (event.key) {
+    case "ArrowLeft":
+      // Faire quelque chose pour la touche "left arrow" pressée.
+	  onRangeVolChange(parseInt(document.getElementById('vol_range').value) -5 ,true)	  
+      break;
+    case "ArrowRight":
+      // Faire quelque chose pour la touche "right arrow" pressée.
+	  onRangeVolChange(parseInt(document.getElementById('vol_range').value) +5 ,true)	  
+      break;
+    default:
+      return; // Quitter lorsque cela ne gère pas l'événement touche.
+  }
+
+  // Annuler l'action par défaut pour éviter qu'elle ne soit traitée deux fois.
+  event.preventDefault();
+}, true);

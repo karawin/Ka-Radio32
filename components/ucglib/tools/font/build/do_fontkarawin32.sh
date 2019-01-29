@@ -27,11 +27,14 @@ rm ../karadio32/ucg_karadio32_fonts.c
 ./do_fontkar.sh crox5hb
 ./do_fontkar.sh crox5t
 ./do_fontkar.sh crox5tb
-./do_fontkar.sh 6x13_gr
 ./do_fontkar.sh 5x7_gr
+./do_fontkar.sh 6x13_gr
+./do_fontkar.sh 9x15_gr
 ./do_fontkar.sh 9x16_gr
+./do_fontkar.sh helvR12_gr
 ./do_fontkar.sh helvR14_gr
 ./do_fontkar.sh helvR18_gr
+./do_fontkar.sh ncenR12_gr
 ./do_fontkar.sh ncenR14_gr
 
 echo "Generate ucg_karadio32_fonts.c"

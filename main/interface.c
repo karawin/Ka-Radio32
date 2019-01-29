@@ -6,7 +6,7 @@
 
 
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
-
+#define TAG "Interface"
 #include "interface.h"
 #include "stdio.h"
 #include "string.h"
@@ -464,18 +464,16 @@ void clientPlay(char *s)
     }	
 }
 
-const char strilLIST[]  = {"##CLI.LIST#%c"};
-const char strilINFOND[]  = {"#CLI.LISTINFO#: %3d: not defined\n"};
-const char strilINFO[]  = {"#CLI.LISTINFO#: %3d: %s, %s:%d%s\n"};
-const char strilINFO1[]  = {"#CLI.LISTNUM#: %3d: %s, %s:%d%s\n"};
-const char strilDINFO[]  = {"\n#CLI.LIST#%c"};
+const char strilLIST[]  = {"##CLI.LIST#\n"};
+const char strilINFO[]  = {"#CLI.LISTINFO#: %3d: %s, %s:%d%s%%%d\n"};
+const char strilDINFO[]  = {"\n#CLI.LIST#\n"};
 
 
 void clientList(char *s)
 {
 	struct shoutcast_info* si;
 	uint16_t i = 0,j = 255;
-	bool onlyOne = false;
+//	bool onlyOne = false;
 	
 	char *t = strstr(s, parslashquote);
 	if(t != NULL) // a number specified
@@ -489,11 +487,10 @@ void clientList(char *s)
 		i = atoi(t+2);
 		if (i>254) i = 0;
 		j = i+1;
-		onlyOne = true;
-		
+//		onlyOne = true;		
 	} 
 	{	
-		kprintf(strilDINFO,0x0d);	
+		kprintf(strilDINFO);	
 		for ( ;i <j;i++)
 		{
 			vTaskDelay(1);
@@ -501,7 +498,6 @@ void clientList(char *s)
 			
 			if ((si == NULL) || (si->port ==0))
 			{
-				//kprintf(strilINFOND,i);
 				if (si != NULL) {free(si);}
 				continue;
 			}
@@ -510,20 +506,95 @@ void clientList(char *s)
 			{
 				if(si->port !=0)
 				{	
-					if (onlyOne)
-						kprintf(strilINFO,i,si->name,si->domain,si->port,si->file);	
-					else
-						kprintf(strilINFO1,i,si->name,si->domain,si->port,si->file);
+						kprintf(strilINFO,i,si->name,si->domain,si->port,si->file,si->ovol);	
 				}
 				free(si);
 			}	
 		}	
-		kprintf(strilLIST,0x0d);
+		kprintf(strilLIST);
 	}
+}
+// parse url
+bool parseUrl(char* src, char* url, char* path, uint16_t *port)
+{
+	char* teu,*tbu,*tbpa;
+	char* tmp = src;
+	tmp = strstr(src,"://");
+	if (tmp) tmp +=3;
+	else tmp = src;
+	tbu = tmp;
+//printf("tbu: %s\n",tbu);
+	teu = strchr(tbu,':');
+	if (teu)
+	{
+		tmp = teu+1;
+		*port = atoi(tmp);
+	}	
+	tbpa = strchr(tmp,'/');	
+	if (tbpa)
+	{
+		if(!teu) teu = tbpa-1;
+		strcpy(path,tbpa);
+	}
+	strncpy(url,tbu,teu-tbu);
+	url[teu-tbu] = 0;
+	return true;
+}
+
+//edit a station
+void clientEdit(char *s)
+{
+struct shoutcast_info* si;
+uint8_t id = 0xff;
+char* tmp; 
+char* tmpend ;
+char url[200];
+
+	si = malloc(sizeof(struct shoutcast_info));	
+	if (si == NULL) { kprintf("##CLI.EDIT#: ERROR MEM#") ; return;}
+	memset(si->domain, 0, sizeof(si->domain));
+    memset(si->file, 0, sizeof(si->file));
+    memset(si->name, 0, sizeof(si->name));
+	memset(url,0,200);
+    si->port = 80;
+	si->ovol = 0;
+//	printf("##CLI.EDIT: %s",s);
+	ESP_LOGI(TAG,"%s",s);
+	tmp = s+10;
+	tmpend = strchr(tmp,':');
+	if (tmpend-tmp) id = atoi(tmp);	
+	tmp = ++tmpend;//:
+	tmpend = strchr(tmp,',');
+	if (tmpend-tmp) {strncpy(si->name,tmp,tmpend-tmp);} //*tmpend = 0; }
+	tmp = ++tmpend;//,
+	tmpend = strchr(tmp,'%');
+	if (tmpend-tmp){ strncpy(url,tmp,tmpend-tmp);} //*tmpend = 0; }
+	else url[0] = 0;
+	tmp = ++tmpend;//%
+	tmpend = strchr(tmp,'"');
+	if (tmpend-tmp) si->ovol = atoi(tmp);	
+	
+	
+//printf("==> id: %d, name: %s, url: %s\n",id,si->name,url);	
+	
+    // Parsing
+	if (url[0] != 0)
+		parseUrl(url, si->domain, si->file, &(si->port));
+	
+//printf(" id: %d, name: %s, url: %s, port: %d, path: %s\n",id,si->name,si->domain,si->port,si->file);
+	if (id < 0xff) {
+		if (si->domain[0]==0) {si->port = 0;si->file[0] = 0;}
+		saveStation(si, id); 
+		kprintf("##CLI.EDIT#: OK (%d)\n",id);
+	}
+	else
+		kprintf("##CLI.EDIT#: ERROR\n");	
+	
 }
 void clientInfo()
 {
 	struct shoutcast_info* si;
+	kprintf("##CLI.INFO#\n");
 	si = getStation(currentStation);
 	if (si != NULL)
 	{
@@ -1140,6 +1211,7 @@ void checkCommand(int size, char* s)
 		else if(strcmp(tmp+4, "vol-") == 0) 	setVolumeMinus();
 		else if(strcmp(tmp+4, "info") == 0) 	clientInfo();
 		else if(startsWith (  "vol",tmp+4)) 	clientVol(tmp);
+		else if(startsWith (  "edit",tmp+4)) 	clientEdit(tmp);
 		else printInfo(tmp);
 	} else
 	if(startsWith ("sys.", tmp))

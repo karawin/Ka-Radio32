@@ -149,10 +149,10 @@ void eeEraseStations() {
 void saveStation(struct shoutcast_info *station, uint16_t position) {
 	uint32_t i = 0;
 	if (position > NBSTATIONS-1) {ESP_LOGE(TAG,"saveStation fails pos=%d",position);return;}
-	while (!eeSetData((position+1)*256, station, 256)) 
+	while (!eeSetData((position)*256, station, 256)) 
 	{
-		kprintf("Retrying %d on saveStation\n",i+1);
-		vTaskDelay ((i+1)*20+200) ;
+		ESP_LOGW(TAG,"Retrying %d on saveStation",i);
+		vTaskDelay ((i+1)*20+100) ;
 		i++; 
 //		if (i == 2) {clientDisconnect("saveStation low Memory"); vTaskDelay (300) ;} // stop the player
 		if (i == 10) return;
@@ -164,9 +164,8 @@ void saveMultiStation(struct shoutcast_info *station, uint16_t position, uint8_t
 	if (number <= 0) return;
 	while (!eeSetData((position)*256, station, number*256))
 	{		
-		kprintf("Retrying %d on SaveMultiStation for %d stations\n",i+1,number);
-		vTaskDelay ((i+1)*20+300) ;
-		i++; 
+		ESP_LOGW(TAG,"Retrying %d on SaveMultiStation for %d stations",i,number);
+		vTaskDelay ((i++)*20+100) ;
 //		if (i == 3) {clientDisconnect("saveMultiStation low Memory"); vTaskDelay (300) ;}
 		if (i == 10) return;
 	}
