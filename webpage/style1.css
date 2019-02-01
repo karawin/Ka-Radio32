@@ -6,12 +6,10 @@ html,body {
 	color:#ffffff;
 	background-color:#333333;
 }
-
 #MAIN {
 	width:100%;
-/*	height:120%;*/
 	overflow:hidden;
-	margin:0
+	margin:0px
 }
 #HEADER{
 	z-index:10;

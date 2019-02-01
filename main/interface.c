@@ -465,7 +465,7 @@ void clientPlay(char *s)
 }
 
 const char strilLIST[]  = {"##CLI.LIST#\n"};
-const char strilINFO[]  = {"#CLI.LISTINFO#: %3d: %s, %s:%d%s%%%d\n"};
+const char strilINFO[]  = {"#CLI.LISTNUM#: %3d: %s, %s:%d%s%%%d\n"};
 const char strilDINFO[]  = {"\n#CLI.LIST#\n"};
 
 
@@ -536,8 +536,12 @@ bool parseUrl(char* src, char* url, char* path, uint16_t *port)
 		if(!teu) teu = tbpa-1;
 		strcpy(path,tbpa);
 	}
-	strncpy(url,tbu,teu-tbu);
-	url[teu-tbu] = 0;
+	if (teu)
+	{
+		strncpy(url,tbu,teu-tbu);
+		url[teu-tbu] = 0;
+	} else
+		strcpy(url,src);
 	return true;
 }
 
@@ -568,11 +572,12 @@ char url[200];
 	if (tmpend-tmp) {strncpy(si->name,tmp,tmpend-tmp);} //*tmpend = 0; }
 	tmp = ++tmpend;//,
 	tmpend = strchr(tmp,'%');
+	if (tmpend == NULL )tmpend = strchr(tmp,'"');
 	if (tmpend-tmp){ strncpy(url,tmp,tmpend-tmp);} //*tmpend = 0; }
 	else url[0] = 0;
 	tmp = ++tmpend;//%
 	tmpend = strchr(tmp,'"');
-	if (tmpend-tmp) si->ovol = atoi(tmp);	
+	if ((tmpend != NULL)&&(tmpend-tmp)) si->ovol = atoi(tmp);	
 	
 	
 //printf("==> id: %d, name: %s, url: %s\n",id,si->name,url);	
@@ -1084,23 +1089,18 @@ void hostname(char* s)
 		kprintf(stritCMDERROR);
 		return;
     }
-		
-    char *hn = (char*) malloc((t_end-t+1)*sizeof(char));
-    if(hn != NULL)
-    {
-		if (t_end-t ==0)
-			strcpy(	g_device->hostname, "karadio32");
-		else
-		{	
-			if (t_end-t >= HOSTLEN) t_end = t+HOSTLEN;
-			strncpy(g_device->hostname,t,(t_end-t)*sizeof(char));
-			g_device->hostname[(t_end-t)*sizeof(char)] = 0;
-		}
-		saveDeviceSettings(g_device);	
-		setHostname(g_device->hostname);
-		kprintf("##SYS.HOST#: %s.local\n  IP:%s #\n",g_device->hostname,getIp());
-		free(hn);
+
+	if (t_end-t ==0)
+		strcpy(	g_device->hostname, "karadio32");
+	else
+	{	
+		if (t_end-t >= HOSTLEN) t_end = t+HOSTLEN;
+		strncpy(g_device->hostname,t,(t_end-t)*sizeof(char));
+		g_device->hostname[(t_end-t)*sizeof(char)] = 0;
 	}
+	saveDeviceSettings(g_device);	
+	setHostname(g_device->hostname);
+	kprintf("##SYS.HOST#: %s.local\n  IP:%s #\n",g_device->hostname,getIp());
 }
 
 void displayLogLevel()
@@ -1229,7 +1229,7 @@ void checkCommand(int size, char* s)
 		else if(startsWith (  "ledpol",tmp+4)) 	sysledpol(tmp);
 		else if(startsWith (  "led",tmp+4)) 	sysled(tmp);
 		else if(strcmp(tmp+4, "date") == 0) 	ntp_print_time();
-		else if(strncmp(tmp+4, "vers",4) == 0) 	kprintf("Release: %s, Revision: %s\n",RELEASE,REVISION);
+		else if(strncmp(tmp+4, "vers",4) == 0) 	kprintf("Release: %s, Revision: %s, KaRadio32\n",RELEASE,REVISION);
 		else if(startsWith(   "tzo",tmp+4)) 	tzoffset(tmp);
 		else if(strcmp(tmp+4, "logn") == 0) 	setLogLevel(ESP_LOG_NONE);
 		else if(strcmp(tmp+4, "loge") == 0) 	setLogLevel(ESP_LOG_ERROR); 

@@ -154,7 +154,6 @@ void saveStation(struct shoutcast_info *station, uint16_t position) {
 		ESP_LOGW(TAG,"Retrying %d on saveStation",i);
 		vTaskDelay ((i+1)*20+100) ;
 		i++; 
-//		if (i == 2) {clientDisconnect("saveStation low Memory"); vTaskDelay (300) ;} // stop the player
 		if (i == 10) return;
 	}
 }

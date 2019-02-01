@@ -43,7 +43,8 @@ const char strsID[]  = {"getstation, no id or Wrong id %d\n"};
 const char strsR13[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:13\r\n\r\n{\"%s\":\"%c\"}"};
 const char strsICY[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:%d\r\n\r\n{\"curst\":\"%s\",\"descr\":\"%s\",\"name\":\"%s\",\"bitr\":\"%s\",\"url1\":\"%s\",\"not1\":\"%s\",\"not2\":\"%s\",\"genre\":\"%s\",\"meta\":\"%s\",\"vol\":\"%s\",\"treb\":\"%s\",\"bass\":\"%s\",\"tfreq\":\"%s\",\"bfreq\":\"%s\",\"spac\":\"%s\",\"auto\":\"%c\"}"};
 const char strsWIFI[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:%d\r\n\r\n{\"ssid\":\"%s\",\"pasw\":\"%s\",\"ssid2\":\"%s\",\"pasw2\":\"%s\",\
-\"ip\":\"%s\",\"msk\":\"%s\",\"gw\":\"%s\",\"ip2\":\"%s\",\"msk2\":\"%s\",\"gw2\":\"%s\",\"ua\":\"%s\",\"dhcp\":\"%s\",\"dhcp2\":\"%s\",\"mac\":\"%s\",\"host\":\"%s\",\"tzo\":\"%s\"}"};
+\"ip\":\"%s\",\"msk\":\"%s\",\"gw\":\"%s\",\"ip2\":\"%s\",\"msk2\":\"%s\",\"gw2\":\"%s\",\"ua\":\"%s\",\"dhcp\":\"%s\",\"dhcp2\":\"%s\",\"mac\":\"%s\"\
+,\"host\":\"%s\",\"tzo\":\"%s\"}"};
 const char strsGSTAT[]  = {"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %d\r\n\r\n{\"Name\":\"%s\",\"URL\":\"%s\",\"File\":\"%s\",\"Port\":\"%d\",\"ovol\":\"%d\"}"};
 
 static int8_t clientOvol = 0;
@@ -538,7 +539,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 					infree(si);
 					return;
 				} else printf(strsID,atoi(id));
-				infree (id);
+//				infree (id);
 			} 			
 		}
 	} else if(strcmp(name, "/setStation") == 0) 
@@ -895,7 +896,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			char adhcp[4],adhcp2[4];	
 			esp_wifi_get_mac(WIFI_IF_STA,macaddr);		
 			int json_length ;
-			json_length =95+ 39+ 10+9+
+			json_length =95+ 39+ 19+
 			strlen(g_device->ssid1) +
 			strlen(g_device->pass1) +
 			strlen(g_device->ssid2) +

@@ -66,14 +66,14 @@ static unsigned int  reclen = 0;
 *******************************************************************************/
 void wsUpgrade(const char* str,int count,int total)
 {
-	char answer[300];
+	char answer[50];
 	if (strlen(str)!= 0)
 		sprintf(answer,"{\"upgrade\":\"%s\"}",str);
 	else		
 	{
 		int value = count*100/total;
-		memset(answer,0,300);
-		if (value == 100)
+		memset(answer,0,50);
+		if (value >= 100)
 			sprintf(answer,"{\"upgrade\":\"Done. Refresh the page.\"}");
 		else
 		if (value == 0)
@@ -258,7 +258,7 @@ static void ota_task(void *pvParameter)
 //            ESP_LOGI(TAG, "Have written image length %d  of  %d", binary_file_length,reclen);
 			cnt = (cnt+1) & 0x1F;
 			if (cnt ==0){
-				kprintf("Have written image length %d  of  %d\n", binary_file_length,reclen);
+				kprintf("Written  %d  of  %d\n", binary_file_length,reclen);
 				wsUpgrade( "",binary_file_length,reclen);
 			}
 			if (binary_file_length >= reclen)

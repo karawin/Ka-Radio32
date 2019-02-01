@@ -3,6 +3,7 @@ var content = "Content-type",
 	cjson = "application/json";
 var auto,intervalid , intervalrssi  ,recrssi = 0, timeid, websocket,urlmonitor , e, moniPlaying = false,editPlaying = false, editIndex= 0 ,curtab = "tab-content1",stchanged = false,maxStation = 255,themeIn = "0";
 const karadio = "Karadio32";
+const working = "Working.. Please Wait";
 
 function openwebsocket(){	
 	autoplay(); //to force the server socket to accept and open the web server client.
@@ -42,7 +43,7 @@ function openwebsocket(){
 		console.log("onclose code: "+event.code);
 		console.log("onclose reason: "+event.reason);
 		if(!window.timerID){ /* avoid firing a new setInterval, after one has been done */
-		window.timerID=setInterval(function(){checkwebsocket()}, 1000);
+		window.timerID=setInterval(function(){checkwebsocket()}, 1500);
 		}	
 	}	
 	websocket.onerror = function(event) {
@@ -839,8 +840,8 @@ function parseEditURL(e)
 }
 
 function refreshList() {
-	promptworking("Working.. Please Wait");
-	intervalid =window.setTimeout(refreshListtemp, 2);
+	promptworking(working);
+	intervalid =window.setTimeout(refreshListtemp, 5);
 }
 function refreshListtemp() {
 	if (stchanged) stChanged();
@@ -852,7 +853,7 @@ function refreshListtemp() {
 	refresh();
 }
 function clearList() {
-		promptworking("Working.. Please Wait");
+		promptworking(working);
 	if (confirm("Warning: This will clear all stations.\n Be sure to save station before.\nClear now?"))
 	{
 		xhr = new XMLHttpRequest();
@@ -864,16 +865,6 @@ function clearList() {
 	}
 	else 	promptworking("");
 }	
-/*
-function removeOptions(selectbox)
-{
-    var i;
-    for(i = selectbox.options.length - 1 ; i >= 0 ; i--)
-    {
-        selectbox.remove(i);
-    }
-}
-*/
 
 function upgrade()
 {
@@ -945,7 +936,7 @@ function downloadStations()
 		reader = new FileReader();
 		xhr = new XMLHttpRequest();
 		xhr.onreadystatechange = function() {
-			promptworking("Working.. Please Wait"); // some time to display promptworking
+			promptworking(working); // some time to display promptworking
 		}
 		reader.onload = function(e){
 			function fillInfo(ind,arri){
@@ -994,8 +985,7 @@ function downloadStations()
 		file = document.getElementById('fileload').files[0];
 		if (file==null) alert("Please select a file");
 		else {			
-//			stopStation();
-			promptworking("Working.. Please Wait");		
+			promptworking(working);		
 			reader.readAsText(file);			
 		}
 	}	
@@ -1012,7 +1002,6 @@ function moveNodes(a, b){
 	for (txt=0;txt<maxStation;txt++)
 	{
 		pa1.rows[txt].cells[0].innerText = txt.toString();
-//		pa1.rows[txt].cells[6].innerHTML = "<a href=\"#\" onClick=\"editStation("+ txt.toString()+")\">Edit</a>";
 		pa1.rows[txt].cells[6].innerHTML = b.parentNode.rows[txt].cells[6].innerHTML ;
 	}
 	stchanged = true;
@@ -1040,13 +1029,13 @@ function stChanged()
 				localStorage.setItem(id,"{\"Name\":\""+name+"\",\"URL\":\""+url +"\",\"File\":\""+file+"\",\"Port\":\""+port+"\",\"ovol\":\""+ovol+"\"}");
 				tosend = tosend+"&id="+id + "&url="+ url+"&name="+ name+ "&file="+file + "&port=" +port+"&ovol=" +ovol+"&";
 	}
-	promptworking("Working.. Please Wait"); // some time to display promptworking
+	promptworking(working); // some time to display promptworking
 	if (stchanged && confirm("The list is modified. Do you want to save the modified list?"))
 	{
 		xhr = new XMLHttpRequest();
 		xhr.onreadystatechange = function() {
 		}
-		promptworking("Working.. Please Wait"); // some time to display promptworking
+		promptworking(working); // some time to display promptworking
 		localStorage.clear();	
 		indmax = 7;
 		index = 0;	
@@ -1095,15 +1084,6 @@ function loadStations() {
 			td.appendChild(document.createTextNode(id ));
 			td.setAttribute('onclick', 'playEditStation(this.parentNode);');
 			tr.appendChild(td);
-/*			for(key in arr){
-				td = document.createElement('TD');
-				td.style="word-break: break-all;overflow-wrap: break-word; word-wrap: break-word;";
-				td.setAttribute('onclick','playEditStation(this.parentNode);');
-				if(arr[key].length > 116) arr[key] = "Error";
-				td.appendChild(document.createTextNode(arr[key]));
-				tr.appendChild(td);
-			}
-*/
 // Name
 				td = document.createElement('TD');
 				td.style="word-break: break-all;overflow-wrap: break-word; word-wrap: break-word;";
@@ -1135,7 +1115,6 @@ function loadStations() {
 // edit button			
 			td = document.createElement('TD');
 			td.style="text-align: center; vertical-align: middle;";
-//			td.innerHTML = "<div  onClick=\"editStation("+id+")\"> Edit</div>";
 			td.innerHTML = "<a href=\"javascript:void(0)\" onClick=\"editStation("+id+")\">Edit</a>";
 			tr.appendChild(td);
 			if (idlist === idstr){
@@ -1184,7 +1163,6 @@ function loadStations() {
 function loadStationsList(max) {
 	var foundNull = false,id,opt,arr,select, liste= [],i;
 	select = document.getElementById("stationsSelect");
-	//clear Select
     for(i = select.options.length - 1 ; i >= 0 ; i--)
     {
         select.remove(i);
@@ -1196,16 +1174,13 @@ function loadStationsList(max) {
 			{
 				opt = document.createElement('option');
 				opt.appendChild(document.createTextNode(id+": \t"+arr["Name"]));
-//				opt.id = id;
-//				select.appendChild(opt);
 				select.add(opt);
 			} else foundNull = true;
 			return foundNull;
 	}		
 	select.disabled = true;
-	promptworking("Working.. Please Wait");
+	promptworking(working);
 	for(id=0; id<max; id++) {
-//		if (foundNull) break;
 		idstr = id.toString();
 		if (localStorage.getItem(idstr) != null)
 		{	
@@ -1213,7 +1188,6 @@ function loadStationsList(max) {
 				arr = JSON.parse(localStorage.getItem(idstr));
 			} catch(e){console.log("error"+e);}
 			foundNull = cploadStationsList(id,arr);
-//			liste.push(arr);
 		}
 		else
 		try {
@@ -1225,7 +1199,6 @@ function loadStationsList(max) {
 					} catch(e){console.log("error"+e);}
 					localStorage.setItem(idstr,xhr.responseText);
 					foundNull = cploadStationsList(id,arr);
-//					liste.push(arr);
 				}
 			}
 			xhr.open("POST","getStation",false);
@@ -1234,49 +1207,12 @@ function loadStationsList(max) {
 		} catch(e){console.log("error"+e); id--;}
 	}
 	
-/*
-	var map = liste.map(function(e, i) {
-		return { index: i, value: e.Name.toLowerCase() };
-	})
-	map.sort(function(a, b) {
-		return +(a.value > b.value) || +(a.value === b.value) - 1;
-	});
-
-	// on utilise un objet final pour les résultats
-	var result = map.map(function(e){
-		return {index: e.index, value:liste[e.index]};
-});	
-	for(id=0; id < maxStation; id++) {
-		foundNull = cploadStationsList(result[id].index,result[id].value);
-	}	
-*/	
 	promptworking("");
 	select.disabled = false;
 	select.options.selectedIndex= parseInt(localStorage.getItem('selindexstore'));
-//	getSelIndex();
-
 }
-/*	
-function getSelIndex() {
-		xhr = new XMLHttpRequest();
-		xhr.onreadystatechange = function() {
-			if (xhr.readyState == 4 && xhr.status == 200) {
-				console.log("JSON: " + xhr.responseText);
-				var arr = JSON.parse(xhr.responseText);
-				if(arr["Index"].length > 0) {
-					document.getElementById("stationsSelect").options.selectedIndex = arr["Index"];
-					document.getElementById("stationsSelect").disabled = false;
-					console.log("selIndex received " + arr["Index"]);
-				} 
-			}
-		}
-		xhr.open("POST","getSelIndex",false);
-		xhr.setRequestHeader(content,ctype);
-		xhr.send();	
-}	*/
-
 function setMainHeight(name) {
-	intervalid =window.setTimeout(setMainHeightd,2,name );	
+	intervalid =window.setTimeout(setMainHeightd,10,name );	
 }
 
 function setMainHeightd(name) {
@@ -1285,24 +1221,19 @@ function setMainHeightd(name) {
 	if(h<minh) h = minh;
 	document.getElementById("MAIN").style.height = h +"px";
 	document.getElementById("MAINCONTENT").style.top = document.getElementById('HEADER').clientHeight+"px" ;
-//	checkwebsocket();
 }
 
 function resizeContent(){
 	if (document.getElementById("MAINCONTENT") != null) 
 	{
 		setMainHeight(curtab);
-		//document.getElementById("MAINCONTENT").style.top = document.getElementById('HEADER').clientHeight+"px" ;
 	}
 }
 window.onresize = resizeContent;
-
-
 function printList()
 {
    var html="<html>";
    id = 0;
-//   html+= document.getElementById(id).innerHTML;
    html+="</html>";
    html+="<h1>KaraDio Stations list</h1><br/><hr><br/>";
    for(id; id < maxStation; id++) {
@@ -1332,13 +1263,13 @@ document.addEventListener("DOMContentLoaded", function() {
 			refresh();
 			curtab = "tab-content1";
 			setMainHeight(curtab);
-		});
+	});
 	document.getElementById("tab2").addEventListener("click", function() {
 			if (stchanged) stChanged();
 			loadStations(/*1*/);
 			curtab = "tab-content2";
-			intervalid =window.setTimeout(setMainHeight,1,curtab );			
-		});
+			intervalid =window.setTimeout(setMainHeight,5,curtab );			
+	});
 	document.getElementById("tab3").addEventListener("click", function() {
 			if (stchanged) stChanged();
 			curtab = "tab-content3";
@@ -1346,7 +1277,27 @@ document.addEventListener("DOMContentLoaded", function() {
 			hardware(0);
 			checkversion();
 			setMainHeight(curtab);	
-		});
+	});
+	window.addEventListener("keydown", function (event)
+	{
+		if (event.defaultPrevented) {
+			return; 
+		}
+		switch (event.key) {
+		case "ArrowDown":
+		case "ArrowLeft":
+		if (event.ctrlKey) onRangeVolChange(parseInt(document.getElementById('vol_range').value) -5 ,true)	  
+		break;
+		case "ArrowUp":
+		case "ArrowRight":
+		if (event.ctrlKey) onRangeVolChange(parseInt(document.getElementById('vol_range').value) +5 ,true)	  
+		break;
+		default:
+		return;
+		}
+		event.preventDefault();
+	}, true);
+	
 	if (intervalid != 0)  window.clearTimeout(intervalid);
 	intervalid = 0;
 	if (timeid != 0)  window.clearInterval(timeid);
@@ -1366,24 +1317,3 @@ document.addEventListener("DOMContentLoaded", function() {
 	intervalrssi = window.setInterval(wsaskrssi,5000 );
 });
 
-window.addEventListener("keydown", function (event) {
-  if (event.defaultPrevented) {
-    return; // Ne devrait rien faire si l'événement de la touche était déjà consommé.
-  }
-
-  switch (event.key) {
-    case "ArrowLeft":
-      // Faire quelque chose pour la touche "left arrow" pressée.
-	  onRangeVolChange(parseInt(document.getElementById('vol_range').value) -5 ,true)	  
-      break;
-    case "ArrowRight":
-      // Faire quelque chose pour la touche "right arrow" pressée.
-	  onRangeVolChange(parseInt(document.getElementById('vol_range').value) +5 ,true)	  
-      break;
-    default:
-      return; // Quitter lorsque cela ne gère pas l'événement touche.
-  }
-
-  // Annuler l'action par défaut pour éviter qu'elle ne soit traitée deux fois.
-  event.preventDefault();
-}, true);

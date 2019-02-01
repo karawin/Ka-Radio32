@@ -45,7 +45,7 @@
 			<div class="LEFT"><img title="Click on the logo to change the theme" onClick= "theme()" src="logo.png"></div>
 			<div class="RIGHT">
 			<a href="https://github.com/karawin/Ka-Radio32" target="_blank">KaraDio32</a><br/>
-			<a href="https://github.com/karawin/Ka-Radio32" target="_blank">V1.7 R1</a><br/>
+			<a href="https://github.com/karawin/Ka-Radio32" target="_blank">V1.8 R0</a><br/>
 			<div id="rssi" >0 dBm</div><br/>
 <!--			<a href="https://github.com/PiotrSperka/ESP8266-WebRadio" style="font-size:8px" target="_blank">From PiotrSperka</a> -->
 			</div>
@@ -154,7 +154,8 @@
 						<input type="button" id="refresh" title="This will reload the stations from the WebRadio" onClick="refreshList()"  value="Refresh locale list(i)">
 						<input type="button" id="stsave" disabled="true" style="margin:0px auto" title="This will save all stations to the WebRadio" onClick="stChanged()"  value="Save the list(i)">
 						<input type="button" style="margin:0px auto" id="clear" title="Warning: This will erase all stations.\n Be sure to save them before." onClick="clearList()"  value="Erase all(i)">				
-						<input type="button" style="margin:0px auto" id="clear" title="Print the list" onClick="printList()"  value="Print all(i)"></h1>			
+						<input type="button" style="margin:0px auto" id="clear" title="Print the list" onClick="printList()"  value="Print all(i)"><br/>
+						</h1>			
 
 						<span >You can Drag/Drop each line to sort the list</span><br/>
 						<table id = "stationsTable" style="table-layout: fixed; width: 100%;">
@@ -186,11 +187,10 @@
 						<span class="bold">  Bass enhance: </span><input type="range"  id="bass_range" name="bass"  onChange="onRangeChange('bass_range', 'bass_span', 1, false)" min=0 max=15 > <span id="bass_span"></span><br>
 						<span class="bold">  Bass frequency: </span><input type="range"  id="bassfreq_range" name="bassfreq"  onChange="onRangeChangeFreqBass('bassfreq_range', 'bassfreq_span', 10, false)" min=2 max=15 > <span id="bassfreq_span"></span><br>
 						<span class="bold">  Spacialization: </span><input type="range"  id="spacial_range" name="spacial"  onChange="onRangeChangeSpatial('spacial_range', 'spacial_span')" min=0 max=3 > <span id="spacial_span"></span><br/>
-						<span class="bold"> </span><input type="button" value="Reset" onClick="resetEQ()"/><br/>			
-						</span><br/>
+						<span class="bold"> </span><input type="button" value="Reset" onClick="resetEQ()"/><br/>			</span><br/>
 						<span class="bold">Volume: </span><input type="range" id="vol_range" name="vol"  onChange="onRangeVolChange(this.value,true)" value=100 min=0 max=254 > <span id="vol_span"></span><br>
 						</p>
-					<h1>Stations Save & Restore</h1>
+						<h1>Stations Save & Restore</h1>
 						<p>
 						<input type="button"  onClick="saveTextAsFile()" value="Save Stations from WebRadio"> 
 						<span style="display:inline-block;">To &nbsp;&nbsp;&nbsp;
@@ -244,7 +244,7 @@
 						<span class="bold4" id="Infos"></span><br/>
 						</p>
 					<h1>History:</h1><BR/>
-						<input type=button value="Read the history" onclick="checkhistory()" /></span><br/>
+						<input type=button value="Read the history" onclick="checkhistory()" /><br/>
 						<span class="bold4" id="History"></span><br/>
 					</div>
 				</li>
