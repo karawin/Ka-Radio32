@@ -152,9 +152,8 @@ static void serveFile(char* name, int conn)
 //	ESP_LOGV(TAG,"serveFile socket:%d, end",conn);
 }
 
-static bool getSParameter(char* result,const char* sep,const char* param, char* data, uint16_t data_length) {
+static bool getSParameter(char* result,uint32_t len,const char* sep,const char* param, char* data, uint16_t data_length) {
 	if ((data == NULL) || (param == NULL))return false;
-	size_t len = sizeof(result);
 	char* p = strstr(data, param);
 	if(p != NULL) {
 		p += strlen(param);
@@ -197,8 +196,8 @@ static char* getParameter(const char* sep,const char* param, char* data, uint16_
 static char* getParameterFromResponse(const char* param, char* data, uint16_t data_length) {
 	return getParameter("&",param,data, data_length) ;
 }
-static bool getSParameterFromResponse(char* result, const char* param, char* data, uint16_t data_length) {
-	return getSParameter(result,"&",param,data, data_length) ;
+static bool getSParameterFromResponse(char* result,uint32_t size, const char* param, char* data, uint16_t data_length) {
+	return getSParameter(result,size,"&",param,data, data_length) ;
 }
 static char* getParameterFromComment(const char* param, char* data, uint16_t data_length) {
 	return getParameter("\"",param,data, data_length) ;
@@ -401,12 +400,12 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 	if(strcmp(name, "/instant_play") == 0) {
 		if(data_size > 0) {
 			char url[100];
-			tst = getSParameterFromResponse(url,"url=", data, data_size);
+			tst = getSParameterFromResponse(url,100,"url=", data, data_size);
 			char path[200];
-			tst &=getSParameterFromResponse(path,"path=", data, data_size);
+			tst &=getSParameterFromResponse(path,200,"path=", data, data_size);
 			pathParse(path);
 			char port[10];
-			tst &=getSParameterFromResponse(port,"port=", data, data_size);
+			tst &=getSParameterFromResponse(port,10,"port=", data, data_size);
 			if(tst) {
 				clientDisconnect("Post instant_play");
 				for (i = 0;i<100;i++)
@@ -444,7 +443,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			char treblefreq[6];
 			char spacial[6];
 			changed = false;
-			if(getSParameterFromResponse(bass,"bass=", data, data_size)) {		
+			if(getSParameterFromResponse(bass,6,"bass=", data, data_size)) {		
 				if (g_device->bass != atoi(bass))
 				{ 
 					if (get_audio_output_mode() == VS1053)
@@ -455,7 +454,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 					}
 				}
 			}
-			if(getSParameterFromResponse(treble,"treble=", data, data_size)) {				
+			if(getSParameterFromResponse(treble,6,"treble=", data, data_size)) {				
 				if (g_device->treble != atoi(treble))
 				{ 
 					if (get_audio_output_mode() == VS1053)
@@ -466,7 +465,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 					}
 				}
 			}
-			if(getSParameterFromResponse(bassfreq,"bassfreq=", data, data_size)) {					
+			if(getSParameterFromResponse(bassfreq,6,"bassfreq=", data, data_size)) {					
 				if (g_device->freqbass != atoi(bassfreq))
 				{ 
 					if (get_audio_output_mode() == VS1053) 
@@ -477,7 +476,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 					}
 				}
 			}
-			if(getSParameterFromResponse(treblefreq,"treblefreq=", data, data_size)) {					
+			if(getSParameterFromResponse(treblefreq,6,"treblefreq=", data, data_size)) {					
 				if (g_device->freqtreble != atoi(treblefreq))
 				{
 					if (get_audio_output_mode() == VS1053)
@@ -488,7 +487,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 					}
 				}
 			}
-			if(getSParameterFromResponse(spacial,"spacial=", data, data_size)) {					
+			if(getSParameterFromResponse(spacial,6,"spacial=", data, data_size)) {					
 				if (g_device->spacial != atoi(spacial))
 				{
 						if (get_audio_output_mode() == VS1053) 
@@ -505,7 +504,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 	} else if(strcmp(name, "/getStation") == 0) {
 		if(data_size > 0) {
 			char id[6];
-			if (getSParameterFromResponse(id,"idgp=", data, data_size) ) 
+			if (getSParameterFromResponse(id,6,"idgp=", data, data_size) ) 
 			{
 				if ((atoi(id) >=0) && (atoi(id) < 255)) 
 				{
@@ -550,7 +549,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			bool res;
 			uint16_t unb,uid = 0;			
 			bool pState = getState();  // remember if we are playing
-			res=getSParameterFromResponse(nb,"nb=", data, data_size);
+			res=getSParameterFromResponse(nb,6,"nb=", data, data_size);
 			if (res) 
 			{	ESP_LOGV(TAG,"Setstation: nb init:%s",nb);
 				unb = atoi(nb);
@@ -587,20 +586,20 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 				file = getParameterFromResponse("file=", data, data_size);
 				pathParse(file);
 				name = getParameterFromResponse("name=", data, data_size);
-				if(getSParameterFromResponse(id,"id=", data, data_size)) {
+				if(getSParameterFromResponse(id,6,"id=", data, data_size)) {
 //					ESP_LOGW(TAG,"nb:%d,si:%x,nsi:%x,id:%s,url:%s,file:%s",i,(int)si,(int)nsi,id,url,file);
 					ESP_LOGV(TAG,"nb:%d, id:%s",i,id);
 					if (i == 0) uid = atoi(id);
 					if ((atoi(id) >=0) && (atoi(id) < 255))
 					{	
-						if(url && file && name && getSParameterFromResponse(port,"port=", data, data_size)) {
+						if(url && file && name && getSParameterFromResponse(port,6,"port=", data, data_size)) {
 							if (strlen(url) > sizeof(nsi->domain)) url[sizeof(nsi->domain)-1] = 0; //truncate if any
 							strcpy(nsi->domain, url);
 							if (strlen(file) > sizeof(nsi->file)) url[sizeof(nsi->file)-1] = 0; //truncate if any
 							strcpy(nsi->file, file);
 							if (strlen(name) > sizeof(nsi->name)) url[sizeof(nsi->name)-1] = 0; //truncate if any
 							strcpy(nsi->name, name);
-							nsi->ovol = (getSParameterFromResponse(ovol,"ovol=", data, data_size))?atoi(ovol):0;
+							nsi->ovol = (getSParameterFromResponse(ovol,6,"ovol=", data, data_size))?atoi(ovol):0;
 							nsi->port = atoi(port);
 						}
 					} 					
@@ -736,10 +735,10 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 		changed = false;
 		if(data_size > 0) {
 			char valid[6];			
-			if(getSParameterFromResponse(valid,"valid=", data, data_size))
+			if(getSParameterFromResponse(valid,6,"valid=", data, data_size))
 				if (strcmp(valid,"1")==0) val = true;
 			char coutput[6];			
-			getSParameterFromResponse(coutput,"coutput=", data, data_size);
+			getSParameterFromResponse(coutput,6,"coutput=", data, data_size);
 			cout = atoi(coutput);
 			if (val)
 			{
@@ -773,7 +772,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 		changed = false;		
 		if(data_size > 0) {
 			char valid[5];
-			if(getSParameterFromResponse(valid,"valid=", data, data_size))
+			if(getSParameterFromResponse(valid,5,"valid=", data, data_size))
 				if (strcmp(valid,"1")==0) val = true;
 			char* aua = getParameterFromResponse("ua=", data, data_size);
 			pathParse(aua);
@@ -817,11 +816,11 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 				ipaddr_aton(agw2, &valu);
 				memcpy(g_device->gate2,&valu,sizeof(uint32_t));
 				
-				if (getSParameterFromResponse(adhcp,"dhcp=", data, data_size))
+				if (getSParameterFromResponse(adhcp,4,"dhcp=", data, data_size))
 					if (strlen(adhcp)!=0) 
 					{if (strcmp(adhcp,"true")==0) 
 					g_device->dhcpEn1 = 1; else g_device->dhcpEn1 = 0;}
-				if (getSParameterFromResponse(adhcp2,"dhcp2=", data, data_size))
+				if (getSParameterFromResponse(adhcp2,4,"dhcp2=", data, data_size))
 					if (strlen(adhcp2)!=0) 
 					{if (strcmp(adhcp2,"true")==0) 
 					g_device->dhcpEn2 = 1; else g_device->dhcpEn2 = 0;}
