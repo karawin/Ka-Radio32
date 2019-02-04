@@ -142,7 +142,7 @@ P_LED_GPIO		GPIO of the status led
 
 ## OPTIONS
 - **LCD CONTROL**  
-P_LCD_TYPE		Type of lcd (see addon.h file).  
+P_LCD_TYPE		Type of lcd (see [addon.h](https://github.com/karawin/Ka-Radio32/blob/master/main/include/addon.h) file).  
 P_LCD_ROTA		Control the rotation of the LCD, 0 no rotation, 1: rotation.  
 O_LCD_OUT 		The tempo to light off the screen in seconds. 0 is no tempo.   
 O_DDMM_FLAG		The format of the date to display 0:MMDD, 1:DDMM.  
