@@ -189,7 +189,9 @@ function wtop() {
 // display current time
 function dtime() {
 	var d = new Date(), elt = document.getElementById('sminutes'),eltw = document.getElementById('wminutes');
-	document.getElementById("time").innerHTML = d.toLocaleTimeString();	
+//	document.getElementById("time").innerHTML = d.toLocaleTimeString();	
+	udate = d.toTimeString().split(" ");
+	document.getElementById("time").innerHTML = udate[0];	
 	if ((!isNaN(elt.innerHTML))&&(elt.innerHTML != "0") )
 		--elt.innerHTML;
 	if ((!isNaN(elt.innerHTML))&&(elt.innerHTML == 0)) elt.innerHTML = "0";
@@ -1002,7 +1004,7 @@ function moveNodes(a, b){
 	for (txt=0;txt<maxStation;txt++)
 	{
 		pa1.rows[txt].cells[0].innerText = txt.toString();
-		pa1.rows[txt].cells[6].innerHTML = b.parentNode.rows[txt].cells[6].innerHTML ;
+		pa1.rows[txt].cells[3].innerHTML = b.parentNode.rows[txt].cells[3].innerHTML ;
 	}
 	stchanged = true;
 	document.getElementById("stsave").disabled = false;
@@ -1016,16 +1018,24 @@ function dragDrop(ev) {
 function allowDrop(ev) {
     ev.preventDefault();
 }
+
 function stChanged()
 {
 	var i,indmax,tosend,index,tbody = document.getElementById("stationsTable").getElementsByTagName('tbody')[0];
 	function fillInfo(ind){
+				var parser = document.createElement('a');
+
 				id=tbody.rows[ind].cells[0].innerText;
 				name=tbody.rows[ind].cells[1].innerText;
-				url=tbody.rows[ind].cells[2].innerText;
-				file=tbody.rows[ind].cells[3].innerText;
-				port= tbody.rows[ind].cells[4].innerText;
-				ovol = tbody.rows[ind].cells[5].innerText;
+				furl=tbody.rows[ind].cells[2].innerText;
+				parser.href = "http://"+furl;
+				url = parser.hostname;
+				file = parser.pathname+parser.hash+parser.search;
+				port = parser.port;
+				if (!port ) port = 80;
+/*				file=tbody.rows[ind].cells[3].innerText;
+				port= tbody.rows[ind].cells[4].innerText;*/
+				ovol = tbody.rows[ind].cells[3].innerText;
 				localStorage.setItem(id,"{\"Name\":\""+name+"\",\"URL\":\""+url +"\",\"File\":\""+file+"\",\"Port\":\""+port+"\",\"ovol\":\""+ovol+"\"}");
 				tosend = tosend+"&id="+id + "&url="+ url+"&name="+ name+ "&file="+file + "&port=" +port+"&ovol=" +ovol+"&";
 	}

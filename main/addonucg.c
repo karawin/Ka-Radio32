@@ -21,42 +21,9 @@
 #include "eeprom.h"
 #include "addoncommon.h"
 #include "xpt2046.h"
+#include "ucg_karadio32_fonts.h"
 
 #define TAG  "addonucg"
-
-extern const ucg_fntpgm_uint8_t ucg_font_crox1c[] UCG_FONT_SECTION("ucg_font_crox1c");
-extern const ucg_fntpgm_uint8_t ucg_font_crox1cb[] UCG_FONT_SECTION("ucg_font_crox1cb");
-extern const ucg_fntpgm_uint8_t ucg_font_crox1h[] UCG_FONT_SECTION("ucg_font_crox1h");
-extern const ucg_fntpgm_uint8_t ucg_font_crox1hb[] UCG_FONT_SECTION("ucg_font_crox1hb");
-extern const ucg_fntpgm_uint8_t ucg_font_crox1t[] UCG_FONT_SECTION("ucg_font_crox1t");
-extern const ucg_fntpgm_uint8_t ucg_font_crox1b[] UCG_FONT_SECTION("ucg_font_crox1tb");
-extern const ucg_fntpgm_uint8_t ucg_font_crox2c[] UCG_FONT_SECTION("ucg_font_crox2c");
-extern const ucg_fntpgm_uint8_t ucg_font_crox2cb[] UCG_FONT_SECTION("ucg_font_crox2cb");
-extern const ucg_fntpgm_uint8_t ucg_font_crox2h[] UCG_FONT_SECTION("ucg_font_crox2h");
-extern const ucg_fntpgm_uint8_t ucg_font_crox2hb[] UCG_FONT_SECTION("ucg_font_crox2hb");
-extern const ucg_fntpgm_uint8_t ucg_font_crox2t[] UCG_FONT_SECTION("ucg_font_crox2t");
-extern const ucg_fntpgm_uint8_t ucg_font_crox2b[] UCG_FONT_SECTION("ucg_font_crox2tb");
-extern const ucg_fntpgm_uint8_t ucg_font_crox3c[] UCG_FONT_SECTION("ucg_font_crox3c");
-extern const ucg_fntpgm_uint8_t ucg_font_crox3cb[] UCG_FONT_SECTION("ucg_font_crox3cb");
-extern const ucg_fntpgm_uint8_t ucg_font_crox3h[] UCG_FONT_SECTION("ucg_font_crox3h");
-extern const ucg_fntpgm_uint8_t ucg_font_crox3hb[] UCG_FONT_SECTION("ucg_font_crox3hb");
-extern const ucg_fntpgm_uint8_t ucg_font_crox3t[] UCG_FONT_SECTION("ucg_font_crox3t");
-extern const ucg_fntpgm_uint8_t ucg_font_crox3b[] UCG_FONT_SECTION("ucg_font_crox3tb");
-extern const ucg_fntpgm_uint8_t ucg_font_crox4h[] UCG_FONT_SECTION("ucg_font_crox4h");
-extern const ucg_fntpgm_uint8_t ucg_font_crox4hb[] UCG_FONT_SECTION("ucg_font_crox4hb");
-extern const ucg_fntpgm_uint8_t ucg_font_crox4t[] UCG_FONT_SECTION("ucg_font_crox4t");
-extern const ucg_fntpgm_uint8_t ucg_font_crox4tb[] UCG_FONT_SECTION("ucg_font_crox4tb");
-extern const ucg_fntpgm_uint8_t ucg_font_crox5h[] UCG_FONT_SECTION("ucg_font_crox5h");
-extern const ucg_fntpgm_uint8_t ucg_font_crox5hb[] UCG_FONT_SECTION("ucg_font_crox5hb");
-extern const ucg_fntpgm_uint8_t ucg_font_crox5t[] UCG_FONT_SECTION("ucg_font_crox5t");
-extern const ucg_fntpgm_uint8_t ucg_font_crox5tb[] UCG_FONT_SECTION("ucg_font_crox5tb");
-
-extern const ucg_fntpgm_uint8_t ucg_font_5x7_gr[] UCG_FONT_SECTION("ucg_font_5x7_gr");
-extern const ucg_fntpgm_uint8_t ucg_font_6x13_gr[] UCG_FONT_SECTION("ucg_font_6x13_gr");
-extern const ucg_fntpgm_uint8_t ucg_font_9x16_gr[] UCG_FONT_SECTION("ucg_font_9x16_gr");
-extern const ucg_fntpgm_uint8_t ucg_font_helvR14_gr[] UCG_FONT_SECTION("ucg_font_helvR14_gr");
-extern const ucg_fntpgm_uint8_t ucg_font_helvR18_gr[] UCG_FONT_SECTION("ucg_font_helvR18_gr");
-extern const ucg_fntpgm_uint8_t ucg_font_ncenR14_gr[] UCG_FONT_SECTION("ucg_font_ncenR14_gr");
 
 
 #define ucg_SetColori(a,b,c,d) ucg_SetColor(a,0,b,c,d)
@@ -95,7 +62,7 @@ static char TTitleStr[15];
 static char TTimeStr[15];
 
 typedef enum Lang {Latin,Cyrillic,Greek} LANG; 
-static LANG charset = Latin;  // latin or cyrillic
+static LANG charset = Latin;  // latin or other
 
 
 ////////////////////////////////////////
@@ -421,7 +388,7 @@ setfont(text);
 			if (tline[i]>0) 
 			{
 				len = (i==0)? ucg_GetStrWidth(&ucg,nameNum)+ucg_GetStrWidth(&ucg,lline[i]):ucg_GetStrWidth(&ucg,lline[i]);
-				if ((tline[i] == 4) && (len > x)) 
+				if ((tline[i] == 4) && (len >= x)) 
 				{
 					iline[i]= 0;
 					mline[i]=1;//draw(i);
@@ -433,10 +400,10 @@ setfont(text);
 				len = (i==0)? ucg_GetStrWidth(&ucg,nameNum)+ucg_GetStrWidth(&ucg,lline[i]+iline[i]):ucg_GetStrWidth(&ucg,lline[i]+iline[i]);
 				if (len > x)
 				{      
-					iline[i] += x/ucg_GetStrWidth(&ucg,"MM");//x/6;
 					len = iline[i];
+					iline[i] += x/ucg_GetStrWidth(&ucg,"MM");//x/6;
 					while ((*(lline[i]+iline[i])!=' ')&&(*(lline[i]+iline[i])!='-')&&(iline[i]!= 0))iline[i]--;
-					if (iline[i]==0) iline[i]=len;     
+					if (iline[i]==len) iline[i] += (x/ucg_GetStrWidth(&ucg,"MM"));//x/6; 
 					mline[i]=1; //draw(i);
 				}
 				else 
@@ -565,7 +532,7 @@ void drawFrameUcg(uint8_t mTscreen)
 int i;
 	if (dt == NULL) {dt = getDt();}
     switch (mTscreen){
-    case 1: 
+    case MTNEW: 
 		ucg_ClearScreen(&ucg);
 		TTitleStr[0] = 0;   
 		setfont(text);
@@ -576,7 +543,7 @@ int i;
 		ucg_DrawBox(&ucg,0,0,x-1,15);  
 		for (i=0;i<LINES;i++) draw(i);
 		// no break
-	case 2:	
+	case MTREFRESH:	
 		markDrawResetUcg(TIME);
 		drawLinesUcg();
 		break;
@@ -676,9 +643,6 @@ void drawVolumeUcg(uint8_t mTscreen)
 		ucg_ClearScreen(&ucg);
 		TTitleStr[0] = 0;
         drawTTitleUcg(vlstr) ;		
-/*        ucg_SetColor(&ucg,0,CBLACK);  
-        ucg_DrawBox(&ucg,0,HHeader,x,yy);     
-        ucg_SetColor(&ucg,0,CBODY);   */     // no break
       case 2:
 //        ucg_SetFont(&ucg,ucg_font_inr49_tf);
         setfont(large); 
@@ -881,11 +845,11 @@ void namesetUcg(char* ici)
 // cli.playing
 void playingUcg()
 {
-	if (strcmp(title,"STOPPED") == 0)
-    {
+//	if (strcmp(title,"STOPPED") == 0)
+//    {
         cleartitleUcg(3);
         separatorUcg(title);
-    }
+//    }
 }
 
 

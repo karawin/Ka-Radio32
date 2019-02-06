@@ -1214,7 +1214,7 @@ void addonParse(const char *fmt, ...)
 //		xQueueSend(event_lcd,&evt, 0);
    } else
  ////// STOPPED  ##CLI.STOPPED#  
-   if ((ici=strstr(line,"STOPPED")) != NULL)
+   if (((ici=strstr(line,"STOPPED")) != NULL)&&(strstr(line,"C_HDER") == NULL)&&(strstr(line,"C_PLIST") == NULL))
    {
 		state = false;	  
  		evt.lcmd = lstop;
