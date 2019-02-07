@@ -687,6 +687,7 @@ function setEditBackground(tr) {
 			tr.style.background = "rgb(185, 213, 236)";
 }
 function playEditStation(tr) {
+	if (stchanged) stChanged();
 	id = tr.cells[0].innerText;
 	if ((editPlaying)&&(editIndex== tr))
 	{
@@ -843,7 +844,7 @@ function parseEditURL(e)
 
 function refreshList() {
 	promptworking(working);
-	intervalid =window.setTimeout(refreshListtemp, 5);
+	intervalid =window.setTimeout(refreshListtemp, 10);
 }
 function refreshListtemp() {
 	if (stchanged) stChanged();
@@ -863,7 +864,7 @@ function clearList() {
 		xhr.setRequestHeader(content,ctype);
 		xhr.send( );
 		refreshList();
-		window.setTimeout(loadStations, 5);
+		window.setTimeout(loadStations, 10);
 	}
 	else 	promptworking("");
 }	
@@ -1073,6 +1074,9 @@ function stChanged()
 		}
 		loadStationsList(maxStation);		
 	}
+	else 
+	if (stchanged) 
+		loadStations();
 	stchanged = false;
 	document.getElementById("stsave").disabled = true;
 	promptworking("");
