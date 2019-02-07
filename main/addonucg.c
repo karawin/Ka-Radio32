@@ -783,7 +783,10 @@ void separatorUcg(char* from)
 //cli.meta
 void metaUcg(char* ici)
 {
-     cleartitleUcg(3); 
+     cleartitleUcg(TITLE1);
+     cleartitleUcg(TITLE11);
+     cleartitleUcg(TITLE2);
+     cleartitleUcg(TITLE21);
      strcpy(title,ici+7);    
 	 removeUtf8(title);
      separatorUcg(title); 	
@@ -818,9 +821,12 @@ void icy0Ucg(char* ici)
 //cli.stopped or label
 void statusUcg(const char* label)
 {
-     cleartitleUcg(3);
-     strcpy(title,label);
-     lline[TITLE1] = title;	
+    cleartitleUcg(TITLE1);
+    cleartitleUcg(TITLE11);
+    cleartitleUcg(TITLE2);
+    cleartitleUcg(TITLE21);
+	strcpy(title,label);
+	lline[TITLE1] = title;	
 }
 //cli.nameset
 void namesetUcg(char* ici)
@@ -845,11 +851,14 @@ void namesetUcg(char* ici)
 // cli.playing
 void playingUcg()
 {
-//	if (strcmp(title,"STOPPED") == 0)
-//    {
-        cleartitleUcg(3);
+	if (strcmp(title,"STOPPED") == 0)
+    {
+        cleartitleUcg(TITLE1);
+        cleartitleUcg(TITLE11);
+        cleartitleUcg(TITLE2);
+        cleartitleUcg(TITLE21);
         separatorUcg(title);
-//    }
+    }
 }
 
 
