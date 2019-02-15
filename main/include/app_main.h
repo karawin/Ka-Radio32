@@ -40,7 +40,7 @@
 #include "driver/timer.h"
 
 #define TIMER_DIVIDER 16 	//5000000Hz 5MHz
-#define TIMER_DIVIDER1MS 8000 //10000Hz 
+#define TIMER_DIVIDER1MS TIMER_BASE_CLK/10000 //10000Hz 
 #define TIMER_DIVIDER1mS 8 //10000000Hz 10MHz
 
 #define TIMERVALUE(x) (x*5000000 )
@@ -137,8 +137,10 @@ void startWake(uint32_t delay);
 void stopWake();
 void noInterrupt1Ms();
 void interrupt1Ms();
-void noInterrupts();
-void interrupts();
+#define noInterrupts noInterrupt1Ms
+#define interrupts interrupt1Ms
+//void noInterrupts();
+//void interrupts();
 char* getIp();
 
 

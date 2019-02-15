@@ -9,7 +9,7 @@
 #include "esp_system.h"
 #include "audio_renderer.h"
 
-//define for bit array 
+//define for bit array options
 #define T_THEME 	1
 #define NT_THEME	0xFE
 #define T_PATCH 	2
@@ -18,6 +18,7 @@
 #define NT_LED		0xFB
 #define T_LEDPOL	8
 #define NT_LEDPOL	0xF7
+//define for bit array options32
 #define T_DDMM		1
 #define NT_DDMM		0xFE
 #define T_ROTAT		2
@@ -26,6 +27,8 @@
 #define T_ENC1		8
 #define NT_ENC0	0xFB
 #define NT_ENC1	0xF7
+#define T_WIFIAUTO	0x10
+#define NT_WIFIAUTO 0xEF
 
 #define APMODE		0
 #define STA1		1
@@ -73,7 +76,7 @@ struct device_settings {
 	uint8_t led_gpio; // the gpio of the led
 	uint32_t lcd_out;	// timeout in seconds to switch off the lcd. 0 = no timeout
 	uint8_t options32;	// bit0:0 = MMDD, 1 = DDMM  in the time display, bit1: 0= lcd without rotation  1 = lcd rotated 180
-						// bit 2: Half step of encoder0, bit3: Half step of encoder1
+						// bit 2: Half step of encoder0, bit3: Half step of encoder1, bit4: wifi auto reconnect
 	char hostname[HOSTLEN];
 	char filler[8]; 
 

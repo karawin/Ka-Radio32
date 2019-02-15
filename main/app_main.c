@@ -100,6 +100,7 @@ const int CONNECTED_AP  = 0x00000010;
 #define striWATERMARK  "watermark: %d  heap: %d"
 
 void start_network();
+void autoPlay();
 /* */
 static bool wifiInitDone = false;
 static EventGroupHandle_t wifi_event_group ;
@@ -118,12 +119,14 @@ static char localIp[20];
 static bool bigRam = false;
 // timeout to save volume in flash
 static uint32_t ctimeVol = 0;
+static uint32_t ctimeMs = 0;	
+
 // disable 1MS timer interrupt
 IRAM_ATTR void noInterrupt1Ms() {timer_disable_intr(TIMERGROUP1MS, msTimer);}
 // enable 1MS timer interrupt
 IRAM_ATTR void interrupt1Ms() {timer_enable_intr(TIMERGROUP1MS, msTimer);}
-IRAM_ATTR void noInterrupts() {noInterrupt1Ms();}
-IRAM_ATTR void interrupts() {interrupt1Ms();}
+//IRAM_ATTR void noInterrupts() {noInterrupt1Ms();}
+//IRAM_ATTR void interrupts() {interrupt1Ms();}
 
 IRAM_ATTR char* getIp() {return (localIp);}
 IRAM_ATTR uint8_t getIvol() {return clientIvol;}
@@ -147,13 +150,16 @@ IRAM_ATTR bool bigSram() { return bigRam;}
 //-----------------------------------
 IRAM_ATTR void   msCallback(void *pArg) {
 	int timer_idx = (int) pArg;
-	queue_event_t evt;	
+//	queue_event_t evt;	
 	TIMERG1.hw_timer[timer_idx].update = 1;
 	TIMERG1.int_clr_timers.t0 = 1; //isr ack
-		evt.type = TIMER_1MS;
-        evt.i1 = TIMERGROUP1MS;
-        evt.i2 = timer_idx;
-	xQueueSendFromISR(event_queue, &evt, NULL);	
+//		evt.type = TIMER_1MS;
+//        evt.i1 = TIMERGROUP1MS;
+//        evt.i2 = timer_idx;
+		ctimeMs++;	// for led
+		ctimeVol++; // to save volume		
+	if (serviceAddon != NULL) serviceAddon(); // for the encoders and buttons
+//	xQueueSendFromISR(event_queue, &evt, NULL);	
 	TIMERG1.hw_timer[timer_idx].config.alarm_en = 1;
 }
 
@@ -328,10 +334,14 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
 		
 	case SYSTEM_EVENT_STA_CONNECTED:
 		xEventGroupSetBits(wifi_event, CONNECTED_AP);
-		wifiInitDone = true;
-		ESP_LOGI(TAG, "Wifi connected");
-		
-		break;
+		ESP_LOGI(TAG, "Wifi connected");		
+		if (wifiInitDone) 
+		{
+			clientSaveOneHeader("Wifi Connected.",18,METANAME);	
+			vTaskDelay(1000);
+			autoPlay();
+			} // retry
+		else wifiInitDone = true;		break;
 
     case SYSTEM_EVENT_STA_GOT_IP:
 		FlashOn = 5;FlashOff = 395;
@@ -344,19 +354,30 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
 		FlashOn = FlashOff = 100;
 		xEventGroupClearBits(wifi_event, CONNECTED_AP);
         xEventGroupClearBits(wifi_event, CONNECTED_BIT);
-		ESP_LOGE(TAG, "\nWifi Disconnected. Connection tried again");
-        if (getAutoWifi()&&(wifiInitDone)) 
+		ESP_LOGE(TAG, "Wifi Disconnected.");
+		vTaskDelay(100);
+        if (!getAutoWifi()&&(wifiInitDone)) 
 		{
-			ESP_LOGE(TAG, "\nWifi Disconnected. reboot");
+			ESP_LOGE(TAG, "reboot");
+			vTaskDelay(100);			
 			esp_restart();
-//			ESP_LOGE(TAG, "\nWifi Disconnected. Connection tried again");
-//			esp_wifi_connect();
 		} else
-			if (!wifiInitDone)
+		{
+			if (wifiInitDone) // a completed init done
 			{
-				ESP_LOGE(TAG, "\nWifi Disconnected.");
-				esp_wifi_connect();
-			}
+				ESP_LOGE(TAG, "Connection tried again");
+//				clientDisconnect("Wifi Disconnected.");
+				clientSilentDisconnect();
+				vTaskDelay(100);
+				clientSaveOneHeader("Wifi Disconnected.",18,METANAME);	
+				vTaskDelay(100);
+				while (esp_wifi_connect() == ESP_ERR_WIFI_SSID) vTaskDelay(10);
+			} else 
+			{
+				ESP_LOGE(TAG, "Try next AP");
+				vTaskDelay(100);	
+			} // init failed?
+		}
         break;
 
 	case SYSTEM_EVENT_AP_START:
@@ -379,6 +400,7 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
 static void start_wifi()
 {
     ESP_LOGI(TAG, "starting wifi");
+	setAutoWifi();
 	wifi_mode_t mode;
 	char ssid[SSIDLEN]; 
 	char pass[PASSLEN];
@@ -455,26 +477,35 @@ static void start_wifi()
 			};
 			strcpy((char*)wifi_config.sta.ssid,ssid);
 			strcpy((char*)wifi_config.sta.password,pass);
-			esp_wifi_disconnect();
-			ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
-			ESP_LOGI(TAG, "connecting");
-			ESP_ERROR_CHECK( esp_wifi_start() );
-//			esp_wifi_connect();				
+			if  (strlen(ssid)&&strlen(pass))
+			{
+				esp_wifi_disconnect();
+				ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
+				ESP_LOGI(TAG, "connecting");
+				ESP_ERROR_CHECK( esp_wifi_start() );
+//			esp_wifi_connect();			
+			} else
+			{
+				g_device->current_ap++;
+				g_device->current_ap %=3;
+				saveDeviceSettings(g_device);
+				printf("Empty AP. Try next one\n");
+				continue;
+			}				
 		}
 
 		ESP_LOGI(TAG, "Initialised wifi");
 // 	   set_wifi_credentials();
  
 		/* Wait for the callback to set the CONNECTED_BIT in the event group. */
-		if ( (xEventGroupWaitBits(wifi_event_group, CONNECTED_AP,false, true, 2000) & CONNECTED_AP) ==0) //timeout
+		if ( (xEventGroupWaitBits(wifi_event_group, CONNECTED_AP,false, true, 2000) & CONNECTED_AP) ==0) 
+		//timeout . Try the next AP
 		{
 			g_device->current_ap++;
 			g_device->current_ap %=3;
 			saveDeviceSettings(g_device);
-			printf("\ndevice->current_ap: %d\n",g_device->current_ap);
-			//vTaskDelay(100);
-			//esp_restart();		
-		}	else break;						
+			printf("\ndevice->current_ap: %d\n",g_device->current_ap);	
+		}	else break;	// 					
 	}					
 }
 
@@ -521,7 +552,9 @@ void start_network(){
 			g_device->dhcpEn1 = g_device->dhcpEn2 = 1;
 			IPADDR2_COPY(&g_device->mask1, &mask);
 			IPADDR2_COPY(&g_device->mask2, &mask);
-			saveDeviceSettings(g_device);			
+			saveDeviceSettings(g_device);	
+			strcpy(localIp , ip4addr_ntoa(&info.ip));
+			printf("IP: %s\n\n",ip4addr_ntoa(&info.ip));			
 	}
 	else // mode STA
 	{	
@@ -595,8 +628,6 @@ void start_network(){
 //blinking led and timer isr
 void timerTask(void* p) {
 //	struct device_settings *device;	
-	uint32_t ctime = 0;
-	
 	uint32_t cCur;
 	bool stateLed = false;
 	gpio_num_t gpioLed;
@@ -629,11 +660,10 @@ void timerTask(void* p) {
 					case TIMER_WAKE:
 					clientConnect(); // start the player	
 					break;
-					case TIMER_1MS: // 1 ms 
-					  ctime++;	// for led
-					  ctimeVol++; // to save volume
-					  if (serviceAddon != NULL) serviceAddon(); // for the encoder
-					break;
+//					case TIMER_1MS: // 1 ms 
+//					  ctimeMs++;	// for led
+//					  ctimeVol++; // to save volume
+//					break;
 //					case TIMER_1mS:  //1µs
 //					break;
 					default:
@@ -642,7 +672,7 @@ void timerTask(void* p) {
 		}
 		if (ledStatus)
 		{
-			if (ctime >= cCur)
+			if (ctimeMs >= cCur)
 			{
 				gpioLed = getLedGpio();
 
@@ -657,7 +687,7 @@ void timerTask(void* p) {
 					stateLed = true;
 					cCur = FlashOn*10;										
 				}
-				ctime = 0;
+				ctimeMs = 0;
 			}			
 		} 
 		
@@ -726,12 +756,41 @@ void uartInterfaceTask(void *pvParameters) {
 	}	
 }
 
+// In STA mode start a station or start in pause mode.
+// Show ip on AP mode.
+void autoPlay()
+{
+	char apmode[50];
+	sprintf(apmode,"at IP %s",localIp);
+	if (g_device->current_ap == APMODE) 
+	{
+		clientSaveOneHeader("Configure the AP with the web page",34,METANAME);
+		clientSaveOneHeader(apmode,strlen(apmode),METAGENRE);
+	} else
+	{
+		if ((audio_output_mode == VS1053) && (getVsVersion() < 3))
+		{
+			clientSaveOneHeader("Invalid audio output. VS1053 not found",38,METAGENRE);
+			ESP_LOGE(TAG,"Invalid audio output. VS1053 not found");
+			vTaskDelay(200);
+		}		
+
+		setCurrentStation( g_device->currentstation);
+		if ((g_device->autostart ==1)&&(g_device->currentstation != 0xFFFF))
+		{	
+			kprintf("autostart: playing:%d, currentstation:%d\n",g_device->autostart,g_device->currentstation);
+			clientSaveOneHeader(apmode,strlen(apmode),METANAME);
+			vTaskDelay(50); // wait a bit
+			playStationInt(g_device->currentstation);
+		} else clientSaveOneHeader("Ready",5,METANAME);			
+	}
+}
+
 /**
- * entry point
+ * Main entry point
  */
 void app_main()
 {
-//	struct device_settings *device;
 	uint32_t uspeed;
 	xTaskHandle pxCreatedTask;
 	esp_err_t err;
@@ -788,27 +847,28 @@ void app_main()
 	telnetinit();
 	websocketinit();
 
-
 	// log level
 	setLogLevel(g_device->trace_level);
-//	setLogLevel(ESP_LOG_INFO);
+	
 	//time display
 	uint8_t ddmm;
 	option_get_ddmm(&ddmm);	
 	setDdmm(ddmm?1:0);
+	
 	//SPI init for the vs1053 and lcd if spi.
 	VS1053_spi_init();
 
     init_hardware(); 
 	ESP_LOGI(TAG, "Hardware init done...");
+	
 	//ESP_LOGE(TAG,"Corrupt1 %d",heap_caps_check_integrity(MALLOC_CAP_DMA,1));
 	
+	// lcd init
 	uint8_t rt;
 	option_get_lcd_info(&g_device->lcd_type,&rt);
 	ESP_LOGI(TAG,"LCD Type %d",g_device->lcd_type);
 	//lcd rotation
 	setRotat(rt) ;	
-
 	lcd_init(g_device->lcd_type);
 	
 /*	
@@ -834,17 +894,9 @@ void app_main()
 	// output mode
 	//I2S, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053
 	audio_output_mode = g_device->audio_output_mode;
-	
-	if ((audio_output_mode == VS1053) && (getVsVersion() < 3))
-	{
-		audio_output_mode = I2S	;
-		g_device->audio_output_mode = audio_output_mode;
-		ESP_LOGE(TAG," No vs1053 detected. Fall back to I2S mode");
-		saveDeviceSettings(g_device);
-	}
-	
+	ESP_LOGI(TAG, "audio_output_mode %d\nOne of I2S=0, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053",audio_output_mode);
 
-	    //Initialize the SPI RAM chip communications and see if it actually retains some bytes. If it
+	//Initialize the SPI RAM chip communications and see if it actually retains some bytes. If it
     //doesn't, warn user.
 	if (bigRam)
 	{
@@ -862,9 +914,6 @@ void app_main()
         esp_restart();
     }
 	
-	ESP_LOGI(TAG, "audio_output_mode %d\nOne of I2S=0, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053",audio_output_mode);
-
-	setCurrentStation( g_device->currentstation);
 
 	//uart speed
 	uspeed = g_device->uartspeed;	
@@ -891,7 +940,7 @@ void app_main()
 	ESP_LOGI(TAG, "Volume set to %d",g_device->vol);
 		
 	
-// queue for events of the sleep / wake and Ms timers
+	// queue for events of the sleep / wake and Ms timers
 	event_queue = xQueueCreate(30, sizeof(queue_event_t));
 	// led blinks
 	xTaskCreatePinnedToCore(timerTask, "timerTask",2100, NULL, PRIO_TIMER, &pxCreatedTask,CPU_TIMER); 
@@ -940,11 +989,7 @@ void app_main()
     player_config->media_stream = calloc(1, sizeof(media_stream_t));
 
 	audio_player_init(player_config);	  
-	
-	//if (audio_output_mode != BTOOTH)
-		renderer_init(create_renderer_config());
-	//else
-	//	bt_speaker_start(create_renderer_config());
+	renderer_init(create_renderer_config());
 	
 	// LCD Display infos
     lcd_welcome(localIp,"STARTED");
@@ -977,16 +1022,10 @@ void app_main()
 	if(g_device->options & T_LED) ledStatus = false;
 	if(g_device->options & T_LEDPOL) ledPolarity = true;
 	
-	//autostart	
 	setIvol( g_device->vol);
 	kprintf("READY. Type help for a list of commands\n");
 	
-	
-	if ((g_device->autostart ==1)&&(g_device->currentstation != 0xFFFF))
-	{	
-		kprintf("autostart: playing:%d, currentstation:%d\n",g_device->autostart,g_device->currentstation);
-		vTaskDelay(50); // wait a bit
-		playStationInt(g_device->currentstation);
-	}	
-//
+	//autostart		
+	autoPlay();
+// All done.
 }

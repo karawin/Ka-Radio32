@@ -11,6 +11,7 @@
 #define METAINT 8
 #define BITRATE 5
 #define METANAME 0
+#define METAGENRE 4
 #define ICY_HEADERS_COUNT 9
 #define ICY_HEADER_COUNT 10
 //2000 1440 1460
@@ -66,6 +67,7 @@ void clientSilentConnect();
 void clientConnectOnce();
 void clientDisconnect(const char* from);
 void clientSilentDisconnect();
+bool clientSaveOneHeader(const char* t, uint16_t len, uint8_t header_num);
 void clientTask(void *pvParams);
 void wsVol(char* vol);
 void wsMonitor();

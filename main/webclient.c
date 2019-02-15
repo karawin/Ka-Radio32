@@ -557,7 +557,7 @@ bool clientPrintHeaders()
 	return true;
 }	
 
-static bool clientSaveOneHeader(const char* t, uint16_t len, uint8_t header_num)
+bool clientSaveOneHeader(const char* t, uint16_t len, uint8_t header_num)
 {
 	char* tt;
 	if(header.members.mArr[header_num] != NULL) 
@@ -688,7 +688,7 @@ void clientConnect()
 		xSemaphoreGive(sConnect);
 	} else {
 		clientDisconnect("clientConnect");
-		clientSaveOneHeader("Invalid host",15,METANAME);
+		clientSaveOneHeader("Invalid host",12,METANAME);
 		wsHeaders();
 		vTaskDelay(1);
 	}
@@ -767,7 +767,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 		}
 		if (t1 != NULL) { // 
 			kprintf(CLIPLAY,0x0d,0x0a);
-			clientSaveOneHeader(notfound, 13,METANAME);
+			clientSaveOneHeader(notfound, 9,METANAME);
 			wsHeaders();
 			vTaskDelay(1);
 			cstatus = C_HEADER;
@@ -1220,7 +1220,7 @@ void clientTask(void *pvParams) {
 						//						
 					else if ((!playing)&&(once == 0)) {  // nothing received
 							clientDisconnect(nodata); 							
-							clientSaveOneHeader(nodata, 9,METANAME);
+							clientSaveOneHeader(nodata,7,METANAME);
 							wsHeaders();
 							vTaskDelay(1);
 					}	

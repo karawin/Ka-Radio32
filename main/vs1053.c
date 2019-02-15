@@ -109,7 +109,7 @@ bool VS1053_HW_init()
 		ESP_LOGE(TAG,"VS1053 not used");
 		return false;
 	}
-	uint32_t freq =spi_cal_clock(APB_CLK_FREQ, 1600000, 128, NULL);
+	uint32_t freq =spi_cal_clock(APB_CLK_FREQ, 1400000, 128, NULL);
 	ESP_LOGI(TAG,"VS1053 LFreq: %d",freq);
 	spi_device_interface_config_t devcfg={
         .clock_speed_hz=freq,               //Clock out at x MHz
@@ -264,9 +264,9 @@ void VS1053_ResetChip(){
 	ControlReset(SET);
 	vTaskDelay(20);
 	ControlReset(RESET);
-	vTaskDelay(10);
+	vTaskDelay(20);
 	if (VS1053_checkDREQ() == 1) return;
-	vTaskDelay(10);
+	vTaskDelay(20);
 }
 
 uint16_t MaskAndShiftRight(uint16_t Source, uint16_t Mask, uint16_t Shift){
@@ -332,7 +332,7 @@ void VS1053_Start(){
 	VS1053_WriteRegister16(SPI_WRAM, 0x0003); //GPIO_DDR=3
 	VS1053_WriteRegister16(SPI_WRAMADDR, 0xc019); //address of GPIO_ODATA is 0xC019
 	VS1053_WriteRegister16(SPI_WRAM, 0x0000); //GPIO_ODATA=0
-	vTaskDelay(100);
+	vTaskDelay(150);
 	
 	int MP3Status = VS1053_ReadRegister(SPI_STATUSVS);
 	vsVersion = (MP3Status >> 4) & 0x000F; //Mask out only the four version bits

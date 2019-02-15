@@ -59,6 +59,7 @@ typedef gpio_mode_t pinMode_t;
   volatile int16_t delta;
   volatile int16_t last;
   volatile uint8_t steps;
+  volatile uint8_t accel_inc;
   volatile uint16_t acceleration;
   bool accelerationEnabled;
   volatile Button button;

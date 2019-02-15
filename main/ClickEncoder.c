@@ -21,9 +21,8 @@
 // ----------------------------------------------------------------------------
 // enc->acceleration configuration (for 1000Hz calls to ::service())
 //
-#define ENC_ACCEL_TOP    2000   // max. acceleration: *12 (val >> 8)
-#define ENC_ACCEL_INC    30
-#define ENC_ACCEL_STEP   20
+#define ENC_ACCEL_TOP    3072    // max. acceleration:  (val >> 5)
+#define ENC_ACCEL_INC    80
 #define ENC_ACCEL_DEC 	 2
 
 // ----------------------------------------------------------------------------
@@ -66,8 +65,13 @@ Encoder_t* ClickEncoderInit(int8_t A, int8_t B, int8_t BTN, bool initHalfStep)
 	enc->pinsActive = LOW; enc->delta = 0; enc->last = 0; enc->steps = 4; 
 	enc->accelerationEnabled = true; enc->button = Open;
 	enc->doubleClickEnabled = true; enc->buttonHeldEnabled = true;
+	enc->accel_inc = ENC_ACCEL_INC;
 
-	if (initHalfStep) enc->steps = 2;
+	if (initHalfStep) 
+	{
+		enc->steps = 2;
+		enc->accel_inc = ENC_ACCEL_INC /2;
+	}
 	
 	enc->keyDownTicks = 0;
 	enc->doubleClickTicks = 0;
@@ -154,8 +158,8 @@ IRAM_ATTR void service(Encoder_t *enc)
 
   if (enc->accelerationEnabled && moved) {
     // increment accelerator if encoder has been moved
-    if (enc->acceleration <= (ENC_ACCEL_TOP - ENC_ACCEL_INC)) {
-      enc->acceleration += ENC_ACCEL_INC;
+    if (enc->acceleration <= (ENC_ACCEL_TOP - enc->accel_inc)) {
+      enc->acceleration += enc->accel_inc ;
     }
   }
 }
@@ -221,22 +225,22 @@ int16_t getValue(Encoder_t *enc)
   if (enc->steps == 2) enc->delta = val & 1;
   else if (enc->steps == 4) enc->delta = val & 3;
   else enc->delta = 0; // default to 1 step per notch
-  uint16_t accel = ((enc->accelerationEnabled) ? (enc->acceleration ) : 0);
-  interrupts();
   
   if (enc->steps == 4) val >>= 2;
   if (enc->steps == 2) val >>= 1;
 
   int16_t r = 0;
-//  int16_t accel = ((enc->accelerationEnabled) ? (enc->acceleration >> 8) : 0);
-  if (accel > ENC_ACCEL_STEP) accel = ENC_ACCEL_STEP;
+//  uint16_t accel = ((enc->accelerationEnabled) ? (enc->acceleration ) : 0);
+  int16_t accel = (enc->accelerationEnabled) ? (enc->acceleration >> 6) : 0;
+  
   if (val < 0) {
     r -= 1 + accel;
   }
   else if (val > 0) {
     r += 1 + accel;
   }
-  //if (r != 0) printf("Acceleration: %d  accel: %d   val:%d,, R:%d\n",enc->acceleration,accel,val,r);
+//  if (r != 0) printf("Acceleration: %d  accel: %d   val:%d,, R:%d\n",enc->acceleration,accel,val,r);
+  interrupts();
 
   return r;
 }

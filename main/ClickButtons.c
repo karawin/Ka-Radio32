@@ -51,7 +51,6 @@ Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C)
 
   if (enc->pinBTN[0] > 0) 
   {
-	gpio_conf.pin_bit_mask = BIT(enc->pinBTN[0]);
 	gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<enc->pinBTN[0]));
 	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
   }

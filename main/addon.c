@@ -681,6 +681,7 @@ void buttonsLoop()
 void encoderCompute(Encoder_t *enc,bool role)
 {	
 	int16_t newValue = - getValue(enc);
+	if (newValue != 0) ESP_LOGD(TAG,"encoder value: %d",newValue);
 	Button newButton = getButton(enc);
 	typeScreen estate;
 	if (role) estate = sstation; else estate = svolume;

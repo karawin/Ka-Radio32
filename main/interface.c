@@ -41,7 +41,7 @@ const char msgcli[] = {"##CLI."};
 
 const char stritWIFISTATUS[]  = {"#WIFI.STATUS#\nIP: %d.%d.%d.%d\nMask: %d.%d.%d.%d\nGateway: %d.%d.%d.%d\n##WIFI.STATUS#\n"};
 const char stritWIFISTATION[]  = {"#WIFI.STATION#\nSSID: %s\nPASSWORD: %s\n##WIFI.STATION#\n"};
-const char stritPATCH[]  = {"#WIFI.PATCH#\nVS1053 Patch will be %s after power Off and On#\n##WIFI.PATCH#\n"};
+const char stritPATCH[]  = {"#WIFI.PATCH#: VS1053 Patch will be %s after power Off and On#\n"};
 const char stritCMDERROR[]  = {"##CMD_ERROR#\n"};
 const char stritHELP0[]  = {"\
 Commands:\n\
@@ -55,7 +55,8 @@ wifi.con(\"ssid\",\"password\"): Record the given AP ssid with password in AP1 f
 wifi.discon: disconnect the current ssid\n\
 wifi.station: the current ssid and password\n\
 wifi.status: give the current IP GW and mask\n\
-wifi.rssi: print the rssi (power of the reception\n\n\
+wifi.rssi: print the rssi (power of the reception\n\
+wifi.auto[(\"x\")]  show the auto state or set it to x. x=0: reboot on wifi disconnect or 1: try reconnection.\n\n\
 //////////////////\n\
   Station Client commands\n\
 //////////////////\n\
@@ -162,9 +163,6 @@ void setRotat(uint8_t dm)
 	if (dm == 0) rotat = 0;
 	else rotat = 1;
 }
-static bool autoWifi = true; // auto reconnect wifi if disconnected
-bool getAutoWifi(void)
-{ return autoWifi;}
 
 void setVolumePlus()
 {
@@ -328,18 +326,52 @@ void wifiConnectMem()
 	kprintf("##WIFI.CON#\n");
 }
 
+static bool autoConWifi = true; // control for wifiReConnect & wifiDisconnect
+static bool autoWifi = false; // auto reconnect wifi if disconnected
+bool getAutoWifi(void)
+{ return autoWifi;}
+void setAutoWifi()
+{ autoWifi = (g_device->options32& T_WIFIAUTO)?true:false;}
+
+void wifiAuto(char* cmd)
+{
+	char *t = strstr(cmd, parslashquote);
+	if(t == 0)
+	{
+		kprintf("##Wifi Auto is %s#\n",autoWifi?"On":"Off");
+//		kprintf(stritCMDERROR);
+		return;
+	}
+	char *t_end  = strstr(t, parquoteslash);
+    if(t_end == NULL)
+    {
+		kprintf(stritCMDERROR);
+		return;
+    }	
+	uint8_t value = atoi(t+2);
+	
+	if (value == 0)
+		g_device->options32 &= NT_WIFIAUTO;
+	else 
+		g_device->options32 |= T_WIFIAUTO;
+	autoWifi = value;
+	saveDeviceSettings(g_device);
+
+	wifiAuto((char*)"");
+}
+
 void wifiReConnect()
 {
-	if (autoWifi == false) esp_wifi_connect();
-	autoWifi = true;
+	if (autoConWifi == false) esp_wifi_connect();
+	autoConWifi = true;
 }
 
 void wifiDisconnect()
 {
 	esp_err_t err;
-	autoWifi = false;
+	autoConWifi = false;
 	err=esp_wifi_disconnect();
-	if(err== ESP_OK) kprintf("\n##WIFI.NOT_CONNECTED#");
+	if(err== ESP_OK) kprintf("\n##WIFI.NOT_CONNECTED#\n");
 	else kprintf("\n##WIFI.DISCONNECT_FAILED %d#",err);
 }
 
@@ -650,7 +682,7 @@ void sysI2S(char* s)
     char *t = strstr(s, parslashquote);
 	if(t == NULL)
 	{
-		kprintf("\n##I2S speed: %d, 0=48kHz, 1=96kHz, 2=192kHz#\n",g_device->i2sspeed);
+		kprintf("\n##I2S speed of the vs1053: %d, 0=48kHz, 1=96kHz, 2=192kHz#\n",g_device->i2sspeed);
 		return;
 	}
 	char *t_end  = strstr(t, parquoteslash);
@@ -663,8 +695,9 @@ void sysI2S(char* s)
 	VS1053_I2SRate(speed);
 
 	g_device->i2sspeed = speed;
-	saveDeviceSettings(g_device);	
-	kprintf("\n##I2S speed: %d, 0=48kHz, 1=96kHz, 2=192kHz#\n",speed);
+	saveDeviceSettings(g_device);
+	sysI2S((char*)"");
+//	kprintf("\n##I2S speed: %d, 0=48kHz, 1=96kHz, 2=192kHz#\n",speed);
 }
 
 void sysUart(char* s)
@@ -737,9 +770,9 @@ void syspatch(char* s)
 	if(t == NULL)
 	{
 		if ((g_device->options & T_PATCH)!= 0)
-			kprintf("\n##VS1053 Patch is not loaded#%c",0x0d);
+			kprintf("##VS1053 Patch is not loaded#\n");
 		else
-			kprintf("\n##VS1053 Patch is loaded#%c",0x0d);
+			kprintf("##VS1053 Patch is loaded#\n");
 		return;
 	}
 	char *t_end  = strstr(t, parquoteslash);
@@ -779,9 +812,10 @@ void sysledgpio(char* s)
 	gpio_output_conf(value);
 	saveDeviceSettings(g_device);	
 	gpio_set_ledgpio(value); // write in nvs if any
-	kprintf("##Led GPIO is now %d\n",value);
-	led_gpio = GPIO_NONE;
+	sysledgpio((char*) "");
+	led_gpio = GPIO_NONE; // for getLedGpio
 }
+
 uint8_t getLedGpio()
 {
 	if (led_gpio == GPIO_NONE)
@@ -815,7 +849,7 @@ void syslcd(char* s)
 	g_device->lcd_type = value; 
 	saveDeviceSettings(g_device);	
 	option_set_lcd_info(value,rotat );
-	kprintf("##LCD is in %d on next reset#\n",value);
+	kprintf("##LCD is %d on next reset#\n",value);
 }
 
 // display or change the DDMM display mode
@@ -846,10 +880,7 @@ void sysddmm(char* s)
 	ddmm = (value)?1:0;
 	saveDeviceSettings(g_device);	
 	option_set_ddmm(ddmm);
-	if (ddmm)
-		kprintf("##Time is DDMM#\n");
-	else
-		kprintf("##Time is MMDD#\n");
+	sysddmm((char*) "");
 }
 
 // get or set the encoder half resolution. Must be set depending of the hardware
@@ -864,9 +895,9 @@ void syshenc(int nenc,char* s)
 	if (nenc == 0) encvalue = options32&T_ENC0;
 	else encvalue = options32&T_ENC1;
 	
-	kprintf("##Step for encoder%d is ",nenc);
 	if(t == NULL)
 	{
+		kprintf("##Step for encoder%d is ",nenc);
 		if (encvalue)
 			kprintf("half#\n");
 		else
@@ -895,12 +926,7 @@ void syshenc(int nenc,char* s)
 	setHalfStep(encoder, value);
 	if (nenc == 0) encvalue = g_device->options32&T_ENC0;
 	else encvalue = g_device->options32&T_ENC1;
-	if (encvalue)
-		kprintf("half ");
-	else
-		kprintf("normal ");
-	kprintf("#\n");
-	
+	syshenc(nenc,(char*)"");
 	saveDeviceSettings(g_device);	
 }
 
@@ -909,9 +935,9 @@ void sysrotat(char* s)
 {
     char *t = strstr(s, parslashquote);
 
-	kprintf("##Lcd rotation is ");
 	if(t == NULL)
 	{
+		kprintf("##Lcd rotation is ");
 		if (rotat)
 			kprintf("on#\n");
 		else
@@ -932,10 +958,7 @@ void sysrotat(char* s)
 	rotat = value;
 	option_set_lcd_info(g_device->lcd_type,rotat );
 	saveDeviceSettings(g_device);	
-	if (rotat)
-		kprintf("on#\n");
-	else
-		kprintf("off#\n");
+	sysrotat((char*) "");
 }
 
 
@@ -943,10 +966,10 @@ void sysrotat(char* s)
 void syslcdout(char* s)
 {
     char *t = strstr(s, parslashquote);
-	kprintf("##LCD out is ");
 	lcd_out = g_device->lcd_out; 
 	if(t == NULL)
 	{
+		kprintf("##LCD out is ");
 		kprintf("%d#\n",lcd_out);
 		return;
 	}
@@ -961,7 +984,7 @@ void syslcdout(char* s)
 	lcd_out = value;
 	saveDeviceSettings(g_device);	
 	option_set_lcd_out(lcd_out);
-	kprintf("%d#\n",value);
+	syslcdout((char*) "");
 	wakeLcd();
 }
 
@@ -999,8 +1022,8 @@ void sysled(char* s)
 	else 
 	{g_device->options &= NT_LED; ledStatus =true;} // options:0 = ledStatus true = Blink mode
 	
-	saveDeviceSettings(g_device);	
-	kprintf("##LED is in %s mode#\n",(ledStatus)?"Blink":"Play");
+	saveDeviceSettings(g_device);
+	sysled((char*) "");	
 }
 
 // mode of the led indicator. polarity 0 or 1
@@ -1026,7 +1049,7 @@ void sysledpol(char* s)
 	{g_device->options &= NT_LEDPOL; ledPolarity =false;} // options:0 = ledPolarity 
 	
 	saveDeviceSettings(g_device);	
-	kprintf("##LED polarity is %d#\n",(ledPolarity)?1:0);
+	sysledpol((char*) "");
 }
 
 
@@ -1048,7 +1071,7 @@ void tzoffset(char* s)
 	uint8_t value = atoi(t+2);
 	g_device->tzoffset = value;	
 	saveDeviceSettings(g_device);	
-	kprintf("##SYS.TZO#: %d\n",g_device->tzoffset);
+	tzoffset((char*) "");
 	addonDt(); // for addon, force the dt fetch
 }
 
@@ -1100,7 +1123,7 @@ void hostname(char* s)
 	}
 	saveDeviceSettings(g_device);	
 	setHostname(g_device->hostname);
-	kprintf("##SYS.HOST#: %s.local\n  IP:%s #\n",g_device->hostname,getIp());
+	hostname((char*) "");
 }
 
 void displayLogLevel()
@@ -1193,6 +1216,7 @@ void checkCommand(int size, char* s)
 		else if(strcmp(tmp+5, "discon") == 0) wifiDisconnect();
 		else if(strcmp(tmp+5, "status") == 0) wifiStatus();
 		else if(strcmp(tmp+5, "station") == 0) wifiGetStation();
+		else if(startsWith("auto", tmp+5)) wifiAuto(tmp);
 		else printInfo(tmp);
 	} else
 	if(startsWith ("cli.", tmp))

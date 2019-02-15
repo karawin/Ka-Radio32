@@ -204,7 +204,11 @@ void option_get_lcd_out(uint32_t *enca)
 	
 	err = nvs_get_u32(hardware_handle, "O_LCD_OUT",(uint32_t *) &lout);
 	if (err != ESP_OK) ESP_LOGD(TAG,"oget_lcd_out err 0x%x",err);
-	else *enca = lout;
+	else
+	{
+		if (lout == 255) lout = 0; // special case
+		*enca = lout;
+	}	
 	close_partition(hardware_handle,hardware);		
 }
 void option_set_lcd_out(uint32_t enca)
