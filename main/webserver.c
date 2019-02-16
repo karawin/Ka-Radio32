@@ -758,7 +758,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			if (val){
 				// set current_ap to the first filled ssid
 				ESP_LOGD(TAG,"audio_output_mode: %d",g_device->audio_output_mode);
-				copyDeviceSettings();
+//				copyDeviceSettings();
 				vTaskDelay(20);	
 				esp_restart();			
 			}		

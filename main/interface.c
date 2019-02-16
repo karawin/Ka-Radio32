@@ -56,7 +56,7 @@ wifi.discon: disconnect the current ssid\n\
 wifi.station: the current ssid and password\n\
 wifi.status: give the current IP GW and mask\n\
 wifi.rssi: print the rssi (power of the reception\n\
-wifi.auto[(\"x\")]  show the auto state or set it to x. x=0: reboot on wifi disconnect or 1: try reconnection.\n\n\
+wifi.auto[(\"x\")]  show the autoconnection  state or set it to x. x=0: reboot on wifi disconnect or 1: try reconnection.\n\n\
 //////////////////\n\
   Station Client commands\n\
 //////////////////\n\
@@ -314,15 +314,15 @@ void wifiConnect(char* cmd)
 	copyDeviceSettings();
 	//
 	kprintf("#WIFI.CON#\n");
-	kprintf("\n##AP1: %s with dhcp on next reset#\n",g_device->ssid1);
+	kprintf("##AP1: %s with dhcp on next reset#\n",g_device->ssid1);
 	kprintf("##WIFI.CON#\n");
 }
 
 void wifiConnectMem()
 {
 	kprintf("#WIFI.CON#\n");
-	kprintf("##AP1: %s#",g_device->ssid1);
-	kprintf("\n##AP2: %s#\n",g_device->ssid2);
+	kprintf("##AP1: %s#\n",g_device->ssid1);
+	kprintf("##AP2: %s#\n",g_device->ssid2);
 	kprintf("##WIFI.CON#\n");
 }
 
@@ -339,7 +339,6 @@ void wifiAuto(char* cmd)
 	if(t == 0)
 	{
 		kprintf("##Wifi Auto is %s#\n",autoWifi?"On":"Off");
-//		kprintf(stritCMDERROR);
 		return;
 	}
 	char *t_end  = strstr(t, parquoteslash);
@@ -371,8 +370,8 @@ void wifiDisconnect()
 	esp_err_t err;
 	autoConWifi = false;
 	err=esp_wifi_disconnect();
-	if(err== ESP_OK) kprintf("\n##WIFI.NOT_CONNECTED#\n");
-	else kprintf("\n##WIFI.DISCONNECT_FAILED %d#",err);
+	if(err== ESP_OK) kprintf("##WIFI.NOT_CONNECTED#\n");
+	else kprintf("##WIFI.DISCONNECT_FAILED %d#\n",err);
 }
 
 void wifiStatus()
@@ -394,18 +393,16 @@ void wifiGetStation()
 
 void clientParseUrl(char* s)
 {
-    char *t = strstr(s, parslashquote);
-	if(t == 0)
+   	char *t_end = NULL;
+	char *t = strstr(s, parslashquote);
+	if (t) t_end  = strstr(t, parquoteslash);
+	if ((!t)||(!t_end))
 	{
 		kprintf(stritCMDERROR);
 		return;
 	}
-	char *t_end  = strstr(t, parquoteslash)-2;
-    if(t_end <= (char*)0)
-    {
-		kprintf(stritCMDERROR);
-		return;
-    }
+	t_end -= 2;
+
     char *url = (char*) malloc((t_end-t+1)*sizeof(char));
     if(url != NULL)
     {
@@ -419,19 +416,16 @@ void clientParseUrl(char* s)
 
 void clientParsePath(char* s)
 {
-    char *t = strstr(s, parslashquote);
-	if(t == 0)
+   	char *t_end = NULL;
+	char *t = strstr(s, parslashquote);
+	if (t) t_end  = strstr(t, parquoteslash);
+	if ((!t)||(!t_end))
 	{
 		kprintf(stritCMDERROR);
 		return;
 	}
-//	kprintf("cli.path: %s\n",t);
-	char *t_end  = strstr(t, parquoteslash)-2;
-    if(t_end <= (char*)0)
-    {
-		kprintf(stritCMDERROR);
-		return;
-    }
+	t_end -= 2;
+	
     char *path = (char*) malloc((t_end-t+1)*sizeof(char));
     if(path != NULL)
     {
@@ -446,18 +440,16 @@ void clientParsePath(char* s)
 
 void clientParsePort(char *s)
 {
-    char *t = strstr(s, parslashquote);
-	if(t == 0)
+   	char *t_end = NULL;
+	char *t = strstr(s, parslashquote);
+	if (t) t_end  = strstr(t, parquoteslash);
+	if ((!t)||(!t_end))
 	{
 		kprintf(stritCMDERROR);
 		return;
 	}
-	char *t_end  = strstr(t, parquoteslash)-2;
-    if(t_end <= (char*)0)
-    {
-		kprintf(stritCMDERROR);
-		return;
-    }
+	t_end -= 2;
+
     char *port = (char*) malloc((t_end-t+1)*sizeof(char));
     if(port != NULL)
     {
@@ -473,19 +465,17 @@ void clientParsePort(char *s)
 
 void clientPlay(char *s)
 {
-    char *t = strstr(s, parslashquote);
-	if(t == 0)
+   	char *t_end = NULL;
+	char *t = strstr(s, parslashquote);
+	if (t) t_end  = strstr(t, parquoteslash);
+	if ((!t)||(!t_end))
 	{
 		kprintf(stritCMDERROR);
 		return;
 	}
-	char *t_end  = strstr(t, parquoteslash)-2;
-    if(t_end <= (char*)0)
-    {
-		kprintf(stritCMDERROR);
-		return;
-    }
-   char *id = (char*) malloc((t_end-t+1)*sizeof(char));
+	t_end -= 2;
+
+	char *id = (char*) malloc((t_end-t+1)*sizeof(char));
     if(id != NULL)
     {
         uint8_t tmp;
@@ -682,7 +672,7 @@ void sysI2S(char* s)
     char *t = strstr(s, parslashquote);
 	if(t == NULL)
 	{
-		kprintf("\n##I2S speed of the vs1053: %d, 0=48kHz, 1=96kHz, 2=192kHz#\n",g_device->i2sspeed);
+		kprintf("##I2S speed of the vs1053: %d, 0=48kHz, 1=96kHz, 2=192kHz#\n",g_device->i2sspeed);
 		return;
 	}
 	char *t_end  = strstr(t, parquoteslash);
@@ -697,7 +687,6 @@ void sysI2S(char* s)
 	g_device->i2sspeed = speed;
 	saveDeviceSettings(g_device);
 	sysI2S((char*)"");
-//	kprintf("\n##I2S speed: %d, 0=48kHz, 1=96kHz, 2=192kHz#\n",speed);
 }
 
 void sysUart(char* s)

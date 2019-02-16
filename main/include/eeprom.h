@@ -34,7 +34,7 @@
 #define STA1		1
 #define STA2		2
 #define SSIDLEN		32
-#define PASSLEN		60 //64
+#define PASSLEN		64
 #define HOSTLEN		24
 
 struct device_settings {
@@ -49,10 +49,8 @@ struct device_settings {
 	uint8_t gate2[4];			
 	char ssid1[SSIDLEN]; 
 	char ssid2[SSIDLEN]; 
-	char pass1[PASSLEN];
-	uint32_t tp_calx;
-	char pass2[PASSLEN];
-	uint32_t tp_caly;
+	char pass1[PASSLEN];	
+	char pass2[PASSLEN];	
 	uint8_t current_ap; // 0 = AP mode, else STA mode: 1 = ssid1, 2 = ssid2
 	uint8_t vol;
 	int8_t treble;
@@ -78,7 +76,8 @@ struct device_settings {
 	uint8_t options32;	// bit0:0 = MMDD, 1 = DDMM  in the time display, bit1: 0= lcd without rotation  1 = lcd rotated 180
 						// bit 2: Half step of encoder0, bit3: Half step of encoder1, bit4: wifi auto reconnect
 	char hostname[HOSTLEN];
-	char filler[8]; 
+	uint32_t tp_calx;
+	uint32_t tp_caly;
 
 } Device_Settings;
 
