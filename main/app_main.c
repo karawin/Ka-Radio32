@@ -768,6 +768,7 @@ void autoPlay()
 		clientSaveOneHeader(apmode,strlen(apmode),METAGENRE);
 	} else
 	{
+		clientSaveOneHeader(apmode,strlen(apmode),METANAME);
 		if ((audio_output_mode == VS1053) && (getVsVersion() < 3))
 		{
 			clientSaveOneHeader("Invalid audio output. VS1053 not found",38,METAGENRE);
@@ -779,7 +780,6 @@ void autoPlay()
 		if ((g_device->autostart ==1)&&(g_device->currentstation != 0xFFFF))
 		{	
 			kprintf("autostart: playing:%d, currentstation:%d\n",g_device->autostart,g_device->currentstation);
-			clientSaveOneHeader(apmode,strlen(apmode),METANAME);
 			vTaskDelay(50); // wait a bit
 			playStationInt(g_device->currentstation);
 		} else clientSaveOneHeader("Ready",5,METANAME);			
