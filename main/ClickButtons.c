@@ -39,7 +39,7 @@ Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C)
 		enc->button[i] = Open;
 		enc->keyDownTicks[i] = 0;
 		enc->doubleClickTicks[i] = 0;
-		enc->lastButtonCheck[i] = 0;
+//		enc->lastButtonCheck[i] = 0;
 	}
 	enc->doubleClickEnabled = true; enc->buttonHeldEnabled = true;
 
@@ -76,15 +76,15 @@ IRAM_ATTR void serviceBtn(Button_t *enc)
 {
   // handle enc->button
   //
-  unsigned long currentMillis = xTaskGetTickCount()* portTICK_PERIOD_MS;
+//  unsigned long currentMillis = xTaskGetTickCount()* portTICK_PERIOD_MS;
   
   for(uint8_t i = 0; i < 3; i++) 
   {
-	if (currentMillis < enc->lastButtonCheck[i]) enc->lastButtonCheck[i] = 0;        // Handle case when millis() wraps back around to zero
-	if ((enc->pinBTN[i] > 0 )        // check enc->button only, if a pin has been provided
-		&& ((currentMillis - enc->lastButtonCheck[i]) >= ENC_BUTTONINTERVAL))            // checking enc->button is sufficient every 10-30ms
+//	if (currentMillis < enc->lastButtonCheck[i]) enc->lastButtonCheck[i] = 0;        // Handle case when millis() wraps back around to zero
+	if ((enc->pinBTN[i] > 0 ))        // check enc->button only, if a pin has been provided
+//		&& ((currentMillis - enc->lastButtonCheck[i]) >= ENC_BUTTONINTERVAL))            // checking enc->button is sufficient every 10-30ms
 	{ 
-		enc->lastButtonCheck[i] = currentMillis;
+//		enc->lastButtonCheck[i] = currentMillis;
 
 		bool pinRead = getPinStates(enc,i);
     

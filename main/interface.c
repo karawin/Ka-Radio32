@@ -122,6 +122,7 @@ sys.henc0 or sys.henc1: Display the current step setting for the encoder. Normal
 sys.hencx(\"y\") with y=0 Normal, y=1 Half\n\
 sys.cali[brate]: start a touch screen calibration\n\
 sys.ledpola and sys.ledpola(\"x\"): display or set the polarity of the system led\n\
+sys.conf: Display the label of the csv file\n\
 ///////////\n\
   Other\n\
 ///////////\n\
@@ -1169,6 +1170,27 @@ void fmUnmute()
 {RDA5807M_unmute(RDA5807M_TRUE);}
 */
 
+void sys_conf()
+{
+	char* label ;
+	kprintf("##CONFIG#\n");
+	gpio_get_label(&label);
+	kprintf("#LABEL: ");
+	if (label != NULL)
+	{
+		kprintf("%s\n",label);
+		free (label);
+	} else kprintf("no label\n");
+	gpio_get_comment(&label);
+	
+	kprintf("#COMMENT: ");
+	if (label != NULL)
+	{
+		kprintf("%s\n",label);
+		free (label);
+	} else kprintf("no comment\n");
+}
+
 void checkCommand(int size, char* s)
 {
 	char *tmp = (char*)malloc((size+1)*sizeof(char));
@@ -1235,6 +1257,7 @@ void checkCommand(int size, char* s)
 		else if(strcmp(tmp+4, "erase") == 0) 	eeEraseAll();
 		else if(strcmp(tmp+4, "heap") == 0) 	heapSize();
 		else if(strcmp(tmp+4, "boot") == 0) 	esp_restart();
+		else if(strcmp(tmp+4, "conf") == 0) 	sys_conf();
 		else if(strcmp(tmp+4, "update") == 0) 	update_firmware((char*)"KaRadio32");
 		else if(strcmp(tmp+4, "prerelease") == 0) 	update_firmware((char*)"KaRadio32prv");
 		else if(startsWith (  "patch",tmp+4)) 	syspatch(tmp);

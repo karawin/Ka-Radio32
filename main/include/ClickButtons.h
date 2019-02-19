@@ -62,7 +62,7 @@ typedef gpio_mode_t pinMode_t;
   bool buttonHeldEnabled;
   uint16_t keyDownTicks[3] ;
   uint16_t doubleClickTicks[3] ; 
-  unsigned long lastButtonCheck[3];
+//  unsigned long lastButtonCheck[3];
   } Button_t;	  
   
   

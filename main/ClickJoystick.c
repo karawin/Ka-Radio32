@@ -46,7 +46,7 @@ Joystick_t* ClickJoystickInit(int8_t A)
 		enc->button[i] = Open;
 		enc->keyDownTicks[i] = 0;
 		enc->doubleClickTicks[i] = 0;
-		enc->lastButtonCheck[i] = 0;
+//		enc->lastButtonCheck[i] = 0;
 	}
 	enc->doubleClickEnabled = true; enc->buttonHeldEnabled = true;
 
@@ -61,18 +61,16 @@ IRAM_ATTR void serviceJoystick(Joystick_t *enc)
 {
   // handle enc->button
   //
-  unsigned long currentMillis = xTaskGetTickCount()* portTICK_PERIOD_MS;
+//  unsigned long currentMillis = xTaskGetTickCount()* portTICK_PERIOD_MS;
   bool pinRead[NBBUTTONS];
   getJoyStates(enc, pinRead);
   for(uint8_t i = 0; i < NBBUTTONS; i++) 
   {
-	if (currentMillis < enc->lastButtonCheck[i]) enc->lastButtonCheck[i] = 0;        // Handle case when millis() wraps back around to zero
-	if (((currentMillis - enc->lastButtonCheck[i]) >= ENC_BUTTONINTERVAL))            // checking enc->button is sufficient every 10-30ms
+//	if (currentMillis < enc->lastButtonCheck[i]) enc->lastButtonCheck[i] = 0;        // Handle case when millis() wraps back around to zero
+//	if (((currentMillis - enc->lastButtonCheck[i]) >= ENC_BUTTONINTERVAL))            // checking enc->button is sufficient every 10-30ms
 	{ 
-		enc->lastButtonCheck[i] = currentMillis;
-
-		
-    
+//		enc->lastButtonCheck[i] = currentMillis;
+   
 		if (pinRead[i] == true) { // key is down
 			enc->keyDownTicks[i]++;
 			if ((enc->keyDownTicks[i] > (BTN_HOLDTIME / ENC_BUTTONINTERVAL)) && (enc->buttonHeldEnabled)) 
@@ -98,17 +96,16 @@ IRAM_ATTR void serviceJoystick(Joystick_t *enc)
 				else {
 					enc->doubleClickTicks[i] = (enc->doubleClickEnabled) ? (BTN_DOUBLECLICKTIME / ENC_BUTTONINTERVAL) : ENC_SINGLECLICKONLY;
 				}
+				}
 			}
-		}
-	
-		enc->keyDownTicks[i] = 0;
+			enc->keyDownTicks[i] = 0;
 		}
   
 		if (enc->doubleClickTicks[i] > 0) {
-		enc->doubleClickTicks[i]--;
-		if (enc->doubleClickTicks[i] == 0) {
-			enc->button[i] = Clicked;
-		}
+			enc->doubleClickTicks[i]--;
+			if (enc->doubleClickTicks[i] == 0) {
+				enc->button[i] = Clicked;
+			}
 		}
 	}
   }

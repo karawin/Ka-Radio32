@@ -129,40 +129,61 @@ bool getHalfStep(Encoder_t *enc)
 //void (*serviceEncoder)() = NULL;
 IRAM_ATTR void service(Encoder_t *enc)
 {
-  bool moved = false;
+  volatile bool moved = false;
   
-  if (enc->pinA >= 0 && enc->pinB >= 0) {
-  if (enc->accelerationEnabled) { // decelerate every tick
-    enc->acceleration -= ENC_ACCEL_DEC;
-    if (enc->acceleration & 0x8000) { // handle overflow of MSB is set
-      enc->acceleration = 0;
-    }
-  }
+//  if (enc->pinA >= 0 && enc->pinB >= 0) 
+  {
+//	if (enc->accelerationEnabled) 
+	{ // decelerate every tick
+		enc->acceleration -= ENC_ACCEL_DEC;
+		if (enc->acceleration & 0x8000) 
+		{ // handle overflow of MSB is set
+			enc->acceleration = 0;
+//enc->dcount++;
+		}
+	}
 
-	int8_t curr = 0; 
-	if (digitalRead(enc->pinA) == enc->pinsActive) {
+	volatile int8_t curr = 0; 
+	volatile int va,vb;
+	va = digitalRead(enc->pinA);
+	vb = digitalRead(enc->pinB);
+	
+//	if (digitalRead(enc->pinA) == enc->pinsActive) {
+//	if (digitalRead(enc->pinA) == 0) {
+	if (va == 0) {
 		curr = 3;
 	}
 
-	if (digitalRead(enc->pinB) == enc->pinsActive) {
+//	if (digitalRead(enc->pinB) == enc->pinsActive) {
+//	if (digitalRead(enc->pinB) == 0) {
+	if (vb == 0) {
 		curr ^= 1;
 	}
   
-	int8_t diff = enc->last - curr;
+	volatile int8_t diff = enc->last - curr;
   
 	if (diff & 1) {            // bit 0 = step
+//printf("diff: %d  cur: %d  last: %d  delta: %d\n",diff,curr,enc->last,enc->delta);
+/*
+enc->pcurr = curr;
+enc->plast = enc->last;
+enc->pdiff = diff;
+enc->count++;
+*/	
 		enc->last = curr;
 		enc->delta += (diff & 2) - 1; // bit 1 = direction (+/-)
 		moved = true;    
+//enc->pdelta	=	enc->delta;
 	}
 
-  if (enc->accelerationEnabled && moved) {
+	if (/*enc->accelerationEnabled &&*/ moved) {
     // increment accelerator if encoder has been moved
-    if (enc->acceleration <= (ENC_ACCEL_TOP - enc->accel_inc)) {
-      enc->acceleration += enc->accel_inc ;
-    }
+		if (enc->acceleration <= (ENC_ACCEL_TOP - enc->accel_inc)) {
+			enc->acceleration += enc->accel_inc ;
+//enc->icount++;
+		}
+	}
   }
-}
   // handle enc->button
   //
   unsigned long currentMillis = xTaskGetTickCount()* portTICK_PERIOD_MS;
@@ -239,7 +260,18 @@ int16_t getValue(Encoder_t *enc)
   else if (val > 0) {
     r += 1 + accel;
   }
-//  if (r != 0) printf("Acceleration: %d  accel: %d   val:%d,, R:%d\n",enc->acceleration,accel,val,r);
+
+/*  
+  if (r != 0)
+  {	  
+	printf("count: %d pdiff: %d  pcur: %d  plast: %d  pdelta: %d\n",enc->count,enc->pdiff,enc->pcurr,enc->plast,enc->pdelta);
+	printf(" increment: %d  decrement: %d\n",enc->icount,enc->dcount);
+	enc->count = 0;
+	enc->icount= 0;
+	enc->dcount=0;
+	printf("Acceleration: %d  step: %d  last: %d   val:%d,, R:%d\n",enc->acceleration,enc->steps,enc->last,val,r);
+  }
+*/
   interrupts();
 
   return r;

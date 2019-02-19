@@ -1,4 +1,9 @@
 key,type,encoding,value
+
+label_space,namespace,,
+L_LABEL,data,string,lolin32pro.csv
+L_COMMENT,data,string,This is the configuration for a lolin pro with wrover cpu.
+
 gpio_space,namespace,,
 K_SPI,data,u8,1
 P_MISO,data,u8,12

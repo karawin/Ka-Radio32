@@ -120,7 +120,7 @@ static bool bigRam = false;
 // timeout to save volume in flash
 static uint32_t ctimeVol = 0;
 static uint32_t ctimeMs = 0;	
-
+static bool divide = false;
 // disable 1MS timer interrupt
 IRAM_ATTR void noInterrupt1Ms() {timer_disable_intr(TIMERGROUP1MS, msTimer);}
 // enable 1MS timer interrupt
@@ -148,18 +148,20 @@ IRAM_ATTR void   microsCallback(void *pArg) {
 // 
 IRAM_ATTR bool bigSram() { return bigRam;}
 //-----------------------------------
+// every 500µs
 IRAM_ATTR void   msCallback(void *pArg) {
 	int timer_idx = (int) pArg;
+
 //	queue_event_t evt;	
 	TIMERG1.hw_timer[timer_idx].update = 1;
 	TIMERG1.int_clr_timers.t0 = 1; //isr ack
-//		evt.type = TIMER_1MS;
-//        evt.i1 = TIMERGROUP1MS;
-//        evt.i2 = timer_idx;
+	if (divide)
+	{
 		ctimeMs++;	// for led
-		ctimeVol++; // to save volume		
+		ctimeVol++; // to save volume
+	}	
+	divide = !divide;
 	if (serviceAddon != NULL) serviceAddon(); // for the encoders and buttons
-//	xQueueSendFromISR(event_queue, &evt, NULL);	
 	TIMERG1.hw_timer[timer_idx].config.alarm_en = 1;
 }
 
@@ -237,7 +239,7 @@ timer_config_t config;
 	ESP_ERROR_CHECK(timer_isr_register(TIMERGROUP, wakeTimer, wakeCallback, (void*) wakeTimer, 0, NULL));	
 	/*Configure timer 1MS*/
 	config.auto_reload = TIMER_AUTORELOAD_EN;
-	config.divider = TIMER_DIVIDER1MS;
+	config.divider = TIMER_DIVIDER1MS ;  
 	ESP_ERROR_CHECK(timer_init(TIMERGROUP1MS, msTimer, &config));
 	ESP_ERROR_CHECK(timer_pause(TIMERGROUP1MS, msTimer));
 	ESP_ERROR_CHECK(timer_isr_register(TIMERGROUP1MS, msTimer, msCallback, (void*) msTimer, 0, NULL));

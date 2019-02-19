@@ -1,4 +1,9 @@
 key,type,encoding,value
+
+label_space,namespace,,
+L_LABEL,data,string,ttgot8.csv
+L_COMMENT,data,string,LilyGo/TTGO-T8 board .
+
 gpio_space,namespace,,
 K_SPI,data,u8,2
 P_MISO,data,u8,19

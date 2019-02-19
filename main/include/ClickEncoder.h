@@ -60,7 +60,7 @@ typedef gpio_mode_t pinMode_t;
   volatile int16_t last;
   volatile uint8_t steps;
   volatile uint8_t accel_inc;
-  volatile uint16_t acceleration;
+  volatile int16_t acceleration;
   bool accelerationEnabled;
   volatile Button button;
   bool doubleClickEnabled;
@@ -68,6 +68,16 @@ typedef gpio_mode_t pinMode_t;
   uint16_t keyDownTicks ;
   uint16_t doubleClickTicks ;
   unsigned long lastButtonCheck ;
+  
+  //printf("diff: %d  cur: %d  last: %d  delta: %d\n",diff,curr,enc->last,enc->delta);	
+/*  int8_t pcurr;
+  int16_t plast;
+  int8_t pdiff;
+  uint16_t count;
+  uint16_t icount;
+  uint16_t dcount;
+  int16_t pdelta;
+*/  
   } Encoder_t;	  
   
 

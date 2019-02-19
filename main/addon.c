@@ -54,7 +54,7 @@ static xTaskHandle  pxTaskLcd;
 // list of screen
 typedef  enum typeScreen {smain,svolume,sstation,snumber,stime,snull} typeScreen ;
 static typeScreen stateScreen = snull;
-static typeScreen oldStateScreen = smain;
+static typeScreen defaultStateScreen = smain;
 // state of the transient screen
 static uint8_t mTscreen = MTNEW; // 0 dont display, 1 display full, 2 display variable part
 
@@ -94,8 +94,11 @@ static bool isButton0 = true;
 static bool isButton1 = true;
 static bool isJoystick0 = true;
 static bool isJoystick1 = true;
+
 void Screen(typeScreen st); 
-static void evtDrawScreen();
+void drawScreen();
+static void evtScreen(typelcmd value);
+
 Encoder_t* encoder0 = NULL;
 Encoder_t* encoder1 = NULL;
 Button_t* button0 = NULL;
@@ -165,15 +168,13 @@ void wakeLcd()
 	// add the gpio switch on here gpioLedBacklight can be directly a GPIO_NUM_xx or declared in gpio.h
 	LedBacklightOn();	
 	timerLcdOut = getLcdOut(); // rearm the tempo
-	if(((isColor) && (itLcdOut))|| mTscreen== MTNEW) { evtDrawScreen(); }
-	itLcdOut = 0;
-	
-
+	if (itLcdOut) {mTscreen= MTNEW; evtScreen(defaultStateScreen);}
+	itLcdOut = 0;  //0 not activated, 1 sleep requested, 2 in sleep 
 }
 
 void sleepLcd()
 {
-	itLcdOut = 2;
+	itLcdOut = 2;  // in sleep
 	// add the gpio switch off here
 	LedBacklightOff();
 	evtClearScreen();
@@ -252,10 +253,9 @@ IRAM_ATTR  void ServiceAddon(void)
 		if ((timestamp % (10*DTIDLE))==0){ itAskTime=true;} // synchronise with ntp every x*DTIDLE
 		 
 		if (((timein % DTIDLE)==0)&&(!state)  ) {           
-			{itAskStime=true;timein = 0;} // start the time display
+			{itAskStime=true;timein = 0;} // start the time display when paused
         } 
-		if (timerLcdOut == 1) itLcdOut = 1;
-		if ((stateScreen == stime)||(stateScreen == smain)) { mTscreen = MTREFRESH; } // display time
+		if (timerLcdOut == 1) itLcdOut = 1; // ask to go to sleep
 		if (!syncTime) itAskTime=true; // first synchro if not done
 		
 		timer1s = 0;
@@ -288,16 +288,25 @@ void scroll()
 // Change the current screen
 ////////////////////////////
 void Screen(typeScreen st){
+//printf("Screen: st: %d, stateScreen: %d, mTscreen: %d, default: %d\n",st,stateScreen,mTscreen,defaultStateScreen);
   if (stateScreen != st)
   {
-	oldStateScreen = stateScreen;
 	mTscreen = MTNEW;
+	wakeLcd();
   }
   else
+  {
     if (mTscreen == MTNODISPLAY) mTscreen = MTREFRESH;
+  }
+
+//  printf("Screenout: st: %d, stateScreen: %d, mTscreen: %d, default: %d, timerScreen: %d \n",st,stateScreen,mTscreen,defaultStateScreen,timerScreen);
+
   stateScreen = st;  
-  timein = 0; 
-//  printf("st: %d, mTscreen: %d, old: %d\n",st,mTscreen,oldStateScreen);
+  timein = 0;
+  timerScreen = 0;  
+  drawScreen();
+//printf("Screendis: st: %d, stateScreen: %d, mTscreen: %d, default: %d\n",st,stateScreen,mTscreen,defaultStateScreen);  
+//  vTaskDelay(1);
 }
 
 
@@ -320,7 +329,8 @@ void drawTTitle(char* ttitle)
 // draw the number entered from IR
 void drawNumber()
 {
-	isColor?drawNumberUcg(mTscreen,irStr):drawNumberU8g2(mTscreen,irStr);  
+	if (strlen(irStr) >0)
+		isColor?drawNumberUcg(mTscreen,irStr):drawNumberU8g2(mTscreen,irStr);  
 }
 
 
@@ -358,7 +368,8 @@ void drawStation()
 		playable = true;                      
   } while (playable == false); 
 	
-  //drawTTitle(ststr);   
+  //drawTTitle(ststr); 
+//printf ("drawStation: %s\n",sNum  );
   isColor?drawStationUcg(mTscreen,sNum,ddot):drawStationU8g2(mTscreen,sNum,ddot);
   free (si);
 }
@@ -404,10 +415,11 @@ void drawScreen()
       drawNumber();     
       break;
     default: 
-	  Screen(smain); 
-	  drawFrame();	  
-	}
-	mTscreen = MTNODISPLAY;
+	  Screen(defaultStateScreen); 
+//	  drawFrame();	  
+	} 
+//	if (mTscreen == MTREFRESH)
+		mTscreen = MTNODISPLAY;
   }   
 }
 
@@ -443,9 +455,6 @@ void stationOk()
 }
 void changeStation(int16_t value)
 {
-//	Screen(sstation);
-//	wakeLcd();
-	timerScreen = 0;  
 	currentValue = value;
 	if (value > 0) futurNum++;
 	if (futurNum > 254) futurNum = 0;
@@ -457,25 +466,14 @@ void changeStation(int16_t value)
 // a number of station in progress...
 void nbStation(char nb)
 {
-  Screen(snumber);
-  timerScreen = 0;
   if (strlen(irStr)>=3) irStr[0] = 0;
   uint8_t id = strlen(irStr);
   irStr[id] = nb;
   irStr[id+1] = 0;
+  evtScreen(snumber);
 }
  
 // 
-
-static void evtDrawScreen()
-{
-	event_lcd_t evt;
-	evt.lcmd = edraw;	
-	evt.lline = NULL;
-//	xQueueSendToFront(event_lcd,&evt, 0);	
-	xQueueSend(event_lcd,&evt, 0);	
-}
-
 static void evtClearScreen()
 {
 //	isColor?ucg_ClearScreen(&ucg):u8g2_ClearDisplay(&u8g2);
@@ -486,13 +484,18 @@ static void evtClearScreen()
 	xQueueSend(event_lcd,&evt, 0);	
 }
 
-
-static void evtStation(int16_t value)
+static void evtScreen(typelcmd value)
 {
 	event_lcd_t evt;
-//	wakeLcd();
-//	if (stateScreen != sstation) evtClearScreen();
-	timerScreen = 0;  
+	evt.lcmd = escreen;	
+	evt.lline = (char*)((uint32_t)value);
+	xQueueSend(event_lcd,&evt, 0);
+	
+}
+
+static void evtStation(int16_t value)
+{ // value +1 or -1
+	event_lcd_t evt; 
 	evt.lcmd = estation;
 	evt.lline = (char*)((uint32_t)value);
 	xQueueSend(event_lcd,&evt, 0);			
@@ -638,8 +641,7 @@ void adcLoop() {
 		// double click = toggle time
 		if (state0 == DoubleClicked) toggletime();	
 		if (state0 == Held)
-		{  
-			timerScreen = 0; 
+		{   
 			if (stateScreen!= (role?sstation:svolume))
 			{	
 				role?evtStation(newValue):setRelVolume(newValue);
@@ -688,15 +690,12 @@ void encoderCompute(Encoder_t *enc,bool role)
    	// if an event on encoder switch	
 	if (newButton != Open)
 	{ 
-//		wakeLcd();
-		// clicked = startstop
 		if (newButton == Clicked) {startStop();}
 		// double click = toggle time
 		if (newButton == DoubleClicked) { toggletime();}
 		// switch held and rotated then change station
 		if ((newButton == Held)&&(getPinState(enc) == getpinsActive(enc)))
-		{   
-			timerScreen = 0; 
+		{    
 			if (stateScreen!= (role?sstation:svolume))
 				role?evtStation(newValue):setRelVolume(newValue);
 		} 			
@@ -777,7 +776,7 @@ event_ir_t evt;
 		ESP_LOGI(TAG,"IR event: Channel: %x, ADDR: %x, CMD: %x = %X, REPEAT: %d",evt.channel,evt.addr,evt.cmd, evtir,evt.repeat_flag );
 		
 		if (isCustomKey){
-			if (irCustom(evtir,evt.repeat_flag)) break;
+			if (irCustom(evtir,evt.repeat_flag)) continue;
 		}
 		else{ // no predefined keys
 		switch(evtir)
@@ -950,17 +949,21 @@ int tx,ty;
 	}
 }
 
-
+static uint8_t divide = 0;
 // indirect call to service
-IRAM_ATTR void multiService()
+IRAM_ATTR void multiService()  // every 1ms
 {
 	if (isEncoder0) service(encoder0);
 	if (isEncoder1) service(encoder1);
-	if (isButton0) serviceBtn(button0);
-	if (isButton1) serviceBtn(button1);
-	if (isJoystick0) serviceJoystick(joystick0);
-	if (isJoystick1) serviceJoystick(joystick1);
 	ServiceAddon();
+	if (divide++ == 10) // only every 10ms
+	{
+		if (isButton0) serviceBtn(button0);
+		if (isButton1) serviceBtn(button1);
+		if (isJoystick0) serviceJoystick(joystick0);
+		if (isJoystick1) serviceJoystick(joystick1);
+		divide = 0;
+	}
 }
 //--------------------
 // LCD display task
@@ -971,18 +974,17 @@ void task_lcd(void *pvParams)
 	event_lcd_t evt ; // lcd event	
 	event_lcd_t evt1 ; // lcd event	
 	ESP_LOGD(TAG, "task_lcd Started, LCD Type %d",lcd_type);
+	defaultStateScreen = (g_device->options32&T_TOGGLETIME)? stime:smain;
+	drawFrame();
+
 	while (1)
 	{	
 		if (itLcdOut==1) // switch off the lcd
 		{
 			sleepLcd();
 		}
-		if (itAskStime) // time start the time display. Don't do that in interrupt.
-		{    
-			Screen(stime);
-			itAskStime = false;
-		}
-		if (timerScroll >= 500) //
+
+		if (timerScroll >= 500) //500 ms
 		{
 			if (lcd_type != LCD_NONE) 
 			{
@@ -990,6 +992,8 @@ void task_lcd(void *pvParams)
 				{
 					scroll(); 
 				}
+				if ((stateScreen == stime)||(stateScreen == smain)) {mTscreen = MTREFRESH; } // display time
+	
 				drawScreen();
 			}
 			timerScroll = 0;
@@ -1000,33 +1004,29 @@ void task_lcd(void *pvParams)
 			if (evt.lcmd != lmeta)
 				ESP_LOGV(TAG,"event_lcd: %x",(int)evt.lcmd);
 			else
-				ESP_LOGV(TAG,"event_lcd: %x  %s",(int)evt.lcmd,evt.lline);
+				ESP_LOGV(TAG,"event_lcd: %x  %s",(int)evt.lcmd,evt.lline); 
 			switch(evt.lcmd)
 			{
 				case lmeta:
-					Screen(smain);
 					isColor?metaUcg(evt.lline):metaU8g2(evt.lline);
-//					mTscreen= MTREFRESH;
-					wakeLcd();	
+					Screen(smain);
+					wakeLcd();					
 					break;
 				case licy4:
 					isColor?icy4Ucg(evt.lline):icy4U8g2(evt.lline);
 					break;
-				case licy0:
-//					wakeLcd(); 					
+				case licy0: 					
 					isColor?icy0Ucg(evt.lline):icy0U8g2(evt.lline);
 					break;
 				case lstop:
-					Screen(smain);
 					isColor?statusUcg(stopped):statusU8g2(stopped);
-//					mTscreen= MTNEW;
+					Screen(smain);
 					wakeLcd();
 					break;
 				case lnameset:
-					Screen(smain);
 					isColor?namesetUcg(evt.lline):namesetU8g2(evt.lline);
 					isColor?statusUcg("STARTING"):statusU8g2("STARTING");
-					mTscreen= MTNEW;
+					Screen(smain); 
 					wakeLcd();
 					break;
 				case lplay:
@@ -1041,43 +1041,40 @@ void task_lcd(void *pvParams)
 					{	Screen(svolume); 
 						wakeLcd();
 					}
-					dvolume = true;									
-					timerScreen = 0;					
+					dvolume = true;														
 					break;
 				case lovol:
-//					wakeLcd();
 					dvolume = false; // don't show volume on start station
 					break;
 				case estation:
 					wakeLcd();
 					if(xQueuePeek(event_lcd, &evt1, 0))
 						if (evt1.lcmd == estation) {evt.lline = NULL;break;}
-					Screen(sstation);
 					changeStation((uint32_t)evt.lline);	
+					Screen(sstation);
 					evt.lline = NULL;	// just a number			
 					break;
 				case eclrs:
 					isColor?ucg_ClearScreen(&ucg):u8g2_ClearDisplay(&u8g2);
 					break;
-				case etoggle:
-//					wakeLcd();
-//					isColor?ucg_ClearScreen(&ucg):u8g2_ClearDisplay(&u8g2);
-					(stateScreen==smain)?Screen(stime):Screen(smain);
-					mTscreen= MTNEW;
+				case escreen: 
+					Screen((uint32_t)evt.lline);
 					wakeLcd();
-//					drawScreen(); 
+					evt.lline = NULL;	// just a number Don't free					
 					break;
-				case edraw:	// force redraw
-					itLcdOut = 0;
-					mTscreen = MTNEW;
-					drawScreen(); 
+				case etoggle:
+					defaultStateScreen = (stateScreen==smain)?stime:smain;
+					(stateScreen==smain)?Screen(stime):Screen(smain);
+					g_device->options32 = (defaultStateScreen== smain)?g_device->options32&NT_TOGGLETIME:g_device->options32|T_TOGGLETIME; 
+					saveDeviceSettings(g_device);
 					break;
 				default:;
 			}
 			if (evt.lline != NULL) free(evt.lline);
-			vTaskDelay(1);	
-		}
-		vTaskDelay(5);	
+			vTaskDelay(1);  			
+		 }
+		 if ((event_lcd)&&(!uxQueueMessagesWaiting(event_lcd))) vTaskDelay(4);
+		vTaskDelay(1);	
 	}
 	vTaskDelete( NULL ); 	
 }
@@ -1110,8 +1107,8 @@ void task_addon(void *pvParams)
 	xTaskCreatePinnedToCore (task_lcd, "task_lcd", 2200, NULL, PRIO_LCD, &pxTaskLcd,CPU_LCD); 
 	ESP_LOGI(TAG, "%s task: %x","task_lcd",(unsigned int)pxTaskLcd);
 	getTaskLcd(&pxTaskLcd); // give the handle to xpt
-	vTaskDelay(1);	
-	wakeLcd();
+//	vTaskDelay(1);	
+//	wakeLcd();
 	
 	while (1)
 	{
@@ -1119,7 +1116,7 @@ void task_addon(void *pvParams)
 		encoderLoop(); // compute the encoder
 		buttonsLoop(); // compute the buttons and joysticks
 		irLoop();  // compute the ir		
-		touchLoop();
+		touchLoop(); // compute the touch screen
 		if (itAskTime) // time to ntp. Don't do that in interrupt.
 		{			
 			if (ntp_get_time(&dt) )
@@ -1133,10 +1130,11 @@ void task_addon(void *pvParams)
 		
 		if (timerScreen >= 3) //  sec timeout transient screen
 		{
-			timerScreen = 0;
-			if ((stateScreen != smain)&&(stateScreen != stime)&&(stateScreen != snull))
+//			if ((stateScreen != smain)&&(stateScreen != stime)&&(stateScreen != snull))
+//printf("timerScreen: %d, stateScreen: %d, defaultStateScreen: %d\n",timerScreen,stateScreen,defaultStateScreen);	
+			timerScreen = 0;				
+			if ((stateScreen != defaultStateScreen)&&(stateScreen != snull))
 			{
-				Screen(oldStateScreen);  //Back the the old screen
 				// Play the changed station on return to main screen
 				// if a number is entered, play it.
 				if (strlen(irStr) >0){
@@ -1151,11 +1149,23 @@ void task_addon(void *pvParams)
 					&& ( futurNum!= atoi(  isColor?getNameNumUcg():getNameNumU8g2()  ))) 
 				{
 					playStationInt(futurNum);
-				}				
+					vTaskDelay(10);
+				}	
+				if (!itAskStime)
+				{
+					if ((defaultStateScreen == stime) && (stateScreen != smain))evtScreen(smain);
+					else
+					if ((defaultStateScreen == stime) && (stateScreen == smain))evtScreen(stime);	
+					else 
+					if 	(stateScreen != defaultStateScreen)
+					evtScreen(defaultStateScreen); //Back to the old screen
+				}
 			}
+			if (itAskStime&&(stateScreen != stime)) // time start the time display. Don't do that in interrupt.  
+				evtScreen(stime);			
 		}
 
-		vTaskDelay(10);
+		vTaskDelay(20);
 	}	
 	vTaskDelete( NULL ); 
 }
@@ -1236,6 +1246,7 @@ void addonParse(const char *fmt, ...)
    if ((ici=strstr(line,"YING#")) != NULL)  
    {
 		state = true;
+		itAskStime = false;
  		evt.lcmd = lplay;
 		evt.lline = NULL;
 //		xQueueSend(event_lcd,&evt, 0);

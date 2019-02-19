@@ -17,6 +17,7 @@ static xSemaphoreHandle muxnvs= NULL;
 const char hardware[] = {"hardware"};
 const char option_space[] = {"option_space"};
 const char gpio_space[] = {"gpio_space"};
+const char label_space[] = {"label_space"};
 
 // init a gpio as output
 void gpio_output_conf(gpio_num_t gpio)
@@ -56,6 +57,44 @@ void close_partition(nvs_handle handle,const char *partition_label)
 	nvs_close(handle);
 	nvs_flash_deinit_partition(partition_label);
 	xSemaphoreGive(muxnvs);	
+}
+
+void gpio_get_label(char** label)
+{
+	size_t required_size;
+	nvs_handle hardware_handle;	
+	if (open_partition(hardware, label_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
+	{
+		ESP_LOGD(TAG,"in get label");
+		return;
+	}	
+	nvs_get_str(hardware_handle, "L_LABEL", NULL, &required_size);
+	if (required_size >1)
+	{
+		*label = malloc(required_size);
+		nvs_get_str(hardware_handle, "L_LABEL", *label, &required_size);	
+		ESP_LOGV(TAG,"Label: \"%s\"\n Required size: %d",*label,required_size);
+	}	
+	close_partition(hardware_handle,hardware);
+}
+
+void gpio_get_comment(char** label)
+{
+	size_t required_size;
+	nvs_handle hardware_handle;	
+	if (open_partition(hardware, label_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
+	{
+		ESP_LOGD(TAG,"in get label");
+		return;
+	}	
+	nvs_get_str(hardware_handle, "L_COMMENT", NULL, &required_size);
+	if (required_size >1)
+	{
+		*label = malloc(required_size);
+		nvs_get_str(hardware_handle, "L_COMMENT", *label, &required_size);	
+		ESP_LOGV(TAG,"Label: \"%s\"\n Required size: %d",*label,required_size);
+	}	
+	close_partition(hardware_handle,hardware);
 }
 
 void gpio_get_spi_bus(uint8_t *spi_no,gpio_num_t *miso,gpio_num_t *mosi,gpio_num_t *sclk)

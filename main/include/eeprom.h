@@ -29,6 +29,8 @@
 #define NT_ENC1	0xF7
 #define T_WIFIAUTO	0x10
 #define NT_WIFIAUTO 0xEF
+#define T_TOGGLETIME  0x20
+#define NT_TOGGLETIME 0xDF
 
 #define APMODE		0
 #define STA1		1
@@ -75,6 +77,7 @@ struct device_settings {
 	uint32_t lcd_out;	// timeout in seconds to switch off the lcd. 0 = no timeout
 	uint8_t options32;	// bit0:0 = MMDD, 1 = DDMM  in the time display, bit1: 0= lcd without rotation  1 = lcd rotated 180
 						// bit 2: Half step of encoder0, bit3: Half step of encoder1, bit4: wifi auto reconnect
+						// bit5: TOGGLE time or main sreen
 	char hostname[HOSTLEN];
 	uint32_t tp_calx;
 	uint32_t tp_caly;

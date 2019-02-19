@@ -63,7 +63,7 @@ typedef gpio_mode_t pinMode_t;
   bool buttonHeldEnabled;
   uint16_t keyDownTicks[NBBUTTONS] ;
   uint16_t doubleClickTicks[NBBUTTONS] ; 
-  unsigned long lastButtonCheck[NBBUTTONS];
+//  unsigned long lastButtonCheck[NBBUTTONS];
   } Joystick_t;	  
   
   

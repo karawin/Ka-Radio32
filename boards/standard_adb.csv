@@ -1,4 +1,9 @@
 key,type,encoding,value
+
+label_space,namespace,,
+L_LABEL,data,string,standard_adb.csv
+L_COMMENT,data,string,This is the standard default configuration as in the builtin conf.
+
 gpio_space,namespace,,
 K_SPI,data,u8,2
 P_MISO,data,u8,19
@@ -39,9 +44,9 @@ P_BACKLIGHT,data,u8,255
 
 option_space,namespace,,
 O_LCD_TYPE,data,u8,255
-O_LCD_ROTA,data,u8,255
-O_LCD_OUT,data,u32,255
-O_DDMM_FLAG,data,u8,255
+O_LCD_ROTA,data,u8,0
+O_LCD_OUT,data,u32,0
+O_DDMM_FLAG,data,u8,0
 
 custom_ir_space,namespace,,
 K_UP,data,string,
