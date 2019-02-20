@@ -84,7 +84,7 @@ void gpio_get_comment(char** label)
 	nvs_handle hardware_handle;	
 	if (open_partition(hardware, label_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
 	{
-		ESP_LOGD(TAG,"in get label");
+		ESP_LOGD(TAG,"in get comment");
 		return;
 	}	
 	nvs_get_str(hardware_handle, "L_COMMENT", NULL, &required_size);

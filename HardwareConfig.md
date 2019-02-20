@@ -79,13 +79,18 @@ See the log on the serial interface.
 ------------------------------------
 Edit the csv file to enter your gpio and options definitions.  
 See gpio.h for the default values if missing in the csv file.  
-Only modify the lines beginning with P_ or O_ by modifying only the last number.  
+Only modify the lines beginning with L_ or P_ or O_ by modifying only the last number.  
 for example:  
 P_MISO, data,u8,19  
 Change 19 to the desired number.  
 Do this for all P_ and O_lines.  
 Never change the string "P_XXXX, data,u8,"  
 A value base 10 is mandatory for each P_.  
+## LABEL
+- **Free strings:**  
+L_LABEL		A free string for the name of the csv or other.  
+L_COMMENT	A free string of your choice.  
+These strings can be viewed with the command sys.conf on serial or telnet.   
 
 ## GPIO
 Definition of the lines in csv  

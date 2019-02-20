@@ -1,4 +1,0 @@
-I (330) spiram: Found 64MBit SPI RAM device
-I (330) spiram: SPI RAM mode: flash 40m sram 40m
-I (330) spiram: PSRAM initialized, cache is in low/high (2-core) mode.
-E (1170) spiram: SPI SRAM memory test fail. 131072/131072 writes failed, first @ 3F800000

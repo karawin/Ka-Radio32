@@ -201,4 +201,5 @@ sys.henc0 or sys.henc1: Display the current step setting for the encoder. Normal
 sys.henc0("x") with x=0 Normal, x=1 Half
 sys.henc1("x") with x=0 Normal, x=1 Half
 sys.cali[brate]: start a touch screen calibration
+sys.conf: Display the labels of the csv file.
 ```

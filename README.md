@@ -1,5 +1,5 @@
 ## STATE
-Release 1.8 Stable
+Release 1.9 Stable
 
 Works on any esp32 board.  
 See the boards directory for a list of pre-configured boards.
