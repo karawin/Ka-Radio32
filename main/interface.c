@@ -1172,7 +1172,7 @@ void fmUnmute()
 
 void sys_conf()
 {
-	char* label ;
+	char* label;
 	kprintf("##CONFIG#\n");
 	gpio_get_label(&label);
 	kprintf("#LABEL: ");

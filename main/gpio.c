@@ -63,6 +63,7 @@ void gpio_get_label(char** label)
 {
 	size_t required_size;
 	nvs_handle hardware_handle;	
+	*label = NULL;
 	if (open_partition(hardware, label_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
 	{
 		ESP_LOGD(TAG,"in get label");
@@ -82,6 +83,7 @@ void gpio_get_comment(char** label)
 {
 	size_t required_size;
 	nvs_handle hardware_handle;	
+	*label = NULL;
 	if (open_partition(hardware, label_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
 	{
 		ESP_LOGD(TAG,"in get comment");
