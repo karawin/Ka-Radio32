@@ -469,6 +469,7 @@ static void start_wifi()
 			ESP_LOGE(TAG, "The default AP is  WifiKaRadio. Connect your wifi to it.\nThen connect a webbrowser to 192.168.4.1 and go to Setting\nMay be long to load the first time.Be patient.");
 			ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &wifi_config));
 			ESP_ERROR_CHECK( esp_wifi_start() );
+			audio_output_mode = I2S;
 		}
 		else
 		{
@@ -834,7 +835,7 @@ void app_main()
 			g_device = getDeviceSettings();	
 			g_device->cleared = 0xAABB; //marker init done
 			g_device->uartspeed = 115200; // default
-			g_device->audio_output_mode = VS1053; // default
+			g_device->audio_output_mode = I2S; // default
 			g_device->trace_level = ESP_LOG_ERROR; //default
 			g_device->vol = 100; //default
 			saveDeviceSettings(g_device);			
