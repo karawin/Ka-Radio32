@@ -2,14 +2,15 @@
 Release 1.9 Stable
 
 Works on any esp32 board.  
-See the boards directory for a list of pre-configured boards.
+See the boards directory for a list of pre-configured boards.  
+See : [Hardware configuration partition](HardwareConfig.md)
 - The esp32 adds the output on the internal dac or with i2s to an external dac but only mp3 stations can be played.  
 Adding a vs1053 board, all stations can be played.  
-Compatible with esp8266 KaRadio addons.  
-- Serial or telnet commands : https://github.com/karawin/Ka-Radio32/blob/master/Interface.md
-
-### New
-A new android application is born  
+On a wrover cpu with external psram, every AAC streams can be played without the vs1053 board.  
+- Compatible with esp8266 KaRadio addons.  
+- Serial or telnet commands : [Interfaces description](Interface.md)
+### Android remote command
+A new android application is born: 
   
 - KaRadio Remote Control by Vassilis Serasidis on google Play.
 
