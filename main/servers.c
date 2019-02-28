@@ -15,6 +15,7 @@
 #include "webserver.h"
 #include "interface.h"
 #include "app_main.h"
+#include "eeprom.h"
 
 #define stack  4400
 #define TAG	"servers"
@@ -134,8 +135,11 @@ void serversTask(void* pvParams) {
 //printf("server_sock SD_set %d\n",server_sock);			
 				
 			//add telnetServer_sock to set (telnet)
-			FD_SET(telnetServer_sock, &readfds);
-			max_sd = telnetServer_sock > max_sd ? telnetServer_sock : max_sd;  
+			if (g_device->current_ap != APMODE) //inhibe telnet in AP mode
+			{				
+				FD_SET(telnetServer_sock, &readfds);
+				max_sd = telnetServer_sock > max_sd ? telnetServer_sock : max_sd;  
+			}
 //printf("telnetServer_sock SD_set %d\n",telnetServer_sock);		
 			//add child sockets to set (wssocket)
 			for (i = 0;i<NBCLIENT;i++) 

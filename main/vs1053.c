@@ -177,6 +177,7 @@ void VS1053_spi_write_char(spi_device_handle_t ivsspi, uint8_t *cbyte, uint16_t 
 {
 	esp_err_t ret;
     spi_transaction_t t;
+	
     memset(&t, 0, sizeof(t));       //Zero out the transaction
 	t.tx_buffer = cbyte;	
     t.length= len*8; 
@@ -196,6 +197,9 @@ void VS1053_WriteRegister(uint8_t addressbyte, uint8_t highbyte, uint8_t lowbyte
 {
     spi_transaction_t t;
 	esp_err_t ret;
+	
+	if (vsVersion == 0) return;
+	
     memset(&t, 0, sizeof(t));       //Zero out the transaction
 	t.flags |= SPI_TRANS_USE_TXDATA;
 	t.cmd = VS_WRITE_COMMAND;
@@ -216,6 +220,9 @@ void VS1053_WriteRegister16(uint8_t addressbyte, uint16_t value)
 {
     spi_transaction_t t;
 	esp_err_t ret;
+	
+	if (vsVersion == 0) return;
+	
     memset(&t, 0, sizeof(t));       //Zero out the transaction
 	t.flags |= SPI_TRANS_USE_TXDATA;
 	t.cmd = VS_WRITE_COMMAND;
@@ -237,6 +244,7 @@ uint16_t VS1053_ReadRegister(uint8_t addressbyte){
 	uint16_t result;
     spi_transaction_t t;
 	esp_err_t ret;
+	if (vsVersion == 0) return 0;
     memset(&t, 0, sizeof(t));       //Zero out the transaction
 	t.length=16;  
 	t.flags |= SPI_TRANS_USE_RXDATA	;
