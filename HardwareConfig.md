@@ -208,6 +208,26 @@ An example of joystick:
 If I2C is not used (ie no lcd or spi lcd) the gpio of the i2C can be reused elsewhere.  
 To disable I2C even a I2C LCD is used: P_I2S_LRCK	and/or P_I2S_BCLK	must be set to 255  
 
+### I2S
+I tried this DAC:  
+https://www.aliexpress.com/…/Interface-I2…/32849017570.html  
+![Screenshoot of DAC](
+https://external-cdt1-1.xx.fbcdn.net/safe_image.php?d=AQAhofo5IQeqvClM&w=540&h=282&url=https%3A%2F%2Fae01.alicdn.com%2Fkf%2FHTB14PaLnsLJ8KJjy0Fnq6AFDpXaq%2FInterface-I2S-PCM5102-DAC-Decoder-GY-PCM5102-I2S-Player-Module-For-Raspberry-Pi-pHAT-Format-Board.jpg&cfs=1&upscale=1&fallback=news_d_placeholder_publisher&_nc_hash=AQCsMu3BxmPKRVtR)  
+To connect it do:  
+FLT GND  
+DMP GND  
+SCL Not connected  
+BCK is P_I2S_BCLK  
+DIN is P_I2S_DATA    
+LCK is P_I2S_LRCK   
+FMT GND  
+XMT 3.3V  
+VCC 5V or  
+3.3 3.3v  
+GND GND  
+
+If Vcc input is 5V, the 3.3V output the 3.3V but you can directly input the 3.3V here if the 5V is not available.
+
 ### VS1053b
 If not used P_XCS must be set to 255. Gpio of P_RST P_XDCS P_DREQ may be reused elsewhere.  
 
