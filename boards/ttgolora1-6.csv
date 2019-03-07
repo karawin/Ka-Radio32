@@ -38,7 +38,7 @@ P_ADC_KBD,data,u8,255
 P_BACKLIGHT,data,u8,255
 
 option_space,namespace,,
-O_LCD_TYPE,data,u8,0
+O_LCD_TYPE,data,u8,1
 O_LCD_ROTA,data,u8,0
 O_LCD_OUT,data,u32,0
 O_DDMM_FLAG,data,u8,0

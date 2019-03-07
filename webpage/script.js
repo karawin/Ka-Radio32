@@ -697,13 +697,13 @@ function playEditStation(tr) {
 	{
 		stopStation();
 		tr.style.background = "initial";
-		editPlaying = false;
+//		editPlaying = false;
 		editIndex = 0;
 	}
 	else{
 		if (editIndex != 0) editIndex.style.background = "initial";
 		wsplayStation(id); // select the station in the list
-		editPlaying = true;
+//		editPlaying = true;
 		editIndex = tr;
 //		getComputedStyle(element).getPropertyValue('--color-font-general');
 		setEditBackground(tr);
@@ -724,12 +724,14 @@ function playStation() {
 		xhr.open("POST","play",false);
 		xhr.setRequestHeader(content,ctype);
 		xhr.send("id=" + id+"&");
+		editPlaying = true;
 	} catch(e){console.log("error"+e);}
 }
 function stopStation() {
 	var select = document.getElementById('stationsSelect');
 //	checkwebsocket();
 	mstop();
+	editPlaying = false;
 	localStorage.setItem('selindexstore', select.options.selectedIndex.toString());
 	try{
 		xhr = new XMLHttpRequest();
@@ -1301,28 +1303,40 @@ document.addEventListener("DOMContentLoaded", function() {
 		if (event.defaultPrevented) {
 			return; 
 		}
-		switch (event.key) {
-		case "ArrowDown":
-		case "ArrowLeft":
 		if (event.ctrlKey) 
 		{
+		switch (event.key) {
+		case ' ':
+		if (editPlaying) stopStation();
+		else playStation();			
+		break;
+		case "ArrowDown":
+			nextStation();
+		break;
+		case "ArrowLeft":
 			vol=parseInt(document.getElementById('vol_range').value);
 			if (vol <5) vol = 0;
 			else vol = vol -5;
-			onRangeVolChange(vol ,true)	 ;
-		}			
+			onRangeVolChange(vol ,true)	 ;		
 		break;
 		case "ArrowUp":
+			prevStation();
+		break;
 		case "ArrowRight":
-		{
 			vol=parseInt(document.getElementById('vol_range').value);
 			if (vol > 249) vol = 254;
 			else vol = vol+5;
-			onRangeVolChange(vol ,true)	 ;
-		}			
+			onRangeVolChange(vol ,true)	 ;			
 		break;
 		default:
 		return;
+		}
+		if (curtab == "tab-content2")
+		{
+			ed = editPlaying;
+			loadStations();
+			editPlaying = ed;
+		}
 		}
 		event.preventDefault();
 	}, true);

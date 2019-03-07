@@ -206,7 +206,7 @@ An example of joystick:
 
 ### I2C
 If I2C is not used (ie no lcd or spi lcd) the gpio of the i2C can be reused elsewhere.  
-To disable I2C even a I2C LCD is used: P_I2S_LRCK	and/or P_I2S_BCLK	must be set to 255  
+To formally disable I2C : P_I2C_SCL and/or P_I2C_SDA	must be set to 255
 
 ### I2S
 I tried this DAC:  
