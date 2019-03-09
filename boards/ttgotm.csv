@@ -13,9 +13,9 @@ P_XCS,data,u8,255
 P_RST,data,u8,33
 P_XDCS,data,u8,2
 P_DREQ,data,u8,14
-P_ENC0_A,data,u8,255
-P_ENC0_B,data,u8,38
-P_ENC0_BTN,data,u8,255
+P_ENC0_A,data,u8,32
+P_ENC0_B,data,u8,33
+P_ENC0_BTN,data,u8,14
 P_ENC1_A,data,u8,255
 P_ENC1_B,data,u8,17
 P_ENC1_BTN,data,u8,255

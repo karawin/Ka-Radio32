@@ -327,6 +327,24 @@ void gpio_get_joysticks(gpio_num_t *enca,gpio_num_t *enca1)
 	close_partition(hardware_handle,hardware);		
 }
 
+// get the active level of buttons
+void gpio_get_active_buttons(bool *abtn0, bool *abtn1)
+{
+	esp_err_t err;
+	nvs_handle hardware_handle;	
+	
+	*abtn0 = 0;
+	*abtn1 = 0;
+	if (open_partition(hardware, option_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
+	{
+		ESP_LOGD(TAG,"in buttons");
+		return;
+	}		 
+	nvs_get_u8(hardware_handle, "O_BTN0",(uint8_t *) abtn0);	 
+	nvs_get_u8(hardware_handle, "O_BTN1",(uint8_t *) abtn0);	
+
+	close_partition(hardware_handle,hardware);			
+}
 
 void gpio_get_buttons(gpio_num_t *enca, gpio_num_t *encb, gpio_num_t *encc,gpio_num_t *enca1, gpio_num_t *encb1, gpio_num_t *encc1)
 {

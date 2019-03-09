@@ -66,7 +66,7 @@ typedef gpio_mode_t pinMode_t;
   } Button_t;	  
   
   
-  Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C );
+  Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C , bool Active);
   void serviceBtn(Button_t *enc); 
   Button getButtons(Button_t *enc,uint8_t index);
 // ----------------------------------------------------------------------------

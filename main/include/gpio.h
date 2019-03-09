@@ -120,6 +120,7 @@ void gpio_get_comment(char** label);
 void gpio_get_spi_bus(uint8_t *spi_no,gpio_num_t *miso,gpio_num_t *mosi,gpio_num_t *sclk);
 void gpio_get_vs1053(gpio_num_t * xcs,gpio_num_t *rst,gpio_num_t *xdcs,gpio_num_t *dreq);
 void gpio_get_encoders(gpio_num_t *enca, gpio_num_t *encb, gpio_num_t *encbtn, gpio_num_t *enca1, gpio_num_t *encb1, gpio_num_t *encbtn1);
+void gpio_get_active_buttons(bool *abtn0, bool *abtn1);
 void gpio_get_buttons(gpio_num_t *enca, gpio_num_t *encb, gpio_num_t *encc, gpio_num_t *enca1, gpio_num_t *encb1, gpio_num_t *encc1);
 void gpio_get_joysticks(gpio_num_t *enca,gpio_num_t *enca1);
 void gpio_get_i2c(gpio_num_t *scl,gpio_num_t *sda,gpio_num_t *rsti2c);

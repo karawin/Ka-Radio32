@@ -147,10 +147,13 @@ P_LED_GPIO		GPIO of the status led
 
 ## OPTIONS
 - **LCD CONTROL**  
-P_LCD_TYPE		Type of lcd (see [addon.h](https://github.com/karawin/Ka-Radio32/blob/master/main/include/addon.h) file).  
-P_LCD_ROTA		Control the rotation of the LCD, 0 no rotation, 1: rotation.  
+O_LCD_TYPE		Type of lcd (see [addon.h](https://github.com/karawin/Ka-Radio32/blob/master/main/include/addon.h) file).  
+O_LCD_ROTA		Control the rotation of the LCD, 0 no rotation, 1: rotation.  
 O_LCD_OUT 		The tempo to light off the screen in seconds. 0 is no tempo.   
 O_DDMM_FLAG		The format of the date to display 0:MMDD, 1:DDMM.  
+- **Buttons option**  
+O_BTN0			The active level of buttons: 0=LOW, 1:HIGH  ( 0=Default)  
+O_BTN1			The active level of buttons: 0=LOW, 1:HIGH  ( 0=Default)  
 -------------------
 ## Special cases:
 -------------------
@@ -191,6 +194,7 @@ Each set has functions equivalent to Encoder0 and Encoder1:
 click on button A: Start/Stop playing  
 click on button B and C: volume down and up for set 0 (P_BTN0), Station down and up for set 1 (P_BTN1)  
 held on button A: click on button B and C: volume down and up for set 1 (P_BTN1), Station down and up for set 0 (P_BTN0)  
+A button may be active with a level of 0 volt (0) (default) or +3.3volt (1)  
 
 If a set is not used, P_BTNx_A must be set to 255. In this case P_BTNx_B P_BTNx_C are disabled too.
 
@@ -240,6 +244,9 @@ GPIO pin must be gpio32 to 39  or 255 if not used.
 Compatible with https://github.com/karawin/Ka-Radio/blob/master/Hardware/controles.pdf and the one found at https://www.drive2.ru/b/487463808323813881/  
 The stop button is replaced with "Toggle Time/Infos" and "start replaced with "Start/Stop"  
 The ESP32 ADC can be sensitive to noise leading to large discrepancies in ADC readings. To minimize noise, users may connect a 0.1uF capacitor to the ADC input pad in use
+
+### OLED
+If your B/W oled has an artefact on the left for type 0, change it to type 1 (command sys.lcd("1") or O_LCD_TYPE,data,u8,1  
 
 ### Lcd backlight
 Thanks to Vadim Polyakovsky:

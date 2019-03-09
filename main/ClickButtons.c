@@ -26,14 +26,14 @@ bool getPinStates(Button_t *enc,uint8_t index);
 
 //bool getpinsActives(Button_t *enc) {return enc->pinsActive;}
 
-Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C)
+Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C, bool Active)
 {
 	Button_t* enc = malloc(sizeof(Button_t));
 	enc->pinBTN[0] = A; 
 	enc->pinBTN[1] = B;
 	enc->pinBTN[2] = C;
 
-	enc->pinsActive = LOW; 
+	enc->pinsActive = Active; 
 	for (int i=0;i<3;i++)
 	{
 		enc->button[i] = Open;

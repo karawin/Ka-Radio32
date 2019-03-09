@@ -873,6 +873,7 @@ void initButtonDevices()
 	gpio_num_t enca1;
 	gpio_num_t encb1;
 	gpio_num_t encbtn1;	
+	bool abtn0,abtn1;
 	gpio_get_encoders(&enca0, &encb0, &encbtn0,&enca1, &encb1, &encbtn1);
 	if (enca1 == GPIO_NONE) isEncoder1 = false; //no encoder
 	if (enca0 == GPIO_NONE) isEncoder0 = false; //no encoder
@@ -882,8 +883,10 @@ void initButtonDevices()
 	gpio_get_buttons(&enca0, &encb0, &encbtn0,&enca1, &encb1, &encbtn1);
 	if (enca1 == GPIO_NONE) isButton1 = false; //no encoder
 	if (enca0 == GPIO_NONE) isButton0 = false; //no encoder	
-	if (isButton0)	button0 = ClickButtonsInit(enca0, encb0, encbtn0);	
-	if (isButton1)	button1 = ClickButtonsInit(enca1, encb1, encbtn1 );	
+	
+	gpio_get_active_buttons(&abtn0, &abtn1);
+	if (isButton0)	button0 = ClickButtonsInit(enca0, encb0, encbtn0,abtn0);	
+	if (isButton1)	button1 = ClickButtonsInit(enca1, encb1, encbtn1,abtn1 );	
 	
 	gpio_get_joysticks(&enca0,&enca1);
 	if (enca0 == GPIO_NONE) isJoystick0 = false; //no encoder
