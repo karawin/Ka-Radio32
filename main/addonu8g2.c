@@ -596,6 +596,13 @@ void lcd_initU8g2(uint8_t *lcd_type)
 			u8g2_esp32_i2c_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
 		break;
+	case LCD_I2C_ST7567:
+		u8g2_Setup_st7567_i2c_64x32_2(
+			&u8g2,
+			rotat,
+			u8g2_esp32_i2c_byte_cb,
+			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
+		break;
 //B/W spi
 	case LCD_SPI_SSD1306NN:	
 		u8g2_Setup_ssd1306_128x64_noname_2(
@@ -662,6 +669,26 @@ void lcd_initU8g2(uint8_t *lcd_type)
 		break;	
 	case LCD_SPI_ST7920:	
 		u8g2_Setup_st7920_s_128x64_2(
+			&u8g2,
+			rotat,
+			u8g2_esp32_spi_byte_cb,
+			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
+		break;
+	case LCD_SPI_ST7565_NHD_C12864:	
+		u8g2_Setup_st7565_nhd_c12864_2(
+			&u8g2,
+			rotat,
+			u8g2_esp32_spi_byte_cb,
+			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
+		break;	case LCD_SPI_ST7567_pi:	
+		u8g2_Setup_st7567_pi_132x64_2(
+			&u8g2,
+			rotat,
+			u8g2_esp32_spi_byte_cb,
+			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
+		break;
+	case LCD_SPI_ST7567:	
+		u8g2_Setup_st7567_64x32_2(
 			&u8g2,
 			rotat,
 			u8g2_esp32_spi_byte_cb,

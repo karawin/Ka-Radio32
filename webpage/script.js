@@ -969,9 +969,9 @@ function downloadStations()
 				}				
 				xhr.open("POST","setStation",false);
 				xhr.setRequestHeader(content,ctype);
-				console.log("post "+tosend);
+//				console.log("post "+tosend);
 				xhr.send(tosend);
-				} catch (e){console.log("error "+e);}
+				} catch (e){console.log("error "+e+" "+tosend);}
 //			}
 			indmax = 2;
 			for(line = 3; line < lines.length; line+=indmax){				
@@ -986,7 +986,7 @@ function downloadStations()
 				xhr.open("POST","setStation",false);
 				xhr.setRequestHeader(content,ctype);
 				xhr.send(tosend);
-				} catch (e){console.log("error "+e);}
+				} catch (e){console.log("error "+e+" "+tosend);}
 			}
 			loadStationsList(maxStation);		
 
@@ -1145,8 +1145,10 @@ function loadStations() {
 			new_tbody.appendChild(tr);
 	}	
 	select = document.getElementById('stationsSelect');
+	try{
 	idlist = select.options[select.selectedIndex].value.split(":");
 	idlist = idlist[0];	
+	} catch(e) {idlist = 0;}
 	for(id; id < maxStation; id++) {
 		idstr = id.toString();		
 		if (localStorage.getItem(idstr) != null)
@@ -1331,14 +1333,14 @@ document.addEventListener("DOMContentLoaded", function() {
 		default:
 		return;
 		}
+		event.preventDefault();
+		}
 		if (curtab == "tab-content2")
 		{
 			ed = editPlaying;
 			loadStations();
 			editPlaying = ed;
 		}
-		}
-		event.preventDefault();
 	}, true);
 	
 	if (intervalid != 0)  window.clearTimeout(intervalid);
