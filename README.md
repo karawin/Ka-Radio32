@@ -190,6 +190,7 @@ You can configure the kind of display used in your configuration with the comman
 #define LCD_I2C_SSD1306NN	4 //128X64
 #define LCD_I2C_SSD1309NN	5 //128X64
 #define LCD_I2C_SSD1306UN	6 //128x32
+#define LCD_I2C_ST7567		7 //64x32
 
 //SPI
 #define LCD_SPI_SSD1306 		64 //128X32 (LCD_SPI =0x40)
@@ -202,6 +203,9 @@ You can configure the kind of display used in your configuration with the comman
 #define LCD_SPI_SSD1306NN 		71 //128X64
 #define LCD_SPI_SSD1309NN 		72 //128X64
 #define LCD_SPI_ST7920 			73 //128X64
+#define LCD_SPI_ST7567_pi 		74 //132X64
+#define LCD_SPI_ST7567	 		75 //64X32
+#define LCD_SPI_ST7565_NHD_C12864	76 //128X64
 
 // Colors
 #define LCD_SPI_ST7735			192 // 128x160  (LCD_COLOR|LCD_SPI =0xC0)
@@ -215,6 +219,7 @@ You can configure the kind of display used in your configuration with the comman
 #define LCD_SPI_ST7735S			200 // 128x128
 #define LCD_SPI_ST7735L			201 // 80x160
 #define LCD_SPI_ST7735W			202 // 128x160 shifted 2+1
+
 ```
   
 
