@@ -25,10 +25,13 @@
   <BR/>
   <BR/>
   
-
+<h1>KaRadio Remote Control</h1> 
+<a href="https://play.google.com/store/apps/details?id=com.serasidis.karadio.rc" target="_blank"><font color="#14A692">KaRadio Remote Control by Vassilis Serasidis on google Play.</font></a> <BR/>
+<p>It is an easy and fast WiFi remote control for your KaRadio or KaRadio32 hardware.<BR/>
+With this android app you can select the WebRadio station you want to play, set the volume and get the station information such as Station name, Genre, Bit rate, Meta data and more. </p>
 <BR/>
 <h1>Playlists:</h1><BR/>
-My playlist: <a href="http://karadio.karawin.fr/WebStations.txt" download> WebStations.txt</a> updated on 2018/06/11<BR/>
+My playlist: <a href="http://karadio.karawin.fr/WebStations.txt" download> WebStations.txt</a> updated on 2018/12/28<BR/>
 An italian playlist: <a href="http://karadio.karawin.fr/WebStations_Italy.txt" download> WebStations_Italy.txt</a><BR/>
 A list of Swiss radio station: <a href="http://karadio.karawin.fr/WebStationssuisse.txt" download> WebStationssuisse.txt</a><BR/>
 A list from arlaor (Arturo): <a href="http://karadio.karawin.fr/WebStationsX.txt" download> WebStationsX.txt</a> <BR/>
@@ -40,8 +43,9 @@ A list from Vlad: <a href="http://karadio.karawin.fr/WebStationsBy.txt", downloa
 A list from Vitaly: <a href="http://karadio.karawin.fr/WebStations_Russia.txt", download> Russian web radio station from WebStations_Russia.txt</a> <BR/>
 A list from CoccoBello: <a href="http://karadio.karawin.fr/WebStations_Romanian_By_Coccobello27.txt", download> Romanian web radio station from WebStations_Romanian_By_Coccobello27.txt</a> <BR/>
 A list from aytacakoz: <a href="http://karadio.karawin.fr/aytacakoz.txt", download> Turkiye's  radio list from aytacakoz.txt</a> <BR/>
+A list from Stego: <a href="WebStations_Belgium.txt" download> Here is a Playlist of mainly Flemish Belgian stationst</a><BR/>
 <BR/>
-<A HREF="mailto:jp@karawin.fr">Please Send me your playlist to add it here.</A> <br/> <br/>
+<A HREF="mailto:jp@karawin.fr">Please Send me your playlist to add it here.</A> <br/> <br/><BR/>
 <h1>Your prototypes:</h1><BR/>
 <a href="http://karadio.karawin.fr/yours/"  target="_blank"><font color="#14A692">Click here to see your prototypes</font></a><BR/>
 <BR/>

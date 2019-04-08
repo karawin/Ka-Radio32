@@ -10,7 +10,7 @@
 #include "lwip/sockets.h"
 #include "lwip/api.h"
 #include "lwip/netdb.h"
-
+#include "esp_wifi.h"
 #include "freertos/semphr.h"
 
 #include "vs1053.h"
@@ -686,6 +686,7 @@ void clientConnect()
 	once = 0;
 	if((server = (struct hostent*)gethostbyname(clientURL))) {
 		xSemaphoreGive(sConnect);
+		esp_wifi_set_ps (WIFI_PS_MIN_MODEM);
 	} else {
 		clientDisconnect("clientConnect");
 		clientSaveOneHeader("Invalid host",12,METANAME);
@@ -698,6 +699,7 @@ void clientConnectOnce()
 	cstatus = C_HEADER;
 	if((server = (struct hostent*)gethostbyname(clientURL))) {
 		xSemaphoreGive(sConnect);
+		esp_wifi_set_ps (WIFI_PS_MIN_MODEM);
 	} else {
 		clientDisconnect("clientConnectOnce");
 	}
@@ -709,6 +711,7 @@ void clientSilentConnect()
 	once = 0;
 	if(server != NULL) {
 		xSemaphoreGive(sConnect);
+		esp_wifi_set_ps (WIFI_PS_MIN_MODEM);
 	} else {
 		clientSilentDisconnect();
 	}
@@ -722,6 +725,7 @@ void clientSilentDisconnect()
 		if(!clientIsConnected())break;
 		vTaskDelay(1);
 	}	
+	esp_wifi_set_ps(WIFI_PS_MAX_MODEM);
 	
 }
 
@@ -737,6 +741,7 @@ void clientDisconnect(const char* from)
 	}	
 	if ((from[0]!='C') || (from[1]!='_'))
 		if (!ledStatus) gpio_set_level(getLedGpio(),0);
+	esp_wifi_set_ps(WIFI_PS_MAX_MODEM);
 	vTaskDelay(5);
 }
 

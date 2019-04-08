@@ -480,7 +480,7 @@ static void start_wifi()
 			};
 			strcpy((char*)wifi_config.sta.ssid,ssid);
 			strcpy((char*)wifi_config.sta.password,pass);
-			if  (strlen(ssid)&&strlen(pass))
+			if  (strlen(ssid)/*&&strlen(pass)*/)
 			{
 				esp_wifi_disconnect();
 				ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));

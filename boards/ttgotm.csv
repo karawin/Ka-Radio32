@@ -1,9 +1,10 @@
 key,type,encoding,value
-
+# free field to define the csv
 label_space,namespace,,
 L_LABEL,data,string,ttgotm.csv
 L_COMMENT,data,string,LilyGO/TTGO-TM-ESP32 board .
 
+# Define the gpio used 
 gpio_space,namespace,,
 K_SPI,data,u8,2
 P_MISO,data,u8,19

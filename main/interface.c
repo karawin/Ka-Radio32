@@ -488,15 +488,16 @@ void clientPlay(char *s)
 }
 
 const char strilLIST[]  = {"##CLI.LIST#\n"};
-const char strilINFO[]  = {"#CLI.LISTNUM#: %3d: %s, %s:%d%s%%%d\n"};
-const char strilDINFO[]  = {"\n#CLI.LIST#\n"};
+const char strilINFO[]  = {"#CLI.LISTINFO#: %3d: %s, %s:%d%s%%%d\n"};
+const char strilNUM[]  = {"#CLI.LISTNUM#: %3d: %s, %s:%d%s%%%d\n"};
+const char strilDLIST[]  = {"\n#CLI.LIST#\n"};
 
 
 void clientList(char *s)
 {
 	struct shoutcast_info* si;
 	uint16_t i = 0,j = 255;
-//	bool onlyOne = false;
+	bool onlyOne = false;
 	
 	char *t = strstr(s, parslashquote);
 	if(t != NULL) // a number specified
@@ -510,10 +511,10 @@ void clientList(char *s)
 		i = atoi(t+2);
 		if (i>254) i = 0;
 		j = i+1;
-//		onlyOne = true;		
+		onlyOne = true;		
 	} 
 	{	
-		kprintf(strilDINFO);	
+		if (!onlyOne) kprintf(strilDLIST);	
 		for ( ;i <j;i++)
 		{
 			vTaskDelay(1);
@@ -529,12 +530,15 @@ void clientList(char *s)
 			{
 				if(si->port !=0)
 				{	
+					if (onlyOne)
 						kprintf(strilINFO,i,si->name,si->domain,si->port,si->file,si->ovol);	
+					else
+						kprintf(strilNUM,i,si->name,si->domain,si->port,si->file,si->ovol);	
 				}
 				free(si);
 			}	
 		}	
-		kprintf(strilLIST);
+		if (!onlyOne) kprintf(strilLIST);
 	}
 }
 // parse url
