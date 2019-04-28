@@ -62,7 +62,8 @@ Output mode set in Setting panel on web page of KaraDio32 :
 ## Configure the hardware and IR codes
 If the default configuration doesn't fit your needs, you can externally configure the software to fit your hardware and peripherals to suit your needs.  
 The configuration file is to be flashed only one time. After, the standard delivery will become compatible with your hardware gpio use and peripherals configuration. A future standard OTA will automatically works for your configuration.  
-See : [Hardware configuration partition](HardwareConfig.md)
+See : [Hardware configuration partition](HardwareConfig.md)  
+For a wrover cpu you need a csv file with psram in the name. Without it, the default configuration will fail.  
 
 ## Build your own
 To build your own release if you want to do some improvments, you must install the idf https://github.com/espressif/esp-idf and the toolchain.
@@ -81,7 +82,9 @@ python /home/yourhome/esp/esp-idf/components/esptool_py/esptool/esptool.py \
 ### GPIO Definition 
 The default configuration is given below. It includes an encoder, an IR remote and a LCD or OLED.  
 To add or edit GPIO definitions and add or remove some devices, you may need a hardware configuration file. Some examples are in the boards directory.  
-See the file main/include/gpio.h and main/include/addon.h
+See the file main/include/gpio.h and main/include/addon.h  
+WARNING: this configuration will not work for a wrover processor. 
+You need an adapted csv configuration.   
 
 ```
 //--------------------------------------//
@@ -239,7 +242,8 @@ http://espressif.com/en/support/download/other-tools
 (change the security of the installation directory to permit all)
 
 See the image at :  
-http://karadio.karawin.fr/karawin32Flash.jpg
+http://karadio.karawin.fr/karawin32Flash.jpg  
+WARNING: the standard_adb.bin must be changed for a wrover processor or another configuration.  
 
 ![Screenshoot of download tool](https://raw.githubusercontent.com/karawin/Ka-Radio32/master/images/downloadtool32.jpg)
 
