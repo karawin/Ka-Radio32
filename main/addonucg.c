@@ -99,7 +99,7 @@ void setfont(sizefont size)
 			case 320:
 			switch (charset){ 	
 								case Cyrillic: ucg_SetFont(&ucg,ucg_font_crox5h );break; 
-								case Greek:ucg_SetFont(&ucg,ucg_font_helvR14_gr );break;
+								case Greek:ucg_SetFont(&ucg,ucg_font_helvR18_gr );break;
 								default:
 								case Latin:ucg_SetFont(&ucg,ucg_font_inr16_mf );break;
 							}
@@ -150,7 +150,7 @@ void setfont(sizefont size)
 			case 320:
 			switch (charset){ 	
 								case Cyrillic: ucg_SetFont(&ucg,ucg_font_crox5h );break; 
-								case Greek:ucg_SetFont(&ucg,ucg_font_helvR18_gr );break;
+								case Greek:ucg_SetFont(&ucg,ucg_font_helvR24_gr );break;
 								default:
 								//case Latin:ucg_SetFont(&ucg,ucg_font_inr33_mf );break;
 								case Latin:ucg_SetFont(&ucg,ucg_font_inb19_tf );break;

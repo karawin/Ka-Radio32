@@ -26,11 +26,11 @@
 						<p>
 							<span class="bold">Slot number: </span><input type="text" id="add_slot" disabled="true" name="slot"><br>
 							<span class="bold">Name: </span><input type="text" style="width:350px;" id="add_name" name="name"><br>
-							<span class=bold>Full URL: </span><input type=text style="width:350px;" id=add_URL name=URL onkeyup="parseEditURL(event)" onmouseup="parseEditURL(event)">
+							<span class=bold>Full URL: </span><input type=text style="width:350px;" id=add_URL name=URL onkeyup="parseEditURL()" onmouseup="parseEditURL()">
 							<br>or<br>
-							<span class="bold">Url: </span><input type="text" id="add_url" name="url"><br>
-							<span class="bold">Port: </span><input type="text" id="add_port" name="port" value="80"><br>
-							<span class="bold">Path: </span><input type="text" id="add_path" name="path" value="/"><br>
+							<span class="bold">Url: </span><input type="text" id="add_url" name="url" onkeyup="buildAddURL()"><br>
+							<span class="bold">Port: </span><input type="text" id="add_port" name="port" value="80" onkeyup="buildAddURL()"><br>
+							<span class="bold">Path: </span><input type="text" id="add_path" name="path" value="/" onkeyup="buildAddURL()"><br>
 							<span class="bold">Volume offset: </span><input type="range" id="ovol" name="ovol" step=2  min=-126 max=126 ><br><br>
 							<input type="button"  onClick="saveStation()" value="save">&nbsp;
 							<input type="button"  onClick="eraseStation()" value="erase">&nbsp;
@@ -48,7 +48,7 @@
 			<div class="LEFT"><img title="Click on the logo to change the theme" onClick= "theme()" src="logo.png"></div>
 			<div class="RIGHT">
 			<a href="https://github.com/karawin/Ka-Radio32" target="_blank">KaraDio32</a><br/>
-			<a href="https://github.com/karawin/Ka-Radio32" target="_blank">V1.9 R3</a><br/>
+			<a href="https://github.com/karawin/Ka-Radio32" target="_blank">V1.9 R4</a><br/>
 			<div id="rssi" >0 dBm</div><br/>
 <!--			<a href="https://github.com/PiotrSperka/ESP8266-WebRadio" style="font-size:8px" target="_blank">From PiotrSperka</a> -->
 			</div>
@@ -128,14 +128,16 @@
 					&nbsp;<input type="button" value="Start"  onClick="startWake()"><input type="button" value="Stop"  onClick="stopWake()">
 					 &nbsp;&nbsp; In: <span id="wminutes">0</span> Sec. 
 				</p>
-				<h1>Instant play</h1>
+				<h1>Instant play &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button"   onClick="editInstantStation()" value="Add & Edit"></h1>
 					<p>
 					<span class=bold1>Full URL: </span>
-					<input type=text style="width:350px;" id=instant_URL name=URL onkeyup="parseURL(event)" onmouseup="parseEditURL(event)"><br/>
+					<input type=text style="width:350px;" id=instant_URL name=URL onkeyup="parseURL()" onmouseup="parseEditURL()"><br/>
 					or<br/> 
-					<span class="bold1">Url: </span><input type="text" id="instant_url" name="url"><br>
-					<span class="bold1">Port: </span><input type="text" id="instant_port" name="port" value="80"><br>
-					<span class="bold1">Path: </span><input type="text" id="instant_path" name="path" value="/"><br><br>
+					<span class="bold1">Url: </span><input type="text" id="instant_url" name="url" onkeyup="buildURL()"><br>
+					<span class="bold1">Port: </span><input type="text" id="instant_port" name="port" value="80" onkeyup="buildURL()"><br>
+					<span class="bold1">Path: </span><input type="text" id="instant_path" name="path" value="/" onkeyup="buildURL()">
+
+					<br><br>
 					
 					<!-- Play icon by Icons8 -->
 <img class="icon icons8" width="40" height="40" title="Play instant station" onClick="instantPlay()" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAACBElEQVRoge3XPWsUQRgH8C0sLFP6AfwAfoAUqcXszG5QCw8sIljkCkGFZGd33RwJFz3FgC9JIWgTTRGMx2VeLkQOtVhOsDgF30AlRUCOaC6bEI/T87EICxGieTFhGHx+8PT/P+zOPGNZCCGEEEII7TcaTXfozrAnCBOKMFEwvpDjy9j2OBBfLNn9pWxXVDmgO9OuOL6M+8ZqkB2vtSiTLRqo+e4Bfkx3rh1zfBlnx19BQTZguFiHM6PPVwnjbScsx9TjR3Tn27aNRdKJphYgM/I0IR5vu4GaOHqRH9Kdc0ubFUnHu/8JTuQerxAmmoSJsCuqHNSd94/+VqQgG3BFLMH5u+/ADcvfqC8XbW8mozvzprYqks7IzBfou11rEiZ+OKF6081Knbqz/2a7RdIZelSH3uvVxPY4uKFSdn/xsO4OlmXtvMjGA+FU/klCmGw5obqp/ULdbZF0BiY+wvHBuVXqy0TrhbonRXIGF4mmFiCTf7ZsM/HdDcq3jPu0hot16B2trhDG2z3hrHk/+2X+FbJj6/uYE6i3Rh6/F+69h55wdo36yswL0Z+ch5NDlYQw0SSBGDRuRck9/Aynr8bLxONt91L5gXFLY760CGdvvFhbX+NV1cA1/iWcu/ManEC1KBMfjH1YEU/8pEw2jH7qEiYUZfKa9gvtXxlfACGEEEII/T9+AR8nzQFJqsL+AAAAAElFTkSuQmCC">&nbsp;

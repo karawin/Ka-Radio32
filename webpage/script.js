@@ -29,6 +29,9 @@ function openwebsocket(){
 		if (arr["wsstation"]) wsplayStation(arr["wsstation"]); 
 		if (arr["wsrssi"]) {document.getElementById('rssi').innerHTML = arr["wsrssi"]+' dBm';setTimeout(wsaskrssi,5000);}
 		if (arr["upgrade"]) {document.getElementById('updatefb').innerHTML = arr["upgrade"];}
+		if (arr["iurl"]) {document.getElementById('instant_url').value  = arr["iurl"];buildURL();}
+		if (arr["ipath"]) {document.getElementById('instant_path').value = arr["ipath"];buildURL();}
+		if (arr["iport"]) {document.getElementById('instant_port').value = arr["iport"];buildURL();}
 	} catch(e){ console.log("error"+e);}
 }
 
@@ -39,7 +42,7 @@ function openwebsocket(){
 			window.timerID=0;
 		}
 		setTimeout(wsaskrssi, 5000); // start the rssi display
-		websocket.send("opencheck");	
+		websocket.send("opencheck");
 	}
 	websocket.onclose = function (event) {
 		console.log("onclose code: "+event.code);
@@ -602,7 +605,28 @@ function instantPlay() {
 		xhr.send("url=" + document.getElementById('instant_url').value + "&port=" + document.getElementById('instant_port').value + "&path=" + curl+"&");
 	} catch(e){console.log("error"+e);}
 }
-function parseURL(e)
+
+function buildAddURL()
+{
+	if (document.getElementById('add_port').value == "") 
+		  document.getElementById('add_port').value= "80";
+	if (document.getElementById('add_path').value == "") 
+		  document.getElementById('add_path').value= "/";
+    document.getElementById('add_URL').value = "http://"+document.getElementById('add_url').value+':'+
+		document.getElementById('add_port').value + document.getElementById('add_path').value;
+}
+
+function buildURL()
+{
+	if (document.getElementById('instant_port').value == "") 
+		  document.getElementById('instant_port').value= "80";
+	if (document.getElementById('instant_path').value == "") 
+		  document.getElementById('instant_path').value= "/";
+    document.getElementById('instant_URL').value = "http://"+document.getElementById('instant_url').value+':'+
+		document.getElementById('instant_port').value + document.getElementById('instant_path').value;
+}
+
+function parseURL()
 {
 	 var a = document.createElement('a');	 
 	 a.href = document.getElementById('instant_URL').value;
@@ -790,6 +814,33 @@ function eraseStation() {
 			document.getElementById('ovol').value = 0;
 			document.getElementById('add_URL').value = ""
 }
+
+//
+function editInstantStation() {
+	var arr, id = 0;		
+		
+	do {
+		idstr = id.toString();
+		try{
+			arr = JSON.parse(localStorage.getItem(idstr));
+		} catch(e){console.log("error"+e);}	
+		id++;
+	} while (arr["URL"].length >0 );
+	
+   id--;
+	
+	if (id <=254)
+	{
+		document.getElementById('editStationDiv').style.display = "block";		
+		document.getElementById('add_slot').value = id;
+		
+		document.getElementById('ovol').value = '0';
+		document.getElementById('add_URL').value = "http://"+document.getElementById('instant_url').value+":"+document.getElementById('instant_port').value+document.getElementById('instant_path').value;
+		parseEditURL();
+	} else alert("No free slot.");
+}
+
+
 function editStation(id) {
 	var arr; 
 	document.getElementById('editStationDiv').style.display = "block";	
@@ -830,7 +881,8 @@ function editStation(id) {
 	}
 }
 
-function parseEditURL(e)
+
+function parseEditURL()
 {
 	 var a = document.createElement('a');
 	 a.href = document.getElementById('add_URL').value;

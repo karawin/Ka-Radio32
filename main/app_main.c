@@ -403,19 +403,19 @@ static void start_wifi()
 {
     ESP_LOGI(TAG, "starting wifi");
 	setAutoWifi();
-	wifi_mode_t mode;
+//	wifi_mode_t mode;
 	char ssid[SSIDLEN]; 
 	char pass[PASSLEN];
 	
 	wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+    ESP_ERROR_CHECK( esp_wifi_init(&cfg) );
+//    ESP_ERROR_CHECK( esp_wifi_set_storage(WIFI_STORAGE_RAM) );
 	
 	tcpip_adapter_init();
 	tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA); // Don't run a DHCP client	
     /* FreeRTOS event group to signal when we are connected & ready to make a request */
 	wifi_event_group = xEventGroupCreate();	
     ESP_ERROR_CHECK( esp_event_loop_init(event_handler, wifi_event_group) );
-    ESP_ERROR_CHECK( esp_wifi_init(&cfg) );
-    ESP_ERROR_CHECK( esp_wifi_set_storage(WIFI_STORAGE_FLASH) );
 	
 	if (g_device->current_ap == APMODE) 
 	{
@@ -431,10 +431,9 @@ static void start_wifi()
 	
 	while (1)
 	{
-		if (g_device->current_ap == APMODE)
-			printf("WIFI GO TO AP MODE\n");
-		else printf("WIFI TRYING TO CONNECT TO SSID %d\n",g_device->current_ap);
 		ESP_ERROR_CHECK( esp_wifi_stop() );
+		vTaskDelay(10);
+		
 		switch (g_device->current_ap)
 		{
 			case STA1: //ssid1 used
@@ -446,33 +445,35 @@ static void start_wifi()
 				strcpy(ssid,g_device->ssid2);
 				strcpy(pass,g_device->pass2);	
 				esp_wifi_set_mode(WIFI_MODE_STA) ;	
-			break;
+				break;
 
 			default: // other: AP mode
-				g_device->current_ap = 0;
-				esp_wifi_set_mode(WIFI_MODE_AP) ;
+				g_device->current_ap = APMODE;
+				ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP)) ;
 		}
 		
-		ESP_ERROR_CHECK(esp_wifi_get_mode(&mode));				
-		if (mode == WIFI_MODE_AP)
+		if (g_device->current_ap == APMODE)
 		{
-			wifi_config_t wifi_config = {
+			printf("WIFI GO TO AP MODE\n");
+			wifi_config_t ap_config = {
 				.ap = {
 					.ssid = "WifiKaradio",
-					.password = "",
-					.ssid_len = 0,
 					.authmode = WIFI_AUTH_OPEN,
-					.max_connection = 4,
-					.beacon_interval = 100,
+					.max_connection = 2,
+					.beacon_interval = 200
 				},
 			};
+			ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &ap_config));
 			ESP_LOGE(TAG, "The default AP is  WifiKaRadio. Connect your wifi to it.\nThen connect a webbrowser to 192.168.4.1 and go to Setting\nMay be long to load the first time.Be patient.");
-			ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &wifi_config));
-			ESP_ERROR_CHECK( esp_wifi_start() );
+
+			vTaskDelay(1);
+			ESP_ERROR_CHECK( esp_wifi_start() );			
+			
 			audio_output_mode = I2S;
 		}
 		else
 		{
+			printf("WIFI TRYING TO CONNECT TO SSID %d\n",g_device->current_ap);
 			wifi_config_t wifi_config = {
 				.sta = {
 					.bssid_set = 0,
@@ -491,15 +492,20 @@ static void start_wifi()
 			{
 				g_device->current_ap++;
 				g_device->current_ap %=3;
+				
+				if (getAutoWifi() && (g_device->current_ap == APMODE))
+				{
+					g_device->current_ap = STA1; // if autoWifi then wait for a reconnection to an AP
+					printf("Wait for the AP\n");
+				}
+				else 
+					printf("Empty AP. Try next one\n");
+				
 				saveDeviceSettings(g_device);
-				printf("Empty AP. Try next one\n");
 				continue;
 			}				
 		}
 
-		ESP_LOGI(TAG, "Initialised wifi");
-// 	   set_wifi_credentials();
- 
 		/* Wait for the callback to set the CONNECTED_BIT in the event group. */
 		if ( (xEventGroupWaitBits(wifi_event_group, CONNECTED_AP,false, true, 2000) & CONNECTED_AP) ==0) 
 		//timeout . Try the next AP
@@ -520,6 +526,7 @@ void start_network(){
 	ip4_addr_t mask;
 	ip4_addr_t gate;
 	uint8_t dhcpEn = 0;
+
 	
 	switch (g_device->current_ap)
 	{
@@ -552,12 +559,13 @@ void start_network(){
 			xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT,false, true, 3000);
 			IPADDR2_COPY(&info.ip,&ipAddr);
 			tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_AP, &info);
-			g_device->dhcpEn1 = g_device->dhcpEn2 = 1;
-			IPADDR2_COPY(&g_device->mask1, &mask);
-			IPADDR2_COPY(&g_device->mask2, &mask);
-			saveDeviceSettings(g_device);	
+//			g_device->dhcpEn1 = g_device->dhcpEn2 = 1;
+//			IPADDR2_COPY(&g_device->mask1, &mask);
+//			IPADDR2_COPY(&g_device->mask2, &mask);
+//			saveDeviceSettings(g_device);	
 			strcpy(localIp , ip4addr_ntoa(&info.ip));
-			printf("IP: %s\n\n",ip4addr_ntoa(&info.ip));			
+			printf("IP: %s\n\n",ip4addr_ntoa(&info.ip));	
+	
 	}
 	else // mode STA
 	{	
@@ -623,8 +631,10 @@ void start_network(){
 		saveDeviceSettings(g_device);	
 		tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, "karadio32");	
 	}
+	
 	lcd_welcome(localIp,"IP found");
 	vTaskDelay(10);
+	
 }
 
 
@@ -637,7 +647,9 @@ void timerTask(void* p) {
 //	int uxHighWaterMark;
 	
 	initTimers();
-	gpioLed = getLedGpio();
+
+	gpio_get_ledgpio(&gpioLed);
+	setLedGpio(gpioLed);
 /*
 	printf("FIRST LED GPIO: %d, SSID:%d\n",gpioLed,g_device->current_ap);
 */				
@@ -838,6 +850,7 @@ void app_main()
 			g_device->audio_output_mode = I2S; // default
 			g_device->trace_level = ESP_LOG_ERROR; //default
 			g_device->vol = 100; //default
+			g_device->led_gpio = GPIO_NONE;
 			saveDeviceSettings(g_device);			
 		} else
 			ESP_LOGE(TAG,"Device config restored");
@@ -960,14 +973,14 @@ void app_main()
 //-----------------------------------------------------
 //init softwares
 //-----------------------------------------------------
-	clientInit();	
 
+	clientInit();	
 	//initialize mDNS service
     err = mdns_init();
     if (err) 
         ESP_LOGE(TAG,"mDNS Init failed: %d", err);
 	else
-		ESP_LOGI(TAG,"mDNS Init ok"); 
+		ESP_LOGE(TAG,"mDNS Init ok"); 
 	
 	//set hostname and instance name
 	if ((strlen(g_device->hostname) == 0)||(strlen(g_device->hostname) > HOSTLEN)) 

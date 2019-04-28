@@ -31,8 +31,12 @@ extern const ucg_fntpgm_uint8_t ucg_font_crox5tb[] UCG_FONT_SECTION("ucg_font_cr
 extern const ucg_fntpgm_uint8_t ucg_font_5x7_gr[] UCG_FONT_SECTION("ucg_font_5x7_gr");
 extern const ucg_fntpgm_uint8_t ucg_font_6x13_gr[] UCG_FONT_SECTION("ucg_font_6x13_gr");
 extern const ucg_fntpgm_uint8_t ucg_font_9x16_gr[] UCG_FONT_SECTION("ucg_font_9x16_gr");
+extern const ucg_fntpgm_uint8_t ucg_font_helvR12_gr[] UCG_FONT_SECTION("ucg_font_helvR12_gr");
 extern const ucg_fntpgm_uint8_t ucg_font_helvR14_gr[] UCG_FONT_SECTION("ucg_font_helvR14_gr");
 extern const ucg_fntpgm_uint8_t ucg_font_helvR18_gr[] UCG_FONT_SECTION("ucg_font_helvR18_gr");
+extern const ucg_fntpgm_uint8_t ucg_font_helvR24_gr[] UCG_FONT_SECTION("ucg_font_helvR24_gr");
+extern const ucg_fntpgm_uint8_t ucg_font_ncenR12_gr[] UCG_FONT_SECTION("ucg_font_ncenR12_gr");
 extern const ucg_fntpgm_uint8_t ucg_font_ncenR14_gr[] UCG_FONT_SECTION("ucg_font_ncenR14_gr");
+extern const ucg_fntpgm_uint8_t ucg_font_ncenR24_gr[] UCG_FONT_SECTION("ucg_font_ncenR24_gr");
 
 #endif /* _UCG_KARADIO32_H */

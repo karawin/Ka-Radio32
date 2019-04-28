@@ -252,8 +252,14 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 
     TickType_t max_wait = 20 / portTICK_PERIOD_MS; // portMAX_DELAY = bad idea
 	//mult = mult>>12;  // for sample on 8 bits 0 to 16
+
+// har-in-air correction	
+	uint32_t outBufBytes = buf_len*(2/buf_desc->num_channels);
+	if (renderer_instance->bit_depth == I2S_BITS_PER_SAMPLE_32BIT) outBufBytes <<= 1;
+	outBuf8 = malloc(outBufBytes);		
 	
-	outBuf8 = malloc(buf_len*(2/buf_desc->num_channels));
+//	outBuf8 = malloc(buf_len*(2/buf_desc->num_channels));
+//
 	if (outBuf8 == NULL) 
 	{
 		ESP_LOGE(TAG, "malloc buf failed len:%d ",buf_len);
@@ -310,8 +316,18 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
         ptr_r += stride;
         ptr_l += stride;
     }
-	
-    size_t bytes_left = buf_len*(2/buf_desc->num_channels);
+//
+// har-in-air correction	
+	size_t bytes_left = outBufBytes;
+	size_t bytes_written = 0;
+	while(bytes_left > 0 && renderer_status != STOPPED) {
+		res = i2s_write(renderer_instance->i2s_num, (const char*) outBuf8, bytes_left,& bytes_written, max_wait);
+		if (res != ESP_OK) {
+			ESP_LOGE(TAG, "i2s_write error %d",res);
+		}
+		if (bytes_written != bytes_left) ESP_LOGV(TAG, "written: %d, len: %d",bytes_written,bytes_left);
+
+/*    size_t bytes_left = buf_len*(2/buf_desc->num_channels);
     size_t bytes_written = 0;
     while(bytes_left > 0 && renderer_status != STOPPED) {
         res = i2s_write(renderer_instance->i2s_num, (const char*) outBuf8, bytes_left,& bytes_written, max_wait);
@@ -319,6 +335,8 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 				ESP_LOGE(TAG, "i2s_write error %d",res);
 		}
 		if (bytes_written != buf_len*(2/buf_desc->num_channels))ESP_LOGV(TAG, "written: %d, len: %d",bytes_written,bytes_left);
+*/
+
         bytes_left -= bytes_written;
         buf += bytes_written;
     }

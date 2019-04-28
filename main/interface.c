@@ -411,7 +411,11 @@ void clientParseUrl(char* s)
         for(tmp=0; tmp<(t_end-t+1); tmp++) url[tmp] = 0;
         strncpy(url, t+2, (t_end-t));
         clientSetURL(url);
-        free(url);
+		char* title = malloc(88);
+		sprintf(title,"{\"iurl\":\"%s\"}",url); 
+		websocketbroadcast(title, strlen(title));
+		free(title);		
+        free(url);		
     }
 }
 
@@ -433,8 +437,12 @@ void clientParsePath(char* s)
         uint8_t tmp;
         for(tmp=0; tmp<(t_end-t+1); tmp++) path[tmp] = 0;
         strncpy(path, t+2, (t_end-t));
-	kprintf("cli.path: %s\n",path);
+//kprintf("cli.path: %s\n",path);
         clientSetPath(path);
+		char* title = malloc(130);
+		sprintf(title,"{\"ipath\":\"%s\"}",path); 
+		websocketbroadcast(title, strlen(title));
+		free(title);		
         free(path);
     }
 }
@@ -459,6 +467,10 @@ void clientParsePort(char *s)
         strncpy(port, t+2, (t_end-t));
         uint16_t porti = atoi(port);
         clientSetPort(porti);
+		char* title = malloc(130);
+		sprintf(title,"{\"iport\":\"%d\"}",porti); 
+		websocketbroadcast(title, strlen(title));
+		free(title);		
         free(port);
     }
 }
@@ -807,12 +819,14 @@ void sysledgpio(char* s)
 	saveDeviceSettings(g_device);	
 	gpio_set_ledgpio(value); // write in nvs if any
 	sysledgpio((char*) "");
-	led_gpio = GPIO_NONE; // for getLedGpio
+//	led_gpio = GPIO_NONE; // for getLedGpio
 }
+
+void setLedGpio(uint8_t val) { led_gpio = val;g_device->led_gpio = val;}
 
 uint8_t getLedGpio()
 {
-	if (led_gpio == GPIO_NONE)
+/*	if (led_gpio == GPIO_NONE)
 	{
 		gpio_get_ledgpio(&led_gpio);
 		if (led_gpio != g_device->led_gpio) 
@@ -821,6 +835,8 @@ uint8_t getLedGpio()
 			saveDeviceSettings(g_device);
 		} 
 	} 
+	
+	*/
 	return led_gpio;	
 }
 

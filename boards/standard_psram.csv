@@ -1,9 +1,7 @@
 key,type,encoding,value
-
 label_space,namespace,,
 L_LABEL,data,string,standard_psram.csv
 L_COMMENT,data,string,This is the standard configuration for a wrover.
-
 gpio_space,namespace,,
 K_SPI,data,u8,2
 P_MISO,data,u8,19
@@ -41,17 +39,15 @@ P_JOY_1,data,u8,255
 P_LED_GPIO,data,u8,4
 P_ADC_KBD,data,u8,255
 P_BACKLIGHT,data,u8,255
-
 option_space,namespace,,
 O_LCD_TYPE,data,u8,255
 O_LCD_ROTA,data,u8,255
 O_LCD_OUT,data,u32,255
 O_DDMM_FLAG,data,u8,255
-
 custom_ir_space,namespace,,
 K_UP,data,string,
 K_LEFT,data,string,
-K_OK,data,string,0
+K_OK,data,string,
 K_RIGHT,data,string,
 K_DOWN,data,string,
 K_0,data,string,
@@ -67,4 +63,3 @@ K_9,data,string,
 K_STAR,data,string,
 K_DIESE,data,string,
 K_INFO,data,string,
-
