@@ -202,6 +202,7 @@ void lcd_init(uint8_t Type)
 
 void in_welcome(const char* ip,const char*state,int y,char* Version)
 {
+	if (lcd_type == LCD_NONE) return;
 	DrawString(2,2*y,Version);
 	DrawColor(0,0,0,0);
 	DrawBox(2, 4*y, GetWidth()-2, y);
@@ -978,7 +979,7 @@ void task_lcd(void *pvParams)
 	event_lcd_t evt1 ; // lcd event	
 	ESP_LOGD(TAG, "task_lcd Started, LCD Type %d",lcd_type);
 	defaultStateScreen = (g_device->options32&T_TOGGLETIME)? stime:smain;
-	drawFrame();
+	if (lcd_type != LCD_NONE)  drawFrame();
 
 	while (1)
 	{	
@@ -1004,6 +1005,7 @@ void task_lcd(void *pvParams)
 		if (event_lcd != NULL)
 		while (xQueueReceive(event_lcd, &evt, 0))
 		{ 
+			if (lcd_type == LCD_NONE) continue;
 			if (evt.lcmd != lmeta)
 				ESP_LOGV(TAG,"event_lcd: %x",(int)evt.lcmd);
 			else
