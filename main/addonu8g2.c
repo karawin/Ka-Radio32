@@ -693,8 +693,16 @@ void lcd_initU8g2(uint8_t *lcd_type)
 			rotat,
 			u8g2_esp32_spi_byte_cb,
 			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
+		break;		
+	case LCD_SPI_ST7565_64128N:
+		u8g2_Setup_st7565_64128n_2(
+			&u8g2,
+			rotat,
+			u8g2_esp32_spi_byte_cb,
+			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure			
 		break;
-	default:
+
+		default:
 		ESP_LOGE(TAG,"UNKNOWN LCD lcd_type %d. Fall back to type \"LCD_NONE\"",*lcd_type);
 		*lcd_type = LCD_NONE;
 /*		u8g2_esp32_hal_t u8g2_esp32_hal = U8G2_ESP32_HAL_DEFAULT;
