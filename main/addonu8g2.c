@@ -128,7 +128,10 @@ void setfont8(sizefont size)
 			u8g2_SetFont(&u8g2, u8g2_font_10x20_t_latcyr);
 			break;
 			case 128:
-			u8g2_SetFont(&u8g2, u8g2_font_10x20_t_latcyr);
+			if (x == 296)
+				u8g2_SetFont(&u8g2, u8g2_font_inr46_mn );
+			else
+				u8g2_SetFont(&u8g2, u8g2_font_10x20_t_latcyr);
 			break;
 			case 32:
 			u8g2_SetFont(&u8g2,  u8g2_font_8x13_t_latcyr);

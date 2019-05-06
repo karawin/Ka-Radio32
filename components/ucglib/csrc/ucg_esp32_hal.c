@@ -129,6 +129,8 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 			bitmask = bitmask | (1<<ucg_esp32_hal.cs);
 		}
 */		
+		if (bitmask == 0) break;
+		
 		gpio_config_t gpioConfig;
 		gpioConfig.pin_bit_mask = bitmask;
 		gpioConfig.mode         = GPIO_MODE_OUTPUT;
