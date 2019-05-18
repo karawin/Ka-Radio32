@@ -155,7 +155,7 @@ uint8_t ma_read_byte(uint8_t address)
 /*
  * Output audio data to I2S and setup MerusAudio digital power amplifier
  */
-void init_ma120(uint8_t vol)
+uint8_t init_ma120(uint8_t vol)
 {
     printf("Setup MA120x0\n");
 
@@ -175,7 +175,8 @@ void init_ma120(uint8_t vol)
     printf("Audio in mode : 0x%02x\n",res);
 
     ma_write_byte(45,0x34);                                // Clean any errors on device
-    ma_write_byte(45,0x30);
+    if (!ma_write_byte(45,0x30)) return 0xff;
 
     printf("Init done\n");
+	return 0;
 }

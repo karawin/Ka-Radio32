@@ -171,20 +171,17 @@ void audio_player_init(player_t *player)
 
 void audio_player_destroy()
 {
-    renderer_destroy();
+    if (get_audio_output_mode() != VS1053) renderer_destroy();
     player_status = UNINITIALIZED;
 }
 
 void audio_player_start()
 {
-	//if (get_audio_output_mode() != VS1053)
-	{
 		if (get_audio_output_mode() != VS1053) renderer_start();
 		player_instance->media_stream->eof = false;
 		player_instance->command = CMD_START;
 		player_instance->decoder_command = CMD_NONE;	
 		player_status = RUNNING;
-	}
 }
 
 void audio_player_stop()

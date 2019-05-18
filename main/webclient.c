@@ -840,10 +840,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 /////////////////////////////////////////////////////////////////////////////////////////////////						
 						
 						
-//						VS1053_flush_cancel(0);
-//						VS1053_flush_cancel(1);
 						t2 = strstr(pdata, "Transfer-Encoding: chunked"); // chunked stream? 
-//						t2 = NULL;
 						chunked = 0;
 						t1+= 4; 
 						if ( t2 != NULL) 
@@ -1074,6 +1071,7 @@ ESP_LOGD(TAG,"mt2 len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,cle
 			playing=1;
 			if (once == 0)vTaskDelay(20);
 			else vTaskDelay(1);
+
 			setVolumei(getVolume());
 			kprintf(CLIPLAY,0x0d,0x0a);
 			if (!ledStatus) gpio_set_level(getLedGpio(),1);
@@ -1238,11 +1236,11 @@ void clientTask(void *pvParams) {
 						
 			if (playing)  // stop clean
 			{		
+				setVolumei(0);
 				audio_player_stop(); 
 				//if (get_audio_output_mode() == VS1053) spiRamFifoReset();
 				player_config->media_stream->eof = true;
 //				bufferReset();
-				setVolumei(0);
 				if (get_audio_output_mode() == VS1053)VS1053_flush_cancel(2);
 				playing = 0;
 				vTaskDelay(40);	// stop without click

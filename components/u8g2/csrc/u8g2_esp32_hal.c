@@ -69,7 +69,11 @@ uint8_t u8g2_esp32_spi_byte_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int,  void
 		  dev_config.duty_cycle_pos   = 0;
 		  dev_config.cs_ena_posttrans = 0;
 		  dev_config.cs_ena_pretrans  = 0;
-		  dev_config.clock_speed_hz   = 10000000;
+		  if (u8x8->display_info->sck_clock_hz <= 1000000UL)
+			   dev_config.clock_speed_hz   = 400000UL;
+		  else if (u8x8->display_info->sck_clock_hz <= 2000000UL)
+			   dev_config.clock_speed_hz   = u8x8->display_info->sck_clock_hz; 
+		  else dev_config.clock_speed_hz   = 10000000UL;
 //		  dev_config.clock_speed_hz   = u8x8->display_info->sck_clock_hz;
 		  dev_config.spics_io_num     = u8g2_esp32_hal.cs;
 		  dev_config.flags            = (u8x8->display_info->chip_enable_level ?SPI_DEVICE_POSITIVE_CS : 0)|SPI_DEVICE_NO_DUMMY; // ST7920.

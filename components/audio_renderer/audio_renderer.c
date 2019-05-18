@@ -13,6 +13,8 @@
 #include "freertos/FreeRTOS.h"
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 #include "esp_log.h"
+#include <freertos/task.h>
+#include <driver/dac.h>
 #include "driver/gpio.h"
 #include "gpio.h"
 #include "app_main.h"
@@ -52,6 +54,7 @@ static void init_i2s(renderer_config_t *config)
 	if ((config->output_mode == I2S)||(config->output_mode == I2S_MERUS))
 	{
 	/* don't use audio pll on buggy rev0 chips */
+	// don't do it for PDM
 		if(out_info.revision > 0) {
 			use_apll = 1;
 			ESP_LOGI(TAG, "chip revision %d, enabling APLL", out_info.revision);
@@ -74,10 +77,11 @@ static void init_i2s(renderer_config_t *config)
             .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,   // 2-channels
             .communication_format = comm_fmt,
             .dma_buf_count = bigSram()?16:16,                            // number of buffers, 128 max.  16
-            .dma_buf_len = bigSram()?256:128,                          // size of each buffer 128
+//            .dma_buf_len = bigSram()?256:128,                          // size of each buffer 128
+            .dma_buf_len = bigSram()?128:128,                          // size of each buffer 128
 //            .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,        // lowest level 1
             .intr_alloc_flags = 0,        // default
-			.use_apll = use_apll			
+			.use_apll = use_apll					
     };
 
 	gpio_num_t lrck;
@@ -102,7 +106,7 @@ static void init_i2s(renderer_config_t *config)
 		return;
 	}	
 	ESP_LOGI(TAG,"i2s intr:%d", i2s_config.intr_alloc_flags);	
-    if((mode & I2S_MODE_DAC_BUILT_IN) || (mode & I2S_MODE_PDM))
+    if((mode & I2S_MODE_DAC_BUILT_IN))// || (mode & I2S_MODE_PDM))
     {
         i2s_set_pin(config->i2s_num, NULL);
         i2s_set_dac_mode(I2S_DAC_CHANNEL_BOTH_EN);
@@ -119,6 +123,7 @@ static void init_i2s(renderer_config_t *config)
 void renderer_volume(uint32_t vol)
 {
 	// log volume (magic)
+	if (vol == 1) return;  // volume 0
 //	ESP_LOGI(TAG, "Renderer vol: %d %X",vol,vol );
 	if (vol >= 255) 
 	{
@@ -143,7 +148,7 @@ void renderer_volume(uint32_t vol)
  */
 void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 {
-//    ESP_LOGI(TAG, "buf_desc: bit_depth %d format %d num_chan %d sample_rate %d", buf_desc->bit_depth, buf_desc->buffer_format, buf_desc->num_channels, buf_desc->sample_rate);
+//    ESP_LOGV(TAG, "buf_desc: bit_depth %d format %d num_chan %d sample_rate %d", buf_desc->bit_depth, buf_desc->buffer_format, buf_desc->num_channels, buf_desc->sample_rate);
 //    ESP_LOGV(TAG, "renderer_instance: bit_depth %d, output_mode %d", renderer_instance->bit_depth, renderer_instance->output_mode);
 //	  ESP_LOGI(TAG, "render_samples len: %d",buf_len);
 	int res = 0;
@@ -197,15 +202,16 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 		}			
 	}
 //-------------------------
-/*ESP_LOGV(TAG, "I2S CHECK:  buf_desc->bit_depth %d, renderer_instance->bit_depth %d, buf_desc->buffer_format %d, PCM_INTERLEAVED %d, buf_desc->num_channels %d (2), renderer_instance->output_mode %d, DAC_BUILT_IN %d ",buf_desc->bit_depth,renderer_instance->bit_depth,buf_desc->buffer_format,PCM_INTERLEAVED,buf_desc->num_channels,renderer_instance->output_mode,DAC_BUILT_IN);
-*/
+//ESP_LOGD(TAG, "I2S CHECK:  buf_desc->bit_depth %d, renderer_instance->bit_depth %d, buf_desc->buffer_format %d, PCM_INTERLEAVED %d, buf_desc->num_channels %d (2), renderer_instance->output_mode %d, DAC_BUILT_IN %d ",buf_desc->bit_depth,renderer_instance->bit_depth,buf_desc->buffer_format,PCM_INTERLEAVED,buf_desc->num_channels,renderer_instance->output_mode,DAC_BUILT_IN);
+
     // formats match, we can write the whole block
     if (buf_desc->bit_depth == renderer_instance->bit_depth
             && buf_desc->buffer_format == PCM_INTERLEAVED
             && buf_desc->num_channels == 2
             && renderer_instance->output_mode != DAC_BUILT_IN 
-			&& renderer_instance->output_mode != PDM)
-			{
+			&& renderer_instance->output_mode != PDM
+			)
+	{
 
         // do not wait longer than the duration of the buffer
 //        TickType_t max_wait = buf_desc->sample_rate / num_samples / 2;
@@ -214,8 +220,7 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
         size_t bytes_left = buf_len;
         size_t bytes_written = 0;
         while(bytes_left > 0 && renderer_status != STOPPED) {
-//			ESP_LOGE(TAG, "i2s_write  nb: %d",bytes_left);
-//            bytes_written = i2s_write_bytes(renderer_instance->i2s_num, buf, bytes_left, 1);
+			ESP_LOGE(TAG, "i2s_write  nb: %d",bytes_left);
             res = i2s_write(renderer_instance->i2s_num, buf, bytes_left,& bytes_written, 0);
 			if (res != ESP_OK) {
 				ESP_LOGE(TAG, "i2s_write error %d",res);
@@ -246,17 +251,18 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
         stride = buf_bytes_per_sample;
     }
 
-    if (buf_desc->num_channels == 1) {
+    if (buf_desc->num_channels == 1)  // duplicate 
+	{
         ptr_r = ptr_l;
     }
 
     TickType_t max_wait = 20 / portTICK_PERIOD_MS; // portMAX_DELAY = bad idea
-	//mult = mult>>12;  // for sample on 8 bits 0 to 16
 
 // har-in-air correction	
 	uint32_t outBufBytes = buf_len*(2/buf_desc->num_channels);
 	if (renderer_instance->bit_depth == I2S_BITS_PER_SAMPLE_32BIT) outBufBytes <<= 1;
-	outBuf8 = malloc(outBufBytes);		
+	
+	outBuf8 = malloc(outBufBytes);
 	
 //	outBuf8 = malloc(buf_len*(2/buf_desc->num_channels));
 //
@@ -266,6 +272,7 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 		renderer_stop();
 		return;
 	}
+//	outBuf16 =(uint16_t*)outBuf8;
 	outBuf32 =(uint32_t*)outBuf8;
 	outBuf64 = (uint64_t*)outBuf8;
 
@@ -273,7 +280,7 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
     for (int i = 0; i < num_samples; i++) {
         if (renderer_status == STOPPED) break;
 
-        if(renderer_instance->output_mode == DAC_BUILT_IN)
+        if((renderer_instance->output_mode == DAC_BUILT_IN))//||(renderer_instance->output_mode == PDM))
         {
             // assume 16 bit src bit_depth
             int16_t left = *(int16_t *) ptr_l;
@@ -289,16 +296,22 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 
 			outBuf32[i] = sample;
         }
+		
+/*		else if (renderer_instance->output_mode == PDM)
+		{
+            const char samp16[2] = {ptr_l[0], ptr_l[1]};
+		    outBuf16[i] = *((uint16_t*)samp16);		
+		
+		} */
         else {
 
             switch (renderer_instance->bit_depth)
             {
                 case I2S_BITS_PER_SAMPLE_16BIT:
                     ; // workaround
-
                     /* low - high / low - high */
                     const char samp32[4] = {ptr_l[0], ptr_l[1], ptr_r[0], ptr_r[1]};
-					outBuf32[i] = *((uint32_t*)samp32);
+					outBuf32[i] = *((uint32_t*)samp32);					
                     break;
 
                 case I2S_BITS_PER_SAMPLE_32BIT:
@@ -318,14 +331,21 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
     }
 //
 // har-in-air correction	
-	size_t bytes_left = outBufBytes;
+	size_t bytes_left = outBufBytes  ;
 	size_t bytes_written = 0;
+	
+if (renderer_instance->output_mode == PDM)
+{
+//	bytes_left = outBufBytes/4 ;
+}	
+	
+	
 	while(bytes_left > 0 && renderer_status != STOPPED) {
 		res = i2s_write(renderer_instance->i2s_num, (const char*) outBuf8, bytes_left,& bytes_written, max_wait);
 		if (res != ESP_OK) {
 			ESP_LOGE(TAG, "i2s_write error %d",res);
 		}
-		if (bytes_written != bytes_left) ESP_LOGV(TAG, "written: %d, len: %d",bytes_written,bytes_left);
+//		if (bytes_written != bytes_left) ESP_LOGV(TAG, "written: %d, len: %d",bytes_written,bytes_left);
 
 /*    size_t bytes_left = buf_len*(2/buf_desc->num_channels);
     size_t bytes_written = 0;
@@ -338,7 +358,7 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 */
 
         bytes_left -= bytes_written;
-        buf += bytes_written;
+        buf += (bytes_written  );
     }
 	free (outBuf8);
 }
@@ -367,10 +387,9 @@ void renderer_init(renderer_config_t *config)
     init_i2s(config);
 
     if(config->output_mode == I2S_MERUS) {
-        init_ma120(0x50); // setup ma120x0p and initial volume
+        if (init_ma120(0x50))			// setup ma120x0p and initial volume
+			config->output_mode = I2S;	// error, back to I2S
     }
-	
-	//free (config);
 }
 
 
@@ -379,20 +398,20 @@ void renderer_start()
     if(renderer_status == RUNNING)
         return;
 
-    renderer_status = RUNNING;
-    i2s_start(renderer_instance->i2s_num);
-
     // buffer might contain noise
-    i2s_zero_dma_buffer(renderer_instance->i2s_num);
+//    i2s_zero_dma_buffer(renderer_instance->i2s_num);
+	ESP_LOGV(TAG, "Start" );
+    i2s_start(renderer_instance->i2s_num);
+    renderer_status = RUNNING;		
 }
 
 void renderer_stop()
 {
     if(renderer_status == STOPPED)
         return;
-    renderer_status = STOPPED;
-
-    i2s_stop(renderer_instance->i2s_num);
+    renderer_status = STOPPED;	
+	ESP_LOGV(TAG, "Stop" );	
+	i2s_stop(renderer_instance->i2s_num);
 }
 
 void renderer_destroy()

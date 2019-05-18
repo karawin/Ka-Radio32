@@ -1,7 +1,7 @@
 key,type,encoding,value
 label_space,namespace,,
 L_LABEL,data,string,new_psram.csv
-L_COMMENT,data,string,This is the standard simple configuration for a wrover .
+L_COMMENT,data,string,This is the standard simple configuration for a wrover. For PCM test .
 gpio_space,namespace,,
 K_SPI,data,u8,2
 P_MISO,data,u8,19
@@ -30,9 +30,9 @@ P_LCD_CS,data,u8,255
 P_LCD_A0,data,u8,255
 P_LCD_RST,data,u8,255
 P_IR_SIGNAL,data,u8,255
-P_I2S_LRCK,data,u8,25
-P_I2S_BCLK,data,u8,26
-P_I2S_DATA,data,u8,22
+P_I2S_LRCK,data,u8,12
+P_I2S_BCLK,data,u8,13
+P_I2S_DATA,data,u8,14
 P_TOUCH_CS,data,u8,255
 P_JOY_0,data,u8,255
 P_JOY_1,data,u8,255
