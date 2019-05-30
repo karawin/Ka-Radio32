@@ -33,8 +33,6 @@ P_IR_SIGNAL,data,u8,255
 P_I2S_LRCK,data,u8,12
 P_I2S_BCLK,data,u8,27
 P_I2S_DATA,data,u8,14
-P_PDM_L,data,u8,26
-P_PDM_R,data,u8,25
 P_TOUCH_CS,data,u8,255
 P_JOY_0,data,u8,255
 P_JOY_1,data,u8,255
