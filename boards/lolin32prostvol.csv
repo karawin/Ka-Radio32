@@ -1,49 +1,68 @@
 key,type,encoding,value
 
 label_space,namespace,,
-L_LABEL,data,string,lolin32pro.csv
+L_LABEL,data,string,lolin32prostvol.csv
+# with encoder 1
 L_COMMENT,data,string,This is the configuration for a lolin pro with wrover cpu.
 
 gpio_space,namespace,,
+# SPI 0 or 1
 K_SPI,data,u8,1
+# SPI controls
 P_MISO,data,u8,12
 P_MOSI,data,u8,13
 P_CLK,data,u8,14
+#vs1053
 P_XCS,data,u8,255
 P_RST,data,u8,12
 P_XDCS,data,u8,33
 P_DREQ,data,u8,34
-P_ENC0_A,data,u8,18
+#enc0 vol control, push station
+P_ENC0_A,data,u8,255
 P_ENC0_B,data,u8,19
 P_ENC0_BTN,data,u8,4
-P_ENC1_A,data,u8,255
+#enc1 station control, push volume
+P_ENC1_A,data,u8,18
 P_ENC1_B,data,u8,19
 P_ENC1_BTN,data,u8,4
+# Buttons 0
 P_BTN0_A,data,u8,255
 P_BTN0_B,data,u8,33
 P_BTN0_C,data,u8,35
+# Buttons 1
 P_BTN1_A,data,u8,255
 P_BTN1_B,data,u8,255
 P_BTN1_C,data,u8,255
+# I2C for lcd or oled
 P_I2C_SCL,data,u8,22
 P_I2C_SDA,data,u8,23
 P_I2C_RST,data,u8,255
+# SPI lcd controls
 P_LCD_CS,data,u8,22
 P_LCD_A0,data,u8,23
 P_LCD_RST,data,u8,21
+# infra red input
 P_IR_SIGNAL,data,u8,255
+# I2S control for external DAC or PDM
 P_I2S_LRCK,data,u8,25
 P_I2S_BCLK,data,u8,26
 P_I2S_DATA,data,u8,27
+# external backlight control
 P_BACKLIGHT,data,u8,255
+# Blinking led output or internal led
 P_LED_GPIO,data,u8,5
+# ADC input for external keyboard
 P_ADC_KBD,data,u8,255
 
 option_space,namespace,,
-O_LCD_TYPE,data,u8,255
-O_LCD_ROTA,data,u8,255
-O_LCD_OUT,data,u32,255
-O_DDMM_FLAG,data,u8,255
+# Display type
+O_LCD_TYPE,data,u8,192
+# Display rotation control
+O_LCD_ROTA,data,u8,0
+# Timeout for display switch off
+O_LCD_OUT,data,u32,0
+# date format
+O_DDMM_FLAG,data,u8,1
 
 custom_ir_space,namespace,,
 K_UP,data,string,0xFF0047 0xFF0040
