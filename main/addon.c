@@ -117,6 +117,7 @@ void* getEncoder(int num)
 
 static void ClearBuffer()
 {
+  if (lcd_type == LCD_NONE) return;
   if (isColor)
 	ucg_ClearScreen(&ucg);
   else
@@ -125,6 +126,7 @@ static void ClearBuffer()
 
 static int16_t DrawString(int16_t x, int16_t y,  const char *str)
 {
+// if (lcd_type == LCD_NONE) return -1;
   if (isColor)
 	return ucg_DrawString(&ucg,x,y,0,str);
   else
@@ -133,6 +135,7 @@ static int16_t DrawString(int16_t x, int16_t y,  const char *str)
 
 static void DrawColor(uint8_t color, uint8_t r, uint8_t g, uint8_t b)
 {
+//  if (lcd_type == LCD_NONE) return;
   if (isColor)
 	ucg_SetColor(&ucg, 0,r,g,b);
   else
@@ -141,6 +144,7 @@ static void DrawColor(uint8_t color, uint8_t r, uint8_t g, uint8_t b)
 
 static void DrawBox(ucg_int_t x, ucg_int_t y, ucg_int_t w, ucg_int_t h)
 {
+//  if (lcd_type == LCD_NONE) return;
   if (isColor)
 	ucg_DrawBox(&ucg, x,y,w,h);
   else
@@ -149,6 +153,7 @@ static void DrawBox(ucg_int_t x, ucg_int_t y, ucg_int_t w, ucg_int_t h)
 
 uint16_t GetWidth()
 {
+//  if (lcd_type == LCD_NONE) return 0;
   if (isColor)
 	  return ucg_GetWidth(&ucg);
 
@@ -156,6 +161,7 @@ uint16_t GetWidth()
 }
 uint16_t GetHeight()
 {
+//  if (lcd_type == LCD_NONE) return 0;
   if (isColor)
 	  return ucg_GetHeight(&ucg);
 
@@ -164,7 +170,7 @@ uint16_t GetHeight()
 
 void wakeLcd()
 {
-	if (lcd_type == LCD_NONE) return;
+//	if (lcd_type == LCD_NONE) return;
 	// add the gpio switch on here gpioLedBacklight can be directly a GPIO_NUM_xx or declared in gpio.h
 	LedBacklightOn();	
 	timerLcdOut = getLcdOut(); // rearm the tempo
@@ -174,6 +180,7 @@ void wakeLcd()
 
 void sleepLcd()
 {
+//    if (lcd_type == LCD_NONE) return;
 	itLcdOut = 2;  // in sleep
 	// add the gpio switch off here
 	LedBacklightOff();
@@ -316,6 +323,7 @@ void Screen(typeScreen st){
 void drawFrame()
 {	
 	dt=localtime(&timestamp);
+	if (lcd_type == LCD_NONE) return;
 	isColor?drawFrameUcg(mTscreen):drawFrameU8g2(mTscreen);
 }
 
@@ -371,8 +379,9 @@ void drawStation()
 	
   //drawTTitle(ststr); 
 //printf ("drawStation: %s\n",sNum  );
-  isColor?drawStationUcg(mTscreen,sNum,ddot):drawStationU8g2(mTscreen,sNum,ddot);
   free (si);
+  if (lcd_type == LCD_NONE) return;
+  isColor?drawStationUcg(mTscreen,sNum,ddot):drawStationU8g2(mTscreen,sNum,ddot);
 }
 
 ////////////////////
@@ -380,12 +389,14 @@ void drawStation()
 void drawVolume()
 {
 //  printf("drawVolume. mTscreen: %d, Volume: %d\n",mTscreen,volume);
+  if (lcd_type == LCD_NONE) return;
   isColor?drawVolumeUcg(mTscreen):drawVolumeU8g2(mTscreen);	
 }
 
 void drawTime()
 {
 	dt=localtime(&timestamp);
+	if (lcd_type == LCD_NONE) return;
 	isColor?drawTimeUcg(mTscreen,timein):drawTimeU8g2(mTscreen,timein);	
 }
 
@@ -394,7 +405,7 @@ void drawTime()
 // Display a screen on the lcd
 void drawScreen()
 {
-  if (lcd_type == LCD_NONE) return;
+//  if (lcd_type == LCD_NONE) return;
 //  ESP_LOGW(TAG,"stateScreen: %d, mTscreen: %d",stateScreen,mTscreen);
   if ((mTscreen != MTNODISPLAY)&&(!itLcdOut))
   {
@@ -457,10 +468,12 @@ void stationOk()
 void changeStation(int16_t value)
 {
 	currentValue = value;
+	ESP_LOGD(TAG,"changeStation val: %d, futurnum: %d",value,futurNum);
 	if (value > 0) futurNum++;
 	if (futurNum > 254) futurNum = 0;
 	else if (value < 0) futurNum--;
 	if (futurNum <0) futurNum = 254;
+	ESP_LOGD(TAG,"futurnum: %d",futurNum);
 	//else if (value != 0) mTscreen = MTREFRESH;
 }				
 // IR 
@@ -684,7 +697,7 @@ void buttonsLoop()
 void encoderCompute(Encoder_t *enc,bool role)
 {	
 	int16_t newValue = - getValue(enc);
-	if (newValue != 0) ESP_LOGD(TAG,"encoder value: %d",newValue);
+	if (newValue != 0) ESP_LOGD(TAG,"encoder value: %d, stateScreen: %d",newValue,stateScreen);
 	Button newButton = getButton(enc);
 	typeScreen estate;
 	if (role) estate = sstation; else estate = svolume;
@@ -1005,7 +1018,7 @@ void task_lcd(void *pvParams)
 		if (event_lcd != NULL)
 		while (xQueueReceive(event_lcd, &evt, 0))
 		{ 
-			if (lcd_type == LCD_NONE) continue;
+//			if (lcd_type == LCD_NONE) continue;
 			if (evt.lcmd != lmeta)
 				ESP_LOGV(TAG,"event_lcd: %x",(int)evt.lcmd);
 			else
@@ -1055,6 +1068,7 @@ void task_lcd(void *pvParams)
 					wakeLcd();
 					if(xQueuePeek(event_lcd, &evt1, 0))
 						if (evt1.lcmd == estation) {evt.lline = NULL;break;}
+					ESP_LOGD(TAG,"estation val: %d",(uint32_t)evt.lline);
 					changeStation((uint32_t)evt.lline);	
 					Screen(sstation);
 					evt.lline = NULL;	// just a number			

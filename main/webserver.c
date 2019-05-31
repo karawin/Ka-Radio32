@@ -802,20 +802,24 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 							
 				changed = true;
 				ip_addr_t valu;
-				ipaddr_aton(aip, &valu);
-				memcpy(g_device->ipAddr1,&valu,sizeof(uint32_t));
-				ipaddr_aton(amsk, &valu);
-				memcpy(g_device->mask1,&valu,sizeof(uint32_t));
-				ipaddr_aton(agw, &valu);
-				memcpy(g_device->gate1,&valu,sizeof(uint32_t));
-				
-				ipaddr_aton(aip2, &valu);
-				memcpy(g_device->ipAddr2,&valu,sizeof(uint32_t));
-				ipaddr_aton(amsk2, &valu);
-				memcpy(g_device->mask2,&valu,sizeof(uint32_t));
-				ipaddr_aton(agw2, &valu);
-				memcpy(g_device->gate2,&valu,sizeof(uint32_t));
-				
+				if (aip != NULL)
+				{
+					ipaddr_aton(aip, &valu);
+					memcpy(g_device->ipAddr1,&valu,sizeof(uint32_t));
+					ipaddr_aton(amsk, &valu);
+					memcpy(g_device->mask1,&valu,sizeof(uint32_t));
+					ipaddr_aton(agw, &valu);
+					memcpy(g_device->gate1,&valu,sizeof(uint32_t));
+				}
+				if (aip2 != NULL)
+				{				
+					ipaddr_aton(aip2, &valu);
+					memcpy(g_device->ipAddr2,&valu,sizeof(uint32_t));
+					ipaddr_aton(amsk2, &valu);
+					memcpy(g_device->mask2,&valu,sizeof(uint32_t));
+					ipaddr_aton(agw2, &valu);
+					memcpy(g_device->gate2,&valu,sizeof(uint32_t));
+				}
 				if (getSParameterFromResponse(adhcp,4,"dhcp=", data, data_size))
 					if (strlen(adhcp)!=0) 
 					{if (strcmp(adhcp,"true")==0) 

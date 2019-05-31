@@ -757,6 +757,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 	char *inpdata;
 	char* inpchr;
 	uint32_t clen;
+	int bread;
 	char* t1;
 	char* t2;
 	bool  icyfound;
@@ -863,7 +864,8 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 					t1 = NULL;
 					if (i++ > 20) {clientDisconnect("header1");break;}
 					vTaskDelay(1); //avoid watchdog is infernal loop
-					len += recvfrom(sockfd, pdata+len, RECEIVE-len, 0,NULL,NULL);
+					bread = recvfrom(sockfd, pdata+len, RECEIVE-len, 0,NULL,NULL);
+					if (bread >0) len += bread;
 				}
 			} while (t1 == NULL);
 		}
@@ -899,7 +901,9 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 						while (lc < cchunk+9) 
 						{
 							vTaskDelay(1);
-							clen = recvfrom(sockfd, pdata+len, 9, 0,NULL,NULL); 
+							bread = recvfrom(sockfd, pdata+len, 9, 0,NULL,NULL); 
+							if (bread >0) clen = bread;
+							else clen = 0;
 							lc+=clen;len+=clen;
 							//ESP_LOGV(TAG,"more:%d, lc:%d\n",clen,lc);
 						} //security to be sure to receive the new length
@@ -1179,8 +1183,8 @@ void clientTask(void *pvParams) {
 						ESP_LOGW(TAG,"No data in recv. Errno = %d",errno);
 						cnterror++;
 						if (errno != 11) vTaskDelay(50); //timeout 
-						else vTaskDelay(3);
-						if ((errno == 128)||(cnterror >= 10)) break;
+						else vTaskDelay(5);
+						if ((errno == 128)||(cnterror > 9 )) break;
 					}
 					vTaskDelay(3);
 					// if a stop is asked

@@ -333,12 +333,7 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 // har-in-air correction	
 	size_t bytes_left = outBufBytes  ;
 	size_t bytes_written = 0;
-	
-if (renderer_instance->output_mode == PDM)
-{
-//	bytes_left = outBufBytes/4 ;
-}	
-	
+		
 	
 	while(bytes_left > 0 && renderer_status != STOPPED) {
 		res = i2s_write(renderer_instance->i2s_num, (const char*) outBuf8, bytes_left,& bytes_written, max_wait);
