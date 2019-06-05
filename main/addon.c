@@ -379,9 +379,9 @@ void drawStation()
 	
   //drawTTitle(ststr); 
 //printf ("drawStation: %s\n",sNum  );
+  if (lcd_type != LCD_NONE) 
+	isColor?drawStationUcg(mTscreen,sNum,ddot):drawStationU8g2(mTscreen,sNum,ddot);
   free (si);
-  if (lcd_type == LCD_NONE) return;
-  isColor?drawStationUcg(mTscreen,sNum,ddot):drawStationU8g2(mTscreen,sNum,ddot);
 }
 
 ////////////////////
