@@ -1146,7 +1146,7 @@ void clientTask(void *pvParams) {
 				{
 				  cstatus = C_PLAYLIST;
 //printf("sprint%d\n",6);				  
-				  sprintf((char*)bufrec, "GET %s HTTP/1.0\r\nHOST: %s\r\n\r\n", clientPath,clientURL); //ask for the playlist
+				  sprintf((char*)bufrec, "GET %s HTTP/1.1\r\nHOST: %s\r\nUser-Agent: %s\r\n\r\n", clientPath,clientURL,useragent); //ask for the playlist
 			    } 
 				else 
 				{

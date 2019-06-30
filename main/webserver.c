@@ -385,8 +385,16 @@ static void pathParse(char* str)
 		{
 			num[0] = str[i+1]; num[1] = str[i+2];
 			cc = strtol(num, &pend,16);
-			str[i] = cc;			
-			str[i+1]=0;
+			if (cc == '"') // for " in the string
+			{
+				str[i] = '\\';
+				str[i+1] = cc;
+				str[i+2] = 0;
+			} else
+			{
+				str[i] = cc;			
+				str[i+1]=0;
+			}
 			if (str[i+3] !=0)strcat(str, str+i+3);
 		}
 	}
