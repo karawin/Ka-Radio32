@@ -1028,7 +1028,7 @@ ESP_LOGD(TAG,"mtlen len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,c
 				{		
 //					if (spiRamFifoFree() < metad) ESP_LOGV(TAG,"metaout wait metad: %d, bufferfree: %d",metad,spiRamFifoFree());			
 					while(spiRamFifoFree()<metad)	 // wait some room
-						vTaskDelay(30);
+						vTaskDelay(20);
 					audio_stream_consumer((char*)inpdata, metad, (void*)player_config);
 				}
 				metad  = header.members.single.metaint;
@@ -1049,7 +1049,7 @@ ESP_LOGD(TAG,"mt2 len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,cle
 				{
 //					if (spiRamFifoFree() < rest) ESP_LOGV(TAG,"metaout wait rest: %d, bufferfree: %d",rest,spiRamFifoFree());			
 					while(spiRamFifoFree()<rest)	 // wait some room						
-						vTaskDelay(30);// 
+						vTaskDelay(20);// 
 					audio_stream_consumer((char*)inpdata, rest, (void*)player_config);					
 				}
 				rest = 0;
@@ -1064,7 +1064,7 @@ ESP_LOGD(TAG,"mt2 len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,cle
 			{
 //				if (spiRamFifoFree() < len) ESP_LOGV(TAG,"metaout wait len: %d, bufferfree: %d",len,spiRamFifoFree());							
 				while(spiRamFifoFree()<len)	 // wait some room	
-						vTaskDelay(30); 
+						vTaskDelay(20); 
 				audio_stream_consumer((char*)(pdata+rest), len, (void*)player_config);
 			}			
 		}
@@ -1182,11 +1182,11 @@ void clientTask(void *pvParams) {
 					{
 						ESP_LOGW(TAG,"No data in recv. Errno = %d",errno);
 						cnterror++;
-						if (errno != 11) vTaskDelay(50); //timeout 
-						else vTaskDelay(5);
+						if (errno != 11) vTaskDelay(20); //timeout 
+						else vTaskDelay(2);
 						if ((errno == 128)||(cnterror > 9 )) break;
 					}
-					vTaskDelay(3);
+					vTaskDelay(2);
 					// if a stop is asked
 					if(xSemaphoreTake(sDisconnect, 0))
 						{ clearHeaders(); break;	}

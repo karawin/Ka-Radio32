@@ -399,6 +399,23 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
 }
 
 
+static void unParse(char* str)
+{
+	int i ;
+	if (str == NULL) return;
+	for (i=0; i< strlen(str);i++)
+	{
+		if (str[i] == '\\')
+		{
+			str[i] = str[i+1];			
+			str[i+1]=0;
+			if (str[i+2] !=0)strcat(str, str+i+2);
+		}
+	}
+}
+
+
+
 static void start_wifi()
 {
     ESP_LOGI(TAG, "starting wifi");
@@ -481,11 +498,14 @@ static void start_wifi()
 			};
 			strcpy((char*)wifi_config.sta.ssid,ssid);
 			strcpy((char*)wifi_config.sta.password,pass);
+			unParse((char*)(wifi_config.sta.ssid));
+			unParse((char*)(wifi_config.sta.password));
 			if  (strlen(ssid)/*&&strlen(pass)*/)
 			{
 				esp_wifi_disconnect();
 				ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
-				ESP_LOGI(TAG, "connecting");
+//				ESP_LOGI(TAG, "connecting %s, %d, %s, %d",ssid,strlen((char*)(wifi_config.sta.ssid)),pass,strlen((char*)(wifi_config.sta.password)));
+				ESP_LOGI(TAG, "connecting %s",ssid);
 				ESP_ERROR_CHECK( esp_wifi_start() );
 //			esp_wifi_connect();			
 			} else
