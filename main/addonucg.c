@@ -942,6 +942,9 @@ void lcd_initUcg(uint8_t *lcd_type)
 	case LCD_SPI_ST7789V:
 		ucg_Init(&ucg, ucg_dev_st7789_18x240x320, ucg_ext_st7789_18, ucg_com_hal);
 		break;
+	case LCD_SPI_ST7789S:
+		ucg_Init(&ucg, ucg_dev_st7789_18x240x240, ucg_ext_st7789_24, ucg_com_hal);
+		break;
 	default: 
 		ESP_LOGE(TAG,"lcd invalid type: %d, Fall back to LCD_NONE",*lcd_type);
 		*lcd_type = LCD_NONE;

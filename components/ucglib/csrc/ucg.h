@@ -170,6 +170,7 @@ ucg_int_t ucg_dev_ssd1331_18x96x64_univision(ucg_t *ucg, ucg_int_t msg, void *da
 ucg_int_t ucg_dev_seps225_16x128x128_univision(ucg_t *ucg, ucg_int_t msg, void *data);
 
 ucg_int_t ucg_dev_st7789_18x240x320(ucg_t *ucg, ucg_int_t msg, void *data);
+ucg_int_t ucg_dev_st7789_18x240x240(ucg_t *ucg, ucg_int_t msg, void *data);
 
 
 /*================================================*/
@@ -202,6 +203,7 @@ ucg_int_t ucg_ext_ssd1331_18(ucg_t *ucg, ucg_int_t msg, void *data);
 ucg_int_t ucg_ext_seps225_16(ucg_t *ucg, ucg_int_t msg, void *data);
 
 ucg_int_t ucg_ext_st7789_18(ucg_t *ucg, ucg_int_t msg, void *data);
+ucg_int_t ucg_ext_st7789_24(ucg_t *ucg, ucg_int_t msg, void *data);
 
 /*================================================*/
 /* list of supported display controllers */
@@ -221,6 +223,7 @@ ucg_int_t ucg_dev_ic_ssd1331_18(ucg_t *ucg, ucg_int_t msg, void *data);   /* act
 ucg_int_t ucg_dev_ic_seps225_16(ucg_t *ucg, ucg_int_t msg, void *data);   /* this display could do 262k colors, but only 65k are supported via SPI */
 
 ucg_int_t ucg_dev_ic_st7789_18(ucg_t *ucg, ucg_int_t msg, void *data);
+ucg_int_t ucg_dev_ic_st7789_24(ucg_t *ucg, ucg_int_t msg, void *data);
 
 /*================================================*/
 /* struct declarations */

@@ -220,7 +220,7 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
         size_t bytes_left = buf_len;
         size_t bytes_written = 0;
         while(bytes_left > 0 && renderer_status != STOPPED) {
-			ESP_LOGE(TAG, "i2s_write  nb: %d",bytes_left);
+			ESP_LOGV(TAG, "i2s_write  nb: %d",bytes_left);
             res = i2s_write(renderer_instance->i2s_num, buf, bytes_left,& bytes_written, 0);
 			if (res != ESP_OK) {
 				ESP_LOGE(TAG, "i2s_write error %d",res);
