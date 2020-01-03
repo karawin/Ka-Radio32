@@ -1,282 +1,260 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<meta name="apple-mobile-web-app-capable" content="yes" >
-	<meta name="apple-mobile-web-app-status-bar-style" content="default" >
-	<link rel="apple-touch-icon" type="image/png" href="assets/logo.png" >
-	<link rel="icon" type="image/png" href="favicon.png" />
-	<link type="text/css" rel="stylesheet" title="base" href="https://bazooka07.github.io/Ka-Radio32/assets/style.css" />
-	<title>Karadio, the ultimate Wifi Webradio</title>
-</head><body>
-	<header class="no-print" id="header">
-		<div title="Click on the logo to change the theme">
-			<img id="logo" alt="Ka-Radio" src="logo.png" />
-		</div><div id="icy-meta" class="center no-print">
-			Ka-Radio
-		</div><div>
-			<a href="https://github.com/karawin/Ka-Radio32" target="_blank">
-				<span>KaraDio32</span><br />
-				<span id="version">...</span>
-			</a>
-			<span id="rssi" >&nbsp;</span>
-		</div>
-	</header>
-
-	<nav class="no-print" id="menu">
-		<form id="tabs" name="tabs">
-			<ul id="menu-list">
-				<li><label for="tab-radio">Radio</label></li>
-				<li><label for="tab-playlist">Playlist</label></li>
-				<li><label for="tab-shoutcast">Shoutcast</label></li>
-				<li><label for="tab-radiobrowser">Radio Browser</label></li>
-				<li><label for="tab-somafm">Soma FM</label></li>
-				<li><label for="tab-calmradio">Calm Radio</label></li>
-				<li><label for="tab-ferarock">Ferarock</label></li>
-				<li><label for="tab-settings">Settings</label></li>
-				<li><label for="tab-about">About</label></li>
-			</ul>
-		</form>
-	</nav>
-
-	<section id="main">
-		<input form="tabs" type="radio" name="tab" id="tab-radio" value="radio" />
-		<div class="no-print" id="radio">
-			<progress value="0" max="255" id="progressBar" class="active no-print"></progress>
-			<div>
-				<h2><span>Station</span><span><input type="checkbox" id="icy-auto" data-action="auto" data-param="id" value="1"><label for="icy-auto">Autoplay</label></span></h2>
-				<div>
-					<form name="icy">
-						<div>
-							<select id="icy-curst" title="Select a station for listening" data-action="play" data-param="id"></select>
-							<button id="stationsBtn" type="button" disabled>Stop</button>
-						</div>
-						<div>
-							<input type="range" id="icy-vol" min="0" max="254" title="Set the volume on Ka-Radio" data-action="soundvol" data-param="vol" />
-						</div>
-					</form>
-					<div id="icy">
-						<p>Name</p>
-						<p id="icy-name"></p>
-						<p>Description</p>
-						<p id="icy-descr"></p>
-						<p>Genre</p>
-						<p id="icy-genre"></p>
-						<p>Url</p>
-						<p><a id="icy-url1" href="" target="_blank"></a></p>
-						<p>Notice 1</p>
-						<p id="icy-not1"></p>
-						<p>Notice 2</p>
-						<p id="icy-not2"></a></p>
-						<p>Bitrate</p>
-						<p id="icy-bitr"></p>
+<!DOCTYPE HTML>
+<HTML>
+	<head>
+<!--		<meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1"> -->
+		<meta charset="UTF-8"> 
+		<meta name="viewport" content="width=device-width, minimum-scale=0.25"/>
+		<meta name="apple-mobile-web-app-capable" content="yes" >
+		<meta name="apple-mobile-web-app-status-bar-style" content="default" >
+		<link rel="apple-touch-icon" type="image/png" href="logo.png" >
+		<link rel="icon" type="image/png" href="favicon.png" />
+		<link rel="stylesheet" title="base" href="style.css" type="text/css"/>
+		<title>Karadio, the ultimate Wifi Webradio</title>
+	    <style type="text/css">
+		</style>
+	</head>
+	<body >
+	<script src="script.js"></script>
+	
+<!-- The Modal Edit window-->	
+	<div id="editStationDiv" class="modal">
+		<div class="modal-content">
+			<div id="MODALCONTENT" class="CONTENT" style ="top:10px;" >
+				<div class="tabs">
+					<h1>Edit station</h1> 
+					<div class="modal-body">							
+						<p>
+							<span class="bold">Slot number: </span><input type="text" id="add_slot" disabled="true" name="slot"><br>
+							<span class="bold">Name: </span><input type="text" style="width:350px;" id="add_name" name="name"><br>
+							<span class=bold>Full URL: </span><input type=text style="width:350px;" id=add_URL name=URL onkeyup="parseEditURL()" onmouseup="parseEditURL()">
+							<br>or<br>
+							<span class="bold">Url: </span><input type="text" id="add_url" name="url" onkeyup="buildAddURL()"><br>
+							<span class="bold">Port: </span><input type="text" id="add_port" name="port" value="80" onkeyup="buildAddURL()"><br>
+							<span class="bold">Path: </span><input type="text" id="add_path" name="path" value="/" onkeyup="buildAddURL()"><br>
+							<span class="bold">Volume offset: </span><input type="range" id="ovol" name="ovol" step=2  min=-126 max=126 ><br><br>
+							<input type="button"  onClick="saveStation()" value="save">&nbsp;
+							<input type="button"  onClick="eraseStation()" value="erase">&nbsp;
+							<input type="button"  onClick="abortStation()" value="abort">
+						</p>							
 					</div>
 				</div>
+			</div>
+		</div>	
+	</div>	
 
-				<h2><span>Monitoring</span><button type="button" id="instantPlaySaveBtn" disabled>Save</button></h2>
-				<div id="monitor">
-					<figure>
-						<figcaption id="monitor-url">&nbsp;</figcaption>
-						<audio id="monitor-audio" controls>
-							<p>Your browser doesn't support audio tag with HTML 5</p>
-						</audio>
-					</figure>
-				</div>
-
-				<h2><span>Sleep / Awake</span><span id="localTime"></span></h2>
-				<div id="sleep-wake">
+	
+	<div id="MAIN">	
+		<div id="HEADER"  onclick="wtop()"> 
+			<div class="LEFT"><img title="Click on the logo to change the theme" onClick= "theme()" src="logo.png"></div>
+			<div class="RIGHT">
+			<a href="https://github.com/karawin/Ka-Radio32" target="_blank">KaraDio32</a><br/>
+			<a href="https://github.com/karawin/Ka-Radio32" target="_blank">V1.9 R5</a><br/>
+			<div id="rssi" >0 dBm</div><br/>
+<!--			<a href="https://github.com/PiotrSperka/ESP8266-WebRadio" style="font-size:8px" target="_blank">From PiotrSperka</a> -->
+			</div>
+			<div id="HEAD">
+			<span class="bold4"><span id="meta">Karadio32</span></span>
+			</div>	
+</div>	
+			
+		<div id="MAINCONTENT" class="CONTENT" >
+				<ul class="tabs">
+				<li>
+				<input type="radio" name="tabs" id="tab1" checked />
+				<label for="tab1">Radio</label>
+				<div id="tab-content1" class="tab-content">
+				<h1>Stations control &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox"  id="aplay"  onClick="autoplay()"/> AutoPlay</h1>
 					<p>
-						<button type="button" id="sleepBtn">Sleep</button>
-						<input type="time" id="sleep-time" />
-						<span id="sleep-laptime"></span>
-					</p>
-					<p>
-						<button type="button" id="wakeBtn">Awake</button>
-						<input type="time" id="wake-time" />
-						<span id="wake-laptime"></span>
-					</p>
-				</div>
+					<select id="stationsSelect" onchange="Select()" >
+					</select></p>
+					<span id="np"><p>	
+					<!-- Rewind icon by Icons8 -->
+<img class="icon icons8" width="50" height="50"  title="Previous station" onClick="prevStation()" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAC7klEQVRoge2YzU8TQRiH98DBA0dOnvgDPHjwwLF32Z3dkhLUBMHgRxRJiIp0ZrdZaq0WhEgwAY2GqFFJ/ULamdkKsZJgICgaBEPUKBpj5EMpoRShulkPWFIqpa1JWSXz3H/J+yTzzvvOcByDwWAwGAwGg2E2NtWbu5G5rMAjUiBAPJ5xDuIKAWFfNmrKCKHmwVYB+p2iTMMCxEbaOYR3AETbBYgNSab92awxJTuhfxtAZFSStejBliEjXRHeTkSASKjY2bNU3thvrghv9x8HkET3uHvDrs4pQ+74mFLEpnpzrQ6tQ4DYONAyFPHgGaOybcQcEbGW5kuKNggg+Vl9eUxvoLNGA51NKVJY67OIsjZR5Hi4gG59MGI5U0R4iMsAIpESVzBcd/fLSjHriVjU4BZJoc0AYn1f00D4jO/rqtyGivCqL09yBAhAWK9se7lUT0KrikkmIkK83aoE3kiKtnjy+rs/MhsqwttxoSiTULGzZ97h/bRmMYkiFjWYI0B8AkCsl9b3zbk6p5Lmsi5iU725VkW7GmvMs/5vSYuJFxFrab7kCLwQEY1WXxlbN5N1ER6RglhjwpvjKYuJFwGILO46/TjsvDeRVi4rIhY1mCPJtAlArJed659PbMx0RI62jfxYq4dMEylvHPgrkapLo+aLxIg/WvF3fiZH69T9SfNFOG5lCl8TIDYOtTxf8OCZzJpdptFj7a/NF4kRu35tdd0R9c7ntK9fEWk1AGK91NMXdndNmy/CccsD0erQNICwXnVx7WZOOhAd2ltJ0RbtN96bL7IiBHEZkElkt7t3LrEH1l1RHNoFALG+v/npfOI8MntpfCai1T2Q1tKo0MkitXshfkMwTSSGgEgNQDS6t+HJnLtrOv01XgncBgjrh1uHv9eTkPkiHLf8sBIRfWVVAtEjrcMZPaxERGdLXI+WKs4Pmi/Ccb8XREQ8AGI9k6cur/ryRES1f+KpG89///kQz6b4DmIwGAwGg8FgbA5+ASg5cXSpDjcMAAAAAElFTkSuQmCC">
+					<!-- Play icon by Icons8 -->
+<img class="icon icons8" width="50" height="50" title="Play station" onClick="playStation()" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAACBElEQVRoge3XPWsUQRgH8C0sLFP6AfwAfoAUqcXszG5QCw8sIljkCkGFZGd33RwJFz3FgC9JIWgTTRGMx2VeLkQOtVhOsDgF30AlRUCOaC6bEI/T87EICxGieTFhGHx+8PT/P+zOPGNZCCGEEEII7TcaTXfozrAnCBOKMFEwvpDjy9j2OBBfLNn9pWxXVDmgO9OuOL6M+8ZqkB2vtSiTLRqo+e4Bfkx3rh1zfBlnx19BQTZguFiHM6PPVwnjbScsx9TjR3Tn27aNRdKJphYgM/I0IR5vu4GaOHqRH9Kdc0ubFUnHu/8JTuQerxAmmoSJsCuqHNSd94/+VqQgG3BFLMH5u+/ADcvfqC8XbW8mozvzprYqks7IzBfou11rEiZ+OKF6081Knbqz/2a7RdIZelSH3uvVxPY4uKFSdn/xsO4OlmXtvMjGA+FU/klCmGw5obqp/ULdbZF0BiY+wvHBuVXqy0TrhbonRXIGF4mmFiCTf7ZsM/HdDcq3jPu0hot16B2trhDG2z3hrHk/+2X+FbJj6/uYE6i3Rh6/F+69h55wdo36yswL0Z+ch5NDlYQw0SSBGDRuRck9/Aynr8bLxONt91L5gXFLY760CGdvvFhbX+NV1cA1/iWcu/ManEC1KBMfjH1YEU/8pEw2jH7qEiYUZfKa9gvtXxlfACGEEEII/T9+AR8nzQFJqsL+AAAAAElFTkSuQmCC">
+					<!-- Stop icon by Icons8 -->
+<img class="icon icons8" width="50" height="50" title="Stop station" onClick="stopStation()" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAAiklEQVRoge3YsQmAMBBAUUfISA4gwXFEUqR3kXQWEpwnG7hB7MRAIhZeivgfXHlwv72uAwAAACQN09bnZrSrKu2MdlWlvYqnp/TsY26ejhqmrS/tVTw9pWcfjQtx2Y9r3obcd4wLhHyCEEKEEEKIEEIIEUIIIUIIIUQIIYQIaeb50Mw7CAAAAP9wAgwPdP6eVGKaAAAAAElFTkSuQmCC">		
+					<!-- Fast Forward icon by Icons8 -->
+<img class="icon icons8" width="50" height="50" title="Next station" onClick="nextStation()" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAADAElEQVRoge2Yy0tUURjAZ9GyZato0bJlixYtWvQHNPc1ZoWCRZKIRUZlzrnnjpNOvm6CpGIRlUGCRaE5c+65V0WRwKHMRCyLDMGih++L48jM5Pi1yIHIbO4VxzE7PzjLD74f936PcxwOBoPBYDAYDAZjIznqfbRzM+NSBicTvxORk7bjkDbqlLWDKUhpfYiYBjlEgJfpPU4mB6zGcYiAgGmIQ4FSrujp7lTmaAkR0+CpmiBklnZFeazNOd3kiJU4DhHIqxsAEesxHtPXTrd/X6pz/SsipsGzN4ehisxCXv2rMIcISIrRnKwGOEQAt4yDr20SsiufzfNIizndgcLNynsVCRGVmqBSE3DLOLi8HWEB69+csv/QWnEJkUTchbvvlgWZxiSP0S8VaXs208HhcKwWUakJFf5pOF37PMQjEpcUve6wt2dHMhGVmnD1yVc44esJ8VgLcyiQnXaRxCl+MAaiokckjz4qILI/mYhKTajW5uDcreEYL5O45NF1p9e/K+0iKjWhvH0KctS+eV6mMRHrVxJfZy2RxPE+/gyZpV0LAtanrTaQlIokzqWm9yBgGpU8+oBQTPcmE1GpCVVkFvLrBxd5mcRdHqMppUPUqohKTShrnYCs8t4QL2sRKyK/NZBFUdG/pGyI2hFJnMI7I8t2RFRqQmVgBnJr+xd4ROKuEr3mTw0kDSJv/20RX9skZFXY/7WUhx8hw9u5NX6ty/dHQVRoVCoxLBd7tTYH+Q2DEV4mcZe3I73FXt4+BTnX+0KcrH0XMHXbab/HyrpDokJn0t5+3c1j4PJ0LIqK/sHOQDx/e2SJR9qSq8Qw0joQKwMzcObGwAKPSFwqMRqsrihlrROQVdE7vyVWFM+jT5Dh7QyLij5hZ2lcGZgxl8d4mdalsVqbg4LGocjPHclosbrG/7rCCFi/uFl5r0LENJhb+wKO+7qjgkxNOxergsYhkBQjJsj0zZa4WK1cdQN2CpNDBHhE4rysXdvw4bYets3jw7Z5DmIwGAwGg8Fg/J/8ALvQciqFBZLiAAAAAElFTkSuQmCC">
+<br/>
+<!--					
+					<input type="button" value="Previous"  onClick="prevStation()"> &nbsp;
+					<input type="button" value="Next"  onClick="nextStation()">
+					<input type="button" value="Play"  onClick="playStation()"> &nbsp;
+					<input type="button" value="Stop"  onClick="stopStation()">
+-->					
+					</p></span><p>
+					
 
-				<h2><span>Instant play</span><span>&nbsp;</span></h2>
-				<div>
-					<form id="instant-play-form" name="instantPlayForm">
-						<label for="full-url">Full URL</label>
-						<input type="url" id="full-url" name="fullUrl">
-						<input type="submit" name="instantPlayBtn" value="play" />
-					</form>
-				</div>
-			</div>
-		</div>
-
-		<input form="tabs" type="radio" name="tab" id="tab-playlist" value="playlist" />
-		<div id="playlist">
-			<nav class="no-print">
-				<a id="download-link" href="#" download="ka-radio.m3u">Download</a>
-				<ul>
-					<li><button type="button" id="reloadPlaylistBtn" onclick="loadStationsList();">Refresh</button></li>
-					<li><button type="button" id="savePlaylistBtn" title="As .mp3 format" onclick="savePlaylistAsM3u();">Save</button></li>
-					<li><button type="button" id="clearAllPlaylistBtn" onclick="clearPlaylist();">Clear All</button></li>
-					<li><button type="button" id="printPlaylistBtn" onclick="print(); return true;">Print</button></li>
-					<li><input type="file" id="loadPlaylist" placeholder="load a playlist" accept=".m3u, .pls, .txt" /><button type="button" onclick="loadPlaylist();">Load</button></li>
-				</ul>
-				<p class="center"><em>Drag & Drop each row for sorting</em></p>
-			</nav>
-			<div class="scroll-table">
-				<table>
-					<thead>
-						<tr>
-							<th>#</th>
-							<th title="Click on the name of the station for listening">Name<em class="no-print"> ( Click for playing )</em></th>
-							<th title="Click on the URL of the station for editing">Url<em class="no-print"> ( Click for editing )</em></th>
-							<th>Vol.</th>
-						</tr>
-					</thead>
-					<tbody id="stationsList">
-					</tbody>
-				</table>
-			</div>
-			<p class="center no-print"><button type="button" id="newStationBtn">New station</button></p>
-		</div>
-
-		<input form="tabs" type="radio" name="tab" id="tab-shoutcast" value="shoutcast" data-unload="1" />
-		<div class="no-print" id="shoutcast"></div>
-
-		<input form="tabs" type="radio" name="tab" id="tab-radiobrowser" value="radiobrowser" data-unload="1" />
-		<div class="no-print" id="radiobrowser"></div>
-
-		<input form="tabs" type="radio" name="tab" id="tab-somafm" value="somafm" data-unload="1" />
-		<div class="no-print" id="somafm"></div>
-
-		<input form="tabs" type="radio" name="tab" id="tab-calmradio" value="calmradio" data-unload="1" />
-		<div class="no-print" id="calmradio"></div>
-
-		<input form="tabs" type="radio" name="tab" id="tab-ferarock" value="ferarock" data-unload="1" />
-		<div class="no-print" id="ferarock"></div>
-
-		<input form="tabs" type="radio" name="tab" id="tab-settings" value="settings" />
-		<div class="no-print" id="settings">
-			<h2>Output audio & reboot</h2>
-			<form name="hardware">
-				<input type="radio" id="i2s" name="output" value="0" /><label for="i2s">I2S</label>
-				<input type="radio" id="merus" name="output" value="1" /><label for="merus">MERUS</label>
-				<input type="radio" id="dac" name="output" value="2" /><label for="dac">DAC</label>
-				<input type="radio" id="pdm" name="output" value="3" /><label for="pdm">PDM</label>
-				<input type="radio" id="vs1053" name="output" value="4" /><label for="vs1053">VS1053</label>
-				<fieldset class="vs1053">
-					<div>
-						<span>Treble control</span>
-						<input type="range" id="icy-treb" name="treble" />
-						<span id="treble_span">0 dB</span>
-						<span>Treble frequency</span>
-						<input type="range" id="icy-tfreq" name="treblefreq" />
-						<span id="treble_span">0 dB</span>
-						<span>Bass enhance</span>
-						<input type="range" id="icy-bass" name="bass" />
-						<span id="treble_span">0 dB</span>
-						<span>Bass frequency</span>
-						<input type="range" id="icy-bfreq" name="bassfreq" />
-						<span id="treble_span">0 dB</span>
-						<span>Spacialization</span>
-						<input type="range" id="icy-spac" name="spacial" />
-						<span id="spacial_span">Off</span>
-					</div>
-				</fieldset>
-				<div class="center">
-					<input type="submit" />
-				</div>
-			</form>
-			<h2>Wifi & Network</h2>
-			<form name="wifi">
-				<div class="row">
-					 <span>Mac Address</span>
-					 <span id="mac">xx:xx:xx:xx:xx:xx</span>
-				</div>
-				<div class="wifi">
-					 <fieldset>
-						<div>
-							<span>AP SSID</span>
-							<input name="ssid" />
-							<input name="ssid2" />
-							<span>AP Password</span>
-							<input type="password" name="pasw" />
-							<input type="password" name="pasw2" />
-							<span>DHCP client</span>
-							<input type="checkbox" name="dhcp" />
-							<input type="checkbox" name="dhcp2" />
-							<span>IP addr.</span>
-							<input name="ip" />
-							<input name="ip2" />
-							<span>Net mask</span>
-							<input name="msk" />
-							<input name="msk2" />
-							<span>Gateway</span>
-							<input name="gw" />
-							<input name="gw2" />
-						</div>
-					 </fieldset>
-				</div>
-				<div>
-					 <fieldset>
-						<div>
-							<span>User Agent</span>
-							<input name="ua" />
-							<span>Hostname</span>
-							<input name="host" />
-							<span>Time zone</span>
-							<input name="tzo" />
-						</div>
-					 </fieldset>
-				</div>
-				 <div class="center">
-					<input type="submit" />
-				 </div>
-			</form>
-		</div>
-
-		<input form="tabs" type="radio" name="tab" id="tab-about" value="about" />
-		<div class="no-print" id="about">
-			<div>
-				<iframe src="http://karadio.karawin.fr/version32.php" width="100%">Your browser doesn't support the iframe tag</iframe>
-				<iframe src="http://karadio.karawin.fr/infos.php" width="100%">Your browser doesn't support the iframe tag</iframe>
-			</div>
-		</div>
-	</section>
-
-	<footer>
-	</footer>
-
-	<aside id="aside" class="modal no-print">
-		<div>
-			<h2 class="center">Edit Station</h2>
-			<form id="editStationForm">
-				<div>
-					<span>#</span><input type="text" name="idStation" value="" readonly />
-				</div>
-				<div>
-					<label for="nameStation">Name</label>
-					<input type="text" id="nameStation" name="nameStation" required />
-					<label for="urlStation">Full url</label>
-					<input type="url" id="urlStation" name="urlStation" required />
-					<label for="volStation">Volume</label>
-					<input type="range" id="volStation" min="0" max="100" />
-				</div>
-				<p class="center">
-					<input type="button" class="button" value="Abort" id="abortEditStationBtn" />
-					<input type="button" class="button" value="Erase" id="eraseStationBtn" >
-					<input type="submit" class="button" />
+                     <span class="bold2">Volume: </span>
+					 &nbsp;&nbsp;<span id="vol1_span"></span><br/>
+					<input type="range" id="vol1_range" name="vol1"  onChange="onRangeVolChange(this.value,true)"  min=0 max=254 style="height:25px;">
+					</p>				
+				 <h1>Station No <span id="curst"></span>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" checked  id="Full"  onclick="full()"/> Full</h1>				  
+					<p><span class="bold1" >Name: </span><span id="name"></span>&nbsp;&nbsp;<img id="icon" src=""  height="16px" width="16px"> </p>
+					<p><span id="ldescr"> <span class="bold1">Description: </span><span id="descr"></span></span></p>
+					<p><span id="lnot1"><span class="bold1">Notice: </span><span id="not1"></span> <span id="not2"></span></span></p>
+					<p><span id="lgenre"><span class="bold1">Genre: </span><span id="genre"></span></span></p>
+					<p><span id="lurl"><span class="bold1">URL: </span><a  target="_blank" id="url2"> <span id="url1"></span></a></span></p>
+					<p><span id="lbitr"><span class="bold1">Bitrate: </span><span id="bitr"></span></span></p>
+							
+				 <h1>Monitoring</h1>	
+				 <p>
+				 <!-- Play icon by Icons8 -->
+<img class="icon icons8" width="40" height="40" title="Play monitoring" onClick="mplay()" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAACBElEQVRoge3XPWsUQRgH8C0sLFP6AfwAfoAUqcXszG5QCw8sIljkCkGFZGd33RwJFz3FgC9JIWgTTRGMx2VeLkQOtVhOsDgF30AlRUCOaC6bEI/T87EICxGieTFhGHx+8PT/P+zOPGNZCCGEEEII7TcaTXfozrAnCBOKMFEwvpDjy9j2OBBfLNn9pWxXVDmgO9OuOL6M+8ZqkB2vtSiTLRqo+e4Bfkx3rh1zfBlnx19BQTZguFiHM6PPVwnjbScsx9TjR3Tn27aNRdKJphYgM/I0IR5vu4GaOHqRH9Kdc0ubFUnHu/8JTuQerxAmmoSJsCuqHNSd94/+VqQgG3BFLMH5u+/ADcvfqC8XbW8mozvzprYqks7IzBfou11rEiZ+OKF6081Knbqz/2a7RdIZelSH3uvVxPY4uKFSdn/xsO4OlmXtvMjGA+FU/klCmGw5obqp/ULdbZF0BiY+wvHBuVXqy0TrhbonRXIGF4mmFiCTf7ZsM/HdDcq3jPu0hot16B2trhDG2z3hrHk/+2X+FbJj6/uYE6i3Rh6/F+69h55wdo36yswL0Z+ch5NDlYQw0SSBGDRuRck9/Aynr8bLxONt91L5gXFLY760CGdvvFhbX+NV1cA1/iWcu/ManEC1KBMfjH1YEU/8pEw2jH7qEiYUZfKa9gvtXxlfACGEEEII/T9+AR8nzQFJqsL+AAAAAElFTkSuQmCC">&nbsp;
+					<!-- Stop icon by Icons8 -->
+<img class="icon icons8" width="40" height="40" title="Stop monitoring" onClick="mstop()" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAAiklEQVRoge3YsQmAMBBAUUfISA4gwXFEUqR3kXQWEpwnG7hB7MRAIhZeivgfXHlwv72uAwAAACQN09bnZrSrKu2MdlWlvYqnp/TsY26ejhqmrS/tVTw9pWcfjQtx2Y9r3obcd4wLhHyCEEKEEEKIEEIIEUIIIUIIIUQIIYQIaeb50Mw7CAAAAP9wAgwPdP6eVGKaAAAAAElFTkSuQmCC"> 		
+<!--
+					<input type="button" value="Play"  onClick="mplay()"> &nbsp;
+					<input type="button" value="Stop"  onClick="mstop()"></p>
+-->					
 				</p>
-			</form>
-		</div>
-	</aside>
-	<script type="text/javascript">
-		(function() {
-			'use strict';
-			const myScript = document.createElement('SCRIPT');
-			myScript.type = 'text/javascript';
-			myScript.src = document.styleSheets[0].href.replace(/\bstyle\.css/, 'script.js');
-			document.head.appendChild(myScript);
-		})();
-	</script>
-</body></html>
+				<p>
+					<span class="bold2">Volume</span><br/>					
+					<input type="range" id="volm_range" name="volm"  onChange="mvol(this.value/100)" min=0 max=100 style="height:25px;" >
+				</p></br>
+				<audio  volume="1"  id="audio" src=""  class="audio_sound" onerror="monerror()">
+						I'm sorry; your browser doesn't support HTML5 <code>audio</code>.
+				</audio>
+				 
+				<h1>Sleep / Wake&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="time">time</span></h1>
+				<p id="sw">
+					<span class="bold1" title="Time mode: HH:MM, or Delay mode (minutes): MM"> Sleep(i) : </span><input type="text" id="sleepdelay" onkeyup="sleepup(event)"> 
+					&nbsp;<input type="button" value="Start"  onClick="startSleep()"><input type="button" value="Stop"  onClick="stopSleep()">
+					&nbsp;&nbsp;  In: <span id="sminutes">0</span> Sec.
+				</p>
+				<p id="sw">
+					<span class="bold1" title="Time mode: HH:MM, or Delay mode (minutes): MM"> Wake(i) : </span><input type="text" id="wakedelay" onkeyup="wakeup(event)">
+					&nbsp;<input type="button" value="Start"  onClick="startWake()"><input type="button" value="Stop"  onClick="stopWake()">
+					 &nbsp;&nbsp; In: <span id="wminutes">0</span> Sec. 
+				</p>
+				<h1>Instant play &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button"   onClick="editInstantStation()" value="Add & Edit"></h1>
+					<p>
+					<span class=bold1>Full URL: </span>
+					<input type=text style="width:350px;" id=instant_URL name=URL onkeyup="parseURL()" onmouseup="parseEditURL()"><br/>
+					or<br/> 
+					<span class="bold1">Url: </span><input type="text" id="instant_url" name="url" onkeyup="buildURL()"><br>
+					<span class="bold1">Port: </span><input type="text" id="instant_port" name="port" value="80" onkeyup="buildURL()"><br>
+					<span class="bold1">Path: </span><input type="text" id="instant_path" name="path" value="/" onkeyup="buildURL()">
+
+					<br><br>
+					
+					<!-- Play icon by Icons8 -->
+<img class="icon icons8" width="40" height="40" title="Play instant station" onClick="instantPlay()" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAACBElEQVRoge3XPWsUQRgH8C0sLFP6AfwAfoAUqcXszG5QCw8sIljkCkGFZGd33RwJFz3FgC9JIWgTTRGMx2VeLkQOtVhOsDgF30AlRUCOaC6bEI/T87EICxGieTFhGHx+8PT/P+zOPGNZCCGEEEII7TcaTXfozrAnCBOKMFEwvpDjy9j2OBBfLNn9pWxXVDmgO9OuOL6M+8ZqkB2vtSiTLRqo+e4Bfkx3rh1zfBlnx19BQTZguFiHM6PPVwnjbScsx9TjR3Tn27aNRdKJphYgM/I0IR5vu4GaOHqRH9Kdc0ubFUnHu/8JTuQerxAmmoSJsCuqHNSd94/+VqQgG3BFLMH5u+/ADcvfqC8XbW8mozvzprYqks7IzBfou11rEiZ+OKF6081Knbqz/2a7RdIZelSH3uvVxPY4uKFSdn/xsO4OlmXtvMjGA+FU/klCmGw5obqp/ULdbZF0BiY+wvHBuVXqy0TrhbonRXIGF4mmFiCTf7ZsM/HdDcq3jPu0hot16B2trhDG2z3hrHk/+2X+FbJj6/uYE6i3Rh6/F+69h55wdo36yswL0Z+ch5NDlYQw0SSBGDRuRck9/Aynr8bLxONt91L5gXFLY760CGdvvFhbX+NV1cA1/iWcu/ManEC1KBMfjH1YEU/8pEw2jH7qEiYUZfKa9gvtXxlfACGEEEII/T9+AR8nzQFJqsL+AAAAAElFTkSuQmCC">&nbsp;
+					<!-- Stop icon by Icons8 -->
+<img class="icon icons8" width="40" height="40" title="Stop instant station" onClick="stopStation()" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAAiklEQVRoge3YsQmAMBBAUUfISA4gwXFEUqR3kXQWEpwnG7hB7MRAIhZeivgfXHlwv72uAwAAACQN09bnZrSrKu2MdlWlvYqnp/TsY26ejhqmrS/tVTw9pWcfjQtx2Y9r3obcd4wLhHyCEEKEEEKIEEIIEUIIIUIIIUQIIYQIaeb50Mw7CAAAAP9wAgwPdP6eVGKaAAAAAElFTkSuQmCC">						
+<!--					
+					<input type="button" value="Play"   onClick="instantPlay()">&nbsp;
+					<input type="button" value="Stop"  onClick="stopStation()">
+-->					
+					</p>					
+				</div>
+				</li>
+				<li>
+					<input type="radio" name="tabs" id="tab2" />
+					<label for="tab2">EDIT</label>
+					<div id="tab-content2" class="tab-content">
+						<!--<h1>Manage stations</h1>-->
+						<h1>
+						<input type="button" id="refresh" title="This will reload the stations from the WebRadio" onClick="refreshList()"  value="Refresh locale list(i)">
+						<input type="button" id="stsave" disabled="true" style="margin:0px auto" title="This will save all stations to the WebRadio" onClick="stChanged()"  value="Save the list(i)">
+						<input type="button" style="margin:0px auto" id="clear" title="Warning: This will erase all stations.\n Be sure to save them before." onClick="clearList()"  value="Erase all(i)">				
+						<input type="button" style="margin:0px auto" id="clear" title="Print the list" onClick="printList()"  value="Print all(i)"><br/>
+						</h1>			
+
+						<span >You can Drag/Drop each line to sort the list</span><br/>
+						<table id = "stationsTable" style="table-layout: fixed; width: 100%;">
+<!--							<thead><tr><td style="width:8%">No.</td><td style="width:30%; ">Name</td><td style="width:20%">URL</td><td style="width:20%">File</td><td style="width:8%">Port</td><td style="width:4%">Vol</td><td style="width:9%"></td></tr></thead> -->
+							<thead><tr><td style="width:5%;text-align: center; vertical-align: middle;">No.</td><td style="width:38%; ">Name<td style="width:45%; ">URL</td></td><td style="width:3%;text-align: center; vertical-align: middle;">Vol</td><td style="width:9%;text-align: center; vertical-align: middle;">Edit</td></tr></thead>
+							<tbody>  							
+							</tbody>
+						</table>
+		
+					</div>
+				</li>
+				<li>
+					<input type="radio" name="tabs" id="tab3" />
+					<label for="tab3">Setting</label>
+					<div id="tab-content3" class="tab-content">
+					<h1>Sound Setting </h1>
+						<p><span class="bold">Output: </span>
+						<span class="coutput">
+						<input type="radio" name="output" id="output0"   /><label for="output0">I2S</label>
+						<input type="radio" name="output" id="output1"   /><label for="output1">MERUS</label>
+						<input type="radio" name="output" id="output2"   /><label for="output2">DAC</label>
+						<input type="radio" name="output" id="output3"   /><label for="output3">PDM</label>
+						<input type="radio" name="output" id="output4" 	 /><label for="output4">VS1053</label>
+						<br/><span class="bold"> </span><input type="button" value="Validate" onclick="validOutput()" />
+						</span><br>
+						<span id="vs1052Only">
+						<span class="bold">Treble control: </span><input type="range" id="treble_range" name="treble"  onChange="onRangeChange('treble_range', 'treble_span', 1.5, false)" min=-8 max=7 > <span id="treble_span"></span><br>
+						<span class="bold">Treble frequency: </span><input type="range" id="treblefreq_range" name="treblefreq"  onChange="onRangeChangeFreqTreble('treblefreq_range', 'treblefreq_span', 1, false)" min=1 max=15 > <span id="treblefreq_span"></span><br>
+						<span class="bold">  Bass enhance: </span><input type="range"  id="bass_range" name="bass"  onChange="onRangeChange('bass_range', 'bass_span', 1, false)" min=0 max=15 > <span id="bass_span"></span><br>
+						<span class="bold">  Bass frequency: </span><input type="range"  id="bassfreq_range" name="bassfreq"  onChange="onRangeChangeFreqBass('bassfreq_range', 'bassfreq_span', 10, false)" min=2 max=15 > <span id="bassfreq_span"></span><br>
+						<span class="bold">  Spacialization: </span><input type="range"  id="spacial_range" name="spacial"  onChange="onRangeChangeSpatial('spacial_range', 'spacial_span')" min=0 max=3 > <span id="spacial_span"></span><br/>
+						<span class="bold"> </span><input type="button" value="Reset" onClick="resetEQ()"/><br/>			</span><br/>
+						<span class="bold">Volume: </span><input type="range" id="vol_range" name="vol"  onChange="onRangeVolChange(this.value,true)" value=100 min=0 max=254 > <span id="vol_span"></span><br>
+						</p>
+						<h1>Stations Save & Restore</h1>
+						<p>
+						<input type="button"  onClick="saveTextAsFile()" value="Save Stations from WebRadio"> 
+						<span style="display:inline-block;">To &nbsp;&nbsp;&nbsp;
+						<input type="text" style="width:300px;color:black;" value="WebStations.txt" id="filesave"></span>
+<!--						<a HREF="" download="WebStations.txt" id="downloadlink" style="display: none;">Download it</a>
+ -->
+						<br/><br/>
+						<input type="button"   onClick="downloadStations()" value="Restore Stations to WebRadio"> <span style="display:inline-block;">From 
+						<input type="file" style="width:300px;color:black;" id="fileload"></span><br/>
+<!--						<input type="button" id="refresh" title="This will reload the stations from the WebRadio" onClick="refreshList()"  value="Refresh locale list">
+						<input type="button" style="float:right;" id="clear" title="Warning: This will clear all stations.\n Be sure to save them before." onClick="clearList()"  value="Clear all stations"><br/>				
+						<br/>-->
+						</p>
+					<h1>Wifi & Network &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="Validate" onclick="valid()" /></h1>
+						<p>
+						<span class="bold">AP SSID:</span>
+						<input  id="ssid" type="text" /> <input  id="ssid2" type="text" />
+						<br/>
+						<span class="bold"> AP PASSWORD:</span>
+						<input id="passwd" type="password"  /> <input id="passwd2" type="password"  />
+						</p>
+						<p>
+						<span class="bold"> Mac Address:</span><span id="Mac"></span><br/>
+						<span class="bold"> Use DHCP:</span>
+						1:<input id="dhcp" type=checkbox onclick="clickdhcp()" />
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						2:<input id="dhcp2" type=checkbox onclick="clickdhcp()" /><br/>
+						<span class="bold">Ip:</span>
+						<input  id="ip" type="text" oninput="chkip(this)" /><input  id="ip2" type="text" oninput="chkip(this)" />
+						<br/>
+						<span class="bold">Mask:</span>
+						<input id="mask" type="text" oninput="chkip(this)" value="255.255.255.0" /><input id="mask2" type="text" oninput="chkip(this)" value="255.255.255.0" /><br/>
+						<span class="bold">Gateway:</span>
+						<input id="gw" type="text" oninput="chkip(this)" /><input id="gw2" type="text" oninput="chkip(this)" />
+							</p>						
+					<h1>Other options &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="Validate" onclick="wifi(0)" /></h1>
+						<p>						
+						<span class="bold">User Agent:</span>
+						<input id="ua" type="text" value="" />	<br/>					
+						<span class="bold">mDNS Hostname:</span>
+						<input id="host" type="text" value="" />
+						<span class="bold">.local</span><br/>
+						<span class="bold">Time Zone Offset:</span>
+						<input id="tzo" type="text" value="" />						
+						</p>
+					<h1>Update to: <span id="newrelease"></span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type=button value="Update now" onclick="upgrade()" />  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="updatefb"></span><br/>	</h1>
+						<p>
+						<span class="bold4" id="Version"></span><br/>
+						<span class="bold4">To update or reload the current release:</span><br/><br/>		
+						<input type=button value="Update now" onclick="upgrade()" /><br/>	
+						<span class="bold4" id="Infos"></span><br/>
+						</p>
+					<h1>History:</h1><BR/>
+						<input type=button value="Read the history" onclick="checkhistory()" /><br/>
+						<span class="bold4" id="History"></span><br/>
+					</div>
+				</li>
+				</ul>
+			</div>
+		</div>	
+	</body>
+</HTML>

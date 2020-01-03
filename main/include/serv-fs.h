@@ -16,19 +16,27 @@ struct servFile
 #define ICACHE_STORE_ATTR __attribute__((aligned(4)))
 #define ICACHE_RAM_ATTR __attribute__((section(".iram0.text")))
 
-#include "../../webpage/index"
-#include "../../webpage/style"
-#include "../../webpage/style1"
-#include "../../webpage/script"
-#include "../../webpage/logo"
-#include "../../webpage/favicon"
+#include "../../webpage/tmp_index"
+#include "../../webpage/tmp_genuine"
+#include "../../webpage/tmp_style"
+#include "../../webpage/tmp_style1"
+#include "../../webpage/tmp_script"
+#include "../../webpage/tmp_logo"
+#include "../../webpage/tmp_favicon"
 
+const struct servFile genuineFile = {
+	"/genuine",
+	"text/html",
+	sizeof(genuine_html),
+	(const char*)genuine_html,
+	(struct servFile*)NULL
+};
 const struct servFile faviconFile = {
 	"/favicon.png",
 	"image/png",
 	sizeof(favicon_png),
 	(const char*)favicon_png,
-	(struct servFile*)NULL
+	(struct servFile*)&genuineFile
 };
 const struct servFile logoFile = {
 	"/logo.png",

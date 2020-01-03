@@ -50,5 +50,7 @@ Temporary Items
 /build
 sdkconfig.old
 
-# others
+# others from bazooka07
 *~
+webpage/tmp_*
+webpage/workdir*

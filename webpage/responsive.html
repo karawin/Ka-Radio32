@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="apple-mobile-web-app-capable" content="yes" >
+	<meta name="apple-mobile-web-app-status-bar-style" content="default" >
+	<link rel="apple-touch-icon" type="image/png" href="assets/logo.png" >
+	<link rel="icon" type="image/png" href="favicon.png" />
+	<link type="text/css" rel="stylesheet" title="base" href="https://bazooka07.github.io/Ka-Radio32/assets/style.css" />
+	<title>Karadio, the ultimate Wifi Webradio</title>
+</head><body>
+	<header class="no-print" id="header">
+		<div title="Click on the logo to change the theme">
+			<img id="logo" alt="Ka-Radio" src="logo.png" />
+		</div><div id="icy-meta" class="center no-print">
+			Ka-Radio
+		</div><div>
+			<a href="https://github.com/karawin/Ka-Radio32" target="_blank">
+				<span>KaraDio32</span><br />
+				<span id="version">...</span>
+			</a>
+			<span id="rssi" >&nbsp;</span>
+		</div>
+	</header>
+
+	<nav class="no-print" id="menu">
+		<form id="tabs" name="tabs">
+			<ul id="menu-list">
+				<li><label for="tab-radio">Radio</label></li>
+				<li><label for="tab-playlist">Playlist</label></li>
+				<li><label for="tab-shoutcast">Shoutcast</label></li>
+				<li><label for="tab-radiobrowser">Radio Browser</label></li>
+				<li><label for="tab-somafm">Soma FM</label></li>
+				<li><label for="tab-calmradio">Calm Radio</label></li>
+				<li><label for="tab-ferarock">Ferarock</label></li>
+				<li><label for="tab-settings">Settings</label></li>
+				<li><label for="tab-about">About</label></li>
+			</ul>
+		</form>
+	</nav>
+
+	<section id="main">
+		<input form="tabs" type="radio" name="tab" id="tab-radio" value="radio" />
+		<div class="no-print" id="radio">
+			<progress value="0" max="255" id="progressBar" class="active no-print"></progress>
+			<div>
+				<h2><span>Station</span><span><input type="checkbox" id="icy-auto" data-action="auto" data-param="id" value="1"><label for="icy-auto">Autoplay</label></span></h2>
+				<div>
+					<form name="icy">
+						<div>
+							<select id="icy-curst" title="Select a station for listening" data-action="play" data-param="id"></select>
+							<button id="stationsBtn" type="button" disabled>Stop</button>
+						</div>
+						<div>
+							<input type="range" id="icy-vol" min="0" max="254" title="Set the volume on Ka-Radio" data-action="soundvol" data-param="vol" />
+						</div>
+					</form>
+					<div id="icy">
+						<p>Name</p>
+						<p id="icy-name"></p>
+						<p>Description</p>
+						<p id="icy-descr"></p>
+						<p>Genre</p>
+						<p id="icy-genre"></p>
+						<p>Url</p>
+						<p><a id="icy-url1" href="" target="_blank"></a></p>
+						<p>Notice 1</p>
+						<p id="icy-not1"></p>
+						<p>Notice 2</p>
+						<p id="icy-not2"></a></p>
+						<p>Bitrate</p>
+						<p id="icy-bitr"></p>
+					</div>
+				</div>
+
+				<h2><span>Monitoring</span><button type="button" id="instantPlaySaveBtn" disabled>Save</button></h2>
+				<div id="monitor">
+					<figure>
+						<figcaption id="monitor-url">&nbsp;</figcaption>
+						<audio id="monitor-audio" controls>
+							<p>Your browser doesn't support audio tag with HTML 5</p>
+						</audio>
+					</figure>
+				</div>
+
+				<h2><span>Sleep / Awake</span><span id="localTime"></span></h2>
+				<div id="sleep-wake">
+					<p>
+						<button type="button" id="sleepBtn">Sleep</button>
+						<input type="time" id="sleep-time" />
+						<span id="sleep-laptime"></span>
+					</p>
+					<p>
+						<button type="button" id="wakeBtn">Awake</button>
+						<input type="time" id="wake-time" />
+						<span id="wake-laptime"></span>
+					</p>
+				</div>
+
+				<h2><span>Instant play</span><span>&nbsp;</span></h2>
+				<div>
+					<form id="instant-play-form" name="instantPlayForm">
+						<label for="full-url">Full URL</label>
+						<input type="url" id="full-url" name="fullUrl">
+						<input type="submit" name="instantPlayBtn" value="play" />
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<input form="tabs" type="radio" name="tab" id="tab-playlist" value="playlist" />
+		<div id="playlist">
+			<nav class="no-print">
+				<a id="download-link" href="#" download="ka-radio.m3u">Download</a>
+				<ul>
+					<li><button type="button" id="reloadPlaylistBtn" onclick="loadStationsList();">Refresh</button></li>
+					<li><button type="button" id="savePlaylistBtn" title="As .mp3 format" onclick="savePlaylistAsM3u();">Save</button></li>
+					<li><button type="button" id="clearAllPlaylistBtn" onclick="clearPlaylist();">Clear All</button></li>
+					<li><button type="button" id="printPlaylistBtn" onclick="print(); return true;">Print</button></li>
+					<li><input type="file" id="loadPlaylist" placeholder="load a playlist" accept=".m3u, .pls, .txt" /><button type="button" onclick="loadPlaylist();">Load</button></li>
+				</ul>
+				<p class="center"><em>Drag & Drop each row for sorting</em></p>
+			</nav>
+			<div class="scroll-table">
+				<table>
+					<thead>
+						<tr>
+							<th>#</th>
+							<th title="Click on the name of the station for listening">Name<em class="no-print"> ( Click for playing )</em></th>
+							<th title="Click on the URL of the station for editing">Url<em class="no-print"> ( Click for editing )</em></th>
+							<th>Vol.</th>
+						</tr>
+					</thead>
+					<tbody id="stationsList">
+					</tbody>
+				</table>
+			</div>
+			<p class="center no-print"><button type="button" id="newStationBtn">New station</button></p>
+		</div>
+
+		<input form="tabs" type="radio" name="tab" id="tab-shoutcast" value="shoutcast" data-unload="1" />
+		<div class="no-print" id="shoutcast"></div>
+
+		<input form="tabs" type="radio" name="tab" id="tab-radiobrowser" value="radiobrowser" data-unload="1" />
+		<div class="no-print" id="radiobrowser"></div>
+
+		<input form="tabs" type="radio" name="tab" id="tab-somafm" value="somafm" data-unload="1" />
+		<div class="no-print" id="somafm"></div>
+
+		<input form="tabs" type="radio" name="tab" id="tab-calmradio" value="calmradio" data-unload="1" />
+		<div class="no-print" id="calmradio"></div>
+
+		<input form="tabs" type="radio" name="tab" id="tab-ferarock" value="ferarock" data-unload="1" />
+		<div class="no-print" id="ferarock"></div>
+
+		<input form="tabs" type="radio" name="tab" id="tab-settings" value="settings" />
+		<div class="no-print" id="settings">
+			<h2>Output audio & reboot</h2>
+			<form name="hardware">
+				<input type="radio" id="i2s" name="output" value="0" /><label for="i2s">I2S</label>
+				<input type="radio" id="merus" name="output" value="1" /><label for="merus">MERUS</label>
+				<input type="radio" id="dac" name="output" value="2" /><label for="dac">DAC</label>
+				<input type="radio" id="pdm" name="output" value="3" /><label for="pdm">PDM</label>
+				<input type="radio" id="vs1053" name="output" value="4" /><label for="vs1053">VS1053</label>
+				<fieldset class="vs1053">
+					<div>
+						<span>Treble control</span>
+						<input type="range" id="icy-treb" name="treble" />
+						<span id="treble_span">0 dB</span>
+						<span>Treble frequency</span>
+						<input type="range" id="icy-tfreq" name="treblefreq" />
+						<span id="treble_span">0 dB</span>
+						<span>Bass enhance</span>
+						<input type="range" id="icy-bass" name="bass" />
+						<span id="treble_span">0 dB</span>
+						<span>Bass frequency</span>
+						<input type="range" id="icy-bfreq" name="bassfreq" />
+						<span id="treble_span">0 dB</span>
+						<span>Spacialization</span>
+						<input type="range" id="icy-spac" name="spacial" />
+						<span id="spacial_span">Off</span>
+					</div>
+				</fieldset>
+				<div class="center">
+					<input type="submit" />
+				</div>
+			</form>
+			<h2>Wifi & Network</h2>
+			<form name="wifi">
+				<div class="row">
+					 <span>Mac Address</span>
+					 <span id="mac">xx:xx:xx:xx:xx:xx</span>
+				</div>
+				<div class="wifi">
+					 <fieldset>
+						<div>
+							<span>AP SSID</span>
+							<input name="ssid" />
+							<input name="ssid2" />
+							<span>AP Password</span>
+							<input type="password" name="pasw" />
+							<input type="password" name="pasw2" />
+							<span>DHCP client</span>
+							<input type="checkbox" name="dhcp" />
+							<input type="checkbox" name="dhcp2" />
+							<span>IP addr.</span>
+							<input name="ip" />
+							<input name="ip2" />
+							<span>Net mask</span>
+							<input name="msk" />
+							<input name="msk2" />
+							<span>Gateway</span>
+							<input name="gw" />
+							<input name="gw2" />
+						</div>
+					 </fieldset>
+				</div>
+				<div>
+					 <fieldset>
+						<div>
+							<span>User Agent</span>
+							<input name="ua" />
+							<span>Hostname</span>
+							<input name="host" />
+							<span>Time zone</span>
+							<input name="tzo" />
+						</div>
+					 </fieldset>
+				</div>
+				 <div class="center">
+					<input type="submit" />
+				 </div>
+			</form>
+		</div>
+
+		<input form="tabs" type="radio" name="tab" id="tab-about" value="about" />
+		<div class="no-print" id="about">
+			<div>
+				<iframe src="http://karadio.karawin.fr/version32.php" width="100%">Your browser doesn't support the iframe tag</iframe>
+				<iframe src="http://karadio.karawin.fr/infos.php" width="100%">Your browser doesn't support the iframe tag</iframe>
+			</div>
+		</div>
+	</section>
+
+	<footer>
+	</footer>
+
+	<aside id="aside" class="modal no-print">
+		<div>
+			<h2 class="center">Edit Station</h2>
+			<form id="editStationForm">
+				<div>
+					<span>#</span><input type="text" name="idStation" value="" readonly />
+				</div>
+				<div>
+					<label for="nameStation">Name</label>
+					<input type="text" id="nameStation" name="nameStation" required />
+					<label for="urlStation">Full url</label>
+					<input type="url" id="urlStation" name="urlStation" required />
+					<label for="volStation">Volume</label>
+					<input type="range" id="volStation" min="0" max="100" />
+				</div>
+				<p class="center">
+					<input type="button" class="button" value="Abort" id="abortEditStationBtn" />
+					<input type="button" class="button" value="Erase" id="eraseStationBtn" >
+					<input type="submit" class="button" />
+				</p>
+			</form>
+		</div>
+	</aside>
+	<script type="text/javascript">
+		(function() {
+			'use strict';
+			const myScript = document.createElement('SCRIPT');
+			myScript.type = 'text/javascript';
+			myScript.src = document.styleSheets[0].href.replace(/\bstyle\.css/, 'script.js');
+			document.head.appendChild(myScript);
+		})();
+	</script>
+</body></html>
