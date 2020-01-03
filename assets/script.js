@@ -1034,7 +1034,7 @@ function kaPlugin(id, content, script) {
 const REPO_URL = document.scripts[0].src.replace(/\/\w+\/script\.js$/, '/');
 console.log('REPO_URL = ', REPO_URL);
 
-if(document.body.hasOwnProperty('data-ip')) {
+if(document.body.hasAttribute('data-ip')) {
 	const IP_DEVICE = document.body.data.ip;
 	console.log('IP Address for the device : ', IP_DEVICE);
 }
