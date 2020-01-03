@@ -1025,7 +1025,7 @@ function kaPlugin(id, content, script) {
 		if(typeof script != 'undefined') {
 			const myScript = document.createElement('SCRIPT');
 			myScript.type = 'text/javascript';
-			myScript.src = 'plugins/' + id + '/script.js';
+			myScript.src = REPO_URL + 'plugins/' + id + '/script.js';
 			document.head.appendChild(myScript);
 		}
 	}
