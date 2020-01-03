@@ -8,7 +8,7 @@
 	<meta name="apple-mobile-web-app-status-bar-style" content="default" >
 	<link rel="apple-touch-icon" type="image/png" href="assets/logo.png" >
 	<link rel="icon" type="image/png" href="favicon.png" />
-	<link type="text/css" rel="stylesheet" title="base" href="assets/style.css" />
+	<link type="text/css" rel="stylesheet" title="base" href="https://bazooka07.github.io/Ka-Radio32/assets/style.css" />
 	<title>Karadio, the ultimate Wifi Webradio</title>
 </head><body>
 	<header class="no-print" id="header">
@@ -270,5 +270,13 @@
 			</form>
 		</div>
 	</aside>
-	<script type="text/javascript" src="assets/script.js"></script>
+	<script type="text/javascript">
+		(function() {
+			'use strict';
+			const myScript = document.createElement('SCRIPT');
+			myScript.type = 'text/javascript';
+			myScript.src = document.styleSheets[0].href.replace(/\bstyle\.css/, 'script.js');
+			document.head.appendChild(myScript);
+		})();
+	</script>
 </body></html>

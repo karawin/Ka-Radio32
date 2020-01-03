@@ -1001,7 +1001,7 @@ document.getElementById('main').addEventListener('change', function(event) {
 
 		event.target.removeAttribute('data-unload');
 		myScript.type = 'text/javascript';
-		myScript.src = 'plugins/' + event.target.value + '/?innerHTML=kaPlugin';
+		myScript.src = REPO_URL + 'plugins/' + event.target.value + '/?innerHTML=kaPlugin';
 		document.head.appendChild(myScript);
 	}
 });
@@ -1033,6 +1033,9 @@ function kaPlugin(id, content, script) {
 /* ============= Init ======================== */
 
 console.log(document.scripts[document.scripts.length - 1].src + ' loaded');
+
+const REPO_URL = document.scripts[document.scripts -1].src.replace(/\/\w+\/script\.js$/, '/');
+console.log('REPO_URL = ', REPO_URL);
 
 // Display the first tab
 document.forms.tabs.elements.tab[0].checked = true;
