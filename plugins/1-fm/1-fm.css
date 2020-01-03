@@ -1,0 +1,64 @@
+body {
+	margin:0 auto;
+	background-color: #aaa;
+	font-family: 'Noto Sans', Arial, Sans-serif;
+}
+#main {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+#main div[data-related] {
+  display: none;
+  width: 15rem;
+  border: 1px #c6ae28 solid;
+  margin: 0.3rem 0.5rem;
+  background-color: beige;
+  padding: 0.3rem;
+  border-radius: 0.3rem;
+}
+#main div[data-related]:not(.hidden) {
+  display: flex;
+  flex-direction: column;
+}
+#main div[data-related] > div:first-of-type {
+	position: relative;
+	height: 150px;
+	width: 150px;
+	margin: 0 auto;
+}
+#main div[data-related] > div:first-of-type > div:first-of-type {
+	height: 100%;
+}
+.icon {
+	width: 90px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	fill: #fff;
+	transition: all 0.5s;
+}
+.icon:hover {
+	width: 120px;
+}
+#main div[data-related] .desc {
+	flex-grow: 1;
+}
+#main h2 {
+  margin: 0;
+  text-align: center;
+  font-size: 125%;
+}
+#main .genre {
+  text-align: center;
+  line-height: 1.5rem;
+}
+#main .genre span {
+  background-color: moccasin;
+  padding: 0 0.3rem;
+}
+div[data-stream],
+span.related {
+	cursor: pointer;
+}

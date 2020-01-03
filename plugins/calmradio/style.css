@@ -1,0 +1,100 @@
+#calmradio * { margin: 0; padding: 0; }
+
+#calmradio { background-color: #f7f8fa; }
+#calmradio > h2 { text-align: center; }
+#calmradio > h2 a {
+	display: inline-block;
+	min-width: 12rem;
+	background-color: #eee;
+	border-radius: 0.5rem;
+}
+
+#calmradio-metadata .card {
+	background: -webkit-gradient(linear, left top, right top, from(#f7f7f7),to(#e8e8e8));
+	background: -webkit-linear-gradient(left, #f7f7f7, #e8e8e8);
+	background: -o-linear-gradient(left, #f7f7f7, #e8e8e8);
+	background: linear-gradient(to right, #f7f7f7, #e8e8e8);
+	border-radius: 8px;
+}
+
+#calmradio ul { list-style: none; }
+#calmradio input[type="radio"] { display: none; }
+#calmradio img[src$=".svg"] { height: 3rem; }
+
+#calmradio-metadata input[name="rows"]:not(:checked) + div + div,
+#calmradio-channels input[name="channels"]:not(:checked) + li {
+	display: none;
+}
+
+#calmradio-metadata input[name="rows"]:checked + div label { background-color: #ccc; }
+
+#calmradio div.scrollable { overflow-x: auto; }
+#calmradio-metadata,
+#calmradio-metadata div.scrollable > ul,
+#calmradio-channels ul { display: flex; }
+
+#calmradio form:first-of-type {
+	position: relative;
+	margin-bottom: 12.5rem;
+}
+#calmradio .rows > li > div.scrollable {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	right: 0;
+}
+#calmradio .rows label { min-width: 5rem; }
+
+#calmradio .card {
+	margin: 0.3rem 0.15rem;
+	padding: 0.15rem 0.25rem;
+	border: 2px solid transparent;
+	text-align: center;
+	background-color: #eee;
+}
+#calmradio-metadata .card.active,
+#calmradio input[type="radio"]:checked + .card { border-color: magenta; }
+#calmradio .card label:hover { background-color: #bbb; }
+
+#calmradio .card label { display: block; cursor: pointer; }
+#calmradio .card span { display: inline-block; }
+#calmradio .categories .card { min-width: 10rem; }
+#calmradio .categories .card label { min-height: 10rem; }
+#calmradio .categories .card img { height: 10rem; }
+#calmradio .categories .card span {
+	width: 10rem;
+	font-size: 130%;
+	margin-top: 50%;
+	transform: translateY(-50%);
+}
+#calmradio-channels .channels > li {
+	min-width: 200px;
+	margin: 0.25rem;
+	background-color: #eee;
+	padding: 0.25rem;
+}
+#calmradio .channels div:first-of-type { text-align: center; }
+#calmradio .channels img { height: 200px; }
+
+#calmradio-channels .streams {
+	flex-wrap: wrap;
+	justify-content: center;
+}
+#calmradio-channels .streams > li {
+	margin: 0.1rem 0.3rem;
+	border: 1px solid #444;
+	border-radius: 0.2rem;
+	padding: 0 0.1rem;
+}
+#calmradio-channels .streams a {
+	margin: 0 0.2rem;
+	padding: 0.3rem 0.15rem;
+	display: inline-block;
+	color: inherit;
+	text-decoration: none;
+}
+#calmradio-channels .streams a:hover { background-color: #ccc; }
+#calmradio-channels .streams .free { color: green; }
+#calmradio-channels .streams .vip { color: red; }
+
+#calmradio { margin:0; padding: 0; background-color: #444; }

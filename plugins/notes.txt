@@ -1,0 +1,11 @@
+https://gitlab.com/goodvibes/goodvibes/issues/3
+
+curl http://dir.xiph.org/yp.xml -o yp.xml
+
+# 1.fm
+https://www.1.fm/genrelist
+https://ws.1.fm/content/images/genres/sq/alternative.jpg
+https://www.1.fm/mainstations
+https://www.1.fm/languages/fr-FR/common.lang.json
+https://www.1.fm/less/style.css
+https://www.1.fm/less/flags.css

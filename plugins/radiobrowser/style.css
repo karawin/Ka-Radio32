@@ -1,0 +1,74 @@
+#radiobrowser { background-color: #fff; }
+
+#radiobrowser > form { margin-left: 0.2rem; }
+#radiobrowser > form > div { margin: 0.5rem 0; }
+#radiobrowser > form select {
+	width: 100%;
+	margin-top: 0.2rem;
+}
+#radiobrowser > form div.text { display: flex; }
+#radiobrowser > form div.text input { flex-grow: 1; }
+#radiobrowser > form div.text label {
+	margin-right: 0.5rem;
+	padding-top: 0.3rem;
+}
+#radiobrowser > form div:last-of-type { text-align: center; }
+
+#rb-stations { overflow-x: auto; }
+#rb-stations th { padding: 0.3rem; }
+#rb-stations td:first-of-type,
+#rb-stations td:nth-of-type(n+4) { text-align: center; }
+/* #rb-stations td:nth-of-type(7) {max-width: 12rem; } */
+#rb-stations tbody tr:nth-of-type(2n) { background-color: #ddd; }
+#rb-stations tbody td:first-of-type img { max-height: 24px; }
+#rb-stations table { border-collapse: collapse; }
+#rb-stations img { max-width: 48px; }
+#rb-stations a[data-stream],
+#rb-stations span {
+	background: linear-gradient(to bottom, #5bc0de 0, #2aabd2 100%);
+	color: #fff;
+	padding: 0.1rem 0.3rem;
+	line-height: 1.5;
+	border-radius: 0.3rem;
+	white-space: nowrap;
+	cursor: pointer;
+}
+#rb-stations span:hover { background: #2aabd2; }
+#rb-stations td:not(:nth-of-type(2)) a { text-decoration: none; }
+
+@media screen and (min-width: 47em) {
+	#radiobrowser > form {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		margin-right: 0.5rem;
+	}
+	#radiobrowser > form div.text { display: block; }
+	#radiobrowser > form label {
+		display: block;
+		padding: 0;
+	}
+	#radiobrowser > form div.text input {
+		width: 100%;
+	}
+	#rb-stations table { min-width: 100%; }
+}
+
+@media screen and (min-width: 63em) {
+	#radiobrowser > form {
+		grid-template-columns: 1fr 1fr 1fr;
+	}
+}
+
+@media screen and (min-width: 63em) {
+	#radiobrowser > form {
+		display: flex;
+		margin-right: 0;
+	}
+	#radiobrowser > form div.text { flex-grow: 1; }
+	#radiobrowser > form label { margin: 0 0 0 0.3rem; }
+	#radiobrowser > form select[name="country"] { max-width: 16rem; }
+	#radiobrowser > form select[name="language"] { max-width: 10.5rem; }
+	#radiobrowser > form div.text input { width: calc(100% - 1rem); }
+
+	#radiobrowser > form div:last-of-type { padding-top: 1.25rem; }
+}

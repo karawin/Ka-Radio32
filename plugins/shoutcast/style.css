@@ -1,0 +1,63 @@
+#shoutcast > div > div:first-of-type { background-color: #fff; }
+#shoutcast h2 {
+	padding: 0.5rem 1rem;
+	background-color: #fff;
+	margin: 0 0.5rem;
+}
+#shoutcast p { margin: 0.3rem 0; }
+#shoutcast div.infos {
+	display: grid;
+	grid-template-columns: 4fr 6fr;
+	grid-column-gap: 0.5rem;
+}
+#sh-title { font-size: 16pt; }
+#sh-link {
+	display: block;
+	padding: 0.1rem 0.5rem;
+	text-align: center;
+}
+#sh-link img { max-width: 100%; }
+
+#sh-genrelist-0 ul { padding-left: 1.25rem; }
+#sh-genrelist-0 label { cursor: pointer; }
+#sh-genrelist-0 input[type="radio"] { display: none; }
+#sh-genrelist-0 input[type="radio"] ~ ul { display: none; }
+#sh-genrelist-0 input[type="radio"]:checked ~ ul { display: block; }
+#sh-genrelist-0 input[type="radio"]:checked ~ label { color: red; cursor: pointer}
+
+/* listing of stations */
+#sh-playlist > figure {
+	display: flex;
+	flex-direction: column;
+	margin: 0 0.5rem 0.5rem;
+	padding: 0.2rem;
+	background-color: #f0e5c0;
+	border-radius: 0.5rem;
+}
+#sh-playlist > figure div.current { flex-grow: 1; }
+#sh-playlist figcaption {
+	font-size: 120%;
+	font-weight: bold;
+	margin-bottom: 0.5rem;
+	color: maroon;
+}
+#sh-playlist img[data-stationid] {
+	max-width: 100px;
+	cursor: pointer;
+}
+#sh-playlist .genres {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+}
+#sh-playlist .genres span {
+	margin: 0.1rem 0.3rem;
+	padding: 0.15rem 0.5rem;
+	background-color: #d49355;
+	color: #fbf6f6;
+	border-radius: 0.3rem;
+	cursor: pointer;
+}
+
+#sh-playlist + div.loader { display: none; }
+#sh-playlist.loading + div.loader { display: block; }

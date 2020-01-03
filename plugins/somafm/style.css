@@ -1,0 +1,42 @@
+#somafm {
+	background-color: #000;
+	text-align: center;
+}
+#somafm h2 {
+	margin: 0;
+	padding: 0.3rem 1rem;
+	color: #f00;
+}
+#somafm-channels {
+	display: flex;
+	flex-wrap: wrap;
+	color: #eee;
+	justify-content: space-around;
+}
+#somafm-channels figure {
+	max-width: 10rem;
+	margin: 0.3rem 0.5rem;
+}
+#somafm-channels figcaption a {
+	color: #1a9096;
+	padding: 0.3rem;
+	text-decoration: none;
+	display: inline-block;
+	/* width: 100%; */
+}
+#somafm-channels figcaption a:hover {
+	background-color: #1a9096;
+	color: #fff;
+}
+#somafm-channels figcaption + p {
+	margin: 0.25rem 0;
+	font-size: 90%;
+}
+#somafm-channels img {
+	max-width: 120px;
+	min-height: 80px;
+	cursor: pointer;
+}
+#somafm-channels p:last-of-type {
+	margin: 0.3rem 0 0;
+}
