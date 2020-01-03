@@ -49,3 +49,6 @@ Temporary Items
 # do not save build directory
 /build
 sdkconfig.old
+
+# others
+*~
