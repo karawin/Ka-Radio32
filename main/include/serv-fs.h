@@ -17,7 +17,7 @@ struct servFile
 #define ICACHE_RAM_ATTR __attribute__((section(".iram0.text")))
 
 #include "../../webpage/tmp_index"
-#include "../../webpage/tmp_genuine"
+#include "../../webpage/tmp_responsive"
 #include "../../webpage/tmp_style"
 #include "../../webpage/tmp_style1"
 #include "../../webpage/tmp_script"
@@ -25,10 +25,10 @@ struct servFile
 #include "../../webpage/tmp_favicon"
 
 const struct servFile genuineFile = {
-	"/genuine",
+	"/karawin",
 	"text/html",
-	sizeof(genuine_html),
-	(const char*)genuine_html,
+	sizeof(index_html),
+	(const char*)index_html,
 	(struct servFile*)NULL
 };
 const struct servFile faviconFile = {
@@ -72,7 +72,7 @@ const struct servFile styleFile1 = {
 const struct servFile indexFile = {
 	"/",
 	"text/html",
-	sizeof(index_html),
-	(const char*)index_html,
+	sizeof(responsive_html),
+	(const char*)responsive_html,
 	(struct servFile*)&styleFile1
 };
