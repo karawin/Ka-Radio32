@@ -177,12 +177,13 @@ var websocket = null;
 function setRssiInterval() {
 	setInterval(function () {
 		try {
-			if (websocket.readyState == WebSocket.CLOSED) {
+			if (websocket.readyState == WebSocket.OPEN) {
+				websocket.send('wsrssi');
+			} else {
 				openSocket();
 			}
-			websocket.send('wsrssi');
 		} catch (e) {
-			console.log('error' + e);
+			console.log('Websocket ', e);
 			clearInterval(rssiTimer);
 			rssiTimer = null;
 		}
@@ -1031,8 +1032,6 @@ function kaPlugin(id, content, script) {
 	}
 }
 /* ============= Init ======================== */
-
-console.log(document.scripts[document.scripts.length - 1].src + ' loaded');
 
 const REPO_URL = document.scripts[0].src.replace(/\/\w+\/script\.js$/, '/');
 console.log('REPO_URL = ', REPO_URL);
