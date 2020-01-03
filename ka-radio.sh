@@ -1,6 +1,8 @@
 #!/bin/sh
 
-IP="192.168.58.77"
+IP="$(grep 'IP_ADDR\s*=' index.php | sed -E 's/^.*IP_ADDR\s*=.*\b([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}).*/\1/')"
+
+echo "IP ADDR : $IP"
 
 CURL="$(command -v curl)"
 
