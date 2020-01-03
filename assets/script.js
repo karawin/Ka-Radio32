@@ -1034,7 +1034,7 @@ function kaPlugin(id, content, script) {
 
 console.log(document.scripts[document.scripts.length - 1].src + ' loaded');
 
-const REPO_URL = document.scripts[document.scripts -1].src.replace(/\/\w+\/script\.js$/, '/');
+const REPO_URL = document.scripts[document.scripts.length -1].src.replace(/\/\w+\/script\.js$/, '/');
 console.log('REPO_URL = ', REPO_URL);
 
 // Display the first tab
