@@ -1,6 +1,6 @@
 <?php
-# $ipAddr = '192.168.30.77';
-$ipAddr = '192.168.58.77';
+
+const IP_ADDR = '192.168.58.77';
 
 if($_SERVER['REQUEST_METHOD'] == 'GET' and !empty($_SERVER['QUERY_STRING'])) {
 	// https://github.com/karawin/Ka-Radio32/wiki#html-interface-for-the-wifi-webradio
@@ -9,7 +9,7 @@ if($_SERVER['REQUEST_METHOD'] == 'GET' and !empty($_SERVER['QUERY_STRING'])) {
 	 * uart, volume=, play=, start, stop, next, prev, instant=, version, infos, list=
 	 * */
 	// phpinfo(INFO_VARIABLES);
-	$ch = curl_init($ipAddr . '?' . $_SERVER['QUERY_STRING']);
+	$ch = curl_init(IP_ADDR . '?' . $_SERVER['QUERY_STRING']);
 	$resp = curl_exec($ch);
 	curl_close($ch);
 	exit;
@@ -55,7 +55,7 @@ if(filter_has_var(INPUT_POST, 'action')) {
 	}
 
 	$params = http_build_query($post_fields);
-	$ch = curl_init("$ipAddr/$action");
+	$ch = curl_init(IP_ADDR . '/' . $action);
 	curl_setopt_array($ch, array(
 		CURLOPT_POSTFIELDS => $params,
 		CURLOPT_POST => true,
@@ -72,5 +72,5 @@ if(filter_has_var(INPUT_POST, 'action')) {
 	exit;
 }
 
-include 'extensions.html';
+echo str_replace('<body>', '<body data-ip="' . IP_ADDR . '">', file_get_contents('extensions.html'));
 ?>

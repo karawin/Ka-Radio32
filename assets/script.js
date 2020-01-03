@@ -1,7 +1,5 @@
 'use strict';
 
-// const IP_DEVICE = '192.168.58.77';
-
 const KA_RADIO = 'Ka-Radio';
 const meta = document.getElementById('icy-meta');
 const stationsList = document.getElementById('stationsList');
@@ -283,7 +281,7 @@ function openSocket() {
 		}
 
 		websocket.onerror = function (event) {
-			console.log('Websocker error: ', event);
+			console.log('Websocker error: ', event.originalTarget);
 			this.close();
 		}
 
@@ -1035,6 +1033,11 @@ function kaPlugin(id, content, script) {
 
 const REPO_URL = document.scripts[0].src.replace(/\/\w+\/script\.js$/, '/');
 console.log('REPO_URL = ', REPO_URL);
+
+if(document.body.hasOwnProperty('data-ip')) {
+	const IP_DEVICE = document.body.data.ip;
+	console.log('IP Address for the device : ', IP_DEVICE);
+}
 
 // Display the first tab
 document.forms.tabs.elements.tab[0].checked = true;
