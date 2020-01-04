@@ -929,7 +929,7 @@ function loadPlaylist() {
 					Port: '',
 					File: '',
 					ovol: 0
-				}
+				});
 
 				// send station to Ka-Radio
 				let datas = extractFullUrl(match[2]);
