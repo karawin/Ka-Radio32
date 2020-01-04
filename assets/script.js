@@ -929,16 +929,16 @@ function loadPlaylist() {
 					Port: '',
 					File: '',
 					ovol: 0
+				}
 
-					// send station to Ka-Radio
-					let datas = extractFullUrl(match[2]);
-					xhr.saveStation(idStation, {
-						Name: match[1],
-						URL: datas.url,
-						port: datas.port,
-						file: encodeURI(datas.path1),
-						ovol: 0
-					});
+				// send station to Ka-Radio
+				let datas = extractFullUrl(match[2]);
+				xhr.saveStation(idStation, {
+					Name: match[1],
+					URL: datas.url,
+					port: datas.port,
+					file: encodeURI(datas.path1),
+					ovol: 0
 				});
 			}
 			return
