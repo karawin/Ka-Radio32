@@ -114,6 +114,11 @@ const instantPlaySaveBtn = document.getElementById('instantPlaySaveBtn');
 
 function extractFullUrl(fullUrl) {
 	const matches = /(?:https?:\/\/)([^:/]*)(?::(\d{2,5}))?(\/.*)?$/.exec(fullUrl);
+	if(matches == null) {
+		console.log('Bad URL : ' + fullUrl);
+		return false;
+	}
+
 	return {
 		url: matches[1],
 		port: (typeof matches[2] === 'string') ? matches[2] : '80',
@@ -176,11 +181,10 @@ var websocket = null;
 function setRssiInterval() {
 	setInterval(function () {
 		try {
-			if (websocket.readyState == WebSocket.OPEN) {
-				websocket.send('wsrssi');
-			} else {
+			if (websocket.readyState == WebSocket.CLOSED) {
 				openSocket();
 			}
+			websocket.send('wsrssi');
 		} catch (e) {
 			console.log('Websocket ', e);
 			clearInterval(rssiTimer);
@@ -789,6 +793,75 @@ function loadStationsList() {
 	xhrSta.loadStation(0);
 }
 
+function saveStationsList() {
+	const xhrPlaylistSave = new XMLHttpRequest();
+	xhrPlaylistSave.timer = null;
+	xhrPlaylistSave.clear = function() {
+		this.stationId = -1;
+		const action = 'clear';
+		let url = '/' + action;
+		let params = '';
+		if(typeof IP_DEVICE == 'string') {
+			let extra = 'action=' + action;
+			if(params.length == 0) {
+				params = extra;
+			} else {
+				params += '&' + extra;
+			}
+			url = window.location.href;
+		}
+		this.open('POST', url);
+		this.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		this.send();
+	};
+	xhrPlaylistSave.saveStation = function(id) {
+		if(typeof id == 'number') {
+			this.stationId = id;
+		}
+		const row = stationsList.querySelector('#station-' + this.stationId);
+		let params = 'nb=1&id=' + this.stationId + '&name=&url=&port=&file=/&ovol=0';
+		if(row != null) {
+			let datas = extractFullUrl(row.cells[2].textContent);
+			params = 'nb=1&id=' + this.stationId + '&name=' + encodeURI(row.cells[1].textContent) + '&url=' + datas.url + '&port=' + datas.port + '&file=' + encodeURI(datas.path1) + '&ovol=' + row.cells[3].textContent;
+		}
+		const action = 'setStation';
+		let url = '/' + action;
+		if(typeof IP_DEVICE == 'string') {
+			let extra = 'action=' + action;
+			if(params.length == 0) {
+				params = extra;
+			} else {
+				params += '&' + extra;
+			}
+			url = window.location.href;
+		}
+		console.log(url, '=>', params);
+		this.open('POST', url);
+		this.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		this.send(params);
+	};
+	xhrPlaylistSave.onreadystatechange = function () {
+		if (this.readyState === XMLHttpRequest.DONE) {
+			if (this.status === 200) {
+				if(this.responseText.length > 0) {
+					console.log(this.responseText);
+				}
+				this.stationId++;
+				if(this.stationId >= MAX_STATIONS) {
+					console.log('Playlist saved');
+					return;
+				}
+
+				this.saveStation();
+				return;
+			}
+			console.log(this.status + ': ' + this.statusText + ' from ' + this.responseURL);
+		}
+	}
+	// xhrPlaylistSave.saveStation(1);
+	xhrPlaylistSave.clear();
+}
+
 function onStationsBtnClick(event) {
 	event.preventDefault();
 	if (stationsBtn.playing) {
@@ -910,6 +983,7 @@ function savePlaylistAsM3u() {
 	el.revokeObjectURL(saveAsText);
 }
 
+/* loads playlist from a m3u file */
 function loadPlaylist() {
 	let input = document.getElementById('loadPlaylist');
 	if (input.files.length != 1) {
@@ -919,32 +993,28 @@ function loadPlaylist() {
 	reader.onloadend = function (e) {
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/matchAll
 		if(/^#EXTM3U\b/.test(this.result)) {
-			let pattern = RegExp('^#EXTINF:-?\d+,\s*(.*)(?:\r\n|\n|\r)^(https?:\/\/.*)', 'g');
-			let matches = this.result.matchAll(pattern);
-			for(const match of matches) {
-				console.log(match[1], match[2]);
+			stationsList.innerHTML = '';
+			stationsSelect.innerHTML = '';
+			const pattern = RegExp('#EXTINF:-?\\d+,(.*)(?:\\r\\n|\\n|\\r)(.*)', 'g');
+			const matches = this.result.matchAll(pattern);
+			for(let item of matches) {
+				// console.log(item[1], ' => ', item[2]);
 				let idStation = addStation('', {
-					Name: match[1],
-					URL: match[2],
+					Name: item[1],
+					URL: item[2],
 					Port: '',
 					File: '',
 					ovol: 0
 				});
-
-				// send station to Ka-Radio
-				let datas = extractFullUrl(match[2]);
-				xhr.saveStation(idStation, {
-					Name: match[1],
-					URL: datas.url,
-					port: datas.port,
-					file: encodeURI(datas.path1),
-					ovol: 0
-				});
 			}
-			return
+			if(confirm('Do you want to save the playlist in the device\nThat takes à while. Let\'s be patient !!')) {
+				saveStationsList();
+			}
+			return;
 		}
+
 		console.log('not in m3u format');
-	}
+	};
 	reader.readAsText(input.files.item(0));
 }
 

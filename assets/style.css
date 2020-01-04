@@ -100,6 +100,9 @@ tbody td {
 	height: 0.5rem;
 	margin: 0 auto;
 }
+#progressBar.saving {
+	background-color: red;
+}
 
 /* online */
 #radio form[name="icy"] {
