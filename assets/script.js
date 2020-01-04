@@ -917,27 +917,33 @@ function loadPlaylist() {
 	}
 	let reader = new FileReader();
 	reader.onloadend = function (e) {
-		let pattern = /^#EXTINF:.*?([^,]*)(?:\r\n|\n|\r)(https?:\/\/.*)$/gm;
-		let matches;
-		while ((matches = pattern.exec(this.result)) !== null) {
-			console.log(matches[0], matches[1]);
-			let idStation = addStation('', {
-				Name: matches[0],
-				URL: matches[1],
-				Port: '',
-				File: '',
-				ovol: 0
-			});
-			// send station to Ka-Radio
-			let datas = extractFullUrl(matches[1]);
-			xhr.saveStation(idStation, {
-				Name: matches[0],
-				URL: datas.url,
-				port: datas.port,
-				file: encodeURI(datas.path1),
-				ovol: 0
-			});
+		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/matchAll
+		if(/^#EXTM3U\b/.test(this.result)) {
+			let pattern = RegExp('^#EXTINF:-?\d+,\s*(.*)(?:\r\n|\n|\r)^(https?:\/\/.*)', 'g');
+			let matches = this.result.matchAll(pattern);
+			for(const match of matches) {
+				console.log(match[1], match[2]);
+				let idStation = addStation('', {
+					Name: match[1],
+					URL: match[2],
+					Port: '',
+					File: '',
+					ovol: 0
+
+					// send station to Ka-Radio
+					let datas = extractFullUrl(match[2]);
+					xhr.saveStation(idStation, {
+						Name: match[1],
+						URL: datas.url,
+						port: datas.port,
+						file: encodeURI(datas.path1),
+						ovol: 0
+					});
+				});
+			}
+			return
 		}
+		console.log('not in m3u format');
 	}
 	reader.readAsText(input.files.item(0));
 }
