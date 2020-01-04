@@ -3,8 +3,8 @@
 const Shoutcast = function() {
 	'use strict';
 
-	const YELLOW_PAGES_SHOUTCAST = 'http://yp.shoutcast.com';
-	const API_URL = 'http://api.shoutcast.com/';
+	const YELLOW_PAGES_SHOUTCAST = 'https://yp.shoutcast.com';
+	const API_URL = 'https://api.shoutcast.com/';
 
 	let stationsList, stationsIndex;
 	let stationsTimer = null;
