@@ -181,7 +181,7 @@ var websocket = null;
 function setRssiInterval() {
 	setInterval(function () {
 		try {
-			if (websocket.readyState == WebSocket.CLOSED) {
+			if (websocket == null || websocket.readyState == WebSocket.CLOSED) {
 				openSocket();
 			}
 			websocket.send('wsrssi');
@@ -371,9 +371,10 @@ function setDrapAndDrop(row) {
 	row.addEventListener('drop', onDrop);
 }
 
+/* Add station in the table and select tags */
 function addStation(stationId, datas) {
 	// datas : { Name: '', URL: '', Port: '', File: '', ovol: '' }
-	let newStation = (stationId.length === 0);
+	let newStation = (stationId == null || stationId.length === 0);
 	if (newStation) {
 		let rows = stationsList.rows;
 		stationId = 0;
@@ -983,7 +984,7 @@ function savePlaylistAsM3u() {
 	el.revokeObjectURL(saveAsText);
 }
 
-/* loads playlist from a m3u file */
+/* loads playlist from a .m3u, .pls or .txt file */
 function loadPlaylist() {
 	let input = document.getElementById('loadPlaylist');
 	if (input.files.length != 1) {
@@ -992,28 +993,31 @@ function loadPlaylist() {
 	let reader = new FileReader();
 	reader.onloadend = function (e) {
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/matchAll
-		if(/^#EXTM3U\b/.test(this.result)) {
-			stationsList.innerHTML = '';
-			stationsSelect.innerHTML = '';
-			const pattern = RegExp('#EXTINF:-?\\d+,(.*)(?:\\r\\n|\\n|\\r)(.*)', 'g');
-			const matches = this.result.matchAll(pattern);
-			for(let item of matches) {
-				// console.log(item[1], ' => ', item[2]);
-				let idStation = addStation('', {
-					Name: item[1],
-					URL: item[2],
-					Port: '',
-					File: '',
-					ovol: 0
-				});
-			}
-			if(confirm('Do you want to save the playlist in the device\nThat takes à while. Let\'s be patient !!')) {
-				saveStationsList();
-			}
-			return;
+		switch(input.files[0].type) {
+			case 'audio/x-mpegurl' :
+				if(/^#EXTM3U\b/.test(this.result)) {
+					stationsList.innerHTML = '';
+					stationsSelect.innerHTML = '';
+					const pattern = RegExp('#EXTINF:-?\\d+,(.*)(?:\\r\\n|\\n|\\r)(.*)', 'g');
+					const matches = this.result.matchAll(pattern);
+					for(let item of matches) {
+						// console.log(item[1], ' => ', item[2]);
+						const datas = extractFullUrl(item[2]);
+						datas.Name = item[1].trim();
+						datas.ovol = 0;
+						let idStation = addStation(null, datas);
+					}
+					if(confirm('Do you want to save the playlist in the device ?\nThat takes à while. Let\'s be patient !!')) {
+						saveStationsList();
+					}
+					return;
+				}
+				break;
+			case 'text/plain' :
+				break;
+			default:
+				console.log('Unknown format for ' + input.files[0].name + ' file (' + input.files[0]..type + ')');
 		}
-
-		console.log('not in m3u format');
 	};
 	reader.readAsText(input.files.item(0));
 }
@@ -1125,8 +1129,3 @@ getVersion();
 displayHardware();
 setRssiInterval();
 loadStationsList();
-/*
-if (document.getElementById('tab-settings').checked) {
-	this.wifi();
-}
-* */
