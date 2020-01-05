@@ -378,8 +378,9 @@ function addStation(stationId, datas) {
 	if (newStation) {
 		let rows = stationsList.rows;
 		stationId = 0;
+		// searches the max value for stationId
 		for (let i = 0, iMax = rows.length; i < iMax; i++) {
-			if (rows[i].id.indexOf('station-' === 0)) {
+			if (rows[i].id.startsWith('station-')) {
 				let id = parseInt(rows[i].id.substr(8));
 				if (stationId < id) {
 					stationId = id;
@@ -389,13 +390,10 @@ function addStation(stationId, datas) {
 		stationId++;
 	}
 
-	let port = datas.Port.trim();
-	if (port == '80') {
-		port = '';
-	} else {
-		port = ':' + port;
+	if(!datas.hasOwnProperty('fullUrl')) {
+		let port = (datas.hasOwnProperty('Port') || datas.Port.trim() == '80') ? '' : ':' + datas.Port.trim();
+		datas.fullUrl = datas.URL + port + datas.File;
 	}
-	let fullUrl = datas.URL + port + datas.File;
 
 	let tr = document.createElement('TR');
 	tr.id = 'station-' + stationId;
@@ -424,7 +422,7 @@ function addStation(stationId, datas) {
 	let urlCell = document.createElement('TD');
 	let volCell = document.createElement('TD');
 
-	urlCell.textContent = ((/^https?:\/\//.test(fullUrl)) ? '' : 'http://') + fullUrl;
+	urlCell.textContent = ((/^https?:\/\//.test(datas.fullUrl)) ? '' : 'http://') + datas.fullUrl;
 	volCell.textContent = datas.ovol;
 	tr.appendChild(urlCell);
 	tr.appendChild(volCell);
@@ -1002,10 +1000,10 @@ function loadPlaylist() {
 					const matches = this.result.matchAll(pattern);
 					for(let item of matches) {
 						// console.log(item[1], ' => ', item[2]);
-						const datas = extractFullUrl(item[2]);
-						datas.Name = item[1].trim();
-						datas.ovol = 0;
-						let idStation = addStation(null, datas);
+						let idStation = addStation(null, {
+							Name: item[1].trim(),
+							fullUrl: item[2].trim()
+						});
 					}
 					if(confirm('Do you want to save the playlist in the device ?\nThat takes à while. Let\'s be patient !!')) {
 						saveStationsList();
