@@ -993,28 +993,68 @@ function loadPlaylist() {
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/matchAll
 		switch(input.files[0].type) {
 			case 'audio/x-mpegurl' :
-				if(/^#EXTM3U\b/.test(this.result)) {
-					stationsList.innerHTML = '';
-					stationsSelect.innerHTML = '';
-					const pattern = RegExp('#EXTINF:-?\\d+,(.*)(?:\\r\\n|\\n|\\r)(.*)', 'g');
-					const matches = this.result.matchAll(pattern);
-					for(let item of matches) {
-						// console.log(item[1], ' => ', item[2]);
-						let idStation = addStation(null, {
-							Name: item[1].trim(),
-							fullUrl: item[2].trim()
-						});
-					}
-					if(confirm('Do you want to save the playlist in the device ?\nThat takes à while. Let\'s be patient !!')) {
-						saveStationsList();
-					}
+				if(!/^#EXTM3U\b/.test(this.result)) {
+					console.log('Bad syntax. Missing #EXTM3U at the beginning of file');
 					return;
+				}
+
+				stationsList.innerHTML = '';
+				stationsSelect.innerHTML = '';
+				const pattern = RegExp('#EXTINF:-?\\d+,(.*)(?:\\r\\n|\\n|\\r)(.*)', 'g');
+				const matches = this.result.matchAll(pattern);
+				for(let item of matches) {
+					// console.log(item[1], ' => ', item[2]);
+					let idStation = addStation(null, {
+						Name: item[1].trim(),
+						fullUrl: item[2].trim()
+					});
+				}
+				break;
+			case 'audio/x-scpls':
+				if(!/^\[playlist\]/.test(this.result)) {
+					console.log('Bad syntax. Missing [playlist] at the beginning of file');
+					return;
+				}
+
+				const pattern = RegExp('^(File|Title)(\d+)=(.*)', 'g');
+				const matches = this.result.matchAll(pattern);
+				if(matches == null) {
+					return;
+				}
+				const entries = {};
+				for(let item of matches) {
+					const i = item[2];
+					if(!entries.hasOwnProperty(i)) {
+						entries[i] = { Name: '' };
+					}
+					switch(item[1]) {
+						case 'File':
+							entries[i].fullUrl = item[3].trim();
+							break;
+						case 'Title':
+							entries[i].Name = item[3].trim();
+							break;
+					}
+				}
+
+				stationsList.innerHTML = '';
+				stationsSelect.innerHTML = '';
+				for(let i in entries) {
+					// console.log(item[1], ' => ', item[2]);
+					if(entries[i].hasOwnProperty('fullUrl')) {
+						let idStation = addStation(null, entries[i]);
+					}
 				}
 				break;
 			case 'text/plain' :
 				break;
 			default:
 				console.log('Unknown format for ' + input.files[0].name + ' file (' + input.files[0].type + ')');
+				return;
+		}
+
+		if(confirm('Do you want to save the playlist in the device ?\nThat takes à while. Let\'s be patient !!')) {
+			saveStationsList();
 		}
 	};
 	reader.readAsText(input.files.item(0));
