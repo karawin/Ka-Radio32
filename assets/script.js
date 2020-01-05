@@ -1016,7 +1016,7 @@ function loadPlaylist() {
 			case 'text/plain' :
 				break;
 			default:
-				console.log('Unknown format for ' + input.files[0].name + ' file (' + input.files[0]..type + ')');
+				console.log('Unknown format for ' + input.files[0].name + ' file (' + input.files[0].type + ')');
 		}
 	};
 	reader.readAsText(input.files.item(0));
