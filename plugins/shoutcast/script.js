@@ -99,7 +99,7 @@ const Shoutcast = function() {
 
 			let div11 = document.createElement('DIV');
 			let img = document.createElement('IMG');
-			img.src = (typeof item.logo == 'string') ? item.logo : 'assets/play.png';
+			img.src = (typeof item.logo == 'string') ? item.logo : REPO_URL + 'assets/play.png';
 			img.alt = 'No logo';
 			img.setAttribute('data-stationid', item.id);
 			div11.appendChild(img);
