@@ -1016,8 +1016,8 @@ function loadPlaylist() {
 					return;
 				}
 
-				const pattern = RegExp('^(File|Title)(\d+)=(.*)', 'g');
-				const matches = this.result.matchAll(pattern);
+				const plsPattern = RegExp('^(File|Title)(\d+)=(.*)', 'g');
+				const matches = this.result.matchAll(plsPattern);
 				if(matches == null) {
 					return;
 				}
