@@ -1017,12 +1017,12 @@ function loadPlaylist() {
 				}
 
 				const plsPattern = RegExp('^(File|Title)(\d+)=(.*)', 'g');
-				const matches = this.result.matchAll(plsPattern);
-				if(matches == null) {
+				const plsMatches = this.result.matchAll(plsPattern);
+				if(plsMatches == null) {
 					return;
 				}
 				const entries = {};
-				for(let item of matches) {
+				for(let item of plsMatches) {
 					const i = item[2];
 					if(!entries.hasOwnProperty(i)) {
 						entries[i] = { Name: '' };
