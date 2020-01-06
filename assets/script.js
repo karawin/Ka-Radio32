@@ -11,15 +11,19 @@ const player = document.getElementById('monitor-audio');
 const localTime = document.getElementById('localTime');
 const rssi = document.getElementById('rssi');
 const progressBar = document.getElementById('progressBar');
+const contentTypeForm = 'application/x-www-form-urlencoded';
 const ICY_FIELDS = new Array('curst', 'descr', 'name', 'bitr', 'url1', 'not1', 'not2', 'genre', 'meta');
 const MAX_STATIONS = 255;
 // const MAX_STATIONS = 20;
+
 
 var IP_DEVICE = null;
 var rssiTimer = null;
 var instantPlaying = false;
 var saveAsText = null;
 var currentStationId = null;
+
+var isLoading = true; // displayed webradios are not saving in the Ka-Radio device
 
 // https://github.com/karawin/Ka-Radio32/wiki#html-interface-for-the-wifi-webradio
 
@@ -39,7 +43,7 @@ function pageReset() {
 	});
 	meta.textContent = KA_RADIO;
 	player.src = '';
-	document.getElementById('monitor-audio').textContent = '';
+	document.getElementById('monitor-url').innerHTML = '&nbsp;';
 }
 
 function icyDisplay(icy) {
@@ -100,7 +104,16 @@ function valueChange(event) {
 			value = (this.checked) ? 'true' : 'false';
 			break;
 	}
-	xhr.valueChange(this.dataset.action, this.dataset.param + '=' + value);
+	if(this.dataset.action != 'play' || !isLoading) {
+		xhr.valueChange(this.dataset.action, this.dataset.param + '=' + value);
+	} else {
+		// stations in the playlist table and select are from a file, not from the Ka-Radio device
+		const row = document.getElementById('station-' + value) ;
+		if(row != null) {
+			instantPlayForm.elements.fullUrl.value = row.cells[2].textContent;
+			instantPlayForm.elements.instantPlayBtn.click();
+		}
+	}
 }
 
 stationsSelect.addEventListener('change', valueChange);
@@ -186,7 +199,7 @@ function setRssiInterval() {
 			}
 			websocket.send('wsrssi');
 		} catch (e) {
-			console.log('Websocket ', e);
+			console.error('Websocket ', e);
 			clearInterval(rssiTimer);
 			rssiTimer = null;
 		}
@@ -391,7 +404,10 @@ function addStation(stationId, datas) {
 	}
 
 	if(!datas.hasOwnProperty('fullUrl')) {
-		let port = (datas.hasOwnProperty('Port') || datas.Port.trim() == '80') ? '' : ':' + datas.Port.trim();
+		let port = '';
+		if(datas.hasOwnProperty('Port') && datas.Port.trim() != '80') {
+			port = ':' + datas.Port.trim();
+		}
 		datas.fullUrl = datas.URL + port + datas.File;
 	}
 
@@ -423,7 +439,7 @@ function addStation(stationId, datas) {
 	let volCell = document.createElement('TD');
 
 	urlCell.textContent = ((/^https?:\/\//.test(datas.fullUrl)) ? '' : 'http://') + datas.fullUrl;
-	volCell.textContent = datas.ovol;
+	volCell.textContent = (datas.hasOwnProperty('ovol')) ? datas.ovol : '0';
 	tr.appendChild(urlCell);
 	tr.appendChild(volCell);
 	stationsList.appendChild(tr);
@@ -487,7 +503,7 @@ function displayCurrentStation() {
 		url = window.location.href;
 	}
 	xhrCurst.open('POST', url);
-	xhrCurst.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	xhrCurst.setRequestHeader('Content-Type', contentTypeForm);
 	xhrCurst.send(params);
 }
 
@@ -535,7 +551,7 @@ function displayHardware(valid) {
 		url = window.location.href;
 	}
 	xhrHardware.open('POST', url);
-	xhrHardware.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	xhrHardware.setRequestHeader('Content-Type', contentTypeForm);
 	xhrHardware.send(params.join('&'));
 }
 
@@ -554,7 +570,7 @@ xhr.sendForm = function(action, params) {
 		url = window.location.href;
 	}
 	this.open('POST', url);
-	this.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	this.setRequestHeader('Content-Type', contentTypeForm);
 	this.send(params);
 }
 xhr.sendCommand = function(action, params) {
@@ -571,6 +587,7 @@ xhr.sendCommand = function(action, params) {
 }
 xhr.saveStation = function (stationId, datas) {
 	let params = 'nb=1&id=' + stationId + '&name=' + datas.Name + '&url=' + datas.URL + '&port=' + datas.port + '&file=' + datas.file + '&ovol=' + datas.ovol;
+	// let params = 'id=' + stationId + '&name=' + datas.Name + '&url=' + datas.URL + '&port=' + datas.port + '&file=' + datas.file + '&ovol=' + datas.ovol;
 	this.sendForm('setStation', params);
 }
 xhr.startCurrentStation = function () {
@@ -748,7 +765,7 @@ function loadStationsList() {
 			url = window.location.href;
 		}
 		this.open('POST', url);
-		this.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		this.setRequestHeader('Content-Type', contentTypeForm);
 		this.send(params);
 	}
 	xhrSta.loadStation = function (stationId) {
@@ -781,6 +798,7 @@ function loadStationsList() {
 						} else {
 							progressBar.value = MAX_STATIONS;
 							stationsBtn.disabled = false;
+							isLoading = false;
 						}
 					}
 					return;
@@ -793,10 +811,12 @@ function loadStationsList() {
 }
 
 function saveStationsList() {
+	const batchSize = 3;
+	let saveStationsTimer = null;
+	let saveStationId = -1;
+
 	const xhrPlaylistSave = new XMLHttpRequest();
-	xhrPlaylistSave.timer = null;
 	xhrPlaylistSave.clear = function() {
-		this.stationId = -1;
 		const action = 'clear';
 		let url = '/' + action;
 		let params = '';
@@ -810,19 +830,51 @@ function saveStationsList() {
 			url = window.location.href;
 		}
 		this.open('POST', url);
-		this.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		this.setRequestHeader('Content-Type', contentTypeForm);
 		this.send();
 	};
-	xhrPlaylistSave.saveStation = function(id) {
-		if(typeof id == 'number') {
-			this.stationId = id;
+
+	xhrPlaylistSave.saveStation = function() {
+		if(saveStationsTimer != null) {
+			clearTimeout(saveStationsTimer);
+			saveStationsTimer = null;
 		}
-		const row = stationsList.querySelector('#station-' + this.stationId);
-		let params = 'nb=1&id=' + this.stationId + '&name=&url=&port=&file=/&ovol=0';
-		if(row != null) {
-			let datas = extractFullUrl(row.cells[2].textContent);
-			params = 'nb=1&id=' + this.stationId + '&name=' + encodeURI(row.cells[1].textContent) + '&url=' + datas.url + '&port=' + datas.port + '&file=' + encodeURI(datas.path1) + '&ovol=' + row.cells[3].textContent;
+
+		const output = new Array();
+		for(let i=0; i<batchSize; i++) {
+			var endOfStations = false;
+			let row = null;
+			let url = '';
+			do {
+				saveStationId++;
+				if(saveStationId >= MAX_STATIONS) { break; }
+				row = stationsList.querySelector('#station-' + saveStationId);
+				if(row != null) {
+					url = row.cells[2].textContent.replace('&nbsp;', ' ').trim();
+				}
+			} while(url.length == 0);
+
+			if(url.length == 0) { break; }
+			let datas = extractFullUrl(url);
+
+			// output.push('id=' + this.stationId + '&name=' + encodeURI(row.cells[1].textContent) + '&url=' + datas.url + '&port=' + datas.port + '&file=' + encodeURI(datas.path1) + volParam);
+			output.push('id=' + saveStationId + '&name=' + row.cells[1].textContent + '&url=' + datas.url + '&port=' + datas.port + '&file=' + datas.path1 + '&ovol=' + row.cells[3].textContent.trim() + '&');
+/*
+nb=3
+&id=0&url=icecast.vrtcdn.be&name=VRT Radio 1&file=/radio1-high.mp3&port=80&ovol=0&
+&id=1&url=icecast.vrtcdn.be&name=VRT Radio 2 Antwerpen&file=/ra2ant-high.mp3&port=80&ovol=0&
+&id=2&url=icecast.vrtcdn.be&name=VRT Radio 2 Limburg&file=/ra2lim-high.mp3&port=80&ovol=0&
+ * */
 		}
+
+		// Check if output not empty
+		if(output.length == 0) {
+			isLoading = false;
+			console.log('Playlist saved');
+			return;
+		}
+
+		let params = 'nb=' + output.length + '&' + output.join('&');
 		const action = 'setStation';
 		let url = '/' + action;
 		if(typeof IP_DEVICE == 'string') {
@@ -834,29 +886,30 @@ function saveStationsList() {
 			}
 			url = window.location.href;
 		}
+
 		console.log(url, '=>', params);
 		this.open('POST', url);
 		this.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		this.setRequestHeader('Content-Type', contentTypeForm);
 		this.send(params);
 	};
+
 	xhrPlaylistSave.onreadystatechange = function () {
 		if (this.readyState === XMLHttpRequest.DONE) {
 			if (this.status === 200) {
 				if(this.responseText.length > 0) {
 					console.log(this.responseText);
 				}
-				this.stationId++;
-				if(this.stationId >= MAX_STATIONS) {
-					console.log('Playlist saved');
-					return;
-				}
 
-				this.saveStation();
+				saveStationsTimer = setTimeout(function(xhr) {
+					xhr.saveStation();
+				}, 250, this);
 				return;
 			}
 			console.log(this.status + ': ' + this.statusText + ' from ' + this.responseURL);
 		}
 	}
+
 	// xhrPlaylistSave.saveStation(1);
 	xhrPlaylistSave.clear();
 }
@@ -991,6 +1044,8 @@ function loadPlaylist() {
 	let reader = new FileReader();
 	reader.onloadend = function (e) {
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/matchAll
+		let matches = null;
+		let count = 0;
 		switch(input.files[0].type) {
 			case 'audio/x-mpegurl' :
 				if(!/^#EXTM3U\b/.test(this.result)) {
@@ -1001,13 +1056,14 @@ function loadPlaylist() {
 				stationsList.innerHTML = '';
 				stationsSelect.innerHTML = '';
 				const pattern = RegExp('#EXTINF:-?\\d+,(.*)(?:\\r\\n|\\n|\\r)(.*)', 'g');
-				const matches = this.result.matchAll(pattern);
+				matches = this.result.matchAll(pattern);
 				for(let item of matches) {
 					// console.log(item[1], ' => ', item[2]);
 					let idStation = addStation(null, {
 						Name: item[1].trim(),
 						fullUrl: item[2].trim()
 					});
+					count++;
 				}
 				break;
 			case 'audio/x-scpls':
@@ -1016,20 +1072,28 @@ function loadPlaylist() {
 					return;
 				}
 
-				const plsPattern = RegExp('^(File|Title)(\d+)=(.*)', 'g');
-				const plsMatches = this.result.matchAll(plsPattern);
-				if(plsMatches == null) {
+				const plsPattern = RegExp('(File|Title)(\\d+)=(.*)', 'g');
+				matches = this.result.matchAll(plsPattern);
+				if(matches == null) {
 					return;
 				}
 				const entries = {};
-				for(let item of plsMatches) {
+				for(let item of matches) {
 					const i = item[2];
 					if(!entries.hasOwnProperty(i)) {
 						entries[i] = { Name: '' };
 					}
 					switch(item[1]) {
 						case 'File':
-							entries[i].fullUrl = item[3].trim();
+							if(!/^https?:\/\//.test(item[3])) {
+								continue;
+							}
+							let value = item[3].trim().replace(/^https:/, 'http:'); // No https for Ka-Radio
+							if(/^https?:\/\/[^:\/]+(:\d+)?$/.test(value)) {
+								// Missing path
+								value += '/';
+							}
+							entries[i].fullUrl = value;
 							break;
 						case 'Title':
 							entries[i].Name = item[3].trim();
@@ -1042,18 +1106,42 @@ function loadPlaylist() {
 				for(let i in entries) {
 					// console.log(item[1], ' => ', item[2]);
 					if(entries[i].hasOwnProperty('fullUrl')) {
+						console.log(entries[i]);
 						let idStation = addStation(null, entries[i]);
+						count++;
 					}
 				}
 				break;
 			case 'text/plain' :
+				const lines = this.result.split(/\r\n|\n|\r/);
+				if(typeof lines.forEach != 'function') {
+					return;
+				}
+				stationsList.innerHTML = '';
+				stationsSelect.innerHTML = '';
+				lines.forEach(function(item) {
+					try {
+						if(item.trim().length > 0) {
+							let station = JSON.parse(item.trim());
+							if(station.hasOwnProperty('URL') && station.URL.trim().length > 0) {
+								console.log(station);
+								let idStation = addStation(null, station);
+								count++;
+							}
+						}
+					} catch(e) {
+						console.log('bad line : ' + item);
+						console.error(e);
+					}
+				});
 				break;
 			default:
 				console.log('Unknown format for ' + input.files[0].name + ' file (' + input.files[0].type + ')');
 				return;
 		}
 
-		if(confirm('Do you want to save the playlist in the device ?\nThat takes à while. Let\'s be patient !!')) {
+		isLoading = true;
+		if(count > 1 && confirm('Do you want to save the ' + count + ' entries of the playlist into the device ?\nThat takes à while. Let\'s be patient !!')) {
 			saveStationsList();
 		}
 	};
@@ -1061,7 +1149,9 @@ function loadPlaylist() {
 }
 
 function clearPlaylist() {
-	alert('Clear the playlist');
+	if(confirm('Erase all stations ?')) {
+		alert('Clear the playlist');
+	}
 }
 
 /* ====== Setup hardware for audio output and wifi ======= */
