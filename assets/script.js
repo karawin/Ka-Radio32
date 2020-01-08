@@ -1136,6 +1136,10 @@ function loadPlaylist() {
 	reader.readAsText(input.files.item(0));
 }
 
+function loadPlaylistFromUrl(url) {
+	console.log('Downloading a playlist from ' + REPO_URL+url);
+}
+
 function clearPlaylist() {
 	if(confirm('Erase all stations ?')) {
 		alert('Clear the playlist');
@@ -1197,7 +1201,7 @@ document.getElementById('main').addEventListener('change', function(event) {
 
 		event.target.removeAttribute('data-unload');
 		myScript.type = 'text/javascript';
-		myScript.src = REPO_URL + 'plugins/' + event.target.value + '/?innerHTML=kaPlugin';
+		myScript.src = REPO_URL + 'plugins/' + event.target.value + '/index.js?innerHTML=kaPlugin';
 		document.head.appendChild(myScript);
 	}
 });
@@ -1230,6 +1234,10 @@ function kaPlugin(id, content, script) {
 
 const REPO_URL = document.scripts[0].src.replace(/\/\w+\/script\.js$/, '/');
 console.log('REPO_URL = ', REPO_URL);
+
+// Update urls for the playlists in the cloud
+const frameInfos = document.getElememtById('frame-info');
+frameInfos.src = (frameInfos != null) ? REPO_URL + 'infos.html' : 'http://karadio.karawin.fr/infos.php';
 
 if(document.body.hasAttribute('data-ip')) {
 	IP_DEVICE = document.body.dataset.ip;

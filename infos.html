@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<title>No title</title>
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Informations</title>
+</head><body>
+	<h1>Donate:</h1>
+	<div>
+		<p>
+			If you like Karadio and want to contribute to the development (software and hardware),<br />
+			please donate, the amount is up to you.<br />
+			Even one euro or dollar, I am so happy to know how many users appreciate this project.
+		</p>
+		<p>
+			Thanks.
+		</p>
+			<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+				<input type="hidden" name="cmd" value="_s-xclick">
+				<input type="hidden" name="hosted_button_id" value="HVGLA5NYAXYFG">
+				<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG_global.gif" border="0" name="submit" alt="PayPal – The safer, easier way to pay online!">
+				<img alt="" border="0" src="https://www.paypalobjects.com/fr_FR/i/scr/pixel.gif" width="1" height="1">
+			</form>
+	</div>
+
+	<h1>Links</h1>
+	<ul>
+		<li><a href="https://github.com/karawin/Ka-Radio" target="_blank">The Github page of KaRadio</a></li>
+		<li><a href="https://github.com/karawin/Ka-Radio32" target="_blank">The Github page of KaRadio32</a></li>
+		<li><a href="https://github.com/karawin/Karadio-addons" target="_blank">The Github page of KaRadio AddOn (lcd, ir encoder etc...)</a></li>
+		<li><a href="https://hackaday.io/project/11570-wifi-webradio-with-esp8266-and-vs1053" target="_blank">The HackaDay page of KaRadio</a></li>
+		<li><a href="https://www.facebook.com/groups/162949914181385/" download>The Karadio facebook group</a></li>
+		<li><a href="https://github.com/karawin/Ka-Radio32/blob/master/Interface.md" target="_blank">Click here for help on the uart and html interfaces</a></li>
+	</ul>
+
+	<h1>KaRadio Remote Control</h1>
+	<div>
+		<p><a href="https://play.google.com/store/apps/details?id=com.serasidis.karadio.rc" target="_blank">KaRadio Remote Control by Vassilis Serasidis on google Play.</a></p>
+		<p>
+			It is an easy and fast WiFi remote control for your KaRadio or KaRadio32 hardware.<br />
+			With this android app you can select the WebRadio station you want to play, set the volume and get the station information such as Station name, Genre, Bit rate, Meta data and more.
+		</p>
+	</div>
+
+	<h1>Playlists:</h1>
+	<p>
+		Click on one following link for downloading a playlist :
+	</p>
+	<ul id="playlist">
+		<li><a href="playlists/WebStations.txt" download>My playlist updated on 2019/12/12</a></li>
+		<li><a href="playlists/WebStations_Italy.txt" download>An italian playlist</a></li>
+		<li><a href="playlists/WebStationssuisse.txt" download>A list of swiss radio stations</a></li>
+		<li><a href="playlists/WebStationsX.txt" download>A list from Arlaor (Arturo)</a></li>
+		<li><a href="playlists/WebStationsIstvan.txt" download>A list from István Szentgyörgyi</a></li>
+		<li><a href="playlists/WebStationsBelarus.txt" download>A list of belarus radio stations</a></li>
+		<li><a href="playlists/RomanianStations.txt" download>A romanian list from Florin Nica</a></li>
+		<li><a href="playlists/rostislav.txt" download>A list of czech and slovak web radio stations from Rostislav</a></li>
+		<li><a href="playlists/WebStationsBy.txt" download>Various radio stations from Vlad</a></li>
+		<li><a href="playlists/WebStations_Russia.txt" download>Russian radio stations from Vitaly</a></li>
+		<li><a href="playlists/WebStations_Romanian_By_Coccobello27.txt", download>Romanian web radio station from CoccoBello</a></li>
+		<li><a href="playlists/aytacakoz.txt" download>Turkiye's radio list by Aytacakoz</a></li>
+		<li><a href="playlists/WebStations_Belgium.txt" download>Here is a playlist of mainly Flemish Belgian stations by Stego</a></li>
+		<li><a href="playlists/WebStationsGreek.txt" download>Here is a playlist of Greek stations from Kosmas</a></li>
+		<li><a href="playlists/WebStations Hungary Csaba Dudas.txt" download>Here is a Playlist of Hungarian radios from Csaba Dudas</a></li>
+		<li><a href="playlists/Lithuania1.txt" download>Here is a playlist of Hungarian radios from Virginijus Jenkus</a></li>
+		<li><a href="playlists/Lithuania2.txt" download>Here is a playlist of radios in Lithuania by Sigissoft</a></li>
+	</ul>
+	<p>
+		<a href="mailto:jp@karawin.fr">Feel free to send me your playlist to add it here.</a>
+	</p>
+
+	<h1>Your prototypes:</h1>
+	<p>
+		<a href="http://karadio.karawin.fr/yours/" target="_blank">Click here to see your prototypes</a>
+	</p>
+
+	<script>
+		(function() {
+			'use strict';
+
+			document.addEventListener('click', function(event)  {
+				if(event.target.hasAttribute('download') && event.target.hasAttribute('href')) {
+					if(typeof parent.loadPlaylistByUrl != 'function') {
+						console.error('loadPlaylistByUrl() function is missing in parent window');
+						return;
+					}
+
+					event.preventDefault();
+					parent.loadPlaylistByUrl(event.target.href);
+				}
+			});
+		})();
+	</script>
+</body></html>
