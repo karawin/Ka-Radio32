@@ -1,0 +1,255 @@
+{"Name":"Europe1","URL":"e1-live-mp3-128.scdn.arkena.com","File":"/europe1.mp3","Port":"80","ovol":"10"}
+{"Name":"RTL","URL":"streaming.radio.rtl.fr","File":"/rtl-1-48-192","Port":"80","ovol":"-4"}
+{"Name":"RTL2","URL":"streaming.radio.rtl2.fr","File":"/rtl2-1-44-96","Port":"80","ovol":"0"}
+{"Name":"RMC","URL":"chai5she.lb.vip.cdn.dvmr.fr","File":"/rmcinfo","Port":"80","ovol":"0"}
+{"Name":"ABSOLUTEMOTOWN","URL":"streaming.radionomy.com","File":"/ABSOLUTEMOTOWN?lang=fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7","Port":"80","ovol":"0"}
+{"Name":"Golden50/70sHits","URL":"listen.radionomy.com","File":"/golden-50-70s-hits","Port":"80","ovol":"0"}
+{"Name":"France Info","URL":"direct.franceinfo.fr","File":"/live/franceinfo-lofi.mp3","Port":"80","ovol":"0"}
+{"Name":"France Inter","URL":"direct.franceinter.fr","File":"/live/franceinter-midfi.mp3","Port":"80","ovol":"0"}
+{"Name":"FIP","URL":"icecast.radiofrance.fr","File":"/fip-midfi.mp3","Port":"80","ovol":"0"}
+{"Name":"Tout nouveau tout FIP","URL":"direct.fipradio.fr","File":"/live/fip-webradio5.mp3","Port":"80","ovol":"0"}
+{"Name":"FIP Rock","URL":"icecast.radiofrance.fr","File":"/fiprock-midfi.mp3","Port":"80","ovol":"0"}
+{"Name":"France Bleu IDF","URL":"direct.francebleu.fr","File":"/live/fb1071-midfi.mp3","Port":"80","ovol":"0"}
+{"Name":"RFM","URL":"rfm-live-mp3-128.scdn.arkena.com","File":"/rfm.mp3","Port":"80","ovol":"4"}
+{"Name":"RFM Collector","URL":"rfm-live.akamaized.net","File":"/rfm.isml/rfm-audio=128000.m3u8","Port":"80","ovol":"0"}
+{"Name":"RFM Night fever","URL":"rfm-wr2-mp3-128.scdn.arkena.com","File":"/rfm.mp3","Port":"80","ovol":"0"}
+{"Name":"RFM 100% Femmes","URL":"rfm-wr3-mp3-128.scdn.arkena.com","File":"/rfm.mp3","Port":"80","ovol":"0"}
+{"Name":"RFM 80'","URL":"rfm-wr4-mp3-128.scdn.arkena.com","File":"/rfm.mp3","Port":"80","ovol":"0"}
+{"Name":"RFM Party 90","URL":"rfm-wr5-mp3-128.scdn.arkena.com","File":"/rfm.mp3","Port":"80","ovol":"0"}
+{"Name":"RFM Lounge","URL":"rfm-wr6-mp3-128.scdn.arkena.com","File":"/rfm.mp3","Port":"80","ovol":"0"}
+{"Name":"RFM Le Hit RFM","URL":"rfm-wr7-mp3-128.scdn.arkena.com","File":"/rfm.mp3","Port":"80","ovol":"0"}
+{"Name":"RFM Thematique Summer","URL":"rfm-wr8-mp3-128.scdn.arkena.com","File":"/rfm.mp3","Port":"80","ovol":"0"}
+{"Name":"RFM Run","URL":"rfm-wr9-mp3-128.scdn.arkena.com","File":"/rfm.mp3","Port":"80","ovol":"0"}
+{"Name":"RFM Pop-Rock","URL":"rfm-wr10-mp3-128.scdn.arkena.com","File":"/rfm.mp3","Port":"80","ovol":"0"}
+{"Name":"RFM 100% Francais","URL":"rfm-wr11-mp3-128.scdn.arkena.com","File":"/rfm.mp3","Port":"80","ovol":"0"}
+{"Name":"RFM 100% New Wave","URL":"rfm-wr12-mp3-128.scdn.arkena.com","File":"/rfm.mp3","Port":"80","ovol":"0"}
+{"Name":"RFM Slow","URL":"rfm-wr13-mp3-128.scdn.arkena.com","File":"/rfm.mp3","Port":"80","ovol":"0"}
+{"Name":"RFM Thematique 2","URL":"rfm-wr14-mp3-128.scdn.arkena.com","File":"/rfm.mp3","Port":"80","ovol":"0"}
+{"Name":"RFM Cinema","URL":"rfm-wr15-mp3-128.scdn.arkena.com","File":"/rfm.mp3","Port":"80","ovol":"0"}
+{"Name":"RFM Thematique 3","URL":"rfm-wr16-mp3-128.scdn.arkena.com","File":"/rfm.mp3","Port":"80","ovol":"0"}
+{"Name":"RJM French","URL":"listen.radionomy.com","File":"/rjm-french.m3u","Port":"80","ovol":"0"}
+{"Name":"Nostalgie","URL":"cdn.nrjaudio.fm","File":"/audio1/fr/30601/mp3_128.mp3?origine=fluxradios","Port":"80","ovol":"0"}
+{"Name":"Nostalgie Chansons Francaises","URL":"cdn.nrjaudio.fm","File":"/adwz1/fr/30611/mp3_128.mp3","Port":"80","ovol":"0"}
+{"Name":"Nostalgie Tous Les Tubes, Tous Les Styles","URL":"cdn.nrjaudio.fm","File":"/adwz1/fr/30699/mp3_128.mp3","Port":"80","ovol":"0"}
+{"Name":"Romantic Dreams","URL":"listen.radionomy.com","File":"/romanticdreams","Port":"80","ovol":"0"}
+{"Name":"MusicOnly FM","URL":"listen.radionomy.com","File":"/musiconly-fm","Port":"80","ovol":"0"}
+{"Name":"Nice oldies","URL":"listen.radionomy.com","File":"/niceoldies","Port":"80","ovol":"0"}
+{"Name":"Mélodie FM","URL":"188.165.35.60","File":"/;stream.3o54","Port":"8008","ovol":"0"}
+{"Name":"RFI Monde","URL":"live02.rfi.fr","File":"/rfimonde-64.mp3","Port":"80","ovol":"0"}
+{"Name":"Sweat FM Blois","URL":"stream.sweetfm.fr","File":"/sweetfmcentre-blois.mp3","Port":"8000","ovol":"0"}
+{"Name":"Alpes 1 Gap","URL":"alpes1gap.ice.infomaniak.ch","File":"/alpes1gap-high.mp3","Port":"80","ovol":"0"}
+{"Name":"Alpes 1 Grenoble","URL":"alpes1grenoble.ice.infomaniak.ch","File":"/alpes1grenoble-high.mp3","Port":"80","ovol":"0"}
+{"Name":"Alouette","URL":"alouette.ice.infomaniak.ch","File":"/alouette-high.mp3","Port":"80","ovol":"0"}
+{"Name":"Autoroute info sud","URL":"media.autorouteinfo.fr","File":"/direct_sud.mp3.m3u","Port":"8000","ovol":"0"}
+{"Name":"Autoroute Info Nord","URL":"media.autorouteinfo.fr","File":"/direct_nord.mp3.m3u","Port":"8000","ovol":"0"}
+{"Name":"California 101","URL":"www.california101radio.com","File":"/california101.pls","Port":"80","ovol":"0"}
+{"Name":"Chante France","URL":"stream1.chantefrance.com","File":"/Chante_France.m3u","Port":"80","ovol":"0"}
+{"Name":"Chérie FM","URL":"cdn.nrjaudio.fm","File":"/audio1/fr/30201/mp3_128.mp3?origine=fluxradios","Port":"80","ovol":"0"}
+{"Name":"Chérie FM Frenchy","URL":"cdn.nrjaudio.fm","File":"/adwz1/fr/30213/mp3_128.mp3?origine=fluxradios","Port":"80","ovol":"0"}
+{"Name":"Evasion FM Essonne","URL":"stream1.evasionfm.com","File":"/Essonne.m3u","Port":"80","ovol":"0"}
+{"Name":"Hit West","URL":"broadcast.infomaniak.ch","File":"/hitwest-high.mp3","Port":"80","ovol":"0"}
+{"Name":"Rire et Chansons","URL":"cdn.nrjaudio.fm","File":"/audio1/fr/30401/mp3_128.mp3?origine=fluxradios","Port":"80","ovol":"0"}
+{"Name":"Rires nouvelle generation","URL":"cdn.nrjaudio.fm","File":"/adwz1/fr/30405/mp3_128.mp3?origine=fluxradios","Port":"80","ovol":"0"}
+{"Name":"Rires Humour du sud","URL":"cdn.nrjaudio.fm","File":"/adwz1/fr/55514/mp3_128.mp3?origine=fluxradios","Port":"80","ovol":"0"}
+{"Name":"Radio Grenouille","URL":"live.radiogrenouille.com","File":"/live.m3u","Port":"80","ovol":"0"}
+{"Name":"Alter Nantes","URL":"diffusion.lafrap.fr","File":"/alternantes.mp3.m3u","Port":"80","ovol":"0"}
+{"Name":"Virgin Radio","URL":"ais-live.cloud-services.paris","File":"/virgin.mp3","Port":"8000","ovol":"0"}
+{"Name":"Impact FM","URL":"impactfm.ice.infomaniak.ch","File":"/impactfm-128.mp3","Port":"80","ovol":"0"}
+{"Name":"AllZic 80's","URL":"allzic08.ice.infomaniak.ch","File":"/allzic08.mp3","Port":"80","ovol":"0"}
+{"Name":"AllZic 90's","URL":"allzic24.ice.infomaniak.ch","File":"/allzic24.mp3","Port":"80","ovol":"0"}
+{"Name":"AllZic 2000","URL":"allzic49.ice.infomaniak.ch","File":"/allzic49.mp3","Port":"80","ovol":"0"}
+{"Name":"AllZic 70's","URL":"allzic50.ice.infomaniak.ch","File":"/allzic50.mp3","Port":"80","ovol":"0"}
+{"Name":"AllZic Fête","URL":"allzic26.ice.infomaniak.ch","File":"/allzic26.mp3","Port":"80","ovol":"0"}
+{"Name":"AllZic Rock","URL":"allzic17.ice.infomaniak.ch","File":"/allzic17.mp3","Port":"80","ovol":"0"}
+{"Name":"AllZic Noel","URL":"allzic42.ice.infomaniak.ch","File":"/allzic42.mp3","Port":"80","ovol":"0"}
+{"Name":"Allzic Radio Nationale 7","URL":"allzic38.ice.infomaniak.ch","File":"/allzic38.mp3","Port":"80","ovol":"0"}
+{"Name":"Allzic Radio Enfoirés","URL":"allzic12.ice.infomaniak.ch","File":"/allzic12.mp3","Port":"80","ovol":"0"}
+{"Name":"Allzic Radio Black Music","URL":"allzic04.ice.infomaniak.ch","File":"/allzic04.mp3","Port":"80","ovol":"0"}
+{"Name":"M Radio","URL":"mfm.ice.infomaniak.ch","File":"/mfm-128.mp3","Port":"80","ovol":"0"}
+{"Name":"M Radio Nouveautés","URL":"mfmwr-005.ice.infomaniak.ch","File":"/mfmwr-005.mp3","Port":"80","ovol":"0"}
+{"Name":"M Radio Générique tv","URL":"mfmwr-021.ice.infomaniak.ch","File":"/mfmwr-021.mp3","Port":"80","ovol":"0"}
+{"Name":"M Radio 100% Goldman","URL":"mfmwr-016.ice.infomaniak.ch","File":"/mfmwr-016.mp3","Port":"80","ovol":"0"}
+{"Name":"M Radio 100% Céline Dion","URL":"mfmwr-023.ice.infomaniak.ch","File":"/mfmwr-023.mp3","Port":"80","ovol":"0"}
+{"Name":"M Radio 100% Yéyé","URL":"mfmwr-009.ice.infomaniak.ch","File":"/mfmwr-009.mp3","Port":"80","ovol":"0"}
+{"Name":"M Radio Francophonie","URL":"mfmwr-018.ice.infomaniak.ch","File":"/mfmwr-018.mp3","Port":"80","ovol":"0"}
+{"Name":"M Radio Nouvelle scène","URL":"mfmwr-012.ice.infomaniak.ch","File":"/mfmwr-012.mp3","Port":"80","ovol":"0"}
+{"Name":"M Radio Culte 60/70","URL":"mfmwr-022.ice.infomaniak.ch","File":"/mfmwr-022.mp3","Port":"80","ovol":"0"}
+{"Name":"M Radio Séducteurs","URL":"mfmwr-017.ice.infomaniak.ch","File":"/mfmwr-017.mp3","Port":"80","ovol":"0"}
+{"Name":"M Radio French touch","URL":"mfmwr-003.ice.infomaniak.ch","File":"/mfmwr-003.mp3","Port":"80","ovol":"0"}
+{"Name":"M Radio Duos","URL":"mfmwr-015.ice.infomaniak.ch","File":"/mfmwr-015.mp3","Port":"80","ovol":"0"}
+{"Name":"M Radio Tubes du grenier","URL":"mfmwr-001.ice.infomaniak.ch","File":"/mfmwr-001.mp3","Port":"80","ovol":"0"}
+{"Name":"OUI FM","URL":"target-ad-2.cdn.dvmr.fr","File":"/ouifm-high.mp3","Port":"80","ovol":"0"}
+{"Name":"OUI FM Alternatif","URL":"broadcast.infomaniak.net","File":"/ouifm2.mp3.m3u","Port":"80","ovol":"0"}
+{"Name":"OUI FM Collector","URL":"stream.collectorradio.fr","File":"/ouifm6-128.mp3","Port":"80","ovol":"0"}
+{"Name":"OUI FM Rock 70's","URL":"rock70s.stream.ouifm.fr","File":"/ouifmseventies.mp3","Port":"80","ovol":"0"}
+{"Name":"OUI FM Rock 80's","URL":"rock80s.stream.ouifm.fr","File":"/ouifmeighties.mp3","Port":"80","ovol":"0"}
+{"Name":"OUI FM Rock 90's","URL":"rock90s.stream.ouifm.fr","File":"/ouifmnineties.mp3","Port":"80","ovol":"0"}
+{"Name":"OUI FM Rock 2000","URL":"rock2000.stream.ouifm.fr","File":"/ouifmrock2000.mp3","Port":"80","ovol":"0"}
+{"Name":"OUI FM Classic Rock","URL":"classicrock.stream.ouifm.fr","File":"/ouifm3.mp3","Port":"80","ovol":"0"}
+{"Name":"OUI FM Summertime","URL":"summertime.stream.ouifm.fr","File":"/ouifmsummertime.mp3","Port":"80","ovol":"0"}
+{"Name":"Classical WETA 90.9 FM - Washington D.C.","URL":"38.100.128.106","File":"/listen.pls?sid=1","Port":"8000","ovol":"0"}
+{"Name":"Radio Bloodstream","URL":"uk1.internet-radio.com","File":"/live.m3u","Port":"8294","ovol":"0"}
+{"Name":"Classic Rock Florida","URL":"listen.shoutcast.com","File":"/classic-rockflorida.m3u","Port":"80","ovol":"0"}
+{"Name":"Classic Rock Records","URL":"listen.radionomy.com","File":"/classic-rock-records.m3u","Port":"80","ovol":"0"}
+{"Name":"Classic Rock Miami HD","URL":"airspectrum.cdnstream1.com","File":"/1303_128.m3u","Port":"8142","ovol":"0"}
+{"Name":"Classic Rock New York","URL":"listen.radionomy.com","File":"/newyorkclassicrock.m3u","Port":"80","ovol":"0"}
+{"Name":"Skeetown Stereo","URL":"s32.myradiostream.com","File":"/","Port":"6784","ovol":"0"}
+{"Name":"Lala Radio","URL":"broadcast.infomaniak.ch","File":"/lalaradio-high.mp3.m3u","Port":"80","ovol":"0"}
+{"Name":"Radioaviva Montpellier","URL":"stream.franclr.fr","File":"/radioaviva.m3u","Port":"8000","ovol":"0"}
+{"Name":"Smooth Jazz Florida","URL":"37.187.79.56","File":"/listen.pls?sid=1","Port":"5120","ovol":"0"}
+{"Name":"Smooth Jazz Florida Plus HQ","URL":"176.9.43.216","File":"/listen.pls?sid=1","Port":"8006","ovol":"0"}
+{"Name":"SUN - LE SON UNIQUE A NANTES","URL":"80.82.229.202","File":"/sunhd.mp3","Port":"8000","ovol":"0"}
+{"Name":"Los 40 Principales","URL":"provisioning.streamtheworld.com","File":"/pls/LOS40.pls","Port":"80","ovol":"0"}
+{"Name":"Vivante FM Belgique","URL":"94.23.26.193","File":"/stream?1445592332931.mp3","Port":"9361","ovol":"0"}
+{"Name":"Radio Plus Belgique","URL":"radioplus23.ice.infomaniak.ch","File":"/radioplus23-48.aac.m3u","Port":"80","ovol":"0"}
+{"Name":"Must FM Belgique","URL":"mustfm.ice.infomaniak.ch","File":"/mustfm-192.mp3","Port":"80","ovol":"0"}
+{"Name":"BBC 1 Uk","URL":"www.listenlive.eu","File":"/bbcradio1.m3u","Port":"80","ovol":"0"}
+{"Name":"BBC 2 Uk","URL":"www.listenlive.eu","File":"/bbcradio2.m3u","Port":"80","ovol":"0"}
+{"Name":"BBC 3 Uk","URL":"www.listenlive.eu","File":"/bbcradio3.m3u","Port":"80","ovol":"0"}
+{"Name":"BBC 4 Uk","URL":"www.listenlive.eu","File":"/bbcradio4.m3u","Port":"80","ovol":"0"}
+{"Name":"BBC 5 Uk","URL":"www.listenlive.eu","File":"/bbc5live.m3u","Port":"80","ovol":"0"}
+{"Name":"BBC 6 Uk","URL":"www.listenlive.eu","File":"/bbc6music.m3u","Port":"80","ovol":"0"}
+{"Name":"BBC World","URL":"www.bbc.co.uk","File":"/worldservice/meta/live/mp3/eneuk.pls","Port":"80","ovol":"0"}
+{"Name":"Earth Uk","URL":"media-ice.musicradio.com","File":"/HeartLondonMP3.m3u","Port":"80","ovol":"0"}
+{"Name":"Public Domain Classical - Swiss Internet Radio","URL":"www.swissradio.ch","File":"/streams/6034.asx","Port":"80","ovol":"0"}
+{"Name":"Minster Radio Uk","URL":"str1.sad.ukrd.com","File":"/minster.m3u","Port":"80","ovol":"0"}
+{"Name":"The voice Uk","URL":"www.rosi-systems.com","File":"/thevoice.mp3.m3u","Port":"8000","ovol":"0"}
+{"Name":"Easy Hit Florida","URL":"airspectrum.cdnstream1.com","File":"/1649_192","Port":"8116","ovol":"0"}
+{"Name":"ALBUMROCK.MIAMI","URL":"37.187.79.56","File":"/listen.pls?sid=1","Port":"5028","ovol":"0"}
+{"Name":"Radio Jazz","URL":"jazzradio.ice.infomaniak.ch","File":"/frequencejazz-high.mp3","Port":"80","ovol":"0"}
+{"Name":"The eagle","URL":"uplink.duplexfx.com","File":"/","Port":"8030","ovol":"0"}
+{"Name":"Zenith Classic Rock Dublin","URL":"148.163.81.10","File":"/listen.pls?sid=1","Port":"8006","ovol":"0"}
+{"Name":"LaFabrik Suisse","URL":"stream.lafabrik.ch","File":"/lafabrik","Port":"80","ovol":"0"}
+{"Name":"Vibration FM Suise","URL":"vibration.stream2net.eu","File":"/listen.pls","Port":"8130","ovol":"0"}
+{"Name":"Vibration PopRock Suisse","URL":"vibrationpoprock.stream2net.eu","File":"/listen.pls","Port":"8260","ovol":"0"}
+{"Name":"Vibration Latina Suisse","URL":"vibracionlatina.stream2net.eu","File":"/listen.pls","Port":"8410","ovol":"0"}
+{"Name":"Vibration classic hit Suisse","URL":"vibrationclassic80.stream2net.eu","File":"/listen.pls","Port":"8060","ovol":"0"}
+{"Name":"Alpradio","URL":"alpradio.stream2net.eu","File":"/;stream.mp3","Port":"8050","ovol":"0"}
+{"Name":"Rhone FM","URL":"broadcast.infomaniak.ch","File":"/rhonefm-high.mp3.m3u","Port":"80","ovol":"0"}
+{"Name":"Motown Magic Oldies","URL":"airspectrum.cdnstream1.com","File":"/1302_192.m3u","Port":"8024","ovol":"0"}
+{"Name":"RTS couleur 3","URL":"stream.srg-ssr.ch","File":"/couleur3/mp3_128.m3u","Port":"80","ovol":"-36"}
+{"Name":"1FM - Music From The 1960s - Today!","URL":"uk2.internet-radio.com","File":"/listen.pls","Port":"8358","ovol":"0"}
+{"Name":"California-101 The Westcoast Radio","URL":"www.california101radio.com","File":"/california101.pls","Port":"80","ovol":"0"}
+{"Name":"Clin d oeil","URL":"broadcast.infomaniak.ch","File":"/clindoeilfm1061-128.mp3","Port":"80","ovol":"0"}
+{"Name":"RADIO HABANA SON CUBA","URL":"streamingv2.shoutcast.com","File":"/RADIOHABANASONCUBA?lang=fr%2cfr-FR%3bq%3d0.8%2cen-US%3bq%3d0.5%2cen%3bq%3d0.3","Port":"80","ovol":"0"}
+{"Name":"Creek Valley Radio - Late 60s to 00s Mix","URL":"142.4.217.133","File":"/listen.pls","Port":"8469","ovol":"0"}
+{"Name":"TROPICALISIMA.FM BACHATA","URL":"tropicalisima.net","File":"/stream/1/","Port":"8024","ovol":"0"}
+{"Name":"TROPICALISIMA.FM SALSA","URL":"tropicalisima.net","File":"/stream/1/","Port":"8020","ovol":"0"}
+{"Name":"RMF Cuba","URL":"31.192.216.8","File":"/rmf_cuba","Port":"8000","ovol":"0"}
+{"Name":"Kiss 94.9 Santo Domingo","URL":"72.29.70.22","File":"/listen.pls?sid=1","Port":"9300","ovol":"0"}
+{"Name":"1.FM - ABSOLUTE TOP 40 RADIO","URL":"69.46.90.245","File":"/","Port":"8078","ovol":"0"}
+{"Name":"Magic Oldies Florida","URL":"airspectrum.cdnstream1.com","File":"/1606_192","Port":"8018","ovol":"0"}
+{"Name":"Coast FM TENERIFE","URL":"uk1.internet-radio.com","File":"/","Port":"15614","ovol":"0"}
+{"Name":"Radio classique","URL":"radioclassique.ice.infomaniak.ch","File":"/radioclassique-high.mp3","Port":"80","ovol":"0"}
+{"Name":"Beatles Radio","URL":"www.beatlesradio.com","File":"/stream/1/","Port":"8000","ovol":"0"}
+{"Name":"RSouvenirs Quebec Canada","URL":"192.99.170.8","File":"/","Port":"5188","ovol":"0"}
+{"Name":"Refresh hit","URL":"listen.radionomy.com","File":"/refreshhitsradio","Port":"80","ovol":"0"}
+{"Name":"VOXINOX la webradio des Jeunes Seniors","URL":"94.23.41.123","File":"/","Port":"8010","ovol":"0"}
+{"Name":"Voxinox 2","URL":"94.23.41.123","File":"/","Port":"8015","ovol":"0"}
+{"Name":"Sud Radio","URL":"start-sud.ice.infomaniak.ch","File":"/start-sud-high.mp3","Port":"80","ovol":"0"}
+{"Name":"Orcières","URL":"imagine.net-radio.fr","File":"/orcieres-48.aac","Port":"80","ovol":"0"}
+{"Name":"100% Hit","URL":"100radio-hit.ice.infomaniak.ch","File":"/100radio-hit-128.mp3","Port":"80","ovol":"0"}
+{"Name":"100% 80","URL":"100radio-80.ice.infomaniak.ch","File":"/100radio-80-128.mp3","Port":"80","ovol":"0"}
+{"Name":"100% 90","URL":"100radio-90.ice.infomaniak.ch","File":"/100radio-90-64.aac","Port":"80","ovol":"0"}
+{"Name":"100% Carcassonne","URL":"100radio-carcassonne.ice.infomaniak.ch","File":"/100radio-carcassonne-128.mp3","Port":"80","ovol":"0"}
+{"Name":"Ringfm","URL":"shout.babahh.com","File":"/ringfm","Port":"80","ovol":"0"}
+{"Name":"Retro FM","URL":"192.99.18.164","File":"/listen.pls","Port":"9986","ovol":"0"}
+{"Name":"SkyPlus","URL":"194.106.119.241","File":"/skyplus_hi.mp3","Port":"8500","ovol":"0"}
+{"Name":"Atlantis radio","URL":"5.39.71.159","File":"/listen.pls?sid=1","Port":"8763","ovol":"0"}
+{"Name":"ES Radio Spain","URL":"livestreaming3.esradio.fm","File":"/stream64.mp3","Port":"80","ovol":"0"}
+{"Name":"Europa FM Spain","URL":"212.129.60.86","File":"/listen.pls","Port":"9968","ovol":"0"}
+{"Name":"Xtra FM Spain","URL":"stream.internetgirona.com","File":"/onair","Port":"8000","ovol":"0"}
+{"Name":"Cadena Spain","URL":"provisioning.streamtheworld.com","File":"/pls/CADENADIAL.pls","Port":"80","ovol":"0"}
+{"Name":"Europa FM Spain","URL":"212.129.60.86","File":"/listen.pls","Port":"9968","ovol":"0"}
+{"Name":"100 HIT USA","URL":"streaming.radionomy.com","File":"/100-HIT-radio","Port":"80","ovol":"0"}
+{"Name":"Classic Hits 4FM Ireland","URL":"sirius.shoutca.st","File":"/listen.pls?sid=1","Port":"8166","ovol":"0"}
+{"Name":"Galway Bay FM Ireland","URL":"tx.sharp-stream.com","File":"/http_live.php?i=galwaybay.mp3","Port":"80","ovol":"0"}
+{"Name":"Near FM Ireland","URL":"178.32.62.163","File":"/listen.pls?sid=1","Port":"8114","ovol":"0"}
+{"Name":"Radio Nova Ireland","URL":"31.14.40.241","File":"/listen.pls","Port":"9752","ovol":"0"}
+{"Name":"Sunshine Ireland","URL":"sirius.shoutca.st","File":"/listen.pls?sid=1","Port":"8291","ovol":"0"}
+{"Name":"RAI Radiouno Italy","URL":"www.listenlive.eu","File":"/rai1.m3u","Port":"80","ovol":"0"}
+{"Name":"RAI Radiodue Italy","URL":"www.listenlive.eu","File":"/rai2.m3u","Port":"80","ovol":"0"}
+{"Name":"Antenna 1 Italy","URL":"s3.mediastreaming.it","File":"/listen.pls","Port":"7568","ovol":"0"}
+{"Name":"Antenna 2 Italy","URL":"wma03.fluidstream.net","File":"/listen.pls","Port":"9070","ovol":"0"}
+{"Name":"FM Italia Italy","URL":"onair7.xdevel.com","File":"/listen.pls","Port":"8700","ovol":"0"}
+{"Name":"Golden Hit radio Italy","URL":"www.goldenradio.it","File":"/hitradio/hr128.m3u","Port":"80","ovol":"0"}
+{"Name":"Onda Libera Italy","URL":"s6.mediastreaming.it","File":"/listen.pls","Port":"9064","ovol":"0"}
+{"Name":"105 Hits Italy","URL":"178.32.113.2","File":"/","Port":"8090","ovol":"0"}
+{"Name":"Ruki_Vverh   Russe","URL":"stream.pcradio.biz","File":"/Ruki_Vverh-hi","Port":"8000","ovol":"0"}
+{"Name":"trancebase","URL":"listen.trancebase.fm","File":"/tunein-aacplus-pls?sid=1","Port":"80","ovol":"0"}
+{"Name":"PARTY VIBE RADIO","URL":"www.partyviberadio.com","File":"/listen.pls?sid=1","Port":"8000","ovol":"42"}
+{"Name":"Party Vibe Top 40","URL":"www.partyviberadio.com","File":"/listen.pls?sid=1","Port":"8024","ovol":"46"}
+{"Name":"PARTY VIBE RADIO : JAZZ","URL":"www.partyviberadio.com","File":"/listen.pls?sid=1","Port":"8020","ovol":"50"}
+{"Name":"Radio Satellite","URL":"195.154.180.106","File":"/tunein/radiosa1.pls","Port":"2199","ovol":"0"}
+{"Name":"The Cardigans","URL":"stream.pcradio.biz","File":"/The_Cardigans-hi","Port":"8000","ovol":"-36"}
+{"Name":"The Beach Boys","URL":"stream.pcradio.biz","File":"/The_Beach_Boys-hi","Port":"8000","ovol":"-20"}
+{"Name":"Top 200","URL":"stream.pcradio.biz","File":"/Top_200-hi","Port":"8000","ovol":"-36"}
+{"Name":"The Corrs","URL":"stream.pcradio.biz","File":"/The_Corrs-hi","Port":"8000","ovol":"-36"}
+{"Name":"Pink Floyd","URL":"stream.pcradio.biz","File":"/Pink_Floyd-hi","Port":"8000","ovol":"-30"}
+{"Name":"BoneyM","URL":"stream.pcradio.biz","File":"/BoneyM-hi","Port":"8000","ovol":"-40"}
+{"Name":"Nirvana","URL":"stream.pcradio.biz","File":"/Nirvana-hi","Port":"8000","ovol":"-34"}
+{"Name":"The Prodigy","URL":"stream.pcradio.biz","File":"/The_Prodigy-hi","Port":"8000","ovol":"-42"}
+{"Name":"Hi On Line Pop netherland","URL":"mediaserv30.live-streams.nl","File":"/","Port":"8086","ovol":"0"}
+{"Name":"Hi On Line World","URL":"mediaserv38.live-streams.nl","File":"/","Port":"8027","ovol":"0"}
+{"Name":"Hi On Line Latin","URL":"mediaserv33.live-streams.nl","File":"/","Port":"8034","ovol":"0"}
+{"Name":"Hi On Line Gold","URL":"mediaserv30.live-streams.nl","File":"/","Port":"8000","ovol":"0"}
+{"Name":"ogg","URL":"striiming.trio.ee","File":"/myhits.ogg","Port":"8008","ovol":"0"}
+{"Name":"Radio Ici et Maintenant","URL":"radio.rim952.fr","File":"/stream.mp3","Port":"8000","ovol":"0"}
+{"Name":"New York Times - Backstory","URL":"podcasts.nytimes.com","File":"/podcasts/2011/03/01/01backstory-hulse.mp3","Port":"80","ovol":"8"}
+{"Name":"Radio libertaire","URL":"ecoutez.radio-libertaire.org","File":"/radiolib.m3u","Port":"8080","ovol":"0"}
+{"Name":"freedom","URL":"freedomice.streamakaci.com","File":"/freedom.mp3","Port":"80","ovol":"0"}
+{"Name":"Radio techno Zagreb","URL":"kapital3.org","File":"/listen.pls?sid=1","Port":"8000","ovol":"0"}
+{"Name":"Makeout Memories","URL":"158.69.114.190","File":"/listen.pls?sid=1","Port":"8034","ovol":"0"}
+{"Name":"DI Radio Digital impulse","URL":"5.39.71.159","File":"/listen.pls?sid=1","Port":"8110","ovol":"0"}
+{"Name":"test1","URL":"radio101.hr","File":"/generated/aac_radio101.pls","Port":"80","ovol":"0"}
+{"Name":"test2","URL":"provisioning.streamtheworld.com","File":"/pls/program1aac.pls","Port":"80","ovol":"0"}
+{"Name":"deltaradio_indie","URL":"stream.pcradio.biz","File":"/deltaradio_indie-low","Port":"8000","ovol":"-20"}
+{"Name":"Супердискотека 90х","URL":"online.radiorecord.ru","File":"/sd90_128","Port":"8102","ovol":"0"}
+{"Name":"Roots Rock iPhone Akamai","URL":"irro-fl.akacast.akamaistream.net","File":"/7/114/166142/v1/auth.akacast.akamaistream.net/irro-fl","Port":"80","ovol":"0"}
+{"Name":"Test slow station","URL":"fmsentir.ddns.net","File":"/stream","Port":"443","ovol":"0"}
+{"Name":"All Gold","URL":"allgold.streamthenet.com","File":"/;stream/1","Port":"80","ovol":"0"}
+{"Name":"derti greek","URL":"derti.live24.gr","File":"/derty1000","Port":"80","ovol":"0"}
+{"Name":"Pure Lazy","URL":"radios.rtbf.be","File":"/wr-pure-lazy-128.mp3","Port":"80","ovol":"0"}
+{"Name":"Pure Like","URL":"radios.rtbf.be","File":"/wr-pure2-128.mp3","Port":"80","ovol":"0"}
+{"Name":"Top club radionomy","URL":"listen.radionomy.com","File":"/topclub.m3u","Port":"80","ovol":"0"}
+{"Name":"RadioMyMe radionomy","URL":"listen.radionomy.com","File":"/radiomyme-tv.m3u","Port":"80","ovol":"0"}
+{"Name":"100% Hit Radionomy","URL":"listen.radionomy.com","File":"/100-hit-radio.m3u","Port":"80","ovol":"0"}
+{"Name":"All 60S Radionomy","URL":"keepfreemusic.com","File":"/60s.m3u","Port":"80","ovol":"0"}
+{"Name":"Magia-1047Fm-Ksiromero-Greece","URL":"88.99.23.20","File":"/listen.pls?sid=1","Port":"8064","ovol":"0"}
+{"Name":"Nostalgia Radionomy","URL":"listen.radionomy.com","File":"/radio-nostalgia.m3u","Port":"80","ovol":"0"}
+{"Name":"MadeIn80 Radionomy","URL":"listen.radionomy.com","File":"/madein80.m3u","Port":"80","ovol":"18"}
+{"Name":"Radio Web Talents","URL":"91.121.59.45","File":"/autodj","Port":"8015","ovol":"0"}
+{"Name":"Wood radio","URL":"streaming.radionomy.com","File":"/WoodRadio","Port":"80","ovol":"0"}
+{"Name":"Hotmix 80","URL":"streaming.hotmix-radio.net","File":"/hotmixradio-80-128.mp3","Port":"80","ovol":"0"}
+{"Name":"Hotmix 90","URL":"streaming.hotmix-radio.net","File":"/hotmixradio-90-128.mp3","Port":"8000","ovol":"0"}
+{"Name":"Hotmix 2000","URL":"streaming.hotmix-radio.net","File":"/hotmixradio-2k-128.mp3","Port":"80","ovol":"0"}
+{"Name":"Hotmix Frenchy","URL":"streaming.hotmix-radio.net","File":"/hotmixradio-frenchy-128.mp3","Port":"80","ovol":"0"}
+{"Name":"Hotmix Hits","URL":"streaming.hotmix-radio.net","File":"/hotmixradio-hits-128.mp3","Port":"80","ovol":"0"}
+{"Name":"Hotmix Funky","URL":"streaming.hotmix-radio.net","File":"/hotmixradio-funky-128.mp3","Port":"80","ovol":"0"}
+{"Name":"Hotmix Lounge","URL":"streaming.hotmix-radio.net","File":"/hotmixradio-lounge-128.mp3","Port":"80","ovol":"0"}
+{"Name":"Hotmix Rock","URL":"streamingads.hotmixradio.fm","File":"/hotmixradio-rock-128.mp3","Port":"80","ovol":"0"}
+{"Name":"Hotmix Golds","URL":"streaming.hotmix-radio.net","File":"/hotmixradio-golds-128.mp3","Port":"80","ovol":"0"}
+{"Name":"Hotmix Baby","URL":"streaming.hotmix-radio.net","File":"/hotmixradio-baby-128.mp3","Port":"80","ovol":"0"}
+{"Name":"Hotmix New","URL":"streaming.hotmix-radio.net","File":"/hotmixradio-new-128.mp3","Port":"80","ovol":"0"}
+{"Name":"Hotmix Sunny","URL":"streaming.hotmix-radio.net","File":"/hotmixradio-sunny-128.mp3","Port":"80","ovol":"0"}
+{"Name":"TSF Jazz","URL":"broadcast.infomaniak.net","File":"/tsfjazz-high.mp3","Port":"80","ovol":"0"}
+{"Name":"http://netradio.radiomax.dk:8002/max.mp3.m3u","URL":"netradio.radiomax.dk","File":"/max.mp3.m3u","Port":"8002","ovol":"0"}
+{"Name":"Virgin Radio","URL":"ais-live.cloud-services.paris","File":"/virgin.mp3","Port":"8000","ovol":"0"}
+{"Name":"Virgin Radio Hit","URL":"vr-wr4-mp3-128.scdn.arkena.com","File":"/virginradio.mp3","Port":"80","ovol":"0"}
+{"Name":"Virgin Radio New","URL":"mp3lg3.tdf-cdn.com","File":"/9145/lag_103228.mp3","Port":"80","ovol":"0"}
+{"Name":"Radio caroline flashback","URL":"sc2.radiocaroline.net","File":"/mp3","Port":"10558","ovol":"0"}
+{"Name":"ru Radio","URL":"online.radioc.ru","File":"/radioc","Port":"8000","ovol":"0"}
+{"Name":"ABF 80","URL":"rod.frequence3.net","File":"/frequence3ac-64.aac.m3u","Port":"80","ovol":"0"}
+{"Name":"107.8 Radio Jackie Finesse","URL":"www.radiojackie.com","File":"/listen.pls","Port":"5873","ovol":"0"}
+{"Name":"Megapark Beach Radio","URL":"rs34.stream24.net","File":"/radio-megapark-beach.mp3","Port":"8000","ovol":"0"}
+{"Name":"newair","URL":"newairhost.com","File":"/listen.pls?sid=1","Port":"8034","ovol":"0"}
+{"Name":"Megapark Beach Radio","URL":"retro80.hostingradio.ru","File":"/retro80-128.mp3","Port":"8025","ovol":"0"}
+{"Name":"Lovely","URL":"radioefm.ice.infomaniak.ch","File":"/radioefm-high.mp3","Port":"80","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"80","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"80","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"80","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"80","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"80","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"80","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"80","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"80","ovol":"0"}

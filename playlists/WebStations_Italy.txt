@@ -1,0 +1,18 @@
+{"Name":"RAI Radio 1","URL":"icestreaming.rai.it","File":"/1.mp3","Port":"80"}
+{"Name":"RAI Radio 2","URL":"icestreaming.rai.it","File":"/2.mp3","Port":"80"}
+{"Name":"RAI Radio 3","URL":"icestreaming.rai.it","File":"/3.mp3","Port":"80"}
+{"Name":"RAI Radio Classica","URL":"icestreaming.rai.it","File":"/5.mp3","Port":"80"}
+{"Name":"RAI Radio Opera","URL":"icestreaming.rai.it","File":"/11.mp3","Port":"80"}
+{"Name":"RTL 102.5","URL":"shoutcast.rtl.it","File":"/","Port":"3010"}
+{"Name":"Virgin Radio","URL":"icecast.unitedradio.it","File":"/Virgin.mp3","Port":"80"}
+{"Name":"Radio Monte Carlo","URL":"icecast.unitedradio.it","File":"/RMC.mp3","Port":"80"}
+{"Name":"RDS","URL":"www.rds.it","File":"/stream","Port":"8000"}
+{"Name":"RTL","URL":"shoutcast.rtl.it","File":"/","Port":"3010"}
+{"Name":"Radio 105","URL":"icecast.unitedradio.it","File":"/Radio105.mp3","Port":"80"}
+{"Name":"Radio Maria","URL":"dreamsiteradiocp.com","File":"/","Port":"8092"}
+{"Name":"RMC '80","URL":"icy.unitedradio.it","File":"/Rmc80.mp3","Port":"80"}
+{"Name":"RMC '90","URL":"icy.unitedradio.it","File":"/Rmc90.mp3","Port":"80"}
+{"Name":"RMC Hits","URL":"icy.unitedradio.it","File":"/RmcHits.mp3","Port":"80"}
+{"Name":"RMC Love Songs","URL":"icy.unitedradio.it","File":"/RmcLoveSongs.mp3","Port":"80"}
+{"Name":"Radio Freccia","URL":"shoutcast.rtl.it","File":"/","Port":"3060"}
+
