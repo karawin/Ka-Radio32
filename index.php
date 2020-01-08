@@ -15,7 +15,7 @@ if($_SERVER['REQUEST_METHOD'] == 'GET' and !empty($_SERVER['QUERY_STRING'])) {
 	exit;
 }
 
-if(filter_has_var(INPUT_POST, 'action')) {
+if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	/*
 	 * Fields for POST request :
 		$params = array(
@@ -45,17 +45,11 @@ if(filter_has_var(INPUT_POST, 'action')) {
 			)
 		);
 	 * */
-	$action = filter_input(INPUT_POST, 'action', FILTER_SANITIZE_STRING);
-	$post_fields = $_POST;
-	unset($post_fields['action']);
 
-	// Bug from Ka-Radio
-	if(in_array($action, array('play', 'icy', 'soundvol', 'auto'))) {
-		$post_fields[''] = '';
-	}
+	if(empty($_SERVER['HTTP_KARADIO_ACTION'])) { exit; }
 
-	$params = http_build_query($post_fields);
-	$ch = curl_init(IP_ADDR . '/' . $action);
+	$params = file_get_contents('php://input');
+	$ch = curl_init(IP_ADDR . '/' . $_SERVER['HTTP_KARADIO_ACTION']);
 	curl_setopt_array($ch, array(
 		CURLOPT_POSTFIELDS => $params,
 		CURLOPT_POST => true,
@@ -64,8 +58,6 @@ if(filter_has_var(INPUT_POST, 'action')) {
 	$resp = curl_exec($ch);
 	$curl_infos = curl_getinfo($ch);
 	curl_close($ch);
-	// error_log(print_r($curl_infos, true), 3, __DIR__ . '/error.log');
-	// header('HTTP/1.1 '. $curl_infos['http_code']);
 	header('Content-Type: ' . $curl_infos['content_type']);
 	header('Content-Length: ' . strlen($resp));
 	echo $resp;
