@@ -8,7 +8,7 @@
 	<meta name="apple-mobile-web-app-status-bar-style" content="default" >
 	<link rel="apple-touch-icon" type="image/png" href="logo.png" >
 	<link rel="icon" type="image/png" href="favicon.png" />
-	<link type="text/css" rel="stylesheet" title="base" href="https://bazooka07.github.io/Ka-Radio32/assets/style.css" />
+	<link type="text/css" rel="stylesheet" title="base" href="https://bazooka07.github.io/Ka-Radio32/assets/extensions.css" />
 	<title>Karadio, the ultimate Wifi Webradio</title>
 </head><body>
 	<header class="no-print" id="header">
@@ -59,17 +59,17 @@
 					</form>
 					<div id="icy">
 						<p>Name</p>
-						<p id="icy-name"></p>
+						<p id="icy-name">J.P. Pourrez (aka bazooka07)</p>
 						<p>Description</p>
-						<p id="icy-descr"></p>
+						<p id="icy-descr">A new home page for you device</p>
 						<p>Genre</p>
-						<p id="icy-genre"></p>
+						<p id="icy-genre">Enhanced version</p>
 						<p>Url</p>
-						<p><a id="icy-url1" href="" target="_blank"></a></p>
+						<p><a id="icy-url1" href="https://bazooka07.github.io/Ka-Radio32/" target="_blank">https://bazooka07.github.io/Ka-Radio32/</a></p>
 						<p>Notice 1</p>
 						<p id="icy-not1"></p>
 						<p>Notice 2</p>
-						<p id="icy-not2"></a></p>
+						<p id="icy-not2">Change IP Constant in index.php if using</a></p>
 						<p>Bitrate</p>
 						<p id="icy-bitr"></p>
 					</div>
@@ -238,8 +238,8 @@
 		<input form="tabs" type="radio" name="tab" id="tab-about" value="about" />
 		<div class="no-print" id="about">
 			<div>
-				<iframe src="http://karadio.karawin.fr/version32.php" width="100%">Your browser doesn't support the iframe tag</iframe>
-				<iframe src="http://karadio.karawin.fr/infos.php" width="100%">Your browser doesn't support the iframe tag</iframe>
+				<iframe id="frame-version32" src="http://karadio.karawin.fr/version32.php" width="100%">Your browser doesn't support the iframe tag</iframe>
+				<iframe id="frame-infos" src="http://karadio.karawin.fr/infos.php" width="100%">Your browser doesn't support the iframe tag</iframe>
 			</div>
 		</div>
 	</section>
@@ -260,7 +260,7 @@
 					<label for="urlStation">Full url</label>
 					<input type="url" id="urlStation" name="urlStation" required />
 					<label for="volStation">Volume</label>
-					<input type="range" id="volStation" min="0" max="100" />
+					<input type="range" id="volStation" min="-126" max="126" />
 				</div>
 				<p class="center">
 					<input type="button" class="button" value="Abort" id="abortEditStationBtn" />
@@ -275,7 +275,7 @@
 			'use strict';
 			const myScript = document.createElement('SCRIPT');
 			myScript.type = 'text/javascript';
-			myScript.src = document.styleSheets[0].href.replace(/\bstyle\.css/, 'script.js');
+			myScript.src = document.styleSheets.item('base').href.replace(/\bextensions\.css/, 'script.js');
 			document.head.appendChild(myScript);
 		})();
 	</script>

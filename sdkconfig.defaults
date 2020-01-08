@@ -1,5 +1,7 @@
 # Override defaults here
 
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+CONFIG_ESPTOOLPY_FLASHSIZE="4MB"
 
 #
 # ESP32-specific config

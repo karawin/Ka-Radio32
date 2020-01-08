@@ -1,7 +1,5 @@
 #!/bin/bash
-cd webpage
-./generate.sh
-cd ..
+webpage/generate.sh
 echo "make flash"
 make app
 

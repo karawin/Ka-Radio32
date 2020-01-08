@@ -5,6 +5,9 @@
 # python3 -m rjsmin < foo.js > foo.min.js
 # same way with https://github.com/ndparker/rcssmin
 
+cd "$(dirname $0)"
+echo "jump into $PWD directory"
+
 WORKDIR="workdir"
 mkdir -p $WORKDIR
 
@@ -28,11 +31,13 @@ for f in $(ls *.html *.png); do
 done
 
 cd $WORKDIR
-ls -l *
 for f in $(ls *); do
 	g="$(echo $f | sed -E 's/\.[a-z]+$//')"
 	xxd -i $f | sed 's/^\s*unsigned/const/' > ../tmp_$g
 done
 
 cd ..
+echo
+ls -1sh tmp_*
+
 rm -R $WORKDIR

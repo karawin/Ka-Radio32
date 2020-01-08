@@ -17,7 +17,7 @@ struct servFile
 #define ICACHE_RAM_ATTR __attribute__((section(".iram0.text")))
 
 #include "../../webpage/tmp_index"
-#include "../../webpage/tmp_responsive"
+#include "../../webpage/tmp_extensions"
 #include "../../webpage/tmp_style"
 #include "../../webpage/tmp_style1"
 #include "../../webpage/tmp_script"
@@ -72,7 +72,7 @@ const struct servFile styleFile1 = {
 const struct servFile indexFile = {
 	"/",
 	"text/html",
-	sizeof(responsive_html),
-	(const char*)responsive_html,
+	sizeof(extensions_html),
+	(const char*)extensions_html,
 	(struct servFile*)&styleFile1
 };

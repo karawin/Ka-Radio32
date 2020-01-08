@@ -49,6 +49,7 @@ Temporary Items
 # do not save build directory
 /build
 sdkconfig.old
+sdkconfig
 
 # others from bazooka07
 *~
