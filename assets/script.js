@@ -27,6 +27,12 @@ var isLoading = true; // displayed webradios are not saving in the Ka-Radio devi
 
 // https://github.com/karawin/Ka-Radio32/wiki#html-interface-for-the-wifi-webradio
 
+function setCustomHeader(xhr, action) {
+	if(typeof IP_DEVICE == 'string') {
+		xhr.setRequestHeader('Karadio-Action', action);
+	}
+}
+
 function pageReset() {
 	ICY_FIELDS.forEach(function (field) {
 		const el = document.getElementById('ici-' + field);
@@ -99,21 +105,23 @@ function valueChange(event) {
 		case 'play':
 			pageReset();
 			instantPlayForm.classList.remove('active');
+			if(!isLoading) {
+				xhr.valueChange(this.dataset.action, this.dataset.param + '=' + value + '&'); // Hack against Ka-Radio
+			} else {
+				// stations in the playlist table and select are from a file, not from the Ka-Radio device
+				const row = document.getElementById('station-' + value) ;
+				if(row != null) {
+					instantPlayForm.elements.fullUrl.value = row.cells[2].textContent;
+					instantPlayForm.elements.instantPlayBtn.click();
+				}
+			}
+			return;
 			break;
 		case 'auto':
 			value = (this.checked) ? 'true' : 'false';
 			break;
 	}
-	if(this.dataset.action != 'play' || !isLoading) {
-		xhr.valueChange(this.dataset.action, this.dataset.param + '=' + value);
-	} else {
-		// stations in the playlist table and select are from a file, not from the Ka-Radio device
-		const row = document.getElementById('station-' + value) ;
-		if(row != null) {
-			instantPlayForm.elements.fullUrl.value = row.cells[2].textContent;
-			instantPlayForm.elements.instantPlayBtn.click();
-		}
-	}
+	xhr.valueChange(this.dataset.action, this.dataset.param + '=' + value);
 }
 
 stationsSelect.addEventListener('change', valueChange);
@@ -250,6 +258,7 @@ function openSocket() {
 				if ('monitor' in msg) {
 					if (player != null) {
 						player.src = msg.monitor;
+						// displayCurrentStation(); // Post /play may give an empty answer
 					}
 					let caption = document.getElementById('monitor-url');
 					if (caption != null) {
@@ -448,7 +457,7 @@ function addStation(stationId, datas) {
 }
 
 function getVersion(release) {
-	// Ex: Release: 1.9, Revision: 5
+	// GET, /?version - Ex: Release: 1.9, Revision: 5
 	let xhrVersion = new XMLHttpRequest();
 	xhrVersion.onreadystatechange = function() {
 		const PATTERN = /^release\b.*?(\d+)\.(\d+).*?(\d+).*/i;
@@ -466,69 +475,62 @@ function getVersion(release) {
 	xhrVersion.send();
 }
 
-function displayCurrentStation() {
-	const xhrCurst = new XMLHttpRequest();
+/* ----------- display current station ---------------- */
+const xhrCurst = new XMLHttpRequest();
+xhrCurst.onreadystatechange = function () {
+	if (this.readyState === XMLHttpRequest.DONE) {
+		if (this.status === 200) {
+			// console.log(this.responseText);
+			if(this.responseText.trim().length === 0 || !this.getResponseHeader('Content-Type').startsWith('application/json')) { return; }
 
-	xhrCurst.onreadystatechange = function () {
-		if (this.readyState === XMLHttpRequest.DONE) {
-			if (this.status === 200) {
-				// console.log(this.responseText);
-				if(this.responseText.trim().length === 0 || !this.getResponseHeader('Content-Type').startsWith('application/json')) { return; }
-
-				let datas = JSON.parse(this.responseText);
-				// console.log(datas);
-				if('curst' in datas) {
-					icyDisplay(datas);
-					meta.textContent = datas.meta;
-					return;
-				}
-
-				console.log('Error: %d (%s)', this.status, this.statusText);
-			} else {
-				console.log('Error ' + this.status + ': ' + this.statusText + ' from ' + this.responseURL);
+			let datas = JSON.parse(this.responseText);
+			// console.log(datas);
+			if('curst' in datas) {
+				icyDisplay(datas);
+				meta.textContent = datas.meta;
+				return;
 			}
-		}
-	}
 
-	const action = 'icy';
-	let params = '';
-	let url = '/' + action;
-	if(typeof IP_DEVICE == 'string') {
-		let extra = 'action=' + action;
-		if(params.length == 0) {
-			params = extra;
+			console.error(this.status, this.statusText);
 		} else {
-			params += '&' + extra;
+			console.error(this.status + ': ' + this.statusText + ' from ' + this.responseURL);
 		}
-		url = window.location.href;
 	}
+}
+
+function displayCurrentStation() {
+	const action = 'icy';
+	const url = (typeof IP_DEVICE != 'string') ? '/' + action : window.location.href;
 	xhrCurst.open('POST', url);
 	xhrCurst.setRequestHeader('Content-Type', contentTypeForm);
-	xhrCurst.send(params);
+	setCustomHeader(xhrCurst, action);
+	xhrCurst.send(null);
+}
+
+/* ------------------- hardware ---------------------- */
+const xhrHardware = new XMLHttpRequest();
+
+xhrHardware.onreadystatechange = function () {
+	if (this.readyState === XMLHttpRequest.DONE) {
+		if (this.status === 200) {
+			// console.log(this.responseText);
+			if (this.responseText.trim().length === 0 || !this.getResponseHeader('Content-Type').startsWith('application/json')) { return; }
+
+			let datas = JSON.parse(this.responseText);
+
+			if ('coutput' in datas) {
+				document.forms.hardware.output.value = datas.coutput;
+				return;
+			}
+
+			console.log('Error: %d (%s)', this.status, this.statusText);
+		} else {
+			console.log('Error ' + this.status + ': ' + this.statusText + ' from ' + this.responseURL);
+		}
+	}
 }
 
 function displayHardware(valid) {
-	const xhrHardware = new XMLHttpRequest();
-	xhrHardware.onreadystatechange = function () {
-		if (this.readyState === XMLHttpRequest.DONE) {
-			if (this.status === 200) {
-				// console.log(this.responseText);
-				if (this.responseText.trim().length === 0 || !this.getResponseHeader('Content-Type').startsWith('application/json')) { return; }
-
-				let datas = JSON.parse(this.responseText);
-
-				if ('coutput' in datas) {
-					document.forms.hardware.output.value = datas.coutput;
-					return;
-				}
-
-				console.log('Error: %d (%s)', this.status, this.statusText);
-			} else {
-				console.log('Error ' + this.status + ': ' + this.statusText + ' from ' + this.responseURL);
-			}
-		}
-	}
-
 	if (typeof valid == 'undefined') { valid = '0'; }
 	if(valid != '0' && valid != '1') { return; }
 	let params = [
@@ -544,33 +546,21 @@ function displayHardware(valid) {
 		}
 	}
 
-	let action = 'hardware';
-	let url = '/' + action;
-	if(typeof IP_DEVICE == 'string') {
-		params.push('action=' + action);
-		url = window.location.href;
-	}
+	const action = 'hardware';
+	const url = (typeof IP_DEVICE != 'string') ? '/' + action : window.location.href;
 	xhrHardware.open('POST', url);
 	xhrHardware.setRequestHeader('Content-Type', contentTypeForm);
+	setCustomHeader(xhrHardware, action);
 	xhrHardware.send(params.join('&'));
 }
 
 const xhr = new XMLHttpRequest();
-xhr.stationId = 0;
+// xhr.stationId = 0;
 xhr.sendForm = function(action, params) {
-	if(typeof action == 'undefined') { return; }
-	let url = '/' + action;
-	if(typeof IP_DEVICE == 'string') {
-		let extra = 'action=' + action;
-		if(params.length == 0) {
-			params = extra;
-		} else {
-			params += '&' + extra;
-		}
-		url = window.location.href;
-	}
+	const url = (typeof IP_DEVICE != 'string') ? '/' + action : window.location.href;
 	this.open('POST', url);
 	this.setRequestHeader('Content-Type', contentTypeForm);
+	setCustomHeader(this, action);
 	this.send(params);
 }
 xhr.sendCommand = function(action, params) {
@@ -680,7 +670,9 @@ xhr.onreadystatechange = function () {
 	if (this.readyState === XMLHttpRequest.DONE) {
 		if (this.status === 200) {
 			// console.log(this.responseText);
-			if (this.responseText.trim().length === 0) { return; }
+			if (this.responseText.trim().length === 0) {
+				return;
+			}
 
 			if(!this.getResponseHeader('Content-Type').startsWith('application/json')) { return; }
 
@@ -744,69 +736,64 @@ xhr.onreadystatechange = function () {
 	}
 }
 
+/* -------- download all the stations from the Ka-Radio device --------- */
+const xhrSta = new XMLHttpRequest();
+
+xhrSta.loadStation = function (stationId) {
+	if (typeof stationId === 'number') {
+		this.stationId = stationId;
+	};
+	progressBar.value = this.stationId;
+
+	const action = 'getStation';
+	const url = (typeof IP_DEVICE != 'string') ? '/' + action : window.location.href;
+	const params = 'idgp=' + this.stationId;
+
+	this.open('POST', url);
+	this.setRequestHeader('Content-Type', contentTypeForm);
+	setCustomHeader(this, action);
+	this.send(params);
+}
+
+xhrSta.onreadystatechange = function () {
+	if (this.readyState === XMLHttpRequest.DONE) {
+		if (this.status === 200) {
+			// console.log(this.responseText);
+			if(
+				this.responseText.trim().length === 0 ||
+				!this.getResponseHeader('Content-Type').startsWith('application/json')
+			) { return; }
+
+			let datas = JSON.parse(this.responseText);
+			// console.log(datas);
+			if ('URL' in datas) {
+				/* loads each station in the table and the select's options */
+				if (datas.URL.length > 0) {
+					addStation(this.stationId, datas);
+				}
+				if (this.stationId < MAX_STATIONS) {
+					this.stationId++;
+					if (this.stationId < MAX_STATIONS) {
+						this.loadStation();
+					} else {
+						progressBar.value = MAX_STATIONS;
+						stationsBtn.disabled = false;
+						isLoading = false;
+					}
+				}
+				return;
+			}
+		}
+		console.error(this.status, this.statusText + ' from ' + this.responseURL);
+	}
+}
+
 function loadStationsList() {
 	if (stationsList == null) { return; }
 
 	stationsList.innerHTML = '';
 	stationsSelect.innerHTML = '';
 	progressBar.max = MAX_STATIONS;
-
-	const xhrSta = new XMLHttpRequest();
-	xhrSta.sendForm = function(action, params) {
-		if(typeof action == 'undefined') { return; }
-		let url = '/' + action;
-		if(typeof IP_DEVICE == 'string') {
-			let extra = 'action=' + action;
-			if(params.length == 0) {
-				params = extra;
-			} else {
-				params += '&' + extra;
-			}
-			url = window.location.href;
-		}
-		this.open('POST', url);
-		this.setRequestHeader('Content-Type', contentTypeForm);
-		this.send(params);
-	}
-	xhrSta.loadStation = function (stationId) {
-		if (typeof stationId === 'number') {
-			this.stationId = stationId;
-		};
-		progressBar.value = this.stationId;
-		this.sendForm('getStation', 'idgp=' + this.stationId);
-	}
-	xhrSta.onreadystatechange = function () {
-		if (this.readyState === XMLHttpRequest.DONE) {
-			if (this.status === 200) {
-				// console.log(this.responseText);
-				if(
-					this.responseText.trim().length === 0 ||
-					!this.getResponseHeader('Content-Type').startsWith('application/json')
-				) { return; }
-
-				let datas = JSON.parse(this.responseText);
-				// console.log(datas);
-				if ('URL' in datas) {
-					/* loads each station in the table and the select's options */
-					if (datas.URL.length > 0) {
-						addStation(this.stationId, datas);
-					}
-					if (this.stationId < MAX_STATIONS) {
-						this.stationId++;
-						if (this.stationId < MAX_STATIONS) {
-							this.loadStation();
-						} else {
-							progressBar.value = MAX_STATIONS;
-							stationsBtn.disabled = false;
-							isLoading = false;
-						}
-					}
-					return;
-				}
-			}
-			console.log('Error ' + this.status + ': ' + this.statusText + ' from ' + this.responseURL);
-		}
-	}
 	xhrSta.loadStation(0);
 }
 
@@ -831,6 +818,7 @@ function saveStationsList() {
 		}
 		this.open('POST', url);
 		this.setRequestHeader('Content-Type', contentTypeForm);
+		setCustomHeader(this, action);
 		this.send();
 	};
 
@@ -889,8 +877,8 @@ nb=3
 
 		console.log(url, '=>', params);
 		this.open('POST', url);
-		this.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 		this.setRequestHeader('Content-Type', contentTypeForm);
+		setCustomHeader(this, action);
 		this.send(params);
 	};
 
