@@ -1236,7 +1236,7 @@ const REPO_URL = document.scripts[0].src.replace(/\/\w+\/script\.js$/, '/');
 console.log('REPO_URL = ', REPO_URL);
 
 // Update urls for the playlists in the cloud
-const frameInfos = document.getElememtById('frame-info');
+const frameInfos = document.getElementById('frame-info');
 frameInfos.src = (frameInfos != null) ? REPO_URL + 'infos.html' : 'http://karadio.karawin.fr/infos.php';
 
 if(document.body.hasAttribute('data-ip')) {
