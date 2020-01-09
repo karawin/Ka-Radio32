@@ -1150,7 +1150,7 @@ xhrPlaylist.onreadystatechange = function() {
 }
 
 function loadPlaylistFromUrl(url) {
-	console.log('Downloading a playlist from ' url);
+	console.log('Downloading a playlist from ' + url);
 	xhrPlaylist.open('GET', url);
 	xhrPlaylist.send(null);
 }
