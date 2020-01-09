@@ -1255,6 +1255,14 @@ setRssiInterval();
 loadStationsList();
 
 window.addEventListener('message', function(event) {
-	event.preventDefault();
-	console.log('You have a message');
+	if(event.type == 'message' && REPO_URL.startsWith(event.origin)) {
+		event.preventDefault();
+		const payload = JSON.parse(event.data);
+		if(payload.hasOwnProperty('playlist')) {
+			loadPlaylistFromUrl(payload.playlist);
+			return;
+		}
+
+		console.error(payload);
+	}
 });

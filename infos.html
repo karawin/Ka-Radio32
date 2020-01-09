@@ -83,12 +83,7 @@
 			document.addEventListener('click', function(event)  {
 				if(event.target.hasAttribute('download') && event.target.hasAttribute('href')) {
 					event.preventDefault();
-					if(window.frameElement != null) {
-						window.frameElement.postMessage({ playlist: event.target.href }, window.location.href);
-						return;
-					}
-
-					console.error('This page is not inside an <iframe>');
+					window.parent.postMessage('{"playlist":"' + event.target.href + '"}', '*');
 				}
 			});
 		})();
