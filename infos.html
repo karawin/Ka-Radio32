@@ -88,7 +88,9 @@
 					}
 
 					event.preventDefault();
-					parent.loadPlaylistByUrl(event.target.href);
+					if(window.frameElement != null) {
+						window.frameElement.postMessage({ playlist: event.target.href }, window.location.href)
+					}
 				}
 			});
 		})();

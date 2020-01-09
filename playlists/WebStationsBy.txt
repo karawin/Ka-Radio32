@@ -1,0 +1,254 @@
+{"Name":"New Clear Radio 192k","URL":"live.ncradio.ru","File":"/192.mp3","Port":"80","ovol":"0"}
+{"Name":"New Clear Radio 256k","URL":"live.ncradio.ru","File":"/256.mp3","Port":"80","ovol":"0"}
+{"Name":"New Clear Radio 320k","URL":"live.ncradio.ru","File":"/320.mp3","Port":"80","ovol":"0"}
+{"Name":"Cafe Romantico Radio","URL":"listen.radionomy.com","File":"/Cafe-Romantico-Radio","Port":"80","ovol":"0"}
+{"Name":"Radio Skvortsov","URL":"listen.radionomy.com","File":"/radio-skvortsov","Port":"80","ovol":"0"}
+{"Name":"Cool Relax Radio","URL":"listen.radionomy.com","File":"/cool-relax.m3u","Port":"80","ovol":"0"}
+{"Name":"Radio Instrumental","URL":"stream.pcradio.biz","File":"/Instrumental-hi","Port":"8000","ovol":"0"}
+{"Name":"Instrumental FM","URL":"stream.pcradio.biz","File":"/Instrumental_fm-hi","Port":"8000","ovol":"0"}
+{"Name":"Retro 256K","URL":"retroserver.streamr.ru","File":"/retro256.mp3","Port":"8043","ovol":"0"}
+{"Name":"Retro Romantic Ballads","URL":"cast2.retro.ua","File":"/retro_romantic","Port":"8000","ovol":"0"}
+{"Name":"Radio Max Italo - Instrumental","URL":"stream.pcradio.biz","File":"/maxitalo_instrumental-hi","Port":"8000","ovol":"0"}
+{"Name":"Radio Relax","URL":"stream.pcradio.biz","File":"/radiorelax_ua_instrumental-hi","Port":"8000","ovol":"0"}
+{"Name":"Hits On Guitar","URL":"streaming.radionomy.com","File":"/hits-on-guitar","Port":"80","ovol":"0"}
+{"Name":"Romantika","URL":"stream.pcradio.biz","File":"/romantica-hi","Port":"8000","ovol":"0"}
+{"Name":"CinéMaRadio Radionomy","URL":"listen.radionomy.com","File":"/cinemaradio-laradioofficielleducinema.m3u","Port":"80","ovol":"0"}
+{"Name":"Русский рок","URL":"212.26.146.50","File":"/rusrock.mp3","Port":"8000","ovol":"0"}
+{"Name":"Rock Radio Beograd","URL":"rockradio.kbcnet.rs","File":"/","Port":"8025","ovol":"0"}
+{"Name":"Classic Rock Lengends","URL":"listen.radionomy.com","File":"/ClassicRockLengendsRadio","Port":"80","ovol":"0"}
+{"Name":"Radio ROKS Ballads","URL":"online-radioroks2.tavrmedia.ua","File":"/RadioROKS_Ballads","Port":"8000","ovol":"0"}
+{"Name":"Classic Rock 109","URL":"107.191.38.214","File":"/stream","Port":"10042","ovol":"0"}
+{"Name":"ROCK RADIO SI","URL":"stream.rockradio.si","File":"/stream","Port":"9034","ovol":"0"}
+{"Name":"Classic Rock Planet HD Plus","URL":"178.79.158.160","File":"/stream","Port":"8022","ovol":"0"}
+{"Name":"EKR Retro Rock","URL":"ekrrockradio4.scs.ms","File":"/","Port":"8400","ovol":"0"}
+{"Name":"EKR Rock Paradise","URL":"ekrrockradio2.scs.ms","File":"/","Port":"8200","ovol":"0"}
+{"Name":"EKR Now Zone","URL":"ekrrockradio5.scs.ms","File":"/","Port":"8500","ovol":"0"}
+{"Name":"The voice Rock","URL":"www.rosi-systems.com","File":"/thevoice.mp3.m3u","Port":"8000","ovol":"0"}
+{"Name":"Europa Plus","URL":"ep256.hostingradio.ru","File":"/europaplus256.mp3","Port":"8052","ovol":"0"}
+{"Name":"RFM Enfoires","URL":"rfm-wr8-mp3-128.scdn.arkena.com","File":"/rfm.mp3","Port":"80","ovol":"0"}
+{"Name":"RTL Romantic Dreams","URL":"ais.rtl.fr","File":"/rtl-1-44-128","Port":"80","ovol":"0"}
+{"Name":"KrautRock","URL":"94.249.254.14","File":"/listen.pls","Port":"7592","ovol":"0"}
+{"Name":"Radio Record Rock","URL":"air.radiorecord.ru","File":"/rock_320","Port":"8102","ovol":"0"}
+{"Name":"Radio Record Teodor","URL":"air.radiorecord.ru","File":"/teo_320","Port":"8102","ovol":"0"}
+{"Name":"Arrow Classic Rock","URL":"radio.2kom.ru","File":"/Arrow_Classic_Rock","Port":"8000","ovol":"0"}
+{"Name":"STAR FM Rock Classic","URL":"91.250.82.237","File":"/","Port":"8008","ovol":"0"}
+{"Name":"RFM 128k","URL":"www.listenlive.eu","File":"/rfm.m3u","Port":"80","ovol":"0"}
+{"Name":"RFM Collector","URL":"www.listenlive.eu","File":"/rfmcollector.m3u","Port":"80","ovol":"0"}
+{"Name":"M2 ROCK - ONLY ROCK","URL":"www.m2radio.fr","File":"/pls/m2rock.m3u","Port":"80","ovol":"0"}
+{"Name":"ROCKRADIO - 90s Rock","URL":"pub1.diforfree.org","File":"/rockradio_90srock_hi","Port":"8000","ovol":"0"}
+{"Name":"Saturn FM Rock","URL":"s5.radioheart.ru","File":"/live","Port":"8000","ovol":"0"}
+{"Name":"Saturn FM relax","URL":"s1.radioheart.ru","File":"/live","Port":"8016","ovol":"0"}
+{"Name":"Radio Aplus Relax","URL":"shoutcast.aplus.by","File":"/aplus_relax_256","Port":"9000","ovol":"0"}
+{"Name":"Beautiful Instrumentals","URL":"stream.pcradio.biz","File":"/beautiful_instrumentals-hi","Port":"8000","ovol":"0"}
+{"Name":"Radio Aviva 88FM","URL":"stream.franclr.fr","File":"/radioaviva.m3u","Port":"8000","ovol":"0"}
+{"Name":"Disco Hits 80s","URL":"5.39.71.159","File":"/stream","Port":"8998","ovol":"0"}
+{"Name":"Alpes 1 Années 90","URL":"allzic24.ice.infomaniak.ch","File":"/allzic24.mp3","Port":"80","ovol":"0"}
+{"Name":"SUN - LE SON UNIQUE A NANTES ","URL":"80.82.229.202","File":"/sunhd.mp3","Port":"8000","ovol":"0"}
+{"Name":"Vivante FM Belgique","URL":"listen.radionomy.com","File":"/radio-vivantefm.m3u","Port":"80","ovol":"0"}
+{"Name":"Must FM Belgique","URL":"rs1.vdl.fm","File":"/listen.pls","Port":"8700","ovol":"0"}
+{"Name":"BBC 6 Uk music","URL":"www.listenlive.eu","File":"/bbc6music.m3u","Port":"80","ovol":"0"}
+{"Name":"RockAntenne [DE]","URL":"mp3channels.webradio.antenne.de","File":"/rockantenne","Port":"80","ovol":"0"}
+{"Name":"Rádió rock[HUN]","URL":"92.61.114.195","File":"/","Port":"13150","ovol":"0"}
+{"Name":"FFH ROCK  aac 128 kbps","URL":"mp3.ffh.de","File":"/ffhchannels/hqrock.aac","Port":"80","ovol":"0"}
+{"Name":"FFH ROCK 128K","URL":"mp3.ffh.de","File":"/ffhchannels/hqrock.mp3","Port":"80","ovol":"0"}
+{"Name":"Rock Ballads (Rock 80's)  mp3 128 kbps","URL":"107.182.234.82","File":"/","Port":"8046","ovol":"0"}
+{"Name":"Rock HotMixRadio (Rock)  mp3 128 kbps","URL":"streaming.hotmixradio.fm","File":"/hotmixradio-rock-128.mp3","Port":"80","ovol":"0"}
+{"Name":"Humor","URL":"ic8.101.ru","File":"/c2_4","Port":"8000","ovol":"0"}
+{"Name":"Instrunental","URL":"ic7.101.ru","File":"/c11_4","Port":"8000","ovol":"0"}
+{"Name":"NovoeRadio_rock-128k","URL":"live.novoeradio.by","File":"/novoeradio-rock-128k","Port":"8000","ovol":"0"}
+{"Name":"Unistar_Lyric-128k","URL":"unistar.by","File":"/unistar_lyric-128","Port":"8000","ovol":"0"}
+{"Name":"Radio Aplus Relax_256k","URL":"shoutcast.aplus.by","File":"/aplus_relax_256","Port":"9000","ovol":"0"}
+{"Name":"Nashe radio","URL":"nashe1.hostingradio.ru","File":"/nashe-128.mp3","Port":"80","ovol":"0"}
+{"Name":"Nashe radio2","URL":"nashe1.hostingradio.ru","File":"/nashe20-128.mp3","Port":"80","ovol":"0"}
+{"Name":"Nostalgia","URL":"www.nostalgia.fm","File":"/nostalgiafm.mp3","Port":"8000","ovol":"0"}
+{"Name":"Radio DNR1","URL":"dnr24.su","File":"/live","Port":"8000","ovol":"0"}
+{"Name":"Radio DNR2","URL":"dnr24.su","File":"/live2","Port":"8000","ovol":"0"}
+{"Name":"Melodia FM","URL":"stream128.melodiafm.spb.ru","File":"/melodia128","Port":"8000","ovol":"0"}
+{"Name":"Radio REKORD 320K","URL":"air.radiorecord.ru","File":"/rr_320","Port":"805","ovol":"0"}
+{"Name":"Comedy radio","URL":"ic6.101.ru","File":"/v11_1","Port":"8000","ovol":"0"}
+{"Name":"Юмор FM","URL":"ic8.101.ru","File":"/v5_1","Port":"8000","ovol":"0"}
+{"Name":"Песни Виктора Цоя","URL":"ic4.101.ru","File":"/a103","Port":"8000","ovol":"0"}
+{"Name":"Бардовская песня","URL":"icecast.etvnet.com","File":"/bards128.mp3","Port":"8000","ovol":"0"}
+{"Name":"Рок-арсенал","URL":"grifon.info","File":"/Rock_Arsenal","Port":"8000","ovol":"0"}
+{"Name":"Песни Высоцкого","URL":"music.myradio.com.ua","File":"/pesni-vysockogo128.mp3","Port":"8000","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}

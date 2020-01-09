@@ -1253,3 +1253,8 @@ getVersion();
 displayHardware();
 setRssiInterval();
 loadStationsList();
+
+window.addEventListener('message', function(event) {
+	event.preventDefault();
+	console.log('You have a message');
+});

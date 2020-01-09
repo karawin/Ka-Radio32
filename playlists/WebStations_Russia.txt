@@ -1,0 +1,255 @@
+{"Name":"Старое Радио — Спектакли","URL":"195.91.237.50","File":"/ices128","Port":"8000","ovol":"42"}
+{"Name":"Наше Радио","URL":"radio02-cn03.akadostream.ru","File":"/nashe128.mp3","Port":"8112","ovol":"0"}
+{"Name":"Радио Шансон","URL":"radio02-cn03.akadostream.ru","File":"/shanson128.mp3","Port":"8108","ovol":"0"}
+{"Name":"Deep Mix Moscow Radio","URL":"radio02-cn03.akadostream.ru","File":"/deepmix128.mp3","Port":"8112","ovol":"0"}
+{"Name":"Радио Premium","URL":"listen.rpfm.ru","File":"/premium128","Port":"9000","ovol":"0"}
+{"Name":"Мегаполис FM","URL":"stream04.media.rambler.ru","File":"/megapolis128.mp3","Port":"80","ovol":"0"}
+{"Name":"Русское радио","URL":"radiopotok.ru","File":"/f/m3u/station_85.m3u","Port":"80","ovol":"0"}
+{"Name":"Маяк","URL":"radiopotok.ru","File":"/f/m3u/station_89.m3u","Port":"80","ovol":"42"}
+{"Name":"Авторадио","URL":"radiopotok.ru","File":"/f/m3u/station_78.m3u","Port":"80","ovol":"0"}
+{"Name":"Свобода","URL":"radiopotok.ru","File":"/f/m3u/station_90.m3u","Port":"80","ovol":"0"}
+{"Name":"Милицейская волна","URL":"radiopotok.ru","File":"/f/m3u/station_129.m3u","Port":"80","ovol":"20"}
+{"Name":"Хитрое радио","URL":"www.hitroe.com","File":"/stream_original.m3u","Port":"8000","ovol":"0"}
+{"Name":"Модель для сборки","URL":"mds-station.com","File":"/mds","Port":"8000","ovol":"0"}
+{"Name":"Радио Фантастики","URL":"fantasyradioru.no-ip.biz","File":"/live","Port":"8002","ovol":"0"}
+{"Name":"Радио КНИГА ","URL":"bookradio.hostingradio.ru","File":"/fm","Port":"8069","ovol":"42"}
+{"Name":"Русский рок","URL":"212.26.146.50","File":"/rusrock.mp3","Port":"8000","ovol":"0"}
+{"Name":"Супердискотека 90х","URL":"online.radiorecord.ru","File":"/sd90_128","Port":"8102","ovol":"0"}
+{"Name":"Песни В.С. Высоцкого","URL":"music.myradio.com.ua","File":"/pesni-vysockogo128.mp3","Port":"8000","ovol":"0"}
+{"Name":"Медляк FM","URL":"air.radiorecord.ru","File":"/mdl_320","Port":"8102","ovol":"0"}
+{"Name":"Европа плюс","URL":"ep128server.streamr.ru","File":"/ep128","Port":"8030","ovol":"0"}
+{"Name":"Кузбас FM (Кемерово 91,0 FM)","URL":"212.75.194.94","File":"/KuzbassFM","Port":"8000","ovol":"0"}
+{"Name":"Радио Ваня","URL":"radio.adsl.by","File":"/vanya","Port":"8000","ovol":"0"}
+{"Name":"Дискотека 90-х","URL":"listen1.myradio24.com","File":"/5967","Port":"9000","ovol":"0"}
+{"Name":"Комсомольская Правда - Москва","URL":"kpradio.hostingradio.ru","File":"/128","Port":"8000","ovol":"0"}
+{"Name":"Русское радио","URL":"radiopotok.ru","File":"/f/m3u/station_85.m3u","Port":"80","ovol":"0"}
+{"Name":"Юмор FM","URL":"ic3.101.ru","File":"/v5_1","Port":"8000","ovol":"0"}
+{"Name":"Вести ФМ","URL":"icecast.vgtrk.cdnvideo.ru","File":"/vestifm_mp3_192kbps","Port":"80","ovol":"42"}
+{"Name":"Дорожное радио","URL":"dor64no.streamr.ru","File":"/","Port":"80","ovol":"0"}
+{"Name":"Радио Звезда","URL":"89.208.99.16","File":"/zvezda_64","Port":"8088","ovol":"0"}
+{"Name":"Спокойное радио","URL":"listen1.myradio24.com","File":"/6262","Port":"9000","ovol":"0"}
+{"Name":"Новое радио","URL":"newradio.fmtuner.ru","File":"/newradio3","Port":"80","ovol":"0"}
+{"Name":"DFM","URL":"icecast.radiodfm.cdnvideo.ru","File":"/dfm.mp3","Port":"80","ovol":"42"}
+{"Name":"Радио Energy","URL":"z.101.ru","File":"/v1_1","Port":"8000","ovol":"0"}
+{"Name":"Радио Ретро FM","URL":"retroserver.streamr.ru","File":"/retro128","Port":"8043","ovol":"0"}
+{"Name":"Радио Хит FM","URL":"icecast.radiohitfm.cdnvideo.ru","File":"/hit.mp3","Port":"80","ovol":"0"}
+{"Name":"Радио Comedy","URL":"z.101.ru","File":"/v11_1","Port":"8000","ovol":"0"}
+{"Name":"Радио 7 на семи холмах","URL":"server03.hostingradio.ru","File":"/radio7128.mp3","Port":"8040","ovol":"0"}
+{"Name":"Радио Страна FM","URL":"icecast.stranafm.cdnvideo.ru","File":"/stranafm_128","Port":"80","ovol":"0"}
+{"Name":"Радио Рекорд","URL":"air2.radiorecord.ru","File":"/rr_320","Port":"805","ovol":"0"}
+{"Name":"Радио Мир","URL":"icecast.mirtv.cdnvideo.ru","File":"/radio_mir128","Port":"8000","ovol":"0"}
+{"Name":"Радио Like FM","URL":"z.101.ru","File":"/v12_1","Port":"8000","ovol":"0"}
+{"Name":"Радио DJ FM","URL":"media.brg.ua","File":"/;stream.nsv","Port":"8010","ovol":"0"}
+{"Name":"Радио Maximum","URL":"icecast.radiomaximum.cdnvideo.ru","File":"/maximum.mp3","Port":"80","ovol":"42"}
+{"Name":"Радио Для Двоих","URL":"cdn.radiopiterfm.ru","File":"/rdd128","Port":"80","ovol":"0"}
+{"Name":"Радио Пионер FM","URL":"pioner.hostingradio.ru","File":"/ppr128","Port":"8008","ovol":"0"}
+{"Name":"Радио Романтика","URL":"z.101.ru","File":"/v4_1","Port":"8000","ovol":"42"}
+{"Name":"Детское Радио","URL":"z.101.ru","File":"/v14_1","Port":"8000","ovol":"0"}
+{"Name":"Радио России","URL":"icecast.vgtrk.cdnvideo.ru","File":"/rrzonam_mp3_128kbps","Port":"8000","ovol":"0"}
+{"Name":"Радио Свежее","URL":"emg02.hostingradio.ru","File":"/fresh64.aac","Port":"80","ovol":"0"}
+{"Name":"Радио Гоп FM","URL":"air2.radiorecord.ru","File":"/gop_320","Port":"805","ovol":"0"}
+{"Name":"Радио Питер FM","URL":"cdn.radiopiterfm.ru","File":"/piterfm","Port":"80","ovol":"0"}
+{"Name":"Радио mCm","URL":"91.227.68.150","File":"/hit128","Port":"10000","ovol":"0"}
+{"Name":"Радио Хорошее","URL":"radio.horoshee.fm","File":"/mp3","Port":"8000","ovol":"0"}
+{"Name":"Радио Море","URL":"sea.1tvcrimea.ru","File":"/stream_sea.mp3","Port":"9003","ovol":"38"}
+{"Name":"Радио Радиус FM","URL":"live.radiusfm.by","File":"/radius_main","Port":"8000","ovol":"0"}
+{"Name":"Радио Люкс FM","URL":"icecastdc.luxnet.ua","File":"/lux_128","Port":"80","ovol":"0"}
+{"Name":"Радио Спорт FM","URL":"sportfm.hostingradio.ru","File":"/sportfm128.mp3","Port":"8050","ovol":"0"}
+{"Name":"Радио Юнистар","URL":"unistar.by","File":"/unistar-128kb","Port":"8000","ovol":"0"}
+{"Name":"Радио Для Друзей","URL":"epdop.hostingradio.ru","File":"/rdd128.mp3","Port":"8033","ovol":"0"}
+{"Name":"Радио День","URL":"air.radioday.fm","File":"/mp3","Port":"80","ovol":"0"}
+{"Name":"Радио Русский Хит","URL":"s8.imgradio.pro","File":"/RusHit","Port":"80","ovol":"0"}
+{"Name":"Радио ИР","URL":"78.110.148.237","File":"/;stream.nsv","Port":"8000","ovol":"0"}
+{"Name":"Радио NS","URL":"episodes.ne.fm","File":"/mp3/radions","Port":"80","ovol":"0"}
+{"Name":"Радио Такси FM","URL":"potokovoe.ru","File":"/TaxiFM.aac","Port":"8008","ovol":"0"}
+{"Name":"Радио Record Russian Mix","URL":"air2.radiorecord.ru","File":"/rus_320","Port":"805","ovol":"0"}
+{"Name":"Радио Юнитон","URL":"online.uniton.ru","File":"/RadioUniton128","Port":"8300","ovol":"0"}
+{"Name":"Радио Рекорд Рок","URL":"air2.radiorecord.ru","File":"/rock_128","Port":"805","ovol":"0"}
+{"Name":"Душевное Радио","URL":"air.volna.top","File":"/DushevnoeRadio48","Port":"80","ovol":"0"}
+{"Name":"Радио Русские Песни","URL":"listen.rusongs.ru","File":"/ru-mp3-128","Port":"80","ovol":"0"}
+{"Name":"Радио Dala FM","URL":"95.56.234.40","File":"/DALA_128","Port":"8080","ovol":"0"}
+{"Name":"Радио Континенталь","URL":"stream01.radiocon.ru","File":"/live","Port":"8000","ovol":"0"}
+{"Name":"Радио Спутник FM","URL":"player.bonus-tv.ru","File":"/radio3_128.mp3","Port":"8090","ovol":"0"}
+{"Name":"Радио Heart FM","URL":"gtrk22.ru","File":"/HFMhigh","Port":"8000","ovol":"0"}
+{"Name":"Радио Болид","URL":"178.161.130.30","File":"/","Port":"8128","ovol":"0"}
+{"Name":"Радио Эльдорадио","URL":"emgspb.hostingradio.ru","File":"/eldoradio128.mp3","Port":"80","ovol":"0"}
+{"Name":"Радио Искатель","URL":"iskatel.hostingradio.ru","File":"/iskatel-128.mp3","Port":"8015","ovol":"0"}
+{"Name":"Радио Пилот","URL":"online.tv-pilot.ru","File":"/pilotradio","Port":"1027","ovol":"0"}
+{"Name":"Радио 2x2","URL":"95.104.192.220","File":"/radio2x2.ogg","Port":"8001","ovol":"0"}
+{"Name":"Радио Анекдоты 101","URL":"z.101.ru","File":"/c3_5","Port":"8000","ovol":"0"}
+{"Name":"Радио Апекс","URL":"webcast.apexradio.ru","File":"/NvkzMp3","Port":"8000","ovol":"42"}
+{"Name":"Радио Пассаж","URL":"listen.radiopassazh.ru","File":"/mp3-128","Port":"80","ovol":"0"}
+{"Name":"Радио Rock FM","URL":"nashe2.hostingradio.ru","File":"/rock-128.mp3","Port":"80","ovol":"0"}
+{"Name":"Радио Premium","URL":"listen.rpfm.ru","File":"/premium128","Port":"9000","ovol":"0"}
+{"Name":"Радио Премиум Русский ТОП","URL":"listen.radonline.ru","File":"/radonline128","Port":"9000","ovol":"0"}
+{"Name":"Радио Радиола","URL":"online1.gkvr.ru","File":"/radiola_eka_128.mp3","Port":"8000","ovol":"0"}
+{"Name":"Радио Волшебный Шансон","URL":"listen2.myradio24.com","File":"/8144","Port":"9000","ovol":"0"}
+{"Name":"Радио BBC 1","URL":"bbcmedia.ic.llnwd.net","File":"/stream/bbcmedia_radio1_mf_q","Port":"80","ovol":"0"}
+{"Name":"Радио Кабриолет","URL":"setmedia.ru","File":"/high3","Port":"8000","ovol":"0"}
+{"Name":"Радио Пирамида FM","URL":"91.211.56.218","File":"/piramida/nazarovo","Port":"8080","ovol":"0"}
+{"Name":"Радио Ретро FM 70e","URL":"retro70.hostingradio.ru","File":"/retro70-128.mp3","Port":"8025","ovol":"0"}
+{"Name":"Радио Кекс FM","URL":"emg02.hostingradio.ru","File":"/keksfm64.aac","Port":"80","ovol":"0"}
+{"Name":"Радио Тенгри FM","URL":"195.210.47.197","File":"/live","Port":"8000","ovol":"0"}
+{"Name":"Радио Владивосток FM","URL":"vladfm.com","File":"/vfm","Port":"8000","ovol":"0"}
+{"Name":"Радио Классик","URL":"jfm1.hostingradio.ru","File":"/rcstream.mp3","Port":"14536","ovol":"0"}
+{"Name":"Радио Коммерсант FM","URL":"kommersant77.hostingradio.ru","File":"/kommersant128.mp3","Port":"8016","ovol":"0"}
+{"Name":"Радио Italo Disco 101","URL":"z.101.ru","File":"/c7_22","Port":"8000","ovol":"0"}
+{"Name":"Радио Балтик Плюс","URL":"217.168.64.61","File":"/balticpl.mp3","Port":"8081","ovol":"0"}
+{"Name":"Просто Радио","URL":"62.80.190.246","File":"/ProstoRadiO128","Port":"8000","ovol":"42"}
+{"Name":"Радио Наши Песни","URL":"beeline.grifon.info","File":"/radio_nashi_pesni","Port":"8800","ovol":"0"}
+{"Name":"Радио Сокаль","URL":"online.sokal.lviv.ua","File":"/sokalfm96.mp3","Port":"8000","ovol":"54"}
+{"Name":"Радио ОК","URL":"radiook.nlink.ru","File":"/OKradio128.mp3","Port":"8000","ovol":"0"}
+{"Name":"Радио Миротворцы","URL":"listen2.myradio24.com","File":"/371096.mp3","Port":"9000","ovol":"0"}
+{"Name":"Радио Megapolis","URL":"stream04.media.rambler.ru","File":"/megapolis128.mp3","Port":"80","ovol":"0"}
+{"Name":"Радио Городская волна","URL":"online.gorvolna.ru","File":"/gorvolna","Port":"8000","ovol":"0"}
+{"Name":"Радио Ulitka","URL":"air.radioulitka.ru","File":"/ulitka_192","Port":"8000","ovol":"0"}
+{"Name":"Радио Виктор Цой и группа КИНО 101","URL":"z.101.ru","File":"/c13_12","Port":"8000","ovol":"0"}
+{"Name":"Радио Сибирь","URL":"stream.radiosibir.ru","File":"/HQ","Port":"8090","ovol":"0"}
+{"Name":"Радио Терра","URL":"91.202.2.156","File":"/terra","Port":"8000","ovol":"0"}
+{"Name":"Радио DFM Deep","URL":"icecast.radiodfm.cdnvideo.ru","File":"/st24.mp3","Port":"80","ovol":"0"}
+{"Name":"Радио Голос Америки","URL":"voa-28.akacast.akamaistream.net","File":"/7/54/322040/v1/ibb.akacast.akamaistream.net/voa-28","Port":"80","ovol":"0"}
+{"Name":"L Радио","URL":"96mp3.lradio.ru","File":"/lradio.stereo.96.mp3","Port":"8000","ovol":"0"}
+{"Name":"Радио ULTRA","URL":"nashe3.hostingradio.ru","File":"/ultra-128.mp3","Port":"80","ovol":"0"}
+{"Name":"Радио Народное Славянское","URL":"s5.radioboss.fm","File":"/stream/1/","Port":"8203","ovol":"0"}
+{"Name":"Радио Хиты России","URL":"stream.hitirossii.com","File":"/khr.mp3","Port":"8000","ovol":"0"}
+{"Name":"Радио Золотой Граммофон","URL":"icecast.russkoeradio.cdnvideo.ru","File":"/st31.mp3","Port":"80","ovol":"0"}
+{"Name":"Радио Душа Кавказа","URL":"37.220.0.26","File":"/live","Port":"8000","ovol":"42"}
+{"Name":"Радио Шоколад","URL":"choco.hostingradio.ru","File":"/fm128","Port":"10010","ovol":"0"}
+{"Name":"Радио Минск","URL":"93.84.113.142","File":"/radio","Port":"8000","ovol":"0"}
+{"Name":"Радио Yum FM","URL":"yumfm.hostingradio.ru","File":"/yumfm128.mp3","Port":"8020","ovol":"0"}
+{"Name":"Радио Атмосфера","URL":"185.53.169.128","File":"/192","Port":"8000","ovol":"0"}
+{"Name":"Радио Record Chill-Out","URL":"air2.radiorecord.ru","File":"/chil_320","Port":"805","ovol":"0"}
+{"Name":"Радио Русский Шторм","URL":"live.shtorm.fm","File":"/mp3_rushtorm","Port":"8000","ovol":"0"}
+{"Name":"Радио Biker FM","URL":"stream1.radiostyle.ru","File":"/biker-fm","Port":"8001","ovol":"0"}
+{"Name":"Радио Весна FM","URL":"potokovoe.ru","File":"/Radio_Vesna_FM.aac","Port":"8008","ovol":"0"}
+{"Name":"Радио Визави FM","URL":"vizavi-nevinka.ru","File":"/stream.ogg","Port":"8000","ovol":"0"}
+{"Name":"Радио KIDS HITS","URL":"92.255.229.74","File":"/kids-hits-junior","Port":"8000","ovol":"0"}
+{"Name":"Радио Карнавал","URL":"81.19.85.204","File":"/karnaval128.mp3","Port":"80","ovol":"0"}
+{"Name":"Радио Брест","URL":"93.84.112.253","File":"/live","Port":"8039","ovol":"0"}
+{"Name":"Радио Детский Хит","URL":"imgradio.pro","File":"/DetiHit","Port":"80","ovol":"0"}
+{"Name":"Радио Рандеву","URL":"212.92.183.74","File":"/;","Port":"8370","ovol":"0"}
+{"Name":"Радио Кот ФМ","URL":"80.252.19.34","File":"/KOTFMmp3","Port":"8000","ovol":"42"}
+{"Name":"Радио Модное","URL":"cast.modnoeradio.ru","File":"/mp128","Port":"8000","ovol":"0"}
+{"Name":"Радио Relax-Nature","URL":"z.101.ru","File":"/c19_1","Port":"8000","ovol":"0"}
+{"Name":"Радио TrueColors","URL":"eu2.radioboss.fm","File":"/TrueColorsRadio","Port":"8232","ovol":"0"}
+{"Name":"Радио 16Bit FM Cafe","URL":"16bit.fm","File":"/cafe_mp3_128","Port":"8000","ovol":"0"}
+{"Name":"Радио Мелодия","URL":"icecast.mediaalliance.cdnvideo.ru","File":"/mediaalliance","Port":"80","ovol":"0"}
+{"Name":"Радио Record Transmission","URL":"air2.radiorecord.ru","File":"/tm_128","Port":"805","ovol":"0"}
+{"Name":"Радио Arbat FM","URL":"stream0.radiostyle.ru","File":"/arbatfm","Port":"8000","ovol":"0"}
+{"Name":"Радио Чистые Ключи","URL":"3n2.ru","File":"/hc","Port":"8010","ovol":"0"}
+{"Name":"Радио New Age 101","URL":"z.101.ru","File":"/c7_14","Port":"8000","ovol":"0"}
+{"Name":"Радио 40","URL":"77.244.76.186","File":"/Radio40","Port":"8000","ovol":"0"}
+{"Name":"Радио Орфей","URL":"icecast.orpheus.cdnvideo.ru","File":"/orpheus_128","Port":"80","ovol":"46"}
+{"Name":"Радио Elit FM","URL":"77.75.129.217","File":"/elit.mp3","Port":"8004","ovol":"0"}
+{"Name":"Радио За облаками","URL":"195.88.63.114","File":"/zaoblakami","Port":"8000","ovol":"42"}
+{"Name":"Радио Хорошего Настроения","URL":"188.93.129.110","File":"/fm1018","Port":"8000","ovol":"0"}
+{"Name":"Радио Рекорд Медляк FM","URL":"air2.radiorecord.ru","File":"/mdl_128","Port":"805","ovol":"0"}
+{"Name":"Радио КУРС","URL":"radio.dcatk.pro","File":"/radio.mp3","Port":"80","ovol":"0"}
+{"Name":"Радио Говорит Москва","URL":"media.govoritmoskva.ru","File":"/ru64.mp3","Port":"8880","ovol":"0"}
+{"Name":"Радио Ростова","URL":"live.radiorostov.ru","File":"/rostovradio","Port":"8000","ovol":"0"}
+{"Name":"Радио Н","URL":"online.radio-n.ru","File":"/radio","Port":"8000","ovol":"0"}
+{"Name":"Радио Новая Волна","URL":"89.249.224.121","File":"/;","Port":"8010","ovol":"0"}
+{"Name":"Радио Голос Ангары","URL":"31.41.192.74","File":"/;stream.nsv","Port":"8006","ovol":"0"}
+{"Name":"Радио Mix FM","URL":"radio.gubernia.com","File":"/radio3","Port":"8000","ovol":"0"}
+{"Name":"Авторитетное Радио","URL":"84.22.142.130","File":"/arstream","Port":"8000","ovol":"0"}
+{"Name":"Радио KFC","URL":"ps.ne.fm","File":"/KFC","Port":"80","ovol":"0"}
+{"Name":"Радио Energy Deep House","URL":"ic3.101.ru","File":"/c18_2","Port":"8000","ovol":"0"}
+{"Name":"Радио РЕТРО ХИТ","URL":"imgradio.pro","File":"/RetroHit","Port":"80","ovol":"0"}
+{"Name":"Радио Jazz","URL":"jazz.streamr.ru","File":"/jazz-128.mp3","Port":"80","ovol":"0"}
+{"Name":"Радио Русское Кино","URL":"icecast.russkoeradio.cdnvideo.ru","File":"/st19.mp3","Port":"80","ovol":"0"}
+{"Name":"Радио Ностальгия FM","URL":"93.189.147.117","File":"/nostalgiafm.mp3","Port":"8000","ovol":"0"}
+{"Name":"Радио Диско","URL":"85.143.216.212","File":"/stream","Port":"8025","ovol":"0"}
+{"Name":"Радио Интерволна","URL":"online.intervolna.ru","File":"/radio128","Port":"8001","ovol":"0"}
+{"Name":"Радио Подмосковные вечера","URL":"setmedia.ru","File":"/high5","Port":"8000","ovol":"0"}
+{"Name":"Радио Победы","URL":"178.236.210.38","File":"/rp","Port":"8000","ovol":"0"}
+{"Name":"Радио METRO","URL":"195.182.132.18","File":"/;?icy=http","Port":"8230","ovol":"0"}
+{"Name":"БИМ Радио","URL":"av.bimradio.ru","File":"/bim_mp3_128k","Port":"8066","ovol":"0"}
+{"Name":"Радио МЕГА","URL":"mega.imgradio.pro","File":"/MegaRadio48","Port":"80","ovol":"0"}
+{"Name":"Радио Новое Чистое","URL":"live.ncradio.fm","File":"/128.mp3","Port":"80","ovol":"0"}
+{"Name":"Радио DELUXE LOUNGE","URL":"46.245.183.120","File":"/0010","Port":"8000","ovol":"0"}
+{"Name":"Радио 161 FM","URL":"stream.161.fm","File":"/128","Port":"8000","ovol":"0"}
+{"Name":"Радио Relax-Life","URL":"z.101.ru","File":"/c19_5","Port":"8000","ovol":"0"}
+{"Name":"Самарское Губернское Радио","URL":"46.20.71.66","File":"/fm","Port":"8000","ovol":"42"}
+{"Name":"Радио Хит FM 2000-е","URL":"icecast.radiohitfm.cdnvideo.ru","File":"/st12.mp3","Port":"80","ovol":"0"}
+{"Name":"Радио Ребячья Республика","URL":"live.radio7.su","File":"/deti","Port":"9000","ovol":"0"}
+{"Name":"Радио Диполь","URL":"icecast.sibinformburo.cdnvideo.ru","File":"/dipolfm","Port":"8000","ovol":"0"}
+{"Name":"Радио Новороссия Рокс","URL":"93.157.14.109","File":"/nfm","Port":"8000","ovol":"0"}
+{"Name":"Радио Discover Trance","URL":"paris.discovertrance.com","File":"/;stream.nsv","Port":"8008","ovol":"0"}
+{"Name":"Радио 1","URL":"cdn.radio1.news","File":"/rtvp_mp3","Port":"8000","ovol":"0"}
+{"Name":"Радио Нара FM","URL":"eu.radioboss.fm","File":"/narafm","Port":"8271","ovol":"0"}
+{"Name":"Радио Образ","URL":"213.177.106.78","File":"/;?2578","Port":"8006","ovol":"0"}
+{"Name":"Радио Брежнев FM","URL":"91.144.154.150","File":"/;stream.nsv","Port":"8000","ovol":"0"}
+{"Name":"Радио Dance Wave","URL":"stream.dancewave.online","File":"/dance.mp3","Port":"8080","ovol":"0"}
+{"Name":"Радио AVN","URL":"46.19.66.177","File":"/AVN","Port":"13838","ovol":"0"}
+{"Name":"Радио МСС","URL":"195.46.181.242","File":"/;?1462446850404.mp3","Port":"8000","ovol":"0"}
+{"Name":"Радио Восток России","URL":"192.240.102.3","File":"/;stream.nsv","Port":"9036","ovol":"0"}
+{"Name":"Радио Волна-FM","URL":"radio.volnafm.ru","File":"/ekb","Port":"8000","ovol":"0"}
+{"Name":"Радио Ника FM","URL":"radio.nikatv.ru","File":"/;stream.nsv","Port":"80","ovol":"0"}
+{"Name":"Радио Тартиб FM","URL":"stream01.hitv.ru","File":"/tartip-fm-128kb","Port":"8000","ovol":"42"}
+{"Name":"Радио Мелодии Века","URL":"93.84.112.253","File":"/MV128","Port":"8010","ovol":"0"}
+{"Name":"Радио Gold FM","URL":"188.68.93.246","File":"/radio1","Port":"8000","ovol":"0"}
+{"Name":"Радио Интерра FM","URL":"ice.interra.fm","File":"/barix","Port":"8000","ovol":"0"}
+{"Name":"Радио Мастер FM","URL":"46.36.24.30","File":"/Master.128","Port":"8000","ovol":"0"}
+{"Name":"Радио Trance Century","URL":"109.105.59.27","File":"/tcr128","Port":"8000","ovol":"0"}
+{"Name":"Радио 100","URL":"195.54.20.148","File":"/radio100fm","Port":"9000","ovol":"0"}
+{"Name":"Радио СК","URL":"beeline.grifon.info","File":"/sk","Port":"8800","ovol":"0"}
+{"Name":"Радио Шторм","URL":"live.shtorm.fm","File":"/mp3","Port":"8000","ovol":"0"}
+{"Name":"Радио Дисней","URL":"disney2.streamr.ru","File":"/disney","Port":"8060","ovol":"0"}
+{"Name":"Радио Van FM","URL":"media.radiovan.am","File":"/96_stereo","Port":"8000","ovol":"0"}
+{"Name":"Радио Orda FM","URL":"ps.ne.fm","File":"/ORDA_FM","Port":"80","ovol":"0"}
+{"Name":"Радио Благо","URL":"www.radioblago.ru","File":"/broadwave.mp3","Port":"3281","ovol":"0"}
+{"Name":"Радио Мир Белогорья","URL":"mirbelogorya.ru","File":"/nonstop2","Port":"8008","ovol":"0"}
+{"Name":"Радио Август","URL":"81.28.166.36","File":"/;stream/1","Port":"8000","ovol":"42"}
+{"Name":"Радио Динамит","URL":"82.208.90.58","File":"/;?1456127630240.mp3","Port":"2000","ovol":"0"}
+{"Name":"Радио Авторадио Мурзилки","URL":"z.101.ru","File":"/c5_3","Port":"8000","ovol":"0"}
+{"Name":"Радио InSTYLE","URL":"s02.radio-tochka.com","File":"/radio","Port":"5060","ovol":"0"}
+{"Name":"Радио Лемма","URL":"212.107.192.130","File":"/;stream.nsv","Port":"8000","ovol":"0"}
+{"Name":"Радио Юность","URL":"ic4.101.ru","File":"/p818411","Port":"8000","ovol":"0"}
+{"Name":"Радио ИТТ - вещание","URL":"77.87.97.62","File":"/radio.ogg","Port":"8085","ovol":"0"}
+{"Name":"Радио Grind FM","URL":"radio.goha.ru","File":"/grind.fm","Port":"8000","ovol":"0"}
+{"Name":"Радио Energy Gangsta & Hip-Hop","URL":"ic3.101.ru","File":"/c14_11","Port":"8000","ovol":"0"}
+{"Name":"Радио Euronews на русском","URL":"euronews-05.ice.infomaniak.ch","File":"/euronews-05.mp3","Port":"80","ovol":"0"}
+{"Name":"Радио Лето Майами","URL":"cast2.serverroom.net","File":"/;stream.mp3","Port":"3004","ovol":"0"}
+{"Name":"Радио Solo Piano","URL":"pianosolo.streamguys.net","File":"/live","Port":"80","ovol":"0"}
+{"Name":"NN Радио","URL":"cast.nnradio.info","File":"/nrd","Port":"8000","ovol":"0"}
+{"Name":"Радио Олимп","URL":"potokovoe.ru","File":"/Radio_Olimp.aac","Port":"8008","ovol":"0"}
+{"Name":"Радио Ватан","URL":"stream1.radiostyle.ru","File":"/radiovatan","Port":"8001","ovol":"0"}
+{"Name":"Радио Alex-M","URL":"s02.radio-tochka.com","File":"/radio","Port":"5740","ovol":"0"}
+{"Name":"Радио Звуки Природы 101","URL":"z.101.ru","File":"/c17_2","Port":"8000","ovol":"0"}
+{"Name":"Радио Город FM","URL":"media.mediatime.ru","File":"/GorodFM","Port":"8051","ovol":"0"}
+{"Name":"Радио Luxe FM","URL":"streaming210.radionomy.com","File":"/LUXEFM","Port":"80","ovol":"0"}
+{"Name":"Радио Адам","URL":"91.226.107.50","File":"/adam/128","Port":"8001","ovol":"0"}
+{"Name":"Радио Джем FM","URL":"beeline.grifon.info","File":"/jam_fm","Port":"8800","ovol":"0"}
+{"Name":"Радио Старая Музыка","URL":"server.audiopedia.su","File":"/music128","Port":"8000","ovol":"0"}
+{"Name":"Большое Радио","URL":"listen2.myradio24.com","File":"/8286","Port":"9000","ovol":"0"}
+{"Name":"Радио Дюртюли FM","URL":"193.124.128.35","File":"/durfm","Port":"8000","ovol":"0"}
+{"Name":"Радио Буу!","URL":"buu.hostingradio.ru","File":"/radio","Port":"8005","ovol":"0"}
+{"Name":"Радио 13","URL":"play.radio13.ru","File":"/","Port":"80","ovol":"0"}
+{"Name":"Радио WarGaming FM","URL":"sv.wargaming.fm","File":"/128","Port":"8051","ovol":"0"}
+{"Name":"Как Бы Радио","URL":"stream.kakbyradio.ru","File":"/KakByRadio-128","Port":"8000","ovol":"0"}
+{"Name":"Радио ТНТ","URL":"tntradio.hostingradio.ru","File":"/tntradio128.mp3","Port":"8027","ovol":"0"}
+{"Name":"Радио SanFM Relax","URL":"sanfm.ru","File":"/relax","Port":"8000","ovol":"0"}
+{"Name":"Радио Губерния FM","URL":"3n2.ru","File":"/guberniya","Port":"8010","ovol":"0"}
+{"Name":"Радио Imagine","URL":"93.189.147.116","File":"/full_stream128.mp3","Port":"8000","ovol":"0"}
+{"Name":"Ну И Радио","URL":"s2.radioheart.ru","File":"/nuiradio","Port":"8003","ovol":"0"}
+{"Name":"Радио Rock Arsenal","URL":"beeline.grifon.info","File":"/Rock_Arsenal","Port":"8800","ovol":"0"}
+{"Name":"Радио Литературное","URL":"79.137.234.183","File":"/;stream.nsv","Port":"8000","ovol":"0"}
+{"Name":"Радио НЕСТАНДАРТ","URL":"listen.radionestandart.ru","File":"/nestandart","Port":"8013","ovol":"0"}
+{"Name":"Радио Раз Раз","URL":"109.169.26.216","File":"/stream","Port":"8181","ovol":"0"}
+{"Name":"Радио Sochi Beach","URL":"198.50.156.36","File":"/live;stream/1","Port":"8391","ovol":"0"}
+{"Name":"Радио Ялта FM","URL":"yaltafm.no-ip.info","File":"/online","Port":"8000","ovol":"0"}
+{"Name":"Радио Золотой Век","URL":"setmedia.ru","File":"/high","Port":"8000","ovol":"0"}
+{"Name":"Радио Ямал","URL":"radio.yamal-region.tv","File":"/radio","Port":"8000","ovol":"42"}
+{"Name":"Радио Зенит","URL":"z.101.ru","File":"/v15_1","Port":"8000","ovol":"0"}
+{"Name":"Радио RADIO 61","URL":"134.0.116.249","File":"/stream","Port":"8000","ovol":"0"}
+{"Name":"Радио UFO TRAP Station","URL":"stream.ufostation.su","File":"/TRAP-128","Port":"80","ovol":"-28"}
+{"Name":"Радио ECHO","URL":"www.online.radioecho.ru","File":"/live3","Port":"8000","ovol":"0"}
+{"Name":"Радио Шок","URL":"spb.radioshock.ru","File":"/radioshock","Port":"80","ovol":"0"}
+{"Name":"Радио Record Minimal/Tech","URL":"air.radiorecord.ru","File":"/mini_128","Port":"805","ovol":"0"}
+{"Name":"Радио Точка","URL":"178.33.138.231","File":"/stream","Port":"8000","ovol":"0"}
+{"Name":"Радио Дагестан","URL":"radio05.ru","File":"/radio_dagestan_128","Port":"8000","ovol":"0"}
+{"Name":"Радио Winter FM","URL":"s1.radio-hoster.ru","File":"/stream","Port":"8787","ovol":"0"}
+{"Name":"Радио Родных Дорог","URL":"stream1.radiord.ru","File":"/live96.aac","Port":"8000","ovol":"0"}
+{"Name":"Радио Детский канал","URL":"icecast.russkoeradio.cdnvideo.ru","File":"/st28.mp3","Port":"80","ovol":"0"}
+{"Name":"Радио Картина","URL":"rs.kartina.tv","File":"/kartina_128kb","Port":"80","ovol":"0"}
+{"Name":"Радио Железо FM","URL":"94.102.16.36","File":"/;","Port":"8000","ovol":"0"}

@@ -1,0 +1,14 @@
+{"Name":"Actualitati","URL":"stream2.srr.ro","File":"/","Port":"8000","ovol":"0"}
+{"Name":"Romantic FM","URL":"live.romanticfm.ro","File":"/","Port":"8002","ovol":"0"}
+{"Name":"Horion","URL":"195.254.135.97","File":"/","Port":"6000","ovol":"0"}
+{"Name":"National FM 64kb","URL":"live2.nationalfm.ro","File":"/","Port":"8001","ovol":"0"}
+{"Name":"National FM 32kb","URL":"live.nationalfm.ro","File":"/","Port":"8001","ovol":"0"}
+{"Name":"Gold FM","URL":"80.86.106.110","File":"/","Port":"8000","ovol":"0"}
+{"Name":"Smart FM","URL":"185.75.54.254","File":"/live","Port":"9128","ovol":"0"}
+{"Name":"Europa FM","URL":"89.37.58.102","File":"/europafm_aacp48k","Port":"8000","ovol":"0"}
+{"Name":"Oltenia","URL":"stream2.srr.ro","File":"/","Port":"8370","ovol":"0"}
+{"Name":"ItsyBitsy","URL":"live.itsybitsy.ro","File":"/itsybitsy","Port":"8000","ovol":"0"}
+{"Name":"Galaxy","URL":"89.47.39.130","File":"/","Port":"8000","ovol":"0"}
+{"Name":"Digi FM","URL":"edge76.rdsnet.ro","File":"/digifm","Port":"84","ovol":"0"}
+{"Name":"Radio Oldies Romania","URL":"live.radiooldies.ro","File":"/","Port":"9200","ovol":"0"}
+{"Name":"Radio Sud","URL":"media.gds.ro","File":"/128.mp3","Port":"8500","ovol":"0"}

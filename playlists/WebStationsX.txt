@@ -1,0 +1,85 @@
+{"Name":"80 HotMixRadio (80's)  mp3 128 kbps","URL":"streaming.hotmix-radio.net","File":"/hotmixradio-80-128.mp3","Port":"80","ovol":"0"}
+{"Name":"90's Dance & Beyond (AddictedToRadio.com)  aac 128 kbps","URL":"wms-13.streamsrus.com","File":"/","Port":"13930","ovol":"0"}
+{"Name":"90s Pop Hits (AddictedToRadio.com)  aac 128 kbps","URL":"wms-13.streamsrus.com","File":"/","Port":"14030","ovol":"0"}
+{"Name":"Antena 2  aac 32 kbps","URL":"live3.rcnmundo.com","File":"/antena2.aac","Port":"80","ovol":"0"}
+{"Name":"At Work (Your Office Station) (AddictedToRadio.com)  aac 128 kbps","URL":"wms-15.streamsrus.com","File":"/","Port":"11530","ovol":"0"}
+{"Name":"Bar Rockin Country (AddictedToRadio.com)  aac 128 kbps","URL":"wms-15.streamsrus.com","File":"/","Port":"11030","ovol":"0"}
+{"Name":"Blu Radio  mp3 64 kbps","URL":"208.80.54.40","File":"/BLURADIO_SC","Port":"80","ovol":"0"}
+{"Name":"Cadena Dial (Pop Latino)  mp3 128 kbps","URL":"19373.live.streamtheworld.com","File":"/CADENADIAL.mp3","Port":"80","ovol":"0"}
+{"Name":"Caracol Radio  aac 32 kbps","URL":"18553.live.streamtheworld.com","File":"/CARACOL_RADIOAAC.aac","Port":"80","ovol":"70"}
+{"Name":"Caracol Radio  mp3 64 kbps","URL":"18243.live.streamtheworld.com","File":"/CARACOL_RADIO_SC","Port":"3690","ovol":"70"}
+{"Name":"Classic Rock Hits (AddictedToRadio.com)  aac 128 kbps","URL":"wms-15.streamsrus.com","File":"/","Port":"12330","ovol":"0"}
+{"Name":"Classic Rock Hits AddictedToRadio.com (80's)  mp3 128 kbps","URL":"wms-15.streamsrus.com","File":"/;","Port":"12310","ovol":"0"}
+{"Name":"CORE RADIO! (Metal)  mp3 128 kbps","URL":"194.58.97.117","File":"/coreradio","Port":"8000","ovol":"0"}
+{"Name":"Cristal Stereo  mp3 64 kbps","URL":"real2.streaming-co.com","File":"/;stream.mp3","Port":"8524","ovol":"0"}
+{"Name":"Dance Hits (AddictedToRadio.com)  aac 128 kbps","URL":"208.77.21.13","File":"/","Port":"10030","ovol":"0"}
+{"Name":"delta radio - Event 100  mp3 128 kbps","URL":"streams.deltaradio.de","File":"/100/mp3-128/","Port":"80","ovol":"0"}
+{"Name":"delta radio - Event 101  mp3 128 kbps","URL":"streams.deltaradio.de","File":"/101/mp3-128/","Port":"80","ovol":"0"}
+{"Name":"delta radio ALTERNATIVE  mp3 128 kbps","URL":"streams.deltaradio.de","File":"/delta-alternative/mp3-128/","Port":"80","ovol":"0"}
+{"Name":"delta radio Der beste RockPop reloaded  mp3 128 kbps","URL":"streams.deltaradio.de","File":"/delta-poprock/mp3-128/","Port":"80","ovol":"0"}
+{"Name":"delta radio GRUNGE  mp3 128 kbps","URL":"streams.deltaradio.de","File":"/delta-grunge/mp3-128/","Port":"80","ovol":"0"}
+{"Name":"delta radio Hard Rock & Heavy Metal  mp3 128 kbps","URL":"streams.deltaradio.de","File":"/delta-foehnfrisur/mp3-128/","Port":"80","ovol":"0"}
+{"Name":"delta radio INDIE  mp3 128 kbps","URL":"streams.deltaradio.de","File":"/delta-indie/mp3-128/","Port":"80","ovol":"0"}
+{"Name":"delta radio LIVE  mp3 128 kbps","URL":"streams.deltaradio.de","File":"/delta-live/mp3-128/","Port":"80","ovol":"0"}
+{"Name":"delta radio Sommer  mp3 128 kbps","URL":"streams.deltaradio.de","File":"/delta-sommer/mp3-128/","Port":"80","ovol":"0"}
+{"Name":"delta radio UNPLUGGED  mp3 128 kbps","URL":"streams.deltaradio.de","File":"/delta-unplugged/mp3-128/","Port":"80","ovol":"0"}
+{"Name":"FFH BRANDNEU  aac 128 kbps","URL":"mp3.ffh.de","File":"/ffhchannels/hqbrandneu.aac","Port":"80","ovol":"0"}
+{"Name":"FFH DIE 80ER  aac 128 kbps","URL":"mp3.ffh.de","File":"/ffhchannels/hq80er.aac","Port":"80","ovol":"0"}
+{"Name":"FFH EURODANCE  aac 128 kbps","URL":"mp3.ffh.de","File":"/ffhchannels/hqeurodance.aac","Port":"80","ovol":"0"}
+{"Name":"FFH iTUNES TOP 40  aac 128 kbps","URL":"mp3.ffh.de","File":"/ffhchannels/hqtop40.aac","Port":"80","ovol":"0"}
+{"Name":"FFH JUST 90s  aac 128 kbps","URL":"mp3.ffh.de","File":"/ffhchannels/hq90er.aac","Port":"80","ovol":"0"}
+{"Name":"FFH LEIDER GEIL  aac 128 kbps","URL":"mp3.ffh.de","File":"/ffhchannels/hqvoting.aac","Port":"80","ovol":"0"}
+{"Name":"FFH LOUNGE  aac 128 kbps","URL":"mp3.ffh.de","File":"/ffhchannels/hqlounge.aac","Port":"80","ovol":"0"}
+{"Name":"FFH PARTY  aac 128 kbps","URL":"mp3.ffh.de","File":"/ffhchannels/hqparty.aac","Port":"80","ovol":"0"}
+{"Name":"FFH ROCK  aac 128 kbps","URL":"mp3.ffh.de","File":"/ffhchannels/hqrock.aac","Port":"80","ovol":"0"}
+{"Name":"FFH SCHLAGERKULT  aac 128 kbps","URL":"mp3.ffh.de","File":"/ffhchannels/hqschlager.aac","Port":"80","ovol":"0"}
+{"Name":"FFH SOUNDTRACK  aac 128 kbps","URL":"mp3.ffh.de","File":"/ffhchannels/hqsoundtrack.aac","Port":"80","ovol":"0"}
+{"Name":"FFH WEIHNACHTSRADIO  aac 128 kbps","URL":"mp3.ffh.de","File":"/ffhchannels/hqxmas.aac","Port":"80","ovol":"0"}
+{"Name":"Hair Voltage (AddictedToRadio.com)  aac 128 kbps","URL":"wms-15.streamsrus.com","File":"/","Port":"15730","ovol":"0"}
+{"Name":"HIT RADIO FFH  aac 128 kbps","URL":"mp3.ffh.de","File":"/radioffh/hqlivestream.aac","Port":"80","ovol":"0"}
+{"Name":"Hits HotmixRadio (Pop)  mp3 128 kbps","URL":"streaming.hotmixradio.fm","File":"/hotmixradio-hits-128.mp3","Port":"80","ovol":"0"}
+{"Name":"Hot Mix Dance Classics (AddictedToRadio.com)  aac 128 kbps","URL":"wms-13.streamsrus.com","File":"/","Port":"10330","ovol":"0"}
+{"Name":"I Love 2 Dance (iloveradio.de)  mp3 128 kbps","URL":"91.121.68.140","File":"/iloveradio2.mp3","Port":"80","ovol":"0"}
+{"Name":"iFM World Radio Topola (Pop)  aac 96 kbps","URL":"91.228.254.120","File":"/","Port":"6060","ovol":"0"}
+{"Name":"Intense Radio (Electronica)  mp3 160 kbps","URL":"stream.intenseradio.net","File":"/live","Port":"8000","ovol":"0"}
+{"Name":"La Fiera 92.3FM  mp3 128 kbps","URL":"s21.myradiostream.com","File":"/","Port":"11382","ovol":"0"}
+{"Name":"La FM  aac 32 kbps","URL":"live3.rcnmundo.com","File":"/lafm.aac","Port":"80","ovol":"0"}
+{"Name":"La Mega (Pop Latino)  aac 32 kbps","URL":"live3.rcnmundo.com","File":"/lamega.aac","Port":"80","ovol":"0"}
+{"Name":"La Poderosa  aac 32 kbps","URL":"giss.tv","File":"/poderosast.mp3","Port":"8000","ovol":"0"}
+{"Name":"La Preferida Pitalito 98.8FM  mp3 128 kbps","URL":"199.217.115.41","File":"/;","Port":"9304","ovol":"0"}
+{"Name":"La Vallenata Prisa Radio  aac 33 kbps","URL":"17973.live.streamtheworld.com","File":"/VALLENATA_PRISAAAC.aac","Port":"80","ovol":"60"}
+{"Name":"La X Mas Musica Bogota  aac 48 kbps","URL":"99.198.110.162","File":"/","Port":"7020","ovol":"-12"}
+{"Name":"La X Mas Musica Cali  aac 48 kbps","URL":"65.60.45.74","File":"/;","Port":"8088","ovol":"-30"}
+{"Name":"Los 40 Colombia (Pop)  aac 33 kbps","URL":"17983.live.streamtheworld.com","File":"/LOS40_COLUMBIAAAC.aac","Port":"80","ovol":"40"}
+{"Name":"Los 40 Principales (Pop)  mp3 128 kbps","URL":"19523.live.streamtheworld.com","File":"/LOS40.mp3","Port":"80","ovol":"0"}
+{"Name":"Love Bites (Rock Ballads) (AddictedToRadio.com)  aac 128 kbps","URL":"wms-15.streamsrus.com","File":"/","Port":"15930","ovol":"0"}
+{"Name":"Love Bites AddictedToRadio.com (80's)  aac 128 kbps","URL":"208.77.21.33","File":"/","Port":"15930","ovol":"0"}
+{"Name":"Merengue (AddictedToRadio.com)  aac 128 kbps","URL":"wms-13.streamsrus.com","File":"/","Port":"17030","ovol":"0"}
+{"Name":"Metal HotMixRadio (Metal)  mp3 128 kbps","URL":"streaming.hotmix-radio.net","File":"/hotmixradio-metal-128.mp3","Port":"80","ovol":"0"}
+{"Name":"Metalcore Kingdom (Metal)  mp3 128 kbps","URL":"192.34.85.144","File":"/stream","Port":"8004","ovol":"0"}
+{"Name":"Mix 106 (90s and Now) (AddictedToRadio.com)  aac 128 kbps","URL":"wms-15.streamsrus.com","File":"/","Port":"9630","ovol":"0"}
+{"Name":"Mussic Happy Hardcore Rautemusic.fm (Happy Hardcore)  mp3 192 kbps","URL":"138.201.140.88","File":"/happyhardcore","Port":"80","ovol":"0"}
+{"Name":"NTN24  mp3 32 kbps","URL":"live3.rcnmundo.com","File":"/ntn24.mp3","Port":"80","ovol":"0"}
+{"Name":"Olimpica FM Cali (Tropical)  aac 48 kbps","URL":"i60.letio.com","File":"/9120.aac","Port":"80","ovol":"0"}
+{"Name":"Olimpica FM Neiva (Tropical)  aac 48 kbps","URL":"i60.letio.com","File":"/9136.aac","Port":"80","ovol":"0"}
+{"Name":"Pop'N'rocK www.popnrockradio.com  mp3 128 kbps","URL":"91.121.59.45","File":"/live","Port":"8304","ovol":"0"}
+{"Name":"radio nacional de colombia  aac 48 kbps","URL":"shoutcast.rtvc.gov.co","File":"/;","Port":"8000","ovol":"0"}
+{"Name":"Radio Tiempo Neiva (Pop Latino)  aac 48 kbps","URL":"i60.letio.com","File":"/9148.aac","Port":"80","ovol":"0"}
+{"Name":"Radioacktiva Bogota  aac 32 kbps","URL":"18553.live.streamtheworld.com","File":"/RADIO_ACTIVAAAC.aac","Port":"80","ovol":"0"}
+{"Name":"Radioacktiva Medellin  aac 32 kbps","URL":"17973.live.streamtheworld.com","File":"/RADIOACKTIVA_MEDAAC.aac","Port":"80","ovol":"0"}
+{"Name":"Reggaeton (AddictedToRadio.com)  aac 128 kbps","URL":"wms-13.streamsrus.com","File":"/","Port":"17230","ovol":"0"}
+{"Name":"Rock Ballads (Rock 80's)  mp3 128 kbps","URL":"107.182.234.82","File":"/","Port":"8046","ovol":"0"}
+{"Name":"Rock HotMixRadio (Rock)  mp3 128 kbps","URL":"streaming.hotmixradio.fm","File":"/hotmixradio-rock-128.mp3","Port":"80","ovol":"0"}
+{"Name":"Rumba Stereo (Tropical)  mp3 48 kbps","URL":"live4.rcnmundo.com","File":"/rumba.mp3","Port":"80","ovol":"0"}
+{"Name":"Rumba Stereo Cali (Tropical)  mp3 48 kbps","URL":"live3.rcnmundo.com","File":"/rumbacali.mp3","Port":"80","ovol":"0"}
+{"Name":"Salsa (1Club.FM) (AddictedToRadio.com)  mp3 128 kbps","URL":"wms-13.streamsrus.com","File":"/","Port":"17330","ovol":"0"}
+{"Name":"StyleCore Radio  mp3 128 kbps","URL":"163.172.117.152","File":"/","Port":"9982","ovol":"0"}
+{"Name":"Sweet Spot Radio (indie Rock)  mp3 192 kbps","URL":"158.69.225.238","File":"/Live","Port":"3471","ovol":"0"}
+{"Name":"The Dum Radio (Rock)  mp3 128 kbps","URL":"oidos.streamlicensing.com","File":"/thedumphigh?cb=472457.mp3","Port":"80","ovol":"0"}
+{"Name":"Top 40 Pop Hits (AddictedToRadio.com)  aac 128 kbps","URL":"wms-15.streamsrus.com","File":"/","Port":"9730","ovol":"0"}
+{"Name":"Tropicana (Tropical)  aac 32 kbps","URL":"19273.live.streamtheworld.com","File":"/TROPICANAAAC.aac","Port":"80","ovol":"0"}
+{"Name":"Tropicana Cali (Tropical)  aac 32 kbps","URL":"16693.live.streamtheworld.com","File":"/TR_CALIAAC.aac","Port":"80","ovol":"0"}
+{"Name":"Tropicana Neiva (Tropical)  aac 32 kbps","URL":"19273.live.streamtheworld.com","File":"/TR_NEIVAAAC.aac","Port":"80","ovol":"0"}
+{"Name":"Vallenato Ventia'o RCN  mp3 64 kbps","URL":"live3.rcnmundo.com","File":"/vallenatoventiao.mp3","Port":"80","ovol":"0"}
+{"Name":"W Radio  aac 32 kbps","URL":"19173.live.streamtheworld.com","File":"/WRADIOAAC.aac","Port":"80","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
