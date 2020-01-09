@@ -798,7 +798,7 @@ function loadStationsList() {
 }
 
 function saveStationsList() {
-	const batchSize = 3;
+	const BATCH_SIZE = 8;
 	let saveStationsTimer = null;
 	let saveStationId = -1;
 
@@ -829,7 +829,7 @@ function saveStationsList() {
 		}
 
 		const output = new Array();
-		for(let i=0; i<batchSize; i++) {
+		for(let i=0; i<BATCH_SIZE; i++) {
 			var endOfStations = false;
 			let row = null;
 			let url = '';
@@ -845,14 +845,7 @@ function saveStationsList() {
 			if(url.length == 0) { break; }
 			let datas = extractFullUrl(url);
 
-			// output.push('id=' + this.stationId + '&name=' + encodeURI(row.cells[1].textContent) + '&url=' + datas.url + '&port=' + datas.port + '&file=' + encodeURI(datas.path1) + volParam);
 			output.push('id=' + saveStationId + '&name=' + row.cells[1].textContent + '&url=' + datas.url + '&port=' + datas.port + '&file=' + datas.path1 + '&ovol=' + row.cells[3].textContent.trim() + '&');
-/*
-nb=3
-&id=0&url=icecast.vrtcdn.be&name=VRT Radio 1&file=/radio1-high.mp3&port=80&ovol=0&
-&id=1&url=icecast.vrtcdn.be&name=VRT Radio 2 Antwerpen&file=/ra2ant-high.mp3&port=80&ovol=0&
-&id=2&url=icecast.vrtcdn.be&name=VRT Radio 2 Limburg&file=/ra2lim-high.mp3&port=80&ovol=0&
- * */
 		}
 
 		// Check if output not empty
