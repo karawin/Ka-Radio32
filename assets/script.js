@@ -1023,6 +1023,110 @@ function savePlaylistAsM3u() {
 	el.revokeObjectURL(saveAsText);
 }
 
+function parsePlaylist(contentType, datas) {
+	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/matchAll
+	let matches = null;
+	let count = 0;
+	switch(contentType) {
+		case 'audio/x-mpegurl' :
+			if(!/^#EXTM3U\b/.test(this.result)) {
+				console.log('Bad syntax. Missing #EXTM3U at the beginning of file');
+				return;
+			}
+
+			stationsList.innerHTML = '';
+			stationsSelect.innerHTML = '';
+			const pattern = RegExp('#EXTINF:-?\\d+,(.*)(?:\\r\\n|\\n|\\r)(.*)', 'g');
+			matches = datas.matchAll(pattern);
+			for(let item of matches) {
+				// console.log(item[1], ' => ', item[2]);
+				let idStation = addStation(null, {
+					Name: item[1].trim(),
+					fullUrl: item[2].trim()
+				});
+				count++;
+			}
+			break;
+		case 'audio/x-scpls':
+			if(!/^\[playlist\]/.test(this.result)) {
+				console.log('Bad syntax. Missing [playlist] at the beginning of file');
+				return;
+			}
+
+			const plsPattern = RegExp('(File|Title)(\\d+)=(.*)', 'g');
+			matches = datas.matchAll(plsPattern);
+			if(matches == null) {
+				return;
+			}
+			const entries = {};
+			for(let item of matches) {
+				const i = item[2];
+				if(!entries.hasOwnProperty(i)) {
+					entries[i] = { Name: '' };
+				}
+				switch(item[1]) {
+					case 'File':
+						if(!/^https?:\/\//.test(item[3])) {
+							continue;
+						}
+						let value = item[3].trim().replace(/^https:/, 'http:'); // No https for Ka-Radio
+						if(/^https?:\/\/[^:\/]+(:\d+)?$/.test(value)) {
+							// Missing path
+							value += '/';
+						}
+						entries[i].fullUrl = value;
+						break;
+					case 'Title':
+						entries[i].Name = item[3].trim();
+						break;
+				}
+			}
+
+			stationsList.innerHTML = '';
+			stationsSelect.innerHTML = '';
+			for(let i in entries) {
+				// console.log(item[1], ' => ', item[2]);
+				if(entries[i].hasOwnProperty('fullUrl')) {
+					console.log(entries[i]);
+					let idStation = addStation(null, entries[i]);
+					count++;
+				}
+			}
+			break;
+		case 'text/plain' :
+			const lines = datas.split(/\r\n|\n|\r/);
+			if(typeof lines.forEach != 'function') {
+				return;
+			}
+			stationsList.innerHTML = '';
+			stationsSelect.innerHTML = '';
+			lines.forEach(function(item) {
+				try {
+					if(item.trim().length > 0) {
+						let station = JSON.parse(item.trim());
+						if(station.hasOwnProperty('URL') && station.URL.trim().length > 0) {
+							console.log(station);
+							let idStation = addStation(null, station);
+							count++;
+						}
+					}
+				} catch(e) {
+					console.log('bad line : ' + item);
+					console.error(e);
+				}
+			});
+			break;
+		default:
+			console.log('Unknown format for ' + input.files[0].name + ' file (' + input.files[0].type + ')');
+			return;
+	}
+
+	isLoading = true;
+	if(count > 1 && confirm('Do you want to save the ' + count + ' entries of the playlist into the device ?\nThat takes à while. Let\'s be patient !!')) {
+		saveStationsList();
+	}
+}
+
 /* loads playlist from a .m3u, .pls or .txt file */
 function loadPlaylist() {
 	let input = document.getElementById('loadPlaylist');
@@ -1031,107 +1135,7 @@ function loadPlaylist() {
 	}
 	let reader = new FileReader();
 	reader.onloadend = function (e) {
-		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/matchAll
-		let matches = null;
-		let count = 0;
-		switch(input.files[0].type) {
-			case 'audio/x-mpegurl' :
-				if(!/^#EXTM3U\b/.test(this.result)) {
-					console.log('Bad syntax. Missing #EXTM3U at the beginning of file');
-					return;
-				}
-
-				stationsList.innerHTML = '';
-				stationsSelect.innerHTML = '';
-				const pattern = RegExp('#EXTINF:-?\\d+,(.*)(?:\\r\\n|\\n|\\r)(.*)', 'g');
-				matches = this.result.matchAll(pattern);
-				for(let item of matches) {
-					// console.log(item[1], ' => ', item[2]);
-					let idStation = addStation(null, {
-						Name: item[1].trim(),
-						fullUrl: item[2].trim()
-					});
-					count++;
-				}
-				break;
-			case 'audio/x-scpls':
-				if(!/^\[playlist\]/.test(this.result)) {
-					console.log('Bad syntax. Missing [playlist] at the beginning of file');
-					return;
-				}
-
-				const plsPattern = RegExp('(File|Title)(\\d+)=(.*)', 'g');
-				matches = this.result.matchAll(plsPattern);
-				if(matches == null) {
-					return;
-				}
-				const entries = {};
-				for(let item of matches) {
-					const i = item[2];
-					if(!entries.hasOwnProperty(i)) {
-						entries[i] = { Name: '' };
-					}
-					switch(item[1]) {
-						case 'File':
-							if(!/^https?:\/\//.test(item[3])) {
-								continue;
-							}
-							let value = item[3].trim().replace(/^https:/, 'http:'); // No https for Ka-Radio
-							if(/^https?:\/\/[^:\/]+(:\d+)?$/.test(value)) {
-								// Missing path
-								value += '/';
-							}
-							entries[i].fullUrl = value;
-							break;
-						case 'Title':
-							entries[i].Name = item[3].trim();
-							break;
-					}
-				}
-
-				stationsList.innerHTML = '';
-				stationsSelect.innerHTML = '';
-				for(let i in entries) {
-					// console.log(item[1], ' => ', item[2]);
-					if(entries[i].hasOwnProperty('fullUrl')) {
-						console.log(entries[i]);
-						let idStation = addStation(null, entries[i]);
-						count++;
-					}
-				}
-				break;
-			case 'text/plain' :
-				const lines = this.result.split(/\r\n|\n|\r/);
-				if(typeof lines.forEach != 'function') {
-					return;
-				}
-				stationsList.innerHTML = '';
-				stationsSelect.innerHTML = '';
-				lines.forEach(function(item) {
-					try {
-						if(item.trim().length > 0) {
-							let station = JSON.parse(item.trim());
-							if(station.hasOwnProperty('URL') && station.URL.trim().length > 0) {
-								console.log(station);
-								let idStation = addStation(null, station);
-								count++;
-							}
-						}
-					} catch(e) {
-						console.log('bad line : ' + item);
-						console.error(e);
-					}
-				});
-				break;
-			default:
-				console.log('Unknown format for ' + input.files[0].name + ' file (' + input.files[0].type + ')');
-				return;
-		}
-
-		isLoading = true;
-		if(count > 1 && confirm('Do you want to save the ' + count + ' entries of the playlist into the device ?\nThat takes à while. Let\'s be patient !!')) {
-			saveStationsList();
-		}
+		parsePlaylist(input.files[0].type, this.result);
 	};
 	reader.readAsText(input.files.item(0));
 }
@@ -1141,7 +1145,11 @@ xhrPlaylist.onreadystatechange = function() {
 	if (this.readyState === XMLHttpRequest.DONE) {
 		if (this.status === 200) {
 			if(this.responseText.length > 0) {
-				console.log(this.responseText);
+				const tab = document.getElementById('tab-playlist');
+				if(tab != null) {
+					tab.labels[0].click();
+				}
+				parsePlaylist(this.getResponseHeader('Content-Type').replace(/;.*$/, ''), this.responseText);
 			}
 			return;
 		}
