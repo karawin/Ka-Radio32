@@ -1,0 +1,255 @@
+{"Name":"Europe1","URL":"e1-live-mp3-128.scdn.arkena.com","File":"/europe1.mp3","Port":"80","ovol":"0"}
+{"Name":"RTL","URL":"ais.rtl.fr","File":"/rtl-1-44-128","Port":"80","ovol":"0"}
+{"Name":"RTL2","URL":"streaming.radio.rtl.fr","File":"/rtl2-1-44-128.m3u","Port":"80","ovol":"0"}
+{"Name":"Space fm kerekegyhaza","URL":"stream3.virtualisan.net","File":"/spacefm.mp3","Port":"8000","ovol":"0"}
+{"Name":"RFM","URL":"www.listenlive.eu","File":"/rfm.m3u","Port":"80","ovol":"0"}
+{"Name":"RFM Collector","URL":"www.listenlive.eu","File":"/rfmcollector.m3u","Port":"80","ovol":"0"}
+{"Name":"Tarjan","URL":"78.129.175.157","File":"/lsteam","Port":"20520","ovol":"0"}
+{"Name":"Ambient","URL":"uk2.internet-radio.com","File":"/","Port":"31491","ovol":"0"}
+{"Name":"Transmission","URL":"83.169.1.182","File":"/","Port":"6660","ovol":"0"}
+{"Name":"club fm","URL":"80.211.203.79","File":"/live.mp3","Port":"8060","ovol":"0"}
+{"Name":"facee chat","URL":"188.165.11.30","File":"/live.mp3","Port":"4280","ovol":"0"}
+{"Name":"Dolmedo","URL":"185.105.4.53","File":"/","Port":"3006","ovol":"0"}
+{"Name":"fresh music","URL":"91.83.93.7","File":"/autodj","Port":"9910","ovol":"0"}
+{"Name":"Ambi nature","URL":"94.23.252.14","File":"/","Port":"8067","ovol":"0"}
+{"Name":"Planet ambi","URL":"176.31.107.8","File":"/","Port":"9019","ovol":"0"}
+{"Name":"Kpop","URL":"78.31.65.20","File":"/live.mp3","Port":"8390","ovol":"0"}
+{"Name":"Panda","URL":"137.74.85.85","File":"/live.mp3","Port":"7820","ovol":"0"}
+{"Name":"Radio vol","URL":"stream.radiovol.net","File":"/live.mp3","Port":"8010","ovol":"0"}
+{"Name":"Mélodie FM","URL":"www.melodiefm.net","File":"/live.m3u","Port":"80","ovol":"0"}
+{"Name":"RFI Monde","URL":"www.listenlive.eu","File":"/rfimonde.m3u","Port":"80","ovol":"0"}
+{"Name":"Alpes 1 Gap","URL":"broadcast.infomaniak.ch","File":"/alpes1gap-high.mp3.m3u","Port":"80","ovol":"0"}
+{"Name":"Alpes 1 Années 80","URL":"allzic08.ice.infomaniak.ch","File":"/allzic08.mp3","Port":"80","ovol":"0"}
+{"Name":"Alpes 1 Années 90","URL":"allzic24.ice.infomaniak.ch","File":"/allzic24.mp3","Port":"80","ovol":"0"}
+{"Name":"Autoroute info sud","URL":"media.autorouteinfo.fr","File":"/direct_sud.mp3.m3u","Port":"8000","ovol":"0"}
+{"Name":"Autoroute Info Nord","URL":"media.autorouteinfo.fr","File":"/direct_nord.mp3.m3u","Port":"8000","ovol":"0"}
+{"Name":"Radio 64","URL":"173.249.2.251","File":"/radio64.mp3","Port":"8000","ovol":"0"}
+{"Name":"California 101","URL":"www.california101radio.com","File":"/california101.pls","Port":"80","ovol":"0"}
+{"Name":"Chante France","URL":"stream1.chantefrance.com","File":"/Chante_France.m3u","Port":"80","ovol":"0"}
+{"Name":"rockparadicsom","URL":"188.165.11.30","File":"/live.mp3","Port":"6590","ovol":"0"}
+{"Name":"harmonia","URL":"137.74.85.85","File":"/;stream","Port":"7060","ovol":"0"}
+{"Name":"Evasion FM","URL":"www.listenlive.eu","File":"/evasionfm.m3u","Port":"80","ovol":"0"}
+{"Name":"Hit West Nantes","URL":"broadcast.infomaniak.ch","File":"/hitwest-high.mp3.m3u","Port":"80","ovol":"0"}
+{"Name":"xt radio","URL":"xtradio.org","File":"/live","Port":"8080","ovol":"0"}
+{"Name":"nst music fm","URL":"80.211.203.79","File":"/nstmusicfm","Port":"8010","ovol":"0"}
+{"Name":"drava hullam","URL":"92.61.114.195","File":"/stream","Port":"13070","ovol":"0"}
+{"Name":"Virgin Radio","URL":"www.listenlive.eu","File":"/virginradiofr.m3u","Port":"80","ovol":"0"}
+{"Name":"Impact FM","URL":"broadcast.infomaniak.ch","File":"/impactfm-128.mp3.m3u","Port":"80","ovol":"0"}
+{"Name":"M2 80's","URL":"www.m2radio.fr","File":"/pls/m280.m3u","Port":"80","ovol":"0"}
+{"Name":"M2 90's","URL":"www.m2radio.fr","File":"/pls/m290.m3u","Port":"80","ovol":"0"}
+{"Name":"M2 Hit's","URL":"www.m2radio.fr","File":"/pls/m2hit.m3u","Port":"80","ovol":"0"}
+{"Name":"M2 Club","URL":"www.m2radio.fr","File":"/pls/m2club.m3u","Port":"80","ovol":"0"}
+{"Name":"M2 Love","URL":"www.m2radio.fr","File":"/pls/m2love.m3u","Port":"80","ovol":"0"}
+{"Name":"M2 Rock","URL":"www.m2radio.fr","File":"/pls/m2rock.m3u","Port":"80","ovol":"0"}
+{"Name":"M2 Sunshine","URL":"www.m2radio.fr","File":"/pls/m2sunshine.m3u","Port":"80","ovol":"0"}
+{"Name":"M2 Funk","URL":"www.m2radio.fr","File":"/pls/m2funk.m3u","Port":"80","ovol":"0"}
+{"Name":"M2 Chillout","URL":"www.m2radio.fr","File":"/pls/m2chillout.m3u","Port":"80","ovol":"0"}
+{"Name":"M2 Caliente","URL":"www.m2radio.fr","File":"/pls/m2caliente.m3u","Port":"80","ovol":"0"}
+{"Name":"Velence classic","URL":"174.36.206.197","File":"/","Port":"8000","ovol":"0"}
+{"Name":"Piano letter","URL":"222.122.178.186","File":"/","Port":"1882","ovol":"0"}
+{"Name":"Frank Sinatra","URL":"94.23.159.187","File":"/","Port":"9998","ovol":"0"}
+{"Name":"Metal","URL":"69.46.88.26","File":"/","Port":"80","ovol":"0"}
+{"Name":"OUI FM","URL":"broadcast.infomaniak.ch","File":"/ouifm-high.mp3.m3u","Port":"80","ovol":"0"}
+{"Name":"OUI FM Alternatif","URL":"broadcast.infomaniak.net","File":"/ouifm2.mp3.m3u","Port":"80","ovol":"0"}
+{"Name":"Megafon","URL":"79.172.201.173","File":"/stream","Port":"8000","ovol":"0"}
+{"Name":"Bide","URL":"relay2.bide-et-musique.com","File":"/","Port":"9200","ovol":"0"}
+{"Name":"Classical WETA 90.9 FM - Washington D.C.","URL":"38.100.128.106","File":"/listen.pls?sid=1","Port":"8000","ovol":"0"}
+{"Name":"Radio 7","URL":"netradio.radio7.hu","File":"/stream.mp3","Port":"8300","ovol":"0"}
+{"Name":"Classic Rock Florida","URL":"us2.internet-radio.com","File":"/","Port":"8046","ovol":"0"}
+{"Name":"Classic Rock Miami","URL":"us2.internet-radio.com","File":"/","Port":"8191","ovol":"0"}
+{"Name":"Classic Rock Miami HD","URL":"us2.internet-radio.com","File":"/","Port":"8050","ovol":"0"}
+{"Name":"Classic Rock New York - WWWSHERADIOCOM ","URL":"us2.internet-radio.com","File":"/","Port":"8347","ovol":"0"}
+{"Name":"Lala Radio","URL":"broadcast.infomaniak.ch","File":"/lalaradio-high.mp3.m3u","Port":"80","ovol":"0"}
+{"Name":"Caliente latin","URL":"50.7.96.210","File":"/","Port":"8404","ovol":"0"}
+{"Name":"","URL":"","File":"","Port":"0","ovol":"0"}
+{"Name":"Nirvana meditation radio","URL":"dir.xiph.org","File":"/listen/2912/listen.m3u","Port":"80","ovol":"0"}
+{"Name":"SUN - LE SON UNIQUE A NANTES ","URL":"80.82.229.202","File":"/sunhd.mp3","Port":"8000","ovol":"0"}
+{"Name":"Sohos gr","URL":"37.59.32.115","File":"/","Port":"2046","ovol":"0"}
+{"Name":"Los 40 Principales","URL":"provisioning.streamtheworld.com","File":"/pls/LOS40.pls","Port":"80","ovol":"0"}
+{"Name":"Vivante FM Belgique","URL":"listen.radionomy.com","File":"/radio-vivantefm.m3u","Port":"80","ovol":"0"}
+{"Name":"Radio Plus Belgique","URL":"radioplus23.ice.infomaniak.ch","File":"/radioplus23-48.aac.m3u","Port":"80","ovol":"0"}
+{"Name":"BBC 1 Uk","URL":"www.listenlive.eu","File":"/bbcradio1.m3u","Port":"80","ovol":"0"}
+{"Name":"BBC 2 Uk","URL":"www.listenlive.eu","File":"/bbcradio2.m3u","Port":"80","ovol":"0"}
+{"Name":"BBC 3 Uk","URL":"www.listenlive.eu","File":"/bbcradio3.m3u","Port":"80","ovol":"0"}
+{"Name":"BBC 4 Uk","URL":"www.listenlive.eu","File":"/bbcradio4.m3u","Port":"80","ovol":"0"}
+{"Name":"BBC 5 Uk","URL":"www.listenlive.eu","File":"/bbc5live.m3u","Port":"80","ovol":"0"}
+{"Name":"BBC 6 Uk","URL":"www.listenlive.eu","File":"/bbc6music.m3u","Port":"80","ovol":"0"}
+{"Name":"BBC World","URL":"www.bbc.co.uk","File":"/worldservice/meta/live/mp3/eneuk.pls","Port":"80","ovol":"0"}
+{"Name":"Earth Uk","URL":"media-ice.musicradio.com","File":"/HeartLondonMP3.m3u","Port":"80","ovol":"0"}
+{"Name":"Radiocell","URL":"70.35.201.123","File":"/stream","Port":"7156","ovol":"0"}
+{"Name":"Minster Radio Uk","URL":"str1.sad.ukrd.com","File":"/minster.m3u","Port":"80","ovol":"0"}
+{"Name":"The voice Uk","URL":"www.rosi-systems.com","File":"/thevoice.mp3.m3u","Port":"8000","ovol":"0"}
+{"Name":"Regio","URL":"live.regioradio.info","File":"/;","Port":"8000","ovol":"0"}
+{"Name":"Miradionk","URL":"hosting2.42netmedia.com","File":"/stream","Port":"6030","ovol":"0"}
+{"Name":"open","URL":"188.138.102.165","File":"/;","Port":"17970","ovol":"0"}
+{"Name":"PARTY VIBE RADIO ","URL":"www.partyviberadio.com","File":"/listen.pls?sid=1","Port":"8000","ovol":"0"}
+{"Name":"Djadm","URL":"151.80.15.24","File":"/;stream","Port":"9579","ovol":"0"}
+{"Name":"Magyar fm","URL":"80.211.203.79","File":"/live.mp3","Port":"8030","ovol":"0"}
+{"Name":"Manna radio","URL":"icast.connectmedia.hu","File":"/4780/live.mp3","Port":"80","ovol":"0"}
+{"Name":"LaFabrik Suisse","URL":"stream.lafabrik.ch","File":"/lafabrik.m3u","Port":"80","ovol":"0"}
+{"Name":"Vibration FM Suise","URL":"vibration.stream2net.eu","File":"/listen.pls","Port":"8130","ovol":"0"}
+{"Name":"Vibration PopRock Suisse","URL":"vibrationpoprock.stream2net.eu","File":"/listen.pls","Port":"8260","ovol":"0"}
+{"Name":"Vibration Latina Suisse","URL":"vibracionlatina.stream2net.eu","File":"/listen.pls","Port":"8410","ovol":"0"}
+{"Name":"Vibratio classic hit Suisse","URL":"vibrationclassic80.stream2net.eu","File":"/listen.pls","Port":"8060","ovol":"0"}
+{"Name":"webcentrum","URL":"stream18.shoutcastsolutions.com","File":"/autodj","Port":"8193","ovol":"126"}
+{"Name":"Radio face","URL":"ca5.rcast.net","File":"/stream","Port":"8034","ovol":"0"}
+{"Name":"Mercy rocker","URL":"91.82.85.58","File":"/autodj","Port":"8000","ovol":"0"}
+{"Name":"Classic Rock California","URL":"listen.radionomy.com","File":"/classicrockcaliforniacom.m3u","Port":"80","ovol":"0"}
+{"Name":"retro","URL":"91.82.85.44","File":"/RetroRadio.mp3","Port":"8080","ovol":"0"}
+{"Name":"Champion 5768 FM - Non Stop Hits From All Eras","URL":"uk3.internet-radio.com","File":"/","Port":"8060","ovol":"0"}
+{"Name":"Beatles","URL":"relay.181.fm","File":"/","Port":"8062","ovol":"0"}
+{"Name":"Creek Valley Radio - Late 60s to 00s Mix","URL":"142.4.217.133","File":"/listen.pls?sid=1","Port":"8469","ovol":"0"}
+{"Name":"All Request Show","URL":"www.streamvortex.com","File":"/listen.pls?sid=1","Port":"10230","ovol":"0"}
+{"Name":"Pesti kabare","URL":"146.185.178.133","File":"/pestikabare","Port":"8000","ovol":"0"}
+{"Name":"Klassz","URL":"92.61.114.191","File":"/stream","Port":"12000","ovol":"0"}
+{"Name":"Hearthits","URL":"hearthits.online","File":"/hearthq.mp3","Port":"80","ovol":"0"}
+{"Name":"SALSA BRAVA RADIO","URL":"206.190.130.180","File":"/","Port":"8053","ovol":"0"}
+{"Name":"RIVER","URL":"icast.connectmedia.hu","File":"/4711/live.mp3","Port":"80","ovol":"0"}
+{"Name":"Broadway","URL":"79.172.209.223","File":"/stream","Port":"8700","ovol":"0"}
+{"Name":"Korona","URL":"82.141.165.6","File":"/stream","Port":"8000","ovol":"0"}
+{"Name":"Karcfm","URL":"92.61.114.191","File":"/stream","Port":"13100","ovol":"0"}
+{"Name":"KOSSUTH","URL":"mr-stream.mediaconnect.hu","File":"/4736/mr1.mp3","Port":"80","ovol":"0"}
+{"Name":"Eger","URL":"hosting2.42netmedia.com","File":"/stream","Port":"10070","ovol":"0"}
+{"Name":"Jimmy","URL":"stream.mercyradio.eu","File":"/jimmy.mp3","Port":"80","ovol":"0"}
+{"Name":"Szentkorona","URL":"radio.szentkoronaradio.com","File":"/","Port":"8048","ovol":"0"}
+{"Name":"LANCHID RADIO","URL":"91.82.85.44","File":"/","Port":"9004","ovol":"0"}
+{"Name":"ENERGY","URL":"213.181.208.242","File":"/live","Port":"8000","ovol":"24"}
+{"Name":"Petofi","URL":"mr-stream.mediaconnect.hu","File":"/4738/mr2.mp3","Port":"80","ovol":"0"}
+{"Name":"Balaton","URL":"87.229.53.9","File":"/","Port":"9000","ovol":"0"}
+{"Name":"Retro","URL":"stream.retroradio.hu","File":"/high.mp3","Port":"80","ovol":"0"}
+{"Name":"Radio Szeged88","URL":"88.151.99.22","File":"/","Port":"8400","ovol":"0"}
+{"Name":"Liceum","URL":"193.225.32.62","File":"/live.mp3","Port":"8880","ovol":"0"}
+{"Name":"Szentes","URL":"91.82.85.44","File":"/","Port":"9006","ovol":"0"}
+{"Name":"Szarvas","URL":"91.82.85.44","File":"/","Port":"9078","ovol":"0"}
+{"Name":"sunshine 99,4 fm","URL":"195.56.193.129","File":"/","Port":"8100","ovol":"0"}
+{"Name":"info","URL":"79.172.209.223","File":"/stream","Port":"8400","ovol":"0"}
+{"Name":"forras radio","URL":"91.82.85.44","File":"/","Port":"9000","ovol":"0"}
+{"Name":"Kek Duna","URL":"stream7.kekduna.hu","File":"/;stream","Port":"8010","ovol":"0"}
+{"Name":"Szent Istvan","URL":"87.229.103.213","File":"/","Port":"7000","ovol":"0"}
+{"Name":"Mez","URL":"79.172.209.223","File":"/stream","Port":"9204","ovol":"0"}
+{"Name":"power dance","URL":"91.82.85.44","File":"/","Port":"9512","ovol":"0"}
+{"Name":"lakihegy","URL":"195.56.193.129","File":"/","Port":"8300","ovol":"0"}
+{"Name":"Tiszato","URL":"92.61.114.195","File":"/","Port":"10010","ovol":"0"}
+{"Name":"periszkop","URL":"193.225.21.163","File":"/;stream","Port":"8088","ovol":"0"}
+{"Name":"Bartok","URL":"mr-stream.mediaconnect.hu","File":"/4742/mr3hq.mp3","Port":"80","ovol":"0"}
+{"Name":"Paprika","URL":"stream1.paprikaradio.ro","File":"/;stream","Port":"8000","ovol":"0"}
+{"Name":"Mix","URL":"91.227.139.87","File":"/","Port":"8000","ovol":"0"}
+{"Name":"Dunaword","URL":"mr-stream.mediaconnect.hu","File":"/4761/dwr.mp3","Port":"80","ovol":"0"}
+{"Name":"VILAG","URL":"137.74.85.85","File":"/stream","Port":"7180","ovol":"0"}
+{"Name":"Podcast","URL":"157.181.47.247","File":"/mpr.mp3","Port":"8000","ovol":"0"}
+{"Name":"Strong","URL":"188.165.64.41","File":"/;stream","Port":"8620","ovol":"0"}
+{"Name":"Gabriel","URL":"radioadmin.info","File":"/live","Port":"9036","ovol":"0"}
+{"Name":"wiliams","URL":"79.120.178.90","File":"/","Port":"8200","ovol":"0"}
+{"Name":"Taska","URL":"79.172.209.223","File":"/stream","Port":"7070","ovol":"0"}
+{"Name":"Radio M","URL":"92.61.114.191","File":"/stream","Port":"10060","ovol":"0"}
+{"Name":"ROCK","URL":"92.61.114.191","File":"/","Port":"13150","ovol":"0"}
+{"Name":"Dunakanyar","URL":"92.61.114.191","File":"/","Port":"9304","ovol":"0"}
+{"Name":"Kossuth u","URL":"mr-stream.mediaconnect.hu","File":"/4736/mr1.mp3","Port":"80","ovol":"0"}
+{"Name":"Aktiv","URL":"195.56.65.180","File":"/aktiv.mp3","Port":"8000","ovol":"0"}
+{"Name":"Ingress fm","URL":"91.82.85.44","File":"/;stream","Port":"9004","ovol":"0"}
+{"Name":"Jazzy","URL":"94.199.183.186","File":"/jazzy.mp3","Port":"80","ovol":"0"}
+{"Name":"GAGA RADIO RO","URL":"rc.radiogaga.ro","File":"/mp3-256","Port":"8000","ovol":"0"}
+{"Name":"Kabare","URL":"radio.magyarchan.net","File":"/pestikabare","Port":"8000","ovol":"0"}
+{"Name":"Harmonia","URL":"137.74.85.85","File":"/;stream","Port":"7060","ovol":"0"}
+{"Name":"Magyar zene","URL":"158.69.180.201","File":"/;stream","Port":"9348","ovol":"0"}
+{"Name":"Chillout radio","URL":"158.69.180.201","File":"/;stream","Port":"9344","ovol":"0"}
+{"Name":"E rock","URL":"158.69.180.201","File":"/;stream","Port":"9334","ovol":"0"}
+{"Name":"Pannon","URL":"79.172.194.189","File":"/live.mp3","Port":"4120","ovol":"0"}
+{"Name":"Hello","URL":"91.82.85.58","File":"/autodj","Port":"8060","ovol":"0"}
+{"Name":"Mustar","URL":"193.138.125.14","File":"/;","Port":"8500","ovol":"0"}
+{"Name":"Bezs","URL":"37.221.209.146","File":"/live.mp3","Port":"6680","ovol":"0"}
+{"Name":"MEGADANCE","URL":"megadanceradio.hopto.org","File":"/MEGADANCE_AUTODJ","Port":"8000","ovol":"0"}
+{"Name":"Klub 88","URL":"stream.radio88.hu","File":"/;stream","Port":"8000","ovol":"0"}
+{"Name":"Dancewave","URL":"dancewave.online","File":"/dance.mp3","Port":"80","ovol":"0"}
+{"Name":"Heart hits","URL":"hearthits.online","File":"/hearthq.mp3","Port":"80","ovol":"0"}
+{"Name":"Mix","URL":"adas.adasszerver.hu","File":"/;","Port":"8000","ovol":"0"}
+{"Name":"Disco","URL":"212.108.220.144","File":"/stream.mp3","Port":"1039","ovol":"0"}
+{"Name":"Nolimit","URL":"webradio.sksyu.net","File":"/nolimithq.ogg","Port":"8000","ovol":"0"}
+{"Name":"Sirius","URL":"91.82.84.179","File":"/relay_882","Port":"8500","ovol":"0"}
+{"Name":"Inside","URL":"player.radioinside.eu","File":"/listen","Port":"4555","ovol":"0"}
+{"Name":"Bridge","URL":"95.154.202.117","File":"/;stream","Port":"37725","ovol":"0"}
+{"Name":"My station","URL":"stream1.virtualisan.net","File":"/live.mp3","Port":"6550","ovol":"0"}
+{"Name":"Radio 1","URL":"213.181.210.106","File":"/mid.mp3","Port":"80","ovol":"0"}
+{"Name":"Music fm","URL":"s02.diazol.hu","File":"/stream","Port":"10190","ovol":"0"}
+{"Name":"Slager fm","URL":"92.61.114.159","File":"/slagerfm256.mp3","Port":"7812","ovol":"0"}
+{"Name":"Karc fm","URL":"92.61.114.191","File":"/stream","Port":"13100","ovol":"0"}
+{"Name":"Trend","URL":"radio.nordtelekom.hu","File":"/gazdasagiradio","Port":"8000","ovol":"0"}
+{"Name":"Radio top","URL":"91.135.127.5","File":"/stream","Port":"888","ovol":"0"}
+{"Name":"All party","URL":"adas.allinparty.hu","File":"/hq","Port":"8430","ovol":"0"}
+{"Name":"Bithang","URL":"stream.diazol.hu","File":"/live.mp3","Port":"35160","ovol":"0"}
+{"Name":"Disco","URL":"212.108.220.144","File":"/stream.mp3","Port":"1039","ovol":"126"}
+{"Name":"Hobby","URL":"hobbyradio.hu","File":"/hobbyback.mp3","Port":"8000","ovol":"0"}
+{"Name":"Slagerzene","URL":"streaming212.radionomy.com","File":"/slagerzeneweb","Port":"80","ovol":"0"}
+{"Name":"Pannonia","URL":"stream.diazol.hu","File":"/stream","Port":"35200","ovol":"0"}
+{"Name":"Delux","URL":"musorcsere.hu","File":"/deluxefm","Port":"8390","ovol":"0"}
+{"Name":"Baptista","URL":"92.61.114.195","File":"/;","Port":"9960","ovol":"0"}
+{"Name":"Hunor1","URL":"188.165.11.30","File":"/live.mp3","Port":"4450","ovol":"0"}
+{"Name":"Hit?","URL":"stream1.hit.hu","File":"/high","Port":"8080","ovol":"0"}
+{"Name":"Gold","URL":"stream1.virtualisan.net","File":"/live.mp3","Port":"6200","ovol":"0"}
+{"Name":"Poptarisznya","URL":"stream1.virtualisan.net","File":"/live.mp3","Port":"8200","ovol":"0"}
+{"Name":"Luxfunk","URL":"stream1.virtualisan.net","File":"/luxfunkradio.mp3","Port":"5000","ovol":"0"}
+{"Name":"Laza","URL":"stream.lazaradio.com","File":"/live.mp3","Port":"8100","ovol":"0"}
+{"Name":"Superdj","URL":"stream.diazol.hu","File":"/stream","Port":"35150","ovol":"0"}
+{"Name":"Erdelyi Magyar Radio","URL":"adas.erdelyimagyarradio.eu","File":"/emr","Port":"8000","ovol":"0"}
+{"Name":"Enjoy","URL":"enjoyhits.eu","File":"/live.mp3","Port":"80","ovol":"0"}
+{"Name":"Fresh","URL":"stream3.virtualisan.net","File":"/freshfm.mp3","Port":"8000","ovol":"0"}
+{"Name":"Szabadka","URL":"79.172.194.189","File":"/live.mp3","Port":"4110","ovol":"0"}
+{"Name":"Buddha","URL":"server.tkbf.hu","File":"/buddhafm","Port":"4000","ovol":"0"}
+{"Name":"Crazy","URL":"radio.nnkcrazyclub.hu","File":"/crazyklub","Port":"7163","ovol":"0"}
+{"Name":"Strong","URL":"188.165.64.41","File":"/;stream","Port":"8620","ovol":"0"}
+{"Name":"Rise fm","URL":"188.165.11.30","File":"/risefm_hq","Port":"8080","ovol":"0"}
+{"Name":"Amadeus","URL":"hosting.42netmedia.com","File":"/;","Port":"13050","ovol":"0"}
+{"Name":"Anntritt","URL":"stream.radioantritt.hu","File":"/Antritt","Port":"8000","ovol":"0"}
+{"Name":"Tilos","URL":"stream.tilos.hu","File":"/tilos","Port":"80","ovol":"0"}
+{"Name":"Laza","URL":"stream.lazaradio.com","File":"/live.mp3","Port":"8100","ovol":"0"}
+{"Name":"Cool fm","URL":"mediagw.e-tiger.net","File":"/stream/coolfm","Port":"8000","ovol":"0"}
+{"Name":"Mex","URL":"stream.diazol.hu","File":"/live.mp3","Port":"31000","ovol":"0"}
+{"Name":"M zoli","URL":"radio.mzoleee.com","File":"/;stream","Port":"8008","ovol":"0"}
+{"Name":"Gyor plus","URL":"hosting.42netmedia.com","File":"/stream","Port":"9620","ovol":"0"}
+{"Name":"Riska boci?","URL":"87.229.53.12","File":"/;stream","Port":"80","ovol":"0"}
+{"Name":"Mercy","URL":"stream.mercyradio.eu","File":"/mercyradio.mp3","Port":"80","ovol":"0"}
+{"Name":"Mercy hangoskonyv","URL":"stream.mercyradio.eu","File":"/hangoskonyv.mp3","Port":"80","ovol":"0"}
+{"Name":"Mercy operett","URL":"stream.mercyradio.eu","File":"/operett.mp3","Port":"80","ovol":"0"}
+{"Name":"MERCY NEMZETIROCK","URL":"stream.mercyradio.eu","File":"/nemzetirock.mp3","Port":"80","ovol":"0"}
+{"Name":"Mercy rap","URL":"stream.mercyradio.eu","File":"/rap.mp3","Port":"80","ovol":"0"}
+{"Name":"Mercy mese","URL":"stream.mercyradio.eu","File":"/mese.mp3","Port":"80","ovol":"0"}
+{"Name":"Mercy komolyzene","URL":"stream.mercyradio.eu","File":"/komolyzene.mp3","Port":"80","ovol":"0"}
+{"Name":"Mercy musical","URL":"stream.mercyradio.eu","File":"/musical.mp3","Port":"80","ovol":"0"}
+{"Name":"Mercy country","URL":"stream.mercyradio.eu","File":"/country.mp3","Port":"80","ovol":"0"}
+{"Name":"Mercy jazz","URL":"stream.mercyradio.eu","File":"/jazz.mp3","Port":"80","ovol":"0"}
+{"Name":"Mercy kabare","URL":"stream.mercyradio.eu","File":"/kabare.mp3","Port":"80","ovol":"0"}
+{"Name":"Mercy napjaink","URL":"stream.mercyradio.eu","File":"/napjaink.mp3","Port":"80","ovol":"0"}
+{"Name":"Mercy vers","URL":"stream.mercyradio.eu","File":"/versproza.mp3","Port":"80","ovol":"0"}
+{"Name":"Mercy vilagslagerek","URL":"stream.mercyradio.eu","File":"/vilagslager.mp3","Port":"80","ovol":"0"}
+{"Name":"Mercy disco","URL":"stream.mercyradio.eu","File":"/disco.mp3","Port":"80","ovol":"0"}
+{"Name":"Zenekoktel","URL":"stream.zenekoktelradio.hu","File":"/fallback.mp3","Port":"4030","ovol":"0"}
+{"Name":"Sztrada","URL":"stream.diazol.hu","File":"/live.mp3","Port":"35080","ovol":"0"}
+{"Name":"Patria","URL":"live.slovakradio.sk","File":"/Patria_128.mp3","Port":"8000","ovol":"0"}
+{"Name":"Szombathely","URL":"77.221.39.23","File":"/;stream","Port":"8000","ovol":"0"}
+{"Name":"Sirius radio","URL":"91.82.84.179","File":"/relay_911","Port":"8500","ovol":"0"}
+{"Name":"Lepes","URL":"79.172.194.189","File":"/live.mp3","Port":"4000","ovol":"0"}
+{"Name":"Múpa","URL":"musorcsere.hu","File":"/stream","Port":"8110","ovol":"0"}
+{"Name":"Moonlight","URL":"149.202.5.119","File":"/stream","Port":"7176","ovol":"0"}
+{"Name":"Ez a nap","URL":"stream1.virtualisan.net","File":"/live.mp3","Port":"6270","ovol":"0"}
+{"Name":"Csibeszek","URL":"91.83.93.7","File":"/live","Port":"9032","ovol":"0"}
+{"Name":"Hungary","URL":"188.165.11.30","File":"/live.mp3","Port":"4450","ovol":"0"}
+{"Name":"Pécs","URL":"radio.ilovepecs.hu","File":"/ilp.mp3","Port":"8200","ovol":"0"}
+{"Name":"Radio e","URL":"radioe.net","File":"/efm_high","Port":"8080","ovol":"0"}
+{"Name":"Club dance","URL":"stream.diazol.hu","File":"/live.mp3","Port":"35000","ovol":"0"}
+{"Name":"EUROPA","URL":"radio2.tirek.hu","File":"/debrecen","Port":"8000","ovol":"0"}
+{"Name":"Vorosmarty Fehervar","URL":"217.13.100.100","File":"/vorosmarty_mid.mp3","Port":"8000","ovol":"0"}
+{"Name":"Orient","URL":"orientfm.hu","File":"/orient","Port":"8000","ovol":"0"}
+{"Name":"Rakospalota","URL":"s2.free-shoutcast.com","File":"/;","Port":"18400","ovol":"0"}
+{"Name":"Tradio","URL":"adas.tradio.hu","File":"/;stream","Port":"8026","ovol":"0"}
+{"Name":"Fenyarnyek","URL":"87.98.180.73","File":"/;stream","Port":"9996","ovol":"0"}
+{"Name":"Fox","URL":"stream.foxradio.rs","File":"/;stream","Port":"8545","ovol":"0"}
+{"Name":"Hello","URL":"91.82.85.58","File":"/autodj","Port":"8060","ovol":"0"}
+{"Name":"Open air","URL":"79.172.209.223","File":"/stream","Port":"9200","ovol":"0"}
+{"Name":"Bakelit","URL":"79.172.209.223","File":"/stream","Port":"8038","ovol":"0"}
+{"Name":"Hun","URL":"188.165.11.30","File":"/live.mp3","Port":"4450","ovol":"0"}
+{"Name":"Dark family","URL":"radioadmin.info","File":"/autodj","Port":"7600","ovol":"0"}
+{"Name":"Podcast","URL":"157.181.47.247","File":"/mpr.mp3","Port":"8000","ovol":"0"}
+{"Name":"Advent","URL":"radio.adventnet.hu","File":"/stream","Port":"8000","ovol":"0"}
+{"Name":"Planet fm","URL":"radioadmin.info","File":"/autodj","Port":"7950","ovol":"0"}
+{"Name":"Muravidek","URL":"mp3.rtvslo.si","File":"/mmr","Port":"80","ovol":"0"}
+{"Name":"Music center","URL":"radioadmin.info","File":"/autodj","Port":"17650","ovol":"0"}
