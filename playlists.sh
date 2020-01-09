@@ -2,6 +2,7 @@
 
 SRC="infos.html"
 TARGET="playlists"
+mkdir -p "$TARGET"
 rm -f "$TARGET/*"
 
 grep 'href="playlists\/' "$SRC" | \
