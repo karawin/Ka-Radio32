@@ -204,8 +204,9 @@ function setRssiInterval() {
 		try {
 			if (websocket == null || websocket.readyState == WebSocket.CLOSED) {
 				openSocket();
+			} else {
+				websocket.send('wsrssi');
 			}
-			websocket.send('wsrssi');
 		} catch (e) {
 			console.error('Websocket ', e);
 			clearInterval(rssiTimer);
