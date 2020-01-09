@@ -82,15 +82,13 @@
 
 			document.addEventListener('click', function(event)  {
 				if(event.target.hasAttribute('download') && event.target.hasAttribute('href')) {
-					if(typeof parent.loadPlaylistByUrl != 'function') {
-						console.error('loadPlaylistByUrl() function is missing in parent window');
+					event.preventDefault();
+					if(window.frameElement != null) {
+						window.frameElement.postMessage({ playlist: event.target.href }, window.location.href);
 						return;
 					}
 
-					event.preventDefault();
-					if(window.frameElement != null) {
-						window.frameElement.postMessage({ playlist: event.target.href }, window.location.href)
-					}
+					console.error('This page is not inside an <iframe>');
 				}
 			});
 		})();
