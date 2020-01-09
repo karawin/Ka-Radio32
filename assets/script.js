@@ -894,7 +894,7 @@ nb=3
 				}, 250, this);
 				return;
 			}
-			console.log(this.status + ': ' + this.statusText + ' from ' + this.responseURL);
+			console.error(this.status + ': ' + this.statusText + ' from ' + this.responseURL);
 		}
 	}
 
@@ -1136,8 +1136,23 @@ function loadPlaylist() {
 	reader.readAsText(input.files.item(0));
 }
 
+const xhrPlaylist = new XMLHttpRequest();
+xhrPlaylist.onreadystatechange = function() {
+	if (this.readyState === XMLHttpRequest.DONE) {
+		if (this.status === 200) {
+			if(this.responseText.length > 0) {
+				console.log(this.responseText);
+			}
+			return;
+		}
+		console.error(this.status + ': ' + this.statusText + ' from ' + this.responseURL);
+	}
+}
+
 function loadPlaylistFromUrl(url) {
-	console.log('Downloading a playlist from ' + REPO_URL+url);
+	console.log('Downloading a playlist from ' url);
+	xhrPlaylist.open('GET', url);
+	xhrPlaylist.send(null);
 }
 
 function clearPlaylist() {
