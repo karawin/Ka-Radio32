@@ -23,12 +23,17 @@ const currentVolume = document.getElementById('icy-vol');
 const autoplay = document.getElementById('icy-auto');
 const player = document.getElementById('monitor-audio');
 const localTime = document.getElementById('localTime');
+const delayTimes = {
+	Sleep: document.getElementById('sleep-laptime'),
+	Wake: document.getElementById('wake-laptime')
+}
 const rssi = document.getElementById('rssi');
 const progressBar = document.getElementById('progressBar');
 const contentTypeForm = 'application/x-www-form-urlencoded';
 const ICY_FIELDS = new Array('curst', 'descr', 'name', 'bitr', 'url1', 'not1', 'not2', 'genre', 'meta');
 const MAX_STATIONS = 255;
 // const MAX_STATIONS = 20;
+const MINUTES = 60000; // duration in miliseconds
 
 
 var IP_DEVICE = null;
@@ -341,6 +346,15 @@ function openSocket() {
 const localTimeTimer = setInterval(function () {
 	let now = new Date();
 	localTime.textContent = now.toLocaleTimeString();
+	for(let i in delayTimes) {
+		if(delayTimes[i] != null) {
+			const k = user + i;
+			if(localTime.hasOwnProperty(k)) {
+				const delay = localTime[k] - now.getTime();
+				delayTimes[i].textContent = (delay <= 0) ? '&nbsp;' : new Date(delay).toISOString(11, 8);
+			}
+		}
+	}
 }, 1000);
 
 /* ================ Stations list =========== */
@@ -1187,9 +1201,49 @@ document.forms.hardware.addEventListener('submit', function(event) {
 
 document.forms.wifi.addEventListener('submit', function(event) {
 	event.preventDefault();
-	alert('Setup Wifi');
+	const lines = ['valid=1'];
+	const elements = event.target.elements;
+	['', '2'].forEach(function(col) {
+		let dhcp = false;
+		['ssid', 'pasw', 'dhcp', 'ip', 'msk', 'gw', 'ua', 'host', 'tzo'].forEach(function(field) {
+			if(col == '2' && ['ua', 'host', 'tzo'].indexOf(field) >= 0) { continue; }
+			if(!dhcp && ['ip', 'msk', 'gw'].indexOf(field) >= 0)
+			const el = elements.namedItem(field + col);
+			if(field == 'dhcp') {
+				dhcp = el.checked;
+				if(dhcp) { lines.push('dhcp' + col + '=true'); }
+			} else {
+				lines.push(el.name + '=' + el.value);
+			}
+		});
+	});
+	xhr.sendForm('wifi', lines.join('&'));
 })
 
+/* -------------- Sleep / Awake ------- */
+document.getElementById('sleep-wake', function(event) {
+	if(/(?:sleep|wake)Btn/.test(event.target.id)) {
+		event.preventDefault();
+		const field = document.getElementById(event.target.id.replace(/Btn$/, '-time'));
+		if(field != null) {
+			// startSleep, stopSleep, startWake, stopWake with websocket
+			const value = field.value;
+			const action = field.name.replace(/-time$/, '').replace(/^(s|w)/, '$1').toUpperCase();
+			if(value.trim().length == 0) {
+				websocket.message('stop' + action);
+				localTime.removeAttribute('data-' + field.name.replace(/-time$/, ''));
+			} else {
+				const now = new Date();
+				const parts = fied.value.split(':');
+				const nextDay = (parts[0] <= now.getHours() && parts[1] <= now.getMinutes()) ? 1 : 0;
+				const nextDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + nextDay, parts[0], parts[1], 0);
+				let delay = nextDate.getTime() - now.getTime();
+				websocket.message('start' + action + "=" + (delay / MINUTES) + '&');
+				localTime.['user' + action] = nextDate.getTime();
+			}
+		}
+	}
+});
 /* ============== tabs ============== */
 
 function onTabChange(event) {
