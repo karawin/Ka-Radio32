@@ -351,7 +351,7 @@ const localTimeTimer = setInterval(function () {
 			const k = 'user' + i;
 			if(localTime.hasOwnProperty(k)) {
 				const delay = localTime[k] - now.getTime();
-				delayTimes[i].innerHTML = (delay <= 0) ? '&nbsp;' : 'delayed in ' + new Date(delay).toISOString.substr(11, 8);
+				delayTimes[i].innerHTML = (delay <= 0) ? '&nbsp;' : 'in ' + new Date(delay).toISOString().substr(11, 8);
 			}
 		}
 	}
