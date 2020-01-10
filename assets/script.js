@@ -348,7 +348,7 @@ const localTimeTimer = setInterval(function () {
 	localTime.textContent = now.toLocaleTimeString();
 	for(let i in delayTimes) {
 		if(delayTimes[i] != null) {
-			const k = user + i;
+			const k = 'user' + i;
 			if(localTime.hasOwnProperty(k)) {
 				const delay = localTime[k] - now.getTime();
 				delayTimes[i].textContent = (delay <= 0) ? '&nbsp;' : new Date(delay).toISOString(11, 8);
