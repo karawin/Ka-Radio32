@@ -1228,10 +1228,10 @@ document.getElementById('sleep-wake').addEventListener('click', function(event) 
 		if(field != null) {
 			// startSleep, stopSleep, startWake, stopWake with websocket
 			const value = field.value;
-			const action = field.name.replace(/-time$/, '').replace(/^(s|w)/, '$1').toUpperCase();
+			const action = field.id.replace(/-time$/, '').replace(/^(s|w)/, '$1').toUpperCase();
 			if(value.trim().length == 0) {
 				websocket.message('stop' + action);
-				localTime.removeAttribute('data-' + field.name.replace(/-time$/, ''));
+				localTime.removeAttribute('data-' + field.id.replace(/-time$/, ''));
 			} else {
 				const now = new Date();
 				const parts = fied.value.split(':');
