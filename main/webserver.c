@@ -444,13 +444,19 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 		}
 	} else if(strcmp(name, "/soundvol") == 0) {
 		if(data_size > 0) {
-			char * vol = data+4;
-			data[data_size-1] = 0;
-			ESP_LOGD(TAG,"/sounvol vol: %s num:%d",vol, atoi(vol));
-			setVolume(vol);
-			respOk(conn,NULL);
-			return;
+			char param[4];
+			int vol;
+			if(getSParameterFromResponse(param,4,"vol=", data, data_size)) {
+				if(param == NULL) { return; }
+				vol = atoi(param);
+				if(vol < 0 || vol > 254) { return; }
+				ESP_LOGD(TAG,"/sounvol vol: %s num:%d", param, vol);
+				setVolume(param); // setVolume waits for a string
+				wsVol(param);
+				respOk(conn,NULL);
+			}
 		}
+		return;
 	} else if(strcmp(name, "/sound") == 0) {
 		if(data_size > 0) {
 			char bass[6];
