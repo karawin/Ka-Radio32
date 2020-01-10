@@ -1221,7 +1221,7 @@ document.forms.wifi.addEventListener('submit', function(event) {
 })
 
 /* -------------- Sleep / Awake ------- */
-document.getElementById('sleep-wake', function(event) {
+document.getElementById('sleep-wake').addEventListener('click', function(event) {
 	if(/(?:sleep|wake)Btn/.test(event.target.id)) {
 		event.preventDefault();
 		const field = document.getElementById(event.target.id.replace(/Btn$/, '-time'));
