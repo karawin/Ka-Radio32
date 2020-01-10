@@ -618,14 +618,6 @@ xhr.stopCurrentStation = function () {
 	this.sendCommand('stop');
 }
 xhr.instantPlay = function (fullUrl) {
-	/*
-	 * No working with fullUrl = http://5.135.154.69:12500/;
-	 * curl 'http://192.168.58.77?instant=http://5.135.154.69:12500/;' doesn't work
-	 * curl 'http://192.168.58.77?instant=http%3A%2F%2F5.135.154.69%3A12500%2F%3B' doesn't work
-	 * but curl -d 'url=5.135.154.69' -d 'port=12500' -d 'path=/;' http://192.168.58.77/instant_play is right
-	 * idem with http://87.118.126.101:19406/stream from http://yp.shoutcast.com/sbin/tunein-station.m3u?id=1683077
-	 * */
-
 	// this.sendCommand('instant', encodeURI(fullUrl.replace(/^https/, 'http')));
 
 	// hack against Ka-Radio
@@ -1116,7 +1108,8 @@ function parsePlaylist(contentType, datas) {
 			}
 			break;
 		case 'text/plain' :
-			const lines = datas.split(/\r\n|\n|\r/);
+			// const lines = datas.split(/\r\n|\n|\r/);
+			const lines = datas.replace(/\}.*?\{/g, '}\n{').split(/\n/);
 			if(typeof lines.forEach != 'function') {
 				return;
 			}
@@ -1175,7 +1168,7 @@ xhrPlaylist.onreadystatechange = function() {
 			}
 			return;
 		}
-		console.error(this.status + ': ' + this.statusText + ' from ' + this.responseURL);
+		alert('Error ' + this.status + ':\n' + this.statusText + ' from ' + this.responseURL);
 	}
 }
 
@@ -1217,6 +1210,7 @@ document.forms.wifi.addEventListener('submit', function(event) {
 			}
 		});
 	});
+	// console.log(lines);
 	xhr.sendForm('wifi', lines.join('&'));
 })
 
