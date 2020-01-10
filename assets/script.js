@@ -1239,7 +1239,7 @@ document.getElementById('sleep-wake', function(event) {
 				const nextDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + nextDay, parts[0], parts[1], 0);
 				let delay = nextDate.getTime() - now.getTime();
 				websocket.message('start' + action + "=" + (delay / MINUTES) + '&');
-				localTime.['user' + action] = nextDate.getTime();
+				localTime['user' + action] = nextDate.getTime();
 			}
 		}
 	}
