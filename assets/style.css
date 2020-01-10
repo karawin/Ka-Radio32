@@ -108,7 +108,7 @@ tbody td {
 #radio form[name="icy"] {
 	padding: 0 0.3rem;
 }
-form[name="icy"] div * {
+form[name="icy"] div > * {
 	display: inline-block;
 	width: 100%;
 }
@@ -371,7 +371,7 @@ form[name="wifi"] > div:nth-of-type(3) fieldset > div {
 		flex-grow: 1;
 	}
 	form[name="icy"] > div:first-of-type > * {
-		display: initial;
+		/* display: initial; */
 		width: auto;
 	}
 }
