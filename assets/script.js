@@ -1206,7 +1206,7 @@ document.forms.wifi.addEventListener('submit', function(event) {
 	['', '2'].forEach(function(col) {
 		let dhcp = false;
 		['ssid', 'pasw', 'dhcp', 'ip', 'msk', 'gw', 'ua', 'host', 'tzo'].forEach(function(field) {
-			if(col == '2' && ['ua', 'host', 'tzo'].indexOf(field) >= 0) { continue; }
+			if(col == '2' && ['ua', 'host', 'tzo'].indexOf(field) >= 0) { return; }
 			if(!dhcp && ['ip', 'msk', 'gw'].indexOf(field) >= 0)
 			const el = elements.namedItem(field + col);
 			if(field == 'dhcp') {
@@ -1339,6 +1339,7 @@ displayHardware();
 setRssiInterval();
 loadStationsList();
 
+// for iframes with CORS policy
 window.addEventListener('message', function(event) {
 	if(event.type == 'message' && REPO_URL.startsWith(event.origin)) {
 		event.preventDefault();
