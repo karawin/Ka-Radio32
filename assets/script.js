@@ -1207,7 +1207,7 @@ document.forms.wifi.addEventListener('submit', function(event) {
 		let dhcp = false;
 		['ssid', 'pasw', 'dhcp', 'ip', 'msk', 'gw', 'ua', 'host', 'tzo'].forEach(function(field) {
 			if(col == '2' && ['ua', 'host', 'tzo'].indexOf(field) >= 0) { return; }
-			if(!dhcp && ['ip', 'msk', 'gw'].indexOf(field) >= 0)
+			if(!dhcp && ['ip', 'msk', 'gw'].indexOf(field) >= 0);
 			const el = elements.namedItem(field + col);
 			if(field == 'dhcp') {
 				dhcp = el.checked;
