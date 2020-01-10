@@ -1,5 +1,19 @@
 'use strict';
 
+/*
+ *
+ * git clone --depth 1 https://bazooka07@github.com/bazooka07/Ka-Radio32.git -b gh-pages
+ * cd Ka-Radio32/
+ * # setup IP_ADDR constant for you Ka-Radio device in index.php
+ * php -S localhost:8080
+ * # open the above address in your web-browser
+ * # Enjoy the new homepage for your device
+ * # Try a playlist in the "About" tab
+ * # Search stations in shoutcast.com, radio-browser.info, Soma-Fm, Calm-Radio or Ferarock directories
+ *
+ * # Have a good journey in the world of web radios
+ *
+ * */
 const KA_RADIO = 'Ka-Radio';
 const meta = document.getElementById('icy-meta');
 const stationsList = document.getElementById('stationsList');
