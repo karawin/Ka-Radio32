@@ -1230,7 +1230,7 @@ document.getElementById('sleep-wake').addEventListener('click', function(event) 
 			const value = field.value;
 			const action = field.id.replace(/-time$/, '').replace(/^(s|w)/, field.id.charAt(0).toUpperCase());
 			if(value.trim().length == 0) {
-				websocket.message('stop' + action);
+				websocket.send('stop' + action);
 				localTime.removeAttribute('data-' + field.id.replace(/-time$/, ''));
 			} else {
 				const now = new Date();
@@ -1238,7 +1238,7 @@ document.getElementById('sleep-wake').addEventListener('click', function(event) 
 				const nextDay = (parts[0] <= now.getHours() && parts[1] <= now.getMinutes()) ? 1 : 0;
 				const nextDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + nextDay, parts[0], parts[1], 0);
 				let delay = nextDate.getTime() - now.getTime();
-				websocket.message('start' + action + "=" + (delay / MINUTES) + '&');
+				websocket.send('start' + action + "=" + (delay / MINUTES) + '&');
 				localTime['user' + action] = nextDate.getTime();
 			}
 		}
