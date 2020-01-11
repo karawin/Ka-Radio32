@@ -847,6 +847,7 @@ void syslcd(char* s)
 	if(t == NULL)
 	{
 		kprintf("##LCD is %d#\n",g_device->lcd_type);
+		kprintf("##LCD Width %d, Height %d#\n",GetWidth(),GetHeight());
 		return;
 	}
 	char *t_end  = strstr(t, parquoteslash);

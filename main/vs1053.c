@@ -110,6 +110,7 @@ bool VS1053_HW_init()
 		return false;
 	}
 	uint32_t freq =spi_cal_clock(APB_CLK_FREQ, 1400000, 128, NULL);
+//	uint32_t freq =spi_cal_clock(APB_CLK_FREQ, 1600000, 128, NULL);
 	ESP_LOGI(TAG,"VS1053 LFreq: %d",freq);
 	spi_device_interface_config_t devcfg={
         .clock_speed_hz=freq,               //Clock out at x MHz
@@ -117,7 +118,7 @@ bool VS1053_HW_init()
 		.address_bits = 8,
 		.dummy_bits = 0,
 		.duty_cycle_pos = 0,
-		.cs_ena_pretrans = 0,
+		.cs_ena_pretrans = 1,
 		.cs_ena_posttrans = 1,
 		.flags = 0,	
         .mode=0,                         //SPI mode 
@@ -143,7 +144,7 @@ bool VS1053_HW_init()
 	//Initialize non-SPI GPIOs
 	gpio_config_t gpio_conf;
 	gpio_conf.mode = GPIO_MODE_OUTPUT;
-	gpio_conf.pull_up_en =  GPIO_PULLUP_DISABLE;
+	gpio_conf.pull_up_en =  GPIO_PULLUP_ENABLE;
 	gpio_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
 	gpio_conf.intr_type = GPIO_INTR_DISABLE;	
 	gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<rst));
@@ -270,9 +271,9 @@ void WriteVS10xxRegister(unsigned short addr,unsigned short val)
 
 void VS1053_ResetChip(){
 	ControlReset(SET);
-	vTaskDelay(20);
+	vTaskDelay(30);
 	ControlReset(RESET);
-	vTaskDelay(20);
+	vTaskDelay(30);
 	if (VS1053_checkDREQ() == 1) return;
 	vTaskDelay(20);
 }
@@ -323,9 +324,9 @@ void VS1053_HighPower(){
 
 void VS1053_Start(){
 	ControlReset(SET);
-	vTaskDelay(50);
+	vTaskDelay(100);
 	ControlReset(RESET);
-	vTaskDelay(150);	
+	vTaskDelay(200);	
 	//Check DREQ
 	if (VS1053_checkDREQ() == 0)
 	{
@@ -334,7 +335,7 @@ void VS1053_Start(){
 		return;
 	} 
 	
-	VS1053_ResetChip();
+//	VS1053_ResetChip();
 // these 4 lines makes board to run on mp3 mode, no soldering required anymore
 	VS1053_WriteRegister16(SPI_WRAMADDR, 0xc017); //address of GPIO_DDR is 0xC017
 	VS1053_WriteRegister16(SPI_WRAM, 0x0003); //GPIO_DDR=3
@@ -349,7 +350,8 @@ void VS1053_Start(){
 	ESP_LOGI(TAG,"VS1053/VS1003 detected. MP3Status: %x, Version: %x",MP3Status,vsVersion);
    if (vsVersion == 4) // only 1053b  	
 //		VS1053_WriteRegister(SPI_CLOCKF,0x78,0x00); // SC_MULT = x3, SC_ADD= x2
-		VS1053_WriteRegister16(SPI_CLOCKF,0xB800); // SC_MULT = x1, SC_ADD= x1
+//		VS1053_WriteRegister16(SPI_CLOCKF,0xB800); // SC_MULT = x1, SC_ADD= x1
+		VS1053_WriteRegister16(SPI_CLOCKF,0x8800); // SC_MULT = x3.5, SC_ADD= x1
 //		VS1053_WriteRegister(SPI_CLOCKF,0x90,0x00); // SC_MULT = x3.5, SC_ADD= x1.5
 	else	
 		VS1053_WriteRegister16(SPI_CLOCKF,0xB000);

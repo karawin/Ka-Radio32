@@ -98,6 +98,9 @@ void setFuturNum(int16_t new);
 int16_t getFuturNum();
 void addonDt();
 void wakeLcd();
+uint16_t GetWidth();
+uint16_t GetHeight();
+
 void* getEncoder(int num);
 struct tm* getDt();
 
