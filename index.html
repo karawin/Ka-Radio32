@@ -6,53 +6,66 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<title>Extensions for Ka-radio32</title>
 	<style>
+		#directories {
+			list-style: none;
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: space-around;
+			padding: 0.3rem 0.8rem;
+			background-color: #eee;
+		}
+		#directories a { display: inline-block; }
+		#directories img:not([src$=".svg"]) { max-height: 45px; width: auto; }
+		#directories .no-picture { line-height: 45px; font-size: 32px; }
+		pre {
+			background-color: #444;
+			padding: 0.3rem 1rem;
+			color: gold;
+			font-size: 12pt;
+		}
 	</style>
 </head><body>
 	<header>
 		<h1>A responsive homepage for your Ka-Radio32 device and more</h1>
 	</header>
-	<div>This project is a complete rewriting of the home page for th Ka-Radio32 devices</div>
+	<div>This project is a complete rewriting of the home page for the <a href="https://github.com/karawin/Ka-Radio32" target="_blank">Ka-Radio32</a> devices forweb radios</div>
+	<h2>About the usage of the Ka-Radio device</h2>
 	<ul>
 		<li>Tired of waiting for the end of loading the playlist from the device</li>
 		<li>Disappointed by the missing responsive design on your smartphone</li>
 		<li>Looking for other web radios from various streams directories like :
-			<ul>
-				<li><a href="https://www.shoutcast.com/"><img alt="Shoutcast" src="http://wiki.shoutcast.com/images/6/61/Logo_shoutcast.png" /></a></li>
-				<li><a href="http://www.radio-browser.info/">Radio Browser</a></li>
-				<li><a href="http://somafm.com/"><img alt="Soma Fm" src="http://somafm.com/img/LogoFP2010.gif" /></a></li>
-				<li><a href="https://calmradio.com/"><img alt="Calm Radio" src="http://calmradio.com/templates/calmradio/images/logo-dark.svg" /></a></li>
-				<li><a href="https://ferarock.org"><img alt="Ferarock" src="http://ferarock.org/sites/all/themes/t_ferarock/img/website-logo.png" />(<em>A french networks of cool radios</em>)</a></li>
+			<ul id="directories">
+				<li><a href="https://www.shoutcast.com/" target="_blank"><img alt="Shoutcast" src="http://wiki.shoutcast.com/images/6/61/Logo_shoutcast.png" /></a></li>
+				<li><a href="http://www.radio-browser.info/" target="_blank" class="no-picture">Radio Browser</a></li>
+				<li><a href="http://somafm.com/" target="_blank"><img alt="Soma Fm" src="http://somafm.com/img/LogoFP2010.gif" /></a></li>
+				<li><a href="https://calmradio.com/" target="_blank"><img alt="Calm Radio" src="http://calmradio.com/templates/calmradio/images/logo-dark.svg" height="45" /></a></li>
+				<li><a href="https://ferarock.org" target="_blank"><img alt="Ferarock" src="http://ferarock.org/sites/all/themes/t_ferarock/img/website-logo.png" /></a></li>
 			</ul>
 		</li>
 		<li>Never explore all the playlists submit by other listeners</li>
 	</ul>
 	<div>This new homepage offers all of that's</div>
+	<h2>Try before flashing</h2>
 	<div>If you want to test all these features before flashing your ESP32, you just need PHP language on your PC or on your Raspberry or others SBC (<em>I am loving my Rock64 with it's EMMC</em>)</div>
 	<div>Just follow the instructions belows. Of source, you can flash after. And you can keep even the old homepage on your device. For all geeks, notice for using the gh-pages branch (<em>Git pages are free</em>).</div>
-	<section id="main">
-		<pre><code>git clone --depth 1 https://bazooka07@github.com/bazooka07/Ka-Radio32.git -b gh-pages
+		<pre>git clone --depth 1 https://github.com/bazooka07/Ka-Radio32.git -b gh-pages
 cd Ka-Radio32/
 # setup IP_ADDR constant for you Ka-Radio device in index.php. Important !
 php -S localhost:8080
 # open the above address in your web-browser
-Enjoy the new homepage for your device
-Try a playlist in the "About" tab
-Search stations in shoutcast.com, radio-browser.info, Soma-Fm, Calm-Radio or Ferarock directories
-
-Have a good journey in the world of web radios
-		</code></pre>
-	</section>
-	<div>Ready to flash your device</div>
-	<div>
-		<p>It's the same repository on Github. hust switch on the expansions branch.</p>
-		<ul>
-			<li>sudo apt install python3-pip</li>
-			<li>sudo -H pip3 install ...</li>
-			<li>git clone --depth 1 https://bazooka07@github.com/bazooka07/Ka-Radio32.git -b gh-pages</li>
-			<li>cd Ka-Radio32</li>
-			<li>webpage/generate.sh</li>
-			<li>make menuconfig. Adjust your serial port</li>
-			<li>make flash</li>
-		</ul>
-	</div>
+# Enjoy the new homepage for your device
+# Try a playlist in the "About" tab
+# Search stations in shoutcast.com, radio-browser.info, Soma-Fm, Calm-Radio or Ferarock directories</pre>
+	<p>Have a good journey in the world of web radios</p>
+	<h2>Ready to flash your device</h2>
+	<p>It's the same repository on Github. Just switch on the expansions branch.</p>
+	<ul>
+		<li>sudo apt install python3-pip</li>
+		<li>sudo -H pip3 install ...</li>
+		<li>git clone --depth 1 https://github.com/bazooka07/Ka-Radio32.git -b gh-pages</li>
+		<li>cd Ka-Radio32</li>
+		<li>webpage/generate.sh</li>
+		<li>make menuconfig. Adjust your serial port</li>
+		<li>make flash</li>
+	</ul>
 </body></html>
