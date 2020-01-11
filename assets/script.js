@@ -938,6 +938,10 @@ document.getElementById('abortEditStationBtn').addEventListener('click', functio
 	document.forms.editStationForm.reset();
 });
 
+document.getElementById('eraseStationBtn').addEventListener('click', function (event) {
+	alert('Erase all the fields');
+});
+
 function saveStation(event) {
 	event.preventDefault();
 	let idStation = this.elements.idStation.value.trim();
@@ -1314,9 +1318,16 @@ function kaPlugin(id, content, script) {
 const REPO_URL = document.scripts[0].src.replace(/\/\w+\/script\.js$/, '/');
 console.log('REPO_URL = ', REPO_URL);
 
-// Update urls for the playlists in the cloud
-const frameInfos = document.getElementById('frame-info');
-frameInfos.src = (frameInfos != null) ? REPO_URL + 'infos.html' : 'http://karadio.karawin.fr/infos.php';
+/* const CLOUD_URL = 'https://kazimentou.fr/ka-radio/'; // must end with '/' */
+const CLOUD_URL = 'https://bazooka07.github.io/Ka-Radio32/'; // must end with '/'
+
+// Update urls for the version and playlists in the cloud
+['version32', 'infos'].forEach(function(item){
+	const el = document.getElementById('frame-' + item);
+	if(el != null) {
+		el.src = CLOUD_URL + item+ '.html';
+	}
+});
 
 if(document.body.hasAttribute('data-ip')) {
 	IP_DEVICE = document.body.dataset.ip;

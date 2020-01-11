@@ -8,7 +8,7 @@
 	<meta name="apple-mobile-web-app-status-bar-style" content="default" >
 	<link rel="apple-touch-icon" type="image/png" href="logo.png" >
 	<link rel="icon" type="image/png" href="favicon.png" />
-	<link type="text/css" rel="stylesheet" title="base" href="https://bazooka07.github.io/Ka-Radio32/assets/style.css" />
+	<link type="text/css" rel="stylesheet" title="base" href="https://bazooka07.github.io/Ka-Radio32/assets/responsive.css" />
 	<title>Karadio, the ultimate Wifi Webradio</title>
 </head><body>
 	<header class="no-print" id="header">
@@ -238,8 +238,8 @@
 		<input form="tabs" type="radio" name="tab" id="tab-about" value="about" />
 		<div class="no-print" id="about">
 			<div>
-				<iframe id="frame-version" src="http://karadio.karawin.fr/version32.php" width="100%">Your browser doesn't support the iframe tag</iframe>
-				<iframe id="frame-info" src="" width="100%">Your browser doesn't support the iframe tag</iframe>
+				<iframe id="frame-version32" src="http://karadio.karawin.fr/version32.php" width="100%">Your browser doesn't support the iframe tag</iframe>
+				<iframe id="frame-infos" src="http://karadio.karawin.fr/infos.php" width="100%">Your browser doesn't support the iframe tag</iframe>
 			</div>
 		</div>
 	</section>
@@ -260,7 +260,7 @@
 					<label for="urlStation">Full url</label>
 					<input type="url" id="urlStation" name="urlStation" required />
 					<label for="volStation">Volume</label>
-					<input type="range" id="volStation" min="0" max="100" />
+					<input type="range" id="volStation" min="-126" max="126" />
 				</div>
 				<p class="center">
 					<input type="button" class="button" value="Abort" id="abortEditStationBtn" />
@@ -275,7 +275,7 @@
 			'use strict';
 			const myScript = document.createElement('SCRIPT');
 			myScript.type = 'text/javascript';
-			myScript.src = document.styleSheets[0].href.replace(/\bstyle\.css/, 'script.js');
+			myScript.src = document.styleSheets.item('base').href.replace(/\bstyle\.css/, 'script.js');
 			document.head.appendChild(myScript);
 		})();
 	</script>
