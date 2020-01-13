@@ -1,7 +1,7 @@
 'use strict';
 
 /*
- * Copyright Jean-Pierre Pourrez http://github.com/bazooka07/Ka-Radio32
+ * Copyright (c) Jean-Pierre Pourrez - http://github.com/bazooka07/Ka-Radio32
  *
  * git clone --depth 1 https://bazooka07@github.com/bazooka07/Ka-Radio32.git -b gh-pages
  * cd Ka-Radio32/
@@ -767,9 +767,16 @@ xhr.onreadystatechange = function () {
 			if(Math.round(this.status / 10) == 40 && this.responseURL.endsWith('/?version')) {
 				// Error 400..409
 				alert('Your device is unreachable');
+				/*
+				// Don't work because CORS policy
+				// https://stackoverflow.com/questions/4911062/pulling-track-info-from-an-audio-stream-using-php/4914538#4914538
 				player.addEventListener('loadeddata', function(event) {
 					console.log(event);
+					xhrIcy.open('GET', event.target.currentSrc);
+					xhrIcy.setRequestHeader('Icy-MetaData', '1');
+					xhrIcy.send();
 				});
+				 * */
 			}
 		}
 	}
@@ -1151,7 +1158,7 @@ function parsePlaylist(contentType, datas, uri) {
 	}
 
 	isLoading = true;
-	if(count > 1 && confirm('Do you want to save the ' + count + ' entries of the playlist into the device ?\nThat takes à while. Let\'s be patient !!')) {
+	if(isConnected && count > 1 && confirm('Do you want to save the ' + count + ' entries of the playlist into the device ?\nThat takes à while. Let\'s be patient !!')) {
 		saveStationsList();
 	}
 }
@@ -1193,7 +1200,7 @@ function loadPlaylistFromUrl(url) {
 }
 
 function clearPlaylist() {
-	if(confirm('Erase all stations ?')) {
+	if(isConnected && confirm('Erase all stations ?')) {
 		alert('Clear the playlist');
 	}
 }
