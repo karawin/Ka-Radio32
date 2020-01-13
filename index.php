@@ -10,8 +10,14 @@ if($_SERVER['REQUEST_METHOD'] == 'GET' and !empty($_SERVER['QUERY_STRING'])) {
 	 * */
 	// phpinfo(INFO_VARIABLES);
 	$ch = curl_init(IP_ADDR . '?' . $_SERVER['QUERY_STRING']);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	$resp = curl_exec($ch);
+	$curl_infos = curl_getinfo($ch);
 	curl_close($ch);
+	if($resp !== false) {
+		header('Content-Type: ' . $curl_infos['content_type']);
+		echo $resp;
+	}
 	exit;
 }
 

@@ -679,7 +679,7 @@ xhr.onreadystatechange = function () {
 				return;
 			}
 
-			if(this.getResponseHeader('Content-Type') == 'text/plain') {
+			if(this.getResponseHeader('Content-Type').startsWith('text/plain')) {
 				const PATTERN = /^release\b.*?(\d+)\.(\d+).*?(\d+).*/i;
 				if(PATTERN.test(this.responseText)) {
 					const el = document.getElementById('version');
@@ -836,12 +836,7 @@ function saveStationsList(changedOnly) {
 
 	const xhrPlaylistSave = new XMLHttpRequest();
 	xhrPlaylistSave.clear = function() {
-		const action = 'clear';
-		const url = (typeof IP_DEVICE != 'string') ? '/' + action : window.location.href;
-		this.open('POST', url);
-		this.setRequestHeader('Content-Type', contentTypeForm);
-		setCustomHeader(this, action);
-		this.send();
+		sendForm(this, 'clear', null);
 	};
 
 	xhrPlaylistSave.saveStation = function() {
