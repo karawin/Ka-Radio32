@@ -36,7 +36,6 @@ const MAX_STATIONS = 255;
 // const MAX_STATIONS = 20;
 const MINUTES = 60000; // duration in miliseconds
 
-
 var IP_DEVICE = null;
 var rssiTimer = null;
 var instantPlaying = false;
@@ -52,6 +51,18 @@ function setCustomHeader(xhr, action) {
 	if(typeof IP_DEVICE == 'string') {
 		xhr.setRequestHeader('Karadio-Action', action);
 	}
+}
+
+function sendForm(xhr1, action, params) {
+	if(!isConnected) { return; }
+
+	const url = (typeof IP_DEVICE != 'string') ? '/' + action : window.location.href;
+	xhr1.open('POST', url);
+	xhr1.setRequestHeader('Content-Type', contentTypeForm);
+	if(typeof IP_DEVICE == 'string') {
+		xhr1.setRequestHeader('Karadio-Action', action);
+	}
+	xhr1.send(params);
 }
 
 function pageReset() {
@@ -102,7 +113,7 @@ function icyDisplay(icy) {
 					target.textContent = icy[value].trim();
 			}
 		} else {
-			console.log('icy-' + value + ' element not found');
+			console.error('icy-' + value + ' element not found');
 		}
 	}
 	const playing = (icy.name.trim().length > 0);
@@ -501,7 +512,7 @@ xhrCurst.onreadystatechange = function () {
 	if (this.readyState === XMLHttpRequest.DONE) {
 		if (this.status === 200) {
 			// console.log(this.responseText);
-			if(this.responseText.trim().length === 0 || !this.getResponseHeader('Content-Type').startsWith('application/json')) { return; }
+			if(this.responseText.trim().length === 0 || this.getResponseHeader('Content-Type') != 'application/json') { return; }
 
 			let datas = JSON.parse(this.responseText);
 			// console.log(datas);
@@ -519,12 +530,7 @@ xhrCurst.onreadystatechange = function () {
 }
 
 function displayCurrentStation() {
-	const action = 'icy';
-	const url = (typeof IP_DEVICE != 'string') ? '/' + action : window.location.href;
-	xhrCurst.open('POST', url);
-	xhrCurst.setRequestHeader('Content-Type', contentTypeForm);
-	setCustomHeader(xhrCurst, action);
-	xhrCurst.send(null);
+	sendForm(xhrCurst, 'icy', null);
 }
 
 /* ------------------- hardware ---------------------- */
@@ -566,12 +572,7 @@ function displayHardware(valid) {
 		}
 	}
 
-	const action = 'hardware';
-	const url = (typeof IP_DEVICE != 'string') ? '/' + action : window.location.href;
-	xhrHardware.open('POST', url);
-	xhrHardware.setRequestHeader('Content-Type', contentTypeForm);
-	setCustomHeader(xhrHardware, action);
-	xhrHardware.send(params.join('&'));
+	sendForm(xhrHardware, 'hardware', params.join('&'));
 }
 
 const xhr = new XMLHttpRequest();
@@ -636,23 +637,7 @@ xhr.wifi = function (valid) {
 	let params = [
 		'valid=' + valid
 	];
-	[
-		'ssid',
-		'ssid2',
-		'pasw',
-		'pasw2',
-		'dhcp',
-		'dhcp2',
-		'ip',
-		'msk',
-		'gw',
-		'ip2',
-		'msk2',
-		'gw2',
-		'ua',
-		'host',
-		'tzo'
-	].forEach(function (name) {
+	['ssid', 'ssid2', 'pasw', 'pasw2', 'dhcp', 'dhcp2', 'ip', 'msk', 'gw', 'ip2', 'msk2', 'gw2', 'ua', 'host', 'tzo'].forEach(function (name) {
 		let el = document.forms.wifi.elements[name];
 		if (el != null) {
 			params.push(name + '=' + el.value);
@@ -694,7 +679,7 @@ xhr.onreadystatechange = function () {
 				return;
 			}
 
-			if(this.getResponseHeader('Content-Type') != 'text/plain') {
+			if(this.getResponseHeader('Content-Type') == 'text/plain') {
 				const PATTERN = /^release\b.*?(\d+)\.(\d+).*?(\d+).*/i;
 				if(PATTERN.test(this.responseText)) {
 					const el = document.getElementById('version');
@@ -709,7 +694,7 @@ xhr.onreadystatechange = function () {
 					loadStationsList();
 					return;
 				}
-				console.error('Unattented response from '+ this.reponseURL, this.responseText);
+				console.error('Unattented response from '+ this.responseURL, this.responseText);
 				return;
 			}
 
@@ -784,15 +769,7 @@ xhrSta.loadStation = function (stationId) {
 		this.stationId = stationId;
 	};
 	progressBar.value = this.stationId;
-
-	const action = 'getStation';
-	const url = (typeof IP_DEVICE != 'string') ? '/' + action : window.location.href;
-	const params = 'idgp=' + this.stationId;
-
-	this.open('POST', url);
-	this.setRequestHeader('Content-Type', contentTypeForm);
-	setCustomHeader(this, action);
-	this.send(params);
+	sendForm(this, 'getStation', 'idgp=' + this.stationId);
 }
 
 xhrSta.onreadystatechange = function () {
@@ -912,13 +889,8 @@ function saveStationsList(changedOnly) {
 		}
 
 		let params = 'nb=' + output.length + '&' + output.join('&');
-		const action = 'setStation';
-		const url = (typeof IP_DEVICE != 'string') ? '/' + action : window.location.href;
+		sendForm(this, 'setStation', params);
 		console.log(url, '=>', params);
-		this.open('POST', url);
-		this.setRequestHeader('Content-Type', contentTypeForm);
-		setCustomHeader(this, action);
-		this.send(params);
 	};
 
 	xhrPlaylistSave.onreadystatechange = function () {
