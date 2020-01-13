@@ -22,6 +22,7 @@ const stationsSelect = document.getElementById('icy-curst');
 const stationsBtn = document.getElementById('stationsBtn');
 const currentVolume = document.getElementById('icy-vol');
 const autoplay = document.getElementById('icy-auto');
+// http://www.mediaelementjs.com/
 const player = document.getElementById('monitor-audio');
 const localTime = document.getElementById('localTime');
 const delayTimes = {
@@ -1117,7 +1118,7 @@ function parsePlaylist(contentType, datas, uri) {
 			lines.forEach(function(item) {
 				try {
 					if(item.trim().length > 0) {
-						let station = JSON.parse(item.trim());
+						let station = JSON.parse(item.replace(/\t/g, ' ').trim());
 						if(station.hasOwnProperty('URL') && station.URL.trim().length > 0) {
 							console.log(station);
 							let idStation = addStation(null, station);
@@ -1311,7 +1312,6 @@ function kaPlugin(id, content, script) {
 window.addEventListener('message', function(event) {
 	if(event.type == 'message' && REPO_URL.startsWith(event.origin)) {
 		event.preventDefault();
-		console.log('Received :', event.data);
 		const payload = JSON.parse(event.data);
 		if(payload.hasOwnProperty('playlist')) {
 			loadPlaylistFromUrl(payload.playlist);
