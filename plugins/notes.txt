@@ -9,3 +9,8 @@ https://www.1.fm/mainstations
 https://www.1.fm/languages/fr-FR/common.lang.json
 https://www.1.fm/less/style.css
 https://www.1.fm/less/flags.css
+
+https://api.laut.fm/
+
+streamfinder
+https://docs.google.com/document/pub?id=1iaD22Rd4NwUoEOeDvM2Ao16XtF4vKG37PuXo1lChWFQ

@@ -140,7 +140,8 @@ function valueChange(event) {
 			instantPlayForm.classList.remove('active');
 			if(isConnected) {
 				if(!isLoading) {
-					xhr.valueChange(this.dataset.action, this.dataset.param + '=' + value + '&'); // Hack against Ka-Radio
+					// xhr.valueChange(this.dataset.action, this.dataset.param + '=' + value + '&'); // Hack against Ka-Radio
+					xhr.sendCommand('play', value);
 				} else {
 					// stations in the playlist table and select are from a file, not from the Ka-Radio device
 					const row = document.getElementById('station-' + value) ;
@@ -156,6 +157,11 @@ function valueChange(event) {
 						player.play();
 					}
 			}
+			return;
+			break;
+		case 'soundvol':
+		case 'volume':
+			xhr.sendCommand('volume', value);
 			return;
 			break;
 		case 'auto':
@@ -474,6 +480,7 @@ function addStation(stationId, datas) {
 	let tr = document.createElement('TR');
 	tr.id = 'station-' + stationId;
 	tr.draggable = true;
+	tr.hasChanged = false;
 
 	let idCell = document.createElement('TD');
 	idCell.textContent = stationId;
@@ -531,7 +538,9 @@ xhrCurst.onreadystatechange = function () {
 }
 
 function displayCurrentStation() {
-	sendForm(xhrCurst, 'icy', null);
+	if(isConnected) {
+		sendForm(xhrCurst, 'icy', null);
+	}
 }
 
 /* ------------------- hardware ---------------------- */
@@ -755,8 +764,12 @@ xhr.onreadystatechange = function () {
 			}
 		} else {
 			console.log('Error ' + this.status + ': ' + this.statusText + ' from ' + this.responseURL);
-			if(this.status == 404 && this.responseURL.endsWith('/?version')) {
+			if(Math.round(this.status, 10) == 40 && this.responseURL.endsWith('/?version')) {
+				// Error 403 or 404 or...
 				alert('Your device is unreachable');
+				player.addEventListener('loadedmetadata', function(event) {
+					console.log(event);
+				});
 			}
 		}
 	}
@@ -811,16 +824,13 @@ const promptMsg = 'Do you want to save the entries of the playlist into the devi
 function loadStationsList() {
 	if (stationsList == null) { return; }
 
-	if(isLoading) {
-		if(confirm(promptMsg)) {
-			saveStationsList();
-		}
-	} else {
-		for(i=0, iMax=stationsList.rows.length; i<iMax; i++) {
-			if(stationsList.rows[i].hasOwnProperty('hasChanged') && stationsList.rows[i].hasChanged && confirm(promptMsg)) {
-				saveStationsList(true); // Only changed  stations
-				break;
+	if(isConnected && stationsList.rows.length > 0) {
+		if(isLoading) {
+			if(confirm(promptMsg)) {
+				saveStationsList();
 			}
+		} else {
+			saveStationsList(true); // Only changed  stations
 		}
 	}
 
@@ -831,9 +841,13 @@ function loadStationsList() {
 }
 
 function saveStationsList(changedOnly) {
+	if(typeof changedOnly == 'undefined') {
+		changedOnly = false;
+	}
+
+	let saveStationId = 0;
 	const BATCH_SIZE = 8;
 	let saveStationsTimer = null;
-	let saveStationId = -1;
 
 	const xhrPlaylistSave = new XMLHttpRequest();
 	xhrPlaylistSave.clear = function() {
@@ -846,32 +860,27 @@ function saveStationsList(changedOnly) {
 			saveStationsTimer = null;
 		}
 
-		const output = new Array();
-
-		if(typeof changedOnly != 'undefined' && changedOnly) {
-			for(i=0, iMax=stationsList.rows.length; i<iMax; i++) {
-				if(stationsList.rows[i].hasOwnProperty('hasChanged') && stationsList.rows[i].hasChanged) {
-					saveStationId = i;
-					break;
-				}
+		for(i=saveStationId, iMax=stationsList.rows.length; i<iMax; i++) {
+			if(stationsList.rows[i].hasChanged) {
+				saveStationId = i;
+				break;
 			}
 		}
 
-		for(let i=0; i<BATCH_SIZE; i++) {
-			var endOfStations = false;
-			let row = null;
-			let url = '';
-			// Non les ids doivent se suivre Pour toutes les rangées hasChanged = false
-			do {
-				saveStationId++;
-				if(saveStationId >= MAX_STATIONS) { break; }
-				row = stationsList.querySelector('#station-' + saveStationId);
-				if(row != null) {
-					url = row.cells[2].textContent.replace('&nbsp;', ' ').trim();
-				}
-			} while(url.length == 0);
+		if(saveStationId == stationsList.rowsLength) { return; }
 
+		const output = new Array();
+		for(let i=0; i<BATCH_SIZE; i++) {
+			if(saveStationId >= stationsList.rows.length) { break; }
+
+			const row = stationsList.querySelector('#station-' + saveStationId);
+			saveStationId++;
+
+			if(changedOnly && !row.hasOwnProperty.hasChanged) { break; }
+
+			url = row.cells[2].textContent.replace('&nbsp;', ' ').trim();
 			if(url.length == 0) { break; }
+
 			let datas = extractFullUrl(url);
 
 			output.push('id=' + saveStationId + '&name=' + row.cells[1].textContent + '&url=' + datas.url + '&port=' + datas.port + '&file=' + datas.path1 + '&ovol=' + row.cells[3].textContent.trim() + '&');
@@ -905,10 +914,15 @@ function saveStationsList(changedOnly) {
 		}
 	}
 
-	if(typeof changedOnly == 'undefined' || !changedOnly) {
-		xhrPlaylistSave.clear(); // Save all stations
-	} else {
+	if(changedOnly) {
 		xhrPlaylistSave.saveStation();
+	} else {
+		for(i=0, iMax=stationsList.rows.length; i<iMax; i++) {
+			const row = stationsList.rows[i];
+			const url = row.cells[2].textContent.replace('&nbsp;', ' ').trim();
+			row.hasChanged = (url.length > 0);
+		}
+		xhrPlaylistSave.clear(); // Save all stations
 	}
 }
 
@@ -1255,7 +1269,7 @@ function onTabChange(event) {
 			displayCurrentStation();
 			break;
 		case 'settings':
-			xhr.wifi();
+			if(isConnected) { xhr.wifi(); }
 			break;
 	}
 }
@@ -1310,7 +1324,7 @@ function kaPlugin(id, content, script) {
 
 /* ========================= for iframes with CORS policy ============ */
 window.addEventListener('message', function(event) {
-	if(event.type == 'message' && REPO_URL.startsWith(event.origin)) {
+	if(event.type == 'message' && CLOUD_URL.startsWith(event.origin)) {
 		event.preventDefault();
 		const payload = JSON.parse(event.data);
 		if(payload.hasOwnProperty('playlist')) {
