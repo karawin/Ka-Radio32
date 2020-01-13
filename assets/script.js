@@ -1051,7 +1051,7 @@ function savePlaylistAsM3u() {
 	el.revokeObjectURL(saveAsText);
 }
 
-function parsePlaylist(contentType, datas) {
+function parsePlaylist(contentType, datas, uri) {
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/matchAll
 	let matches = null;
 	let count = 0;
@@ -1146,7 +1146,7 @@ function parsePlaylist(contentType, datas) {
 			});
 			break;
 		default:
-			console.log('Unknown format for ' + input.files[0].name + ' file (' + input.files[0].type + ')');
+			console.log('Unknown format for ' + uri + ' file (' + contentType + ')');
 			return;
 	}
 
@@ -1164,7 +1164,7 @@ function loadPlaylist() {
 	}
 	let reader = new FileReader();
 	reader.onloadend = function (e) {
-		parsePlaylist(input.files[0].type, this.result);
+		parsePlaylist(input.files[0].type, this.result, input.files[0].name);
 	};
 	reader.readAsText(input.files.item(0));
 }
@@ -1178,7 +1178,7 @@ xhrPlaylist.onreadystatechange = function() {
 				if(tab != null) {
 					tab.labels[0].click();
 				}
-				parsePlaylist(this.getResponseHeader('Content-Type').replace(/;.*$/, ''), this.responseText);
+				parsePlaylist(this.getResponseHeader('Content-Type').replace(/;.*$/, ''), this.responseText, this.responseUrl);
 			}
 			return;
 		}

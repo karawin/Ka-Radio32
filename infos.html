@@ -85,9 +85,13 @@
 				playlist.addEventListener('click', function(event)  {
 					if(event.target.hasAttribute('download') && event.target.hasAttribute('href')) {
 						event.preventDefault();
-						const msg = '{"playlist":"' + event.target.href + '"}';
-						window.parent.postMessage(msg, '*');
-						console.log('Send :', msg);
+						if(typeof window.loadPlaylistFromUrl == 'function') {
+							window.loadPlaylistFromUrl(event.target.href);
+						} else {
+							const msg = '{"playlist":"' + event.target.href + '"}';
+							window.parent.postMessage(msg, '*');
+							console.log('Send :', msg);
+						}
 					}
 				});
 			}
