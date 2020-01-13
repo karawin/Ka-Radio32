@@ -498,10 +498,18 @@ function getVersion(release) {
 		) {
 			const el = document.getElementById('version');
 			el.textContent = this.responseText.trim().replace(PATTERN, 'Ver. $1.$2.$3');
+
+			// Let's go
+			openSocket();
+			displayCurrentStation();
+			displayHardware();
+			setRssiInterval();
+			loadStationsList();
 			return;
 		}
 
-		console.error(this.status, this.statusText, this.responseText);
+		console.error(this.status, this.statusText, this.responseUrl);
+		alert('Your device is unreachable');
 	};
 
 	let url = (typeof IP_DEVICE != 'string') ? '/' : window.location.href;
@@ -1367,9 +1375,5 @@ if(document.body.hasAttribute('data-ip')) {
 // Display the first tab
 document.forms.tabs.elements.tab[0].checked = true;
 
+// getVersion launches each function if success
 getVersion();
-openSocket();
-displayCurrentStation();
-displayHardware();
-setRssiInterval();
-loadStationsList();
