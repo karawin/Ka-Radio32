@@ -80,12 +80,17 @@
 		(function() {
 			'use strict';
 
-			document.addEventListener('click', function(event)  {
-				if(event.target.hasAttribute('download') && event.target.hasAttribute('href')) {
-					event.preventDefault();
-					window.parent.postMessage('{"playlist":"' + event.target.href + '"}', '*');
-				}
-			});
+			const playlist = document.getElementById('playlist');
+			if(playlist != null) {
+				playlist.addEventListener('click', function(event)  {
+					if(event.target.hasAttribute('download') && event.target.hasAttribute('href')) {
+						event.preventDefault();
+						const msg = '{"playlist":"' + event.target.href + '"}';
+						window.parent.postMessage(msg, '*');
+						console.log('Send :', msg);
+					}
+				});
+			}
 		})();
 	</script>
 </body></html>

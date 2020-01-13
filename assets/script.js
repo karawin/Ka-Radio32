@@ -408,6 +408,7 @@ function onDrop(event) {
 		if (stationsList.rows[i].id != 'station-' + i) {
 			stationsList.rows[i].id = 'station-' + i;
 			stationsList.rows[i].cells[0].textContent = i;
+			stationsList.rows[i].hasChanged = true;
 		}
 	}
 }
@@ -809,8 +810,23 @@ xhrSta.onreadystatechange = function () {
 	}
 }
 
+const promptMsg = 'Do you want to save the entries of the playlist into the device ?\nThat takes à while. Let\'s be patient !!';
+
 function loadStationsList() {
 	if (stationsList == null) { return; }
+
+	if(isLoading) {
+		if(confirm(promptMsg)) {
+			saveStationsList();
+		}
+	} else {
+		for(i=0, iMax=stationsList.rows.length; i<iMax; i++) {
+			if(stationsList.rows[i].hasOwnProperty('hasChanged') && stationsList.rows[i].hasChanged && confirm(promptMsg)) {
+				saveStationsList(true); // Only changed  stations
+				break;
+			}
+		}
+	}
 
 	stationsList.innerHTML = '';
 	stationsSelect.innerHTML = '';
@@ -818,7 +834,7 @@ function loadStationsList() {
 	xhrSta.loadStation(0);
 }
 
-function saveStationsList() {
+function saveStationsList(changedOnly) {
 	const BATCH_SIZE = 8;
 	let saveStationsTimer = null;
 	let saveStationId = -1;
@@ -826,17 +842,7 @@ function saveStationsList() {
 	const xhrPlaylistSave = new XMLHttpRequest();
 	xhrPlaylistSave.clear = function() {
 		const action = 'clear';
-		let url = '/' + action;
-		let params = '';
-		if(typeof IP_DEVICE == 'string') {
-			let extra = 'action=' + action;
-			if(params.length == 0) {
-				params = extra;
-			} else {
-				params += '&' + extra;
-			}
-			url = window.location.href;
-		}
+		const url = (typeof IP_DEVICE != 'string') ? '/' + action : window.location.href;
 		this.open('POST', url);
 		this.setRequestHeader('Content-Type', contentTypeForm);
 		setCustomHeader(this, action);
@@ -850,10 +856,21 @@ function saveStationsList() {
 		}
 
 		const output = new Array();
+
+		if(typeof changedOnly != 'undefined' && changedOnly) {
+			for(i=0, iMax=stationsList.rows.length; i<iMax; i++) {
+				if(stationsList.rows[i].hasOwnProperty('hasChanged') && stationsList.rows[i].hasChanged) {
+					saveStationId = i;
+					break;
+				}
+			}
+		}
+
 		for(let i=0; i<BATCH_SIZE; i++) {
 			var endOfStations = false;
 			let row = null;
 			let url = '';
+			// Non les ids doivent se suivre Pour toutes les rangées hasChanged = false
 			do {
 				saveStationId++;
 				if(saveStationId >= MAX_STATIONS) { break; }
@@ -878,17 +895,7 @@ function saveStationsList() {
 
 		let params = 'nb=' + output.length + '&' + output.join('&');
 		const action = 'setStation';
-		let url = '/' + action;
-		if(typeof IP_DEVICE == 'string') {
-			let extra = 'action=' + action;
-			if(params.length == 0) {
-				params = extra;
-			} else {
-				params += '&' + extra;
-			}
-			url = window.location.href;
-		}
-
+		const url = (typeof IP_DEVICE != 'string') ? '/' + action : window.location.href;
 		console.log(url, '=>', params);
 		this.open('POST', url);
 		this.setRequestHeader('Content-Type', contentTypeForm);
@@ -912,8 +919,11 @@ function saveStationsList() {
 		}
 	}
 
-	// xhrPlaylistSave.saveStation(1);
-	xhrPlaylistSave.clear();
+	if(typeof changedOnly == 'undefined' || !changedOnly) {
+		xhrPlaylistSave.clear(); // Save all stations
+	} else {
+		xhrPlaylistSave.saveStation();
+	}
 }
 
 function onStationsBtnClick(event) {
@@ -1348,6 +1358,7 @@ loadStationsList();
 window.addEventListener('message', function(event) {
 	if(event.type == 'message' && REPO_URL.startsWith(event.origin)) {
 		event.preventDefault();
+		console.log('Received :', event.data);
 		const payload = JSON.parse(event.data);
 		if(payload.hasOwnProperty('playlist')) {
 			loadPlaylistFromUrl(payload.playlist);
