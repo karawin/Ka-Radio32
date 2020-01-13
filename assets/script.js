@@ -764,10 +764,10 @@ xhr.onreadystatechange = function () {
 			}
 		} else {
 			console.log('Error ' + this.status + ': ' + this.statusText + ' from ' + this.responseURL);
-			if(Math.round(this.status, 10) == 40 && this.responseURL.endsWith('/?version')) {
-				// Error 403 or 404 or...
+			if(Math.round(this.status / 10) == 40 && this.responseURL.endsWith('/?version')) {
+				// Error 400..409
 				alert('Your device is unreachable');
-				player.addEventListener('loadedmetadata', function(event) {
+				player.addEventListener('loadeddata', function(event) {
 					console.log(event);
 				});
 			}
