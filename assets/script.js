@@ -694,7 +694,26 @@ xhr.onreadystatechange = function () {
 				return;
 			}
 
-			if(!this.getResponseHeader('Content-Type').startsWith('application/json')) { return; }
+			if(this.getResponseHeader('Content-Type') != 'text/plain') {
+				const PATTERN = /^release\b.*?(\d+)\.(\d+).*?(\d+).*/i;
+				if(PATTERN.test(this.responseText)) {
+					const el = document.getElementById('version');
+					el.textContent = this.responseText.trim().replace(PATTERN, 'Ver. $1.$2.$3');
+
+					// Let's go
+					isConnected = true;
+					openSocket();
+					displayCurrentStation();
+					displayHardware();
+					setRssiInterval();
+					loadStationsList();
+					return;
+				}
+				console.error('Unattented response from '+ this.reponseURL, this.responseText);
+				return;
+			}
+
+			if(this.getResponseHeader('Content-Type') != 'application/json') { return; }
 
 			let datas = JSON.parse(this.responseText);
 			// console.log(datas);
@@ -748,35 +767,11 @@ xhr.onreadystatechange = function () {
 				document.forms.hardware.output.value = datas.coutput;
 				return;
 			}
-
-			if('release' in datas) {
-				const PATTERN = /^release\b.*?(\d+)\.(\d+).*?(\d+).*/i;
-				if(
-					this.readyState === XMLHttpRequest.DONE && this.status === 200 &&
-					this.getResponseHeader('Content-Type').startsWith('text/') &&
-					PATTERN.test(this.responseText)
-				) {
-					const el = document.getElementById('version');
-					el.textContent = this.responseText.trim().replace(PATTERN, 'Ver. $1.$2.$3');
-
-					// Let's go
-					isConnected = true;
-					openSocket();
-					displayCurrentStation();
-					displayHardware();
-					setRssiInterval();
-					loadStationsList();
-					return;
-				}
-
-				console.error(this.status, this.statusText, this.responseURL);
-				alert('Your device is unreachable');
-				return;
-			}
-
-			console.log('Error: %d (%s)', this.status, this.statusText);
 		} else {
 			console.log('Error ' + this.status + ': ' + this.statusText + ' from ' + this.responseURL);
+			if(this.status == 404 && this.responseURL.endsWith('/?version')) {
+				alert('Your device is unreachable');
+			}
 		}
 	}
 }
