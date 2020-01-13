@@ -1,6 +1,7 @@
 'use strict';
 
 /*
+ * Copyright Jean-Pierre Pourrez http://github.com/bazooka07/Ka-Radio32
  *
  * git clone --depth 1 https://bazooka07@github.com/bazooka07/Ka-Radio32.git -b gh-pages
  * cd Ka-Radio32/
@@ -41,6 +42,7 @@ var rssiTimer = null;
 var instantPlaying = false;
 var saveAsText = null;
 var currentStationId = null;
+var isConnected = false;
 
 var isLoading = true; // displayed webradios are not saving in the Ka-Radio device
 
@@ -124,15 +126,23 @@ function valueChange(event) {
 		case 'play':
 			pageReset();
 			instantPlayForm.classList.remove('active');
-			if(!isLoading) {
-				xhr.valueChange(this.dataset.action, this.dataset.param + '=' + value + '&'); // Hack against Ka-Radio
-			} else {
-				// stations in the playlist table and select are from a file, not from the Ka-Radio device
-				const row = document.getElementById('station-' + value) ;
-				if(row != null) {
-					instantPlayForm.elements.fullUrl.value = row.cells[2].textContent;
-					instantPlayForm.elements.instantPlayBtn.click();
+			if(isConnected) {
+				if(!isLoading) {
+					xhr.valueChange(this.dataset.action, this.dataset.param + '=' + value + '&'); // Hack against Ka-Radio
+				} else {
+					// stations in the playlist table and select are from a file, not from the Ka-Radio device
+					const row = document.getElementById('station-' + value) ;
+					if(row != null) {
+						instantPlayForm.elements.fullUrl.value = row.cells[2].textContent;
+						instantPlayForm.elements.instantPlayBtn.click();
+					}
 				}
+			} else {
+					const row = document.getElementById('station-' + value) ;
+					if(row != null) {
+						player.src = row.cells[2].textContent;
+						player.play();
+					}
 			}
 			return;
 			break;
@@ -192,7 +202,6 @@ function instantPlaySave(event) {
 }
 
 function playStation() {
-	// Créer un évenement change pour StationsSelect
 	console.log('Play station');
 	const event = new Event('change');
 	stationsSelect.dispatchEvent(event);
@@ -486,37 +495,6 @@ function addStation(stationId, datas) {
 	return stationId;
 }
 
-function getVersion(release) {
-	// GET, /?version - Ex: Release: 1.9, Revision: 5
-	let xhrVersion = new XMLHttpRequest();
-	xhrVersion.onreadystatechange = function() {
-		const PATTERN = /^release\b.*?(\d+)\.(\d+).*?(\d+).*/i;
-		if(
-			this.readyState === XMLHttpRequest.DONE && this.status === 200 &&
-			this.getResponseHeader('Content-Type').startsWith('text/') &&
-			PATTERN.test(this.responseText)
-		) {
-			const el = document.getElementById('version');
-			el.textContent = this.responseText.trim().replace(PATTERN, 'Ver. $1.$2.$3');
-
-			// Let's go
-			openSocket();
-			displayCurrentStation();
-			displayHardware();
-			setRssiInterval();
-			loadStationsList();
-			return;
-		}
-
-		console.error(this.status, this.statusText, this.responseUrl);
-		alert('Your device is unreachable');
-	};
-
-	let url = (typeof IP_DEVICE != 'string') ? '/' : window.location.href;
-	xhrVersion.open('GET', url + '?version');
-	xhrVersion.send();
-}
-
 /* ----------- display current station ---------------- */
 const xhrCurst = new XMLHttpRequest();
 xhrCurst.onreadystatechange = function () {
@@ -700,6 +678,11 @@ xhr.hardware = function (valid) {
 	}
 	this.sendForm('hardware', params.join('&'));
 }
+xhr.getVersion = function() {
+	let url = (typeof IP_DEVICE != 'string') ? '/' : window.location.href;
+	this.open('GET', url + '?version');
+	this.send();
+}
 xhr.onreadystatechange = function () {
 	if (this.readyState === XMLHttpRequest.DONE) {
 		if (this.status === 200) {
@@ -760,6 +743,31 @@ xhr.onreadystatechange = function () {
 
 			if ('coutput' in datas) {
 				document.forms.hardware.output.value = datas.coutput;
+				return;
+			}
+
+			if('release' in datas) {
+				const PATTERN = /^release\b.*?(\d+)\.(\d+).*?(\d+).*/i;
+				if(
+					this.readyState === XMLHttpRequest.DONE && this.status === 200 &&
+					this.getResponseHeader('Content-Type').startsWith('text/') &&
+					PATTERN.test(this.responseText)
+				) {
+					const el = document.getElementById('version');
+					el.textContent = this.responseText.trim().replace(PATTERN, 'Ver. $1.$2.$3');
+
+					// Let's go
+					isConnected = true;
+					openSocket();
+					displayCurrentStation();
+					displayHardware();
+					setRssiInterval();
+					loadStationsList();
+					return;
+				}
+
+				console.error(this.status, this.statusText, this.responseURL);
+				alert('Your device is unreachable');
 				return;
 			}
 
@@ -1376,4 +1384,4 @@ if(document.body.hasAttribute('data-ip')) {
 document.forms.tabs.elements.tab[0].checked = true;
 
 // getVersion launches each function if success
-getVersion();
+xhr.getVersion();
