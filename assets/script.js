@@ -1367,9 +1367,9 @@ if(document.body.hasAttribute('data-ip')) {
 // Display the first tab
 document.forms.tabs.elements.tab[0].checked = true;
 
+getVersion();
 openSocket();
 displayCurrentStation();
-getVersion();
 displayHardware();
 setRssiInterval();
 loadStationsList();
