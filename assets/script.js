@@ -1339,7 +1339,7 @@ window.addEventListener('message', function(event) {
 			return;
 		}
 
-		console.error(payload);
+		// console.error(payload);
 	}
 });
 
