@@ -498,8 +498,12 @@ function getVersion(release) {
 		) {
 			const el = document.getElementById('version');
 			el.textContent = this.responseText.trim().replace(PATTERN, 'Ver. $1.$2.$3');
+			return;
 		}
+
+		console.error(this.status, this.statusText, this.responseText);
 	};
+
 	let url = (typeof IP_DEVICE != 'string') ? '/' : window.location.href;
 	xhrVersion.open('GET', url + '?version');
 	xhrVersion.send();
@@ -1323,6 +1327,22 @@ function kaPlugin(id, content, script) {
 		}
 	}
 }
+
+// for iframes with CORS policy
+window.addEventListener('message', function(event) {
+	if(event.type == 'message' && REPO_URL.startsWith(event.origin)) {
+		event.preventDefault();
+		console.log('Received :', event.data);
+		const payload = JSON.parse(event.data);
+		if(payload.hasOwnProperty('playlist')) {
+			loadPlaylistFromUrl(payload.playlist);
+			return;
+		}
+
+		console.error(payload);
+	}
+});
+
 /* ============= Init ======================== */
 
 const REPO_URL = document.scripts[0].src.replace(/\/\w+\/script\.js$/, '/');
@@ -1353,18 +1373,3 @@ getVersion();
 displayHardware();
 setRssiInterval();
 loadStationsList();
-
-// for iframes with CORS policy
-window.addEventListener('message', function(event) {
-	if(event.type == 'message' && REPO_URL.startsWith(event.origin)) {
-		event.preventDefault();
-		console.log('Received :', event.data);
-		const payload = JSON.parse(event.data);
-		if(payload.hasOwnProperty('playlist')) {
-			loadPlaylistFromUrl(payload.playlist);
-			return;
-		}
-
-		console.error(payload);
-	}
-});
