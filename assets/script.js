@@ -609,18 +609,21 @@ xhr.stopCurrentStation = function () {
 	this.sendCommand('stop');
 }
 xhr.instantPlay = function (fullUrl) {
-	// this.sendCommand('instant', encodeURI(fullUrl.replace(/^https/, 'http')));
-
-	// hack against Ka-Radio
-	const matches = fullUrl.match(/^https?:\/\/([^:/]+)(?::(\d+))?(.*)/);
-	if(matches != null) {
-		if(typeof matches[2] == 'undefined') {
-			matches[2] = '80';
+	if(isConnected) {
+		// this.sendCommand('instant', encodeURI(fullUrl.replace(/^https/, 'http')));
+		const matches = fullUrl.match(/^https?:\/\/([^:/]+)(?::(\d+))?(.*)/);
+		if(matches != null) {
+			if(typeof matches[2] == 'undefined') {
+				matches[2] = '80';
+			}
+			if(!matches[3].startsWith('/')) {
+				matches[3] = '/' + matches[3];
+			}
+				xhr.sendForm('instant_play', 'url=' + matches[1] + '&port=' + matches[2] + '&path=' + matches[3]);
 		}
-		if(!matches[3].startsWith('/')) {
-			matches[3] = '/' + matches[3];
-		}
-		xhr.sendForm('instant_play', 'url=' + matches[1] + '&port=' + matches[2] + '&path=' + matches[3]);
+	} else {
+		player.src = fullUrl;
+		player.play();
 	}
 }
 xhr.valueChange = function (action, params) {
@@ -1306,6 +1309,8 @@ function initTabs() {
 	}
 }
 
+/* ================ Plugins ================== */
+
 /* loads a plugin on demand */
 document.getElementById('main').addEventListener('change', function(event) {
 	if(event.target.tagName == 'INPUT' && event.target.name == 'tab' && 'unload' in event.target.dataset) {
@@ -1318,10 +1323,6 @@ document.getElementById('main').addEventListener('change', function(event) {
 		document.head.appendChild(myScript);
 	}
 });
-
-initTabs();
-
-/* ================ Plugins ================== */
 
 function kaPlugin(id, content, script) {
 	const container = document.getElementById(id);
@@ -1344,7 +1345,7 @@ function kaPlugin(id, content, script) {
 	}
 }
 
-// for iframes with CORS policy
+/* ========================= for iframes with CORS policy ============ */
 window.addEventListener('message', function(event) {
 	if(event.type == 'message' && REPO_URL.startsWith(event.origin)) {
 		event.preventDefault();
@@ -1354,8 +1355,6 @@ window.addEventListener('message', function(event) {
 			loadPlaylistFromUrl(payload.playlist);
 			return;
 		}
-
-		// console.error(payload);
 	}
 });
 
@@ -1381,6 +1380,7 @@ if(document.body.hasAttribute('data-ip')) {
 }
 
 // Display the first tab
+initTabs();
 document.forms.tabs.elements.tab[0].checked = true;
 
 // getVersion launches each function if success
