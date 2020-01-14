@@ -892,7 +892,7 @@ function saveStationsList(changedOnly) {
 
 				let datas = extractFullUrl(url);
 
-				output.push('id=' + row.id.replace(/.*-(\d+)$/, '$1') + '&name=' + row.cells[1].textContent + '&url=' + datas.url + '&port=' + datas.port + '&file=' + datas.path1 + '&ovol=' + row.cells[3].textContent.trim() + '&');
+				output.push('id=' + row.id.replace(/.*-(\d+)$/, '$1') + '&name=' + row.cells[1].textContent.trim() + '&url=' + datas.url + '&port=' + datas.port + '&file=' + datas.path1 + '&ovol=' + row.cells[3].textContent.trim() + '&');
 			}
 
 			if(output.length > 0) {
@@ -1069,7 +1069,7 @@ function parsePlaylist(contentType, datas, uri) {
 	let count = 0;
 	switch(contentType) {
 		case 'audio/x-mpegurl' :
-			if(!/^#EXTM3U\b/.test(this.result)) {
+			if(!/^#EXTM3U\b/.test(datas)) {
 				console.log('Bad syntax. Missing #EXTM3U at the beginning of file');
 				return;
 			}
@@ -1088,7 +1088,7 @@ function parsePlaylist(contentType, datas, uri) {
 			}
 			break;
 		case 'audio/x-scpls':
-			if(!/^\[playlist\]/.test(this.result)) {
+			if(!/^\[playlist\]/.test(datas)) {
 				console.log('Bad syntax. Missing [playlist] at the beginning of file');
 				return;
 			}
