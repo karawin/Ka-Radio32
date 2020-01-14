@@ -892,7 +892,7 @@ function saveStationsList(changedOnly) {
 
 				let datas = extractFullUrl(url);
 
-				output.push('id=' + saveStationId + '&name=' + row.cells[1].textContent + '&url=' + datas.url + '&port=' + datas.port + '&file=' + datas.path1 + '&ovol=' + row.cells[3].textContent.trim() + '&');
+				output.push('id=' + row.id.replace(/.*(\d+)$/, '$1') + '&name=' + row.cells[1].textContent + '&url=' + datas.url + '&port=' + datas.port + '&file=' + datas.path1 + '&ovol=' + row.cells[3].textContent.trim() + '&');
 			}
 
 			if(output.length > 0) {
