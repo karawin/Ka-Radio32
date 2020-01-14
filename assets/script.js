@@ -852,7 +852,7 @@ function saveStationsList(changedOnly) {
 		changedOnly = false;
 	}
 
-	let saveStationId = 0;
+	let currentRow = 0;
 	const BATCH_SIZE = 8;
 	let saveStationsTimer = null;
 
@@ -867,42 +867,46 @@ function saveStationsList(changedOnly) {
 			saveStationsTimer = null;
 		}
 
-		for(let i=saveStationId, iMax=stationsList.rows.length; i<iMax; i++) {
+		let found = false;
+		const iMax=stationsList.rows.length;
+		for(let i=currentRow; i<iMax; i++) {
 			if(stationsList.rows[i].hasChanged) {
-				saveStationId = i;
+				currentRow = i;
+				found = true;
 				break;
 			}
 		}
 
-		if(saveStationId == stationsList.rowsLength) { return; }
+		if(found) {
+			const output = new Array();
+			for(let i=0; i<BATCH_SIZE; i++) {
+				if(currentRow >= stationsList.rows.length) { break; }
 
-		const output = new Array();
-		for(let i=0; i<BATCH_SIZE; i++) {
-			if(saveStationId >= stationsList.rows.length) { break; }
+				const row = stationsList.rows[currentRow];
+				currentRow++;
 
-			const row = stationsList.querySelector('#station-' + saveStationId);
-			saveStationId++;
+				if(changedOnly && !row.hasOwnProperty.hasChanged) { break; }
 
-			if(changedOnly && !row.hasOwnProperty.hasChanged) { break; }
+				url = row.cells[2].textContent.replace('&nbsp;', ' ').trim();
+				if(url.length == 0) { break; }
 
-			url = row.cells[2].textContent.replace('&nbsp;', ' ').trim();
-			if(url.length == 0) { break; }
+				let datas = extractFullUrl(url);
 
-			let datas = extractFullUrl(url);
+				output.push('id=' + saveStationId + '&name=' + row.cells[1].textContent + '&url=' + datas.url + '&port=' + datas.port + '&file=' + datas.path1 + '&ovol=' + row.cells[3].textContent.trim() + '&');
+			}
 
-			output.push('id=' + saveStationId + '&name=' + row.cells[1].textContent + '&url=' + datas.url + '&port=' + datas.port + '&file=' + datas.path1 + '&ovol=' + row.cells[3].textContent.trim() + '&');
+			if(output.length > 0) {
+				let params = 'nb=' + output.length + '&' + output.join('&');
+				sendForm(this, 'setStation', params);
+				console.log(url, '=>', params);
+			}
 		}
 
-		// Check if output not empty
-		if(output.length == 0) {
+		if(currentRow >= iMax) {
 			isLoading = false;
 			console.log('Playlist saved');
 			return;
 		}
-
-		let params = 'nb=' + output.length + '&' + output.join('&');
-		sendForm(this, 'setStation', params);
-		console.log(url, '=>', params);
 	};
 
 	xhrPlaylistSave.onreadystatechange = function () {
