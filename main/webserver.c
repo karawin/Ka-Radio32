@@ -450,7 +450,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 				if(param == NULL) { return; }
 				vol = atoi(param);
 				if(vol < 0 || vol > 254) { return; }
-				ESP_LOGD(TAG,"/sounvol vol: %s num:%d", param, vol);
+				ESP_LOGD(TAG,"/soundvol vol: %s num:%d", param, vol);
 				setVolume(param); // setVolume waits for a string
 				wsVol(param);
 				respOk(conn,NULL);
@@ -563,8 +563,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 //				infree (id);
 			}
 		}
-	} else if(strcmp(name, "/setStation") == 0)
-	{
+	} else if(strcmp(name, "/setStation") == 0) {
 		if(data_size > 0) {
 //printf("data:%s\n",data);
 			char nb[6] ;
@@ -639,17 +638,15 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 				if (pState) {clientConnect();vTaskDelay(200);}	 //we was playing so start again the play
 		}
 	} else if(strcmp(name, "/play") == 0) {
-		if(data_size > 4) {
-			char * id = data+3;
-			data[data_size-1] = 0;
-				playStation(id);
+		char param[4];
+		if(getSParameterFromResponse(param,4,"id=", data, data_size)) {
+			playStation(param);
 		}
 	} else if(strcmp(name, "/auto") == 0) {
 		if(data_size > 4) {
 			char * id = data+3;
 			data[data_size-1] = 0;
-			if ((strcmp(id,"true"))&&(g_device->autostart==1))
-			{
+			if ((strcmp(id,"true"))&&(g_device->autostart==1)) {
 				g_device->autostart = 0;
 				ESP_LOGV(TAG,"autostart: %s, num:%d",id,g_device->autostart);
 				saveDeviceSettings(g_device);
@@ -983,8 +980,7 @@ static bool httpServerHandleConnection(int conn, char* buf, uint16_t buflen) {
 	char* d;
 	ESP_LOGD(TAG,"Heap size: %d",xPortGetFreeHeapSize( ));
 //printf("httpServerHandleConnection  %20c \n",&buf);
-	if( (c = strstr(buf, "GET ")) != NULL)
-	{
+	if( (c = strstr(buf, "GET ")) != NULL) {
 		ESP_LOGV(TAG,"GET socket:%d len: %d, str:\n%s",conn,buflen,buf);
 		if( ((d = strstr(buf,"Connection:")) !=NULL)&& ((d = strstr(d," Upgrade")) != NULL))
 		{  // a websocket request
