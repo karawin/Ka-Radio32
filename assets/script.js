@@ -896,9 +896,10 @@ function saveStationsList(changedOnly) {
 			}
 
 			if(output.length > 0) {
+				const action = 'setStation';
 				let params = 'nb=' + output.length + '&' + output.join('&');
-				sendForm(this, 'setStation', params);
-				console.log(url, '=>', params);
+				sendForm(this, action, params);
+				console.log(action, '=>', params);
 			}
 		}
 
