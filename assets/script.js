@@ -887,7 +887,7 @@ function saveStationsList(changedOnly) {
 
 				if(changedOnly && !row.hasOwnProperty.hasChanged) { break; }
 
-				url = row.cells[2].textContent.replace('&nbsp;', ' ').trim();
+				const url = row.cells[2].textContent.replace('&nbsp;', ' ').trim();
 				if(url.length == 0) { break; }
 
 				let datas = extractFullUrl(url);
