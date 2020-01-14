@@ -867,7 +867,7 @@ function saveStationsList(changedOnly) {
 			saveStationsTimer = null;
 		}
 
-		for(i=saveStationId, iMax=stationsList.rows.length; i<iMax; i++) {
+		for(let i=saveStationId, iMax=stationsList.rows.length; i<iMax; i++) {
 			if(stationsList.rows[i].hasChanged) {
 				saveStationId = i;
 				break;
@@ -924,7 +924,7 @@ function saveStationsList(changedOnly) {
 	if(changedOnly) {
 		xhrPlaylistSave.saveStation();
 	} else {
-		for(i=0, iMax=stationsList.rows.length; i<iMax; i++) {
+		for(let i=0, iMax=stationsList.rows.length; i<iMax; i++) {
 			const row = stationsList.rows[i];
 			const url = row.cells[2].textContent.replace('&nbsp;', ' ').trim();
 			row.hasChanged = (url.length > 0);
@@ -1346,7 +1346,6 @@ window.addEventListener('message', function(event) {
 const REPO_URL = document.scripts[0].src.replace(/\/\w+\/script\.js$/, '/');
 console.log('REPO_URL = ', REPO_URL);
 
-/* const CLOUD_URL = 'https://kazimentou.fr/ka-radio/'; // must end with '/' */
 const CLOUD_URL = 'https://bazooka07.github.io/Ka-Radio32/'; // must end with '/'
 
 // Update urls for the version and playlists in the cloud
