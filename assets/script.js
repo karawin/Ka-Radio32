@@ -431,11 +431,11 @@ function onDrop(event) {
 		this.parentNode.insertBefore(dragSrcEl, this);
 	}
 	this.classList.remove('over');
-	for (let i = 0, iMax = stationsList.rows.length; i < iMax; i++) {
-		if (stationsList.rows[i].id != 'station-' + i) {
-			stationsList.rows[i].id = 'station-' + i;
-			stationsList.rows[i].cells[0].textContent = i;
-			stationsList.rows[i].hasChanged = true;
+	for (let i = 1, iMax = stationsList.rows.length; i <= iMax; i++) {
+		if (stationsList.rows[i-1].id != 'station-' + i) {
+			stationsList.rows[i-1].id = 'station-' + i;
+			stationsList.rows[i-1].cells[0].textContent = i;
+			stationsList.rows[i-1].hasChanged = true;
 		}
 	}
 }
