@@ -124,16 +124,6 @@ form[name="icy"] div > * {
 /* playlist */
 #playlist nav button { min-width: 5.2rem; }
 #playlist table { border-collapse: collapse; }
-#playlist tbody td { padding: 0.1rem; }
-#playlist tbody td:first-of-type,
-#playlist tbody td:nth-of-type(4) {
-	text-align: right;
-	padding-right: 0.5rem;
-}
-#stationsList td:nth-of-type(2),
-#stationsList td:nth-of-type(3) {
-	cursor: pointer;
-}
 #playlist > p:last-of-type {
 	position: sticky;
 	bottom: 0;
@@ -141,6 +131,18 @@ form[name="icy"] div > * {
 	width: 10rem;
 	margin: 0 auto;
 }
+#stationsList td { padding: 0.1rem; }
+#stationsList td:first-of-type,
+#stationsList td:nth-of-type(4) {
+	text-align: right;
+	padding-right: 0.5rem;
+}
+#stationsList td:nth-of-type(2),
+#stationsList td:nth-of-type(3) {
+	cursor: pointer;
+}
+span.has-changed,
+#stationsList tr.has-changed td:first-of-type { background-color: firebrick; color: #fff; }
 #stationsList tr:nth-of-type(2n) { background-color: #eee; }
 #stationsList tr:not(.dragElem):hover {
 	color: #fff;
@@ -151,8 +153,9 @@ form[name="icy"] div > * {
 	color: #fff;
 }
 #stationsList tr.over {
-	color: #eee;
+	color: #ddd;
 }
+span.has-changed { padding: 0 0.3rem; border-radius: 0.3rem; }
 
 #menu label.active {
 	color: yellow;
@@ -488,6 +491,17 @@ aside.modal.active {
 		max-height: 100vh;
 		overflow: auto;
 	}
+	.range-value {
+		position: absolute;
+		top: 100%;
+		width: auto !important;
+		padding: 0.2rem 0.5rem;
+		text-align: center;
+		background-color: #4b667d;
+		color: #fff;
+		transform: translateX(-50%);
+	}
+	input[type="range"]:not(:hover) + .range-value { display: none; }
 }
 
 @media screen and (min-width: 64rem) {

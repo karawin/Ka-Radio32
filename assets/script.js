@@ -44,7 +44,7 @@ var saveAsText = null;
 var currentStationId = null;
 var isConnected = false;
 
-var isLoading = true; // displayed webradios are not saving in the Ka-Radio device
+var isLoading = false; // displayed webradios are not saving in the Ka-Radio device if true
 
 // https://github.com/karawin/Ka-Radio32/wiki#html-interface-for-the-wifi-webradio
 
@@ -183,7 +183,6 @@ const instantPlaySaveBtn = document.getElementById('instantPlaySaveBtn');
 function extractFullUrl(fullUrl) {
 	const matches = /(?:https?:\/\/)([^:/]*)(?::(\d{2,5}))?(\/.*)?$/.exec(fullUrl);
 	if(matches == null) {
-		console.log('Bad URL : ' + fullUrl);
 		return false;
 	}
 
@@ -202,7 +201,7 @@ function onInstantPlay(event) {
 		alert('Url is empty');
 		return;
 	}
-	// console.log('Instant play', fullUrl);
+	console.log('Instant play', fullUrl);
 
 	pageReset();
 	xhr.instantPlay(fullUrl);
@@ -220,7 +219,6 @@ function instantPlaySave(event) {
 }
 
 function playStation() {
-	console.log('Play station');
 	const event = new Event('change');
 	stationsSelect.dispatchEvent(event);
 }
@@ -431,11 +429,12 @@ function onDrop(event) {
 		this.parentNode.insertBefore(dragSrcEl, this);
 	}
 	this.classList.remove('over');
-	for (let i = 1, iMax = stationsList.rows.length; i <= iMax; i++) {
-		if (stationsList.rows[i-1].id != 'station-' + i) {
-			stationsList.rows[i-1].id = 'station-' + i;
-			stationsList.rows[i-1].cells[0].textContent = i;
-			stationsList.rows[i-1].hasChanged = true;
+	for (let i = 0, iMax = stationsList.rows.length - 1; i <= iMax; i++) {
+		const id = 'station-' + i;
+		if (stationsList.rows[i].id != id) {
+			stationsList.rows[i].id = id;
+			stationsList.rows[i].cells[0].textContent = i;
+			stationsList.rows[i].classList.add('has-changed');
 		}
 	}
 }
@@ -480,7 +479,11 @@ function addStation(stationId, datas) {
 	let tr = document.createElement('TR');
 	tr.id = 'station-' + stationId;
 	tr.draggable = true;
-	tr.hasChanged = false;
+	if(isLoading) {
+		tr.classList.add('has-changed');;
+	} else {
+		tr.classList.remove('has-changed');;
+	}
 
 	let idCell = document.createElement('TD');
 	idCell.textContent = stationId;
@@ -511,6 +514,9 @@ function addStation(stationId, datas) {
 	tr.appendChild(volCell);
 	stationsList.appendChild(tr);
 	setDrapAndDrop(tr);
+	if(isLoading) {
+		console.log(datas);
+	}
 	return stationId;
 }
 
@@ -607,9 +613,9 @@ xhr.sendCommand = function(action, params) {
 	this.send();
 }
 xhr.saveStation = function (stationId, datas) {
-	let params = 'nb=1&id=' + stationId + '&name=' + datas.Name + '&url=' + datas.URL + '&port=' + datas.port + '&file=' + datas.file + '&ovol=' + datas.ovol;
-	// let params = 'id=' + stationId + '&name=' + datas.Name + '&url=' + datas.URL + '&port=' + datas.port + '&file=' + datas.file + '&ovol=' + datas.ovol;
+	let params = 'id=' + stationId + '&name=' + datas.Name + '&url=' + datas.URL + '&port=' + datas.port + '&file=' + datas.file + '&ovol=' + datas.ovol;
 	this.sendForm('setStation', params);
+	console.log('SetStation => ', params);
 }
 xhr.startCurrentStation = function () {
 	console.log('Start Ka-Radio');
@@ -831,20 +837,25 @@ const promptMsg = 'Do you want to save the entries of the playlist into the devi
 function loadStationsList() {
 	if (stationsList == null) { return; }
 
+	stationsList.innerHTML = '';
+	stationsSelect.innerHTML = '';
+	progressBar.max = MAX_STATIONS;
+	xhrSta.loadStation(0);
+}
+
+function reloadStationsList() {
 	if(isConnected && stationsList.rows.length > 0) {
 		if(isLoading) {
 			if(confirm(promptMsg)) {
 				saveStationsList();
+			} else {
+				isLoading = false;
+				loadStationsList();
 			}
 		} else {
 			saveStationsList(true); // Only changed  stations
 		}
 	}
-
-	stationsList.innerHTML = '';
-	stationsSelect.innerHTML = '';
-	progressBar.max = MAX_STATIONS;
-	xhrSta.loadStation(0);
 }
 
 function saveStationsList(changedOnly) {
@@ -869,7 +880,7 @@ function saveStationsList(changedOnly) {
 
 		const iMax=stationsList.rows.length;
 		for(let i=this.currentRow; i<iMax; i++) {
-			if(stationsList.rows[i].hasChanged) {
+			if(stationsList.rows[i].classList.contains('has-changed')) {
 				this.currentRow = i;
 				const output = new Array();
 				for(let i=0; i<BATCH_SIZE; i++) {
@@ -878,19 +889,27 @@ function saveStationsList(changedOnly) {
 					const row = stationsList.rows[this.currentRow];
 					this.currentRow++;
 
-					if(changedOnly && !row.hasChanged) { break; }
+					if(changedOnly && !row.classList.contains('has-changed')) { break; }
+					row.classList.remove('has-changed');
 
 					const url = row.cells[2].textContent.replace('&nbsp;', ' ').trim();
 					if(url.length == 0) { break; }
 
 					let datas = extractFullUrl(url);
+					if(typeof datas == 'object') {
+						output.push('id=' + row.id.replace(/.*-(\d+)$/, '$1') + '&name=' + row.cells[1].textContent.trim() + '&url=' + datas.url + '&port=' + datas.port + '&file=' + datas.path1 + '&ovol=' + row.cells[3].textContent.trim() + '&');
+					}
 
-					output.push('id=' + row.id.replace(/.*-(\d+)$/, '$1') + '&name=' + row.cells[1].textContent.trim() + '&url=' + datas.url + '&port=' + datas.port + '&file=' + datas.path1 + '&ovol=' + row.cells[3].textContent.trim() + '&');
 				}
 
 				if(output.length > 0) {
 					const action = 'setStation';
-					let params = 'nb=' + output.length + '&' + output.join('&');
+					let params = null;
+					if(output.length != 1) {
+						params = 'nb=' + output.length + '&' + output.join('&');
+					} else {
+						params = output[0].replace(/&+$/, '');
+					}
 					sendForm(this, action, params);
 					console.log(action, '=>', params);
 					// xhrPlaylistSave.saveStation() called again by xhrPlaylistSave.onreadystatechange()
@@ -900,7 +919,8 @@ function saveStationsList(changedOnly) {
 		}
 
 		isLoading = false;
-		console.log('Playlist saved');
+		console.log('saveStationsList() is done');
+		loadStationsList();
 	};
 
 	xhrPlaylistSave.onreadystatechange = function () {
@@ -925,7 +945,9 @@ function saveStationsList(changedOnly) {
 		for(let i=0, iMax=stationsList.rows.length; i<iMax; i++) {
 			const row = stationsList.rows[i];
 			const url = row.cells[2].textContent.replace('&nbsp;', ' ').trim();
-			row.hasChanged = (url.length > 0);
+			if(url.length > 0) {
+				row.classList.add('has-changed');
+			}
 		}
 		xhrPlaylistSave.clear(); // Save all stations
 	}
@@ -953,10 +975,6 @@ document.getElementById('abortEditStationBtn').addEventListener('click', functio
 	document.forms.editStationForm.reset();
 });
 
-document.getElementById('eraseStationBtn').addEventListener('click', function (event) {
-	alert('Erase all the fields');
-});
-
 function saveStation(event) {
 	event.preventDefault();
 	let idStation = this.elements.idStation.value.trim();
@@ -968,6 +986,7 @@ function saveStation(event) {
 			row.cells[1].textContent = this.elements.nameStation.value;
 			row.cells[2].textContent = this.elements.urlStation.value;
 			row.cells[3].textContent = this.elements.volStation.value;
+			row.classList.remove('has-changed');
 			stationsSelect.querySelector('option[value="' + idStation + '"]').textContent = this.elements.nameStation.value;
 		}
 	} else {
@@ -982,15 +1001,22 @@ function saveStation(event) {
 	}
 	document.getElementById('aside').classList.remove('active');
 	// send station to Ka-Radio
+	const params = {
+			Name: this.elements.nameStation.value,
+			URL: '',
+			port: '',
+			// file: encodeURI(datas.path1),
+			file: '',
+			ovol: '0'
+		}
 	let datas = extractFullUrl(this.elements.urlStation.value);
-	xhr.saveStation(idStation, {
-		Name: this.elements.nameStation.value,
-		URL: datas.url,
-		port: datas.port,
-		// file: encodeURI(datas.path1),
-		file: datas.path1,
-		ovol: this.elements.volStation.value
-	});
+	if(typeof datas == 'object') {
+		params.URL = datas.url;
+		params.port = datas.port;
+		// params.file = encodeURI(datas.path1);
+		params.file = datas.path1;
+	}
+	xhr.saveStation(idStation, params);
 
 	if (newStation) {
 		instantPlayForm.elements.fullUrl.value = '';
@@ -1069,6 +1095,7 @@ function parsePlaylist(contentType, datas, uri) {
 
 			stationsList.innerHTML = '';
 			stationsSelect.innerHTML = '';
+			isLoading = true;
 			const pattern = RegExp('#EXTINF:-?\\d+,(.*)(?:\\r\\n|\\n|\\r)(.*)', 'g');
 			matches = datas.matchAll(pattern);
 			for(let item of matches) {
@@ -1117,6 +1144,7 @@ function parsePlaylist(contentType, datas, uri) {
 
 			stationsList.innerHTML = '';
 			stationsSelect.innerHTML = '';
+			isLoading = true;
 			for(let i in entries) {
 				// console.log(item[1], ' => ', item[2]);
 				if(entries[i].hasOwnProperty('fullUrl')) {
@@ -1134,12 +1162,12 @@ function parsePlaylist(contentType, datas, uri) {
 			}
 			stationsList.innerHTML = '';
 			stationsSelect.innerHTML = '';
+			isLoading = true;
 			lines.forEach(function(item) {
 				try {
 					if(item.trim().length > 0) {
 						let station = JSON.parse(item.replace(/\t/g, ' ').trim());
 						if(station.hasOwnProperty('URL') && station.URL.trim().length > 0) {
-							console.log(station);
 							let idStation = addStation(null, station);
 							count++;
 						}
@@ -1155,7 +1183,6 @@ function parsePlaylist(contentType, datas, uri) {
 			return;
 	}
 
-	isLoading = true;
 	if(isConnected && count > 1 && confirm('Do you want to save the ' + count + ' entries of the playlist into the device ?\nThat takes à while. Let\'s be patient !!')) {
 		saveStationsList();
 	}
@@ -1339,6 +1366,34 @@ window.addEventListener('message', function(event) {
 	}
 });
 
+/* ======= input[type="range"] ==================== */
+function displayRangeValue(el) {
+	if(typeof el.max == 'undefined' || typeof el.min == 'undefined') { return; }
+
+	const range = parseInt(el.max) - parseInt(el.min);
+	const ratio = (el.valueAsNumber - parseInt(el.min)) / range;
+	const caption = el.nextElementSibling;
+	caption.textContent = Math.round(100 * el.valueAsNumber / range) + '%';
+	caption.style.left = Math.round(el.offsetLeft + el.offsetWidth * ratio) + 'px';
+}
+
+const inputRanges = document.querySelectorAll('input[type="range"]');
+if(inputRanges.length > 0) {
+	for(let i=0, iMax=inputRanges.length; i<iMax; i++) {
+		const caption = document.createElement('SPAN');
+		caption.textContent = '';
+		caption.className = 'range-value';
+		const el = inputRanges[i];
+		el.parentElement.appendChild(caption);
+		el.parentElement.style.position = 'relative';
+		displayRangeValue(el);
+
+		el.addEventListener('input', function(event) {
+			event.preventDefault();
+			displayRangeValue(event.target);
+		});
+	}
+}
 /* ============= Init ======================== */
 
 const REPO_URL = document.scripts[0].src.replace(/\/\w+\/script\.js$/, '/');
