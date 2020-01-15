@@ -902,7 +902,6 @@ function saveStationsList(changedOnly) {
 
 		isLoading = false;
 		console.log('Playlist saved');
-		}
 	};
 
 	xhrPlaylistSave.onreadystatechange = function () {
