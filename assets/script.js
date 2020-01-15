@@ -872,41 +872,36 @@ function saveStationsList(changedOnly) {
 		for(let i=currentRow; i<iMax; i++) {
 			if(stationsList.rows[i].hasChanged) {
 				currentRow = i;
-				found = true;
-				break;
+				const output = new Array();
+				for(let i=0; i<BATCH_SIZE; i++) {
+					if(currentRow >= stationsList.rows.length) { break; }
+
+					const row = stationsList.rows[currentRow];
+					currentRow++;
+
+					if(changedOnly && !row.hasChanged) { break; }
+
+					const url = row.cells[2].textContent.replace('&nbsp;', ' ').trim();
+					if(url.length == 0) { break; }
+
+					let datas = extractFullUrl(url);
+
+					output.push('id=' + row.id.replace(/.*-(\d+)$/, '$1') + '&name=' + row.cells[1].textContent.trim() + '&url=' + datas.url + '&port=' + datas.port + '&file=' + datas.path1 + '&ovol=' + row.cells[3].textContent.trim() + '&');
+				}
+
+				if(output.length > 0) {
+					const action = 'setStation';
+					let params = 'nb=' + output.length + '&' + output.join('&');
+					sendForm(this, action, params);
+					console.log(action, '=>', params);
+					// xhrPlaylistSave.saveStation() called again by xhrPlaylistSave.onreadystatechange()
+					break;
+				}
 			}
 		}
 
-		if(found) {
-			const output = new Array();
-			for(let i=0; i<BATCH_SIZE; i++) {
-				if(currentRow >= stationsList.rows.length) { break; }
-
-				const row = stationsList.rows[currentRow];
-				currentRow++;
-
-				if(changedOnly && !row.hasOwnProperty.hasChanged) { break; }
-
-				const url = row.cells[2].textContent.replace('&nbsp;', ' ').trim();
-				if(url.length == 0) { break; }
-
-				let datas = extractFullUrl(url);
-
-				output.push('id=' + row.id.replace(/.*-(\d+)$/, '$1') + '&name=' + row.cells[1].textContent.trim() + '&url=' + datas.url + '&port=' + datas.port + '&file=' + datas.path1 + '&ovol=' + row.cells[3].textContent.trim() + '&');
-			}
-
-			if(output.length > 0) {
-				const action = 'setStation';
-				let params = 'nb=' + output.length + '&' + output.join('&');
-				sendForm(this, action, params);
-				console.log(action, '=>', params);
-			}
-		}
-
-		if(currentRow >= iMax) {
-			isLoading = false;
-			console.log('Playlist saved');
-			return;
+		isLoading = false;
+		console.log('Playlist saved');
 		}
 	};
 
