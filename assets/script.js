@@ -852,11 +852,11 @@ function saveStationsList(changedOnly) {
 		changedOnly = false;
 	}
 
-	let currentRow = 0;
 	const BATCH_SIZE = 8;
 	let saveStationsTimer = null;
 
 	const xhrPlaylistSave = new XMLHttpRequest();
+	xhrPlaylistSave.currentRow = 0;
 	xhrPlaylistSave.clear = function() {
 		sendForm(this, 'clear', null);
 	};
@@ -867,17 +867,16 @@ function saveStationsList(changedOnly) {
 			saveStationsTimer = null;
 		}
 
-		let found = false;
 		const iMax=stationsList.rows.length;
-		for(let i=currentRow; i<iMax; i++) {
+		for(let i=this.currentRow; i<iMax; i++) {
 			if(stationsList.rows[i].hasChanged) {
-				currentRow = i;
+				this.currentRow = i;
 				const output = new Array();
 				for(let i=0; i<BATCH_SIZE; i++) {
-					if(currentRow >= stationsList.rows.length) { break; }
+					if(this.currentRow >= stationsList.rows.length) { break; }
 
-					const row = stationsList.rows[currentRow];
-					currentRow++;
+					const row = stationsList.rows[this.currentRow];
+					this.currentRow++;
 
 					if(changedOnly && !row.hasChanged) { break; }
 
@@ -895,7 +894,7 @@ function saveStationsList(changedOnly) {
 					sendForm(this, action, params);
 					console.log(action, '=>', params);
 					// xhrPlaylistSave.saveStation() called again by xhrPlaylistSave.onreadystatechange()
-					break;
+					return;
 				}
 			}
 		}
