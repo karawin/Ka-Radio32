@@ -1,5 +1,10 @@
 # Override defaults here
 
+#
+# Partition Table
+#
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+CONFIG_PARTITION_TABLE_FILENAME="partitions.csv"
 
 #
 # ESP32-specific config
