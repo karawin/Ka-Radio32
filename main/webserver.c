@@ -369,48 +369,54 @@ void playStationInt(int sid) {
 }
 
 void playStation(char* id) {
-
-
-	int uid;
-	uid = atoi(id) ;
+	int uid = atoi(id) ;
 	ESP_LOGV(TAG,"playstation: %d",uid);
 	if (uid < 255)
 		setCurrentStation (atoi(id)) ;
 	playStationInt(getCurrentStation());
 }
 
-// replace special  json char
-static void pathParse(char* str)
-{
-	int i ;
-	char *pend;
-	char  num[3]= {0,0,0};
-	uint8_t cc;
+// https://circuits4you.com/2019/03/21/esp8266-url-encode-decode-example/
+unsigned char h2int(char c) {
+    if (c >= '0' && c <='9'){
+        return((unsigned char)c - '0');
+    }
+    if (c >= 'a' && c <='f'){
+        return((unsigned char)c - 'a' + 10);
+    }
+    if (c >= 'A' && c <='F'){
+        return((unsigned char)c - 'A' + 10);
+    }
+    return(0);
+}
+
+// decode URI like Javascript
+static void pathParse(char* str) {
+    char c;
+    char code0;
+    char code1;
+    int j=0;
 	if (str == NULL) return;
-	for (i=0; i< strlen(str);i++)
-	{
-		if (str[i] == '%')
-		{
-			num[0] = str[i+1]; num[1] = str[i+2];
-			cc = strtol(num, &pend,16);
-			if (cc == '"') // for " in the string
-			{
-				str[i] = '\\';
-				str[i+1] = cc;
-				str[i+2] = 0;
-			} else
-			{
-				str[i] = cc;
-				str[i+1]=0;
-			}
-			if (str[i+3] !=0)strcat(str, str+i+3);
+	for (int i=0; i< strlen(str);i++) {
+		if(str[i] == '+') {
+			c = ' ';
+		} else if(str[i] == '%') {
+			i++;
+			code0 = str[i];
+			i++;
+			code1 = str[i];
+			c = (h2int(code0) << 4) | h2int(code1);
+		} else {
+			c = str[i];
 		}
+		str[j] = c;
+		j++;
 	}
+	str[j] = 0;
 }
 
 static void handlePOST(char* name, char* data, int data_size, int conn) {
 	ESP_LOGD(TAG,"HandlePost %s\n",name);
-	int i;
 	bool tst;
 	bool changed = false;
 	if(strcmp(name, "/instant_play") == 0) {
@@ -424,7 +430,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			tst &=getSParameterFromResponse(port,10,"port=", data, data_size);
 			if(tst) {
 				clientDisconnect("Post instant_play");
-				for (i = 0;i<100;i++)
+				for (int i = 0;i<100;i++)
 				{
 					if(!clientIsConnected())break;
 					vTaskDelay(4);
@@ -435,7 +441,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 				clientSetOvol(0);
 				clientConnectOnce();
 				setOffsetVolume();
-				for (i = 0;i<100;i++)
+				for (int i = 0;i<100;i++)
 				{
 					if (clientIsConnected()) break;
 					vTaskDelay(5);
@@ -532,7 +538,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 				{
 					char ibuf [6];
 					char *buf;
-					for(i = 0; i<sizeof(ibuf); i++) ibuf[i] = 0;
+					for(int i = 0; i<sizeof(ibuf); i++) ibuf[i] = 0;
 					struct shoutcast_info* si;
 					si = getStation(atoi(id));
 					if (strlen(si->domain) > sizeof(si->domain)) si->domain[sizeof(si->domain)-1] = 0; //truncate if any (rom crash)
@@ -550,7 +556,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 					}
 					else {
 
-						for(i = 0; i<sizeof(buf); i++) buf[i] = 0;
+						for(int i = 0; i<sizeof(buf); i++) buf[i] = 0;
 						sprintf(buf, strsGSTAT,
 						json_length, si->name, si->domain, si->file,si->port,si->ovol);
 						ESP_LOGV(TAG,"getStation Buf len:%d : %s",strlen(buf),buf);
@@ -582,7 +588,6 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			}
 
 			ESP_LOGV(TAG,"unb init:%d",unb);
-			char* url; char* file; char* name;
 			struct shoutcast_info *si =  inmalloc(sizeof(struct shoutcast_info)*unb);
 			struct shoutcast_info *nsi ;
 
@@ -592,25 +597,23 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 				return;
 			}
 			char* bsi = (char*)si;
-			int j;
-			for (j=0;j< sizeof(struct shoutcast_info)*unb;j++) bsi[j]=0; //clean
+			for (int j=0;j< sizeof(struct shoutcast_info)*unb;j++) bsi[j]=0; //clean
 
+			char* url; char* file; char* name;
 			char id[6];
 			char port[6];
 			char ovol[6];
-			for (i=0;i<unb;i++)
-			{
+			for (int i=0;i<unb;i++) {
 				nsi = si + i;
-				url = getParameterFromResponse("url=", data, data_size);
-				file = getParameterFromResponse("file=", data, data_size);
-				pathParse(file);
-				name = getParameterFromResponse("name=", data, data_size);
 				if(getSParameterFromResponse(id,6,"id=", data, data_size)) {
-//					ESP_LOGW(TAG,"nb:%d,si:%x,nsi:%x,id:%s,url:%s,file:%s",i,(int)si,(int)nsi,id,url,file);
 					ESP_LOGV(TAG,"nb:%d, id:%s",i,id);
-					if (i == 0) uid = atoi(id);
-					if ((atoi(id) >=0) && (atoi(id) < 255))
-					{
+					if ((atoi(id) >=0) && (atoi(id) < 255)) {
+						if (i == 0) uid = atoi(id);
+						url = getParameterFromResponse("url=", data, data_size);
+						file = getParameterFromResponse("file=", data, data_size);
+						pathParse(file);
+						name = getParameterFromResponse("name=", data, data_size);
+						pathParse(name);
 						if(url && file && name && getSParameterFromResponse(port,6,"port=", data, data_size)) {
 							if (strlen(url) > sizeof(nsi->domain)) url[sizeof(nsi->domain)-1] = 0; //truncate if any
 							strcpy(nsi->domain, url);
@@ -620,12 +623,14 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 							strcpy(nsi->name, name);
 							nsi->ovol = (getSParameterFromResponse(ovol,6,"ovol=", data, data_size))?atoi(ovol):0;
 							nsi->port = atoi(port);
+//							ESP_LOGW(TAG,"nb:%d,si:%x,nsi:%x,id:%s,url:%s,file:%s",i,(int)si,(int)nsi,id,url,file);
+							ESP_LOGV(TAG,"id:%s => url:%s, port:%d, file:%s", id, url, atoi(port), file);
 						}
+						infree(name);
+						infree(file);
+						infree(url);
 					}
 				}
-				infree(name);
-				infree(file);
-				infree(url);
 
 				data = strstr(data,"&&")+2;
 				ESP_LOGV(TAG,"si:%x, nsi:%x, addr:%x",(int)si,(int)nsi,(int)data);
@@ -675,7 +680,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 		if (clientIsConnected())
 		{
 			clientDisconnect("Post Stop");
-			for (i = 0;i<100;i++)
+			for (int i = 0;i<100;i++)
 			{
 				if (!clientIsConnected()) break;
 				vTaskDelay(4);
