@@ -115,13 +115,13 @@
 			<nav class="no-print">
 				<a id="download-link" href="#" download="ka-radio.m3u">Download</a>
 				<ul>
-					<li><button type="button" id="reloadPlaylistBtn" onclick="loadStationsList();">Refresh</button></li>
-					<li><button type="button" id="savePlaylistBtn" title="As .mp3 format" onclick="savePlaylistAsM3u();">Save</button></li>
+					<li><button type="button" id="reloadPlaylistBtn" onclick="reloadStationsList();">Refresh</button></li>
+					<li><button type="button" id="savePlaylistBtn" title="As .mp3 format" onclick="savePlaylistAsM3u();">Export</button></li>
 					<li><button type="button" id="clearAllPlaylistBtn" onclick="clearPlaylist();">Clear All</button></li>
 					<li><button type="button" id="printPlaylistBtn" onclick="print(); return true;">Print</button></li>
 					<li><input type="file" id="loadPlaylist" placeholder="load a playlist" accept=".m3u, .pls, .txt" /><button type="button" onclick="loadPlaylist();">Load</button></li>
 				</ul>
-				<p class="center"><em>Drag & Drop each row for sorting</em></p>
+				<p class="center"><em>Drag & Drop each row for sorting ( <span class="has-changed">Refresh after done</span> ) - Erase the url for the station to drop</em></p>
 			</nav>
 			<div class="scroll-table">
 				<table>
@@ -258,13 +258,12 @@
 					<label for="nameStation">Name</label>
 					<input type="text" id="nameStation" name="nameStation" required />
 					<label for="urlStation">Full url</label>
-					<input type="url" id="urlStation" name="urlStation" required />
+					<input type="url" id="urlStation" name="urlStation" />
 					<label for="volStation">Volume</label>
 					<input type="range" id="volStation" min="-126" max="126" />
 				</div>
 				<p class="center">
 					<input type="button" class="button" value="Abort" id="abortEditStationBtn" />
-					<input type="button" class="button" value="Erase" id="eraseStationBtn" >
 					<input type="submit" class="button" />
 				</p>
 			</form>
