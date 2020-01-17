@@ -613,7 +613,7 @@ xhr.sendCommand = function(action, params) {
 	this.send();
 }
 xhr.saveStation = function (stationId, datas) {
-	let params = 'id=' + stationId + '&name=' + datas.Name + '&url=' + datas.URL + '&port=' + datas.port + '&file=' + datas.file + '&ovol=' + datas.ovol;
+	let params = 'id=' + stationId + '&name=' + encodeURI(datas.Name) + '&url=' + datas.URL + '&port=' + datas.port + '&file=' + encodeURI(datas.file) + '&ovol=' + datas.ovol;
 	this.sendForm('setStation', params);
 	console.log('SetStation => ', params);
 }
@@ -636,7 +636,7 @@ xhr.instantPlay = function (fullUrl) {
 			if(!matches[3].startsWith('/')) {
 				matches[3] = '/' + matches[3];
 			}
-				xhr.sendForm('instant_play', 'url=' + matches[1] + '&port=' + matches[2] + '&path=' + matches[3]);
+				xhr.sendForm('instant_play', 'url=' + matches[1] + '&port=' + matches[2] + '&path=' + encodeURI(matches[3]));
 		}
 	} else {
 		player.src = fullUrl;
@@ -897,7 +897,7 @@ function saveStationsList(changedOnly) {
 
 					let datas = extractFullUrl(url);
 					if(typeof datas == 'object') {
-						output.push('id=' + row.id.replace(/.*-(\d+)$/, '$1') + '&name=' + row.cells[1].textContent.trim() + '&url=' + datas.url + '&port=' + datas.port + '&file=' + datas.path1 + '&ovol=' + row.cells[3].textContent.trim() + '&');
+						output.push('id=' + row.id.replace(/.*-(\d+)$/, '$1') + '&name=' + encodeURI(row.cells[1].textContent.trim()) + '&url=' + datas.url + '&port=' + datas.port + '&file=' + encodeURI(datas.path1) + '&ovol=' + parseInt(row.cells[3].textContent.trim()) + '&');
 					}
 
 				}
