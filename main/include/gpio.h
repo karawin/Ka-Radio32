@@ -70,14 +70,16 @@
 //------------------------------------------------
 #define PIN_I2C_SCL GPIO_NUM_14
 #define PIN_I2C_SDA GPIO_NUM_13
-#define PIN_I2C_RST	GPIO_NUM_4		// or not used
+// GPIO2 is connected to the blue led on the board for ESP32. A better choice is GPIO_NUM_4
+#define PIN_I2C_RST	GPIO_NUM_2		// or not used.
 
 
 // SPI lcd
 //---------
 #define PIN_LCD_CS	GPIO_NUM_13		//CS
 #define PIN_LCD_A0	GPIO_NUM_14		//A0 or D/C
-#define PIN_LCD_RST	GPIO_NUM_4		//Reset RES RST or not used
+// See comment for I2C
+#define PIN_LCD_RST	GPIO_NUM_2		//Reset RES RST or not used
 // KSPI pins +
 
 // IR Signal
@@ -95,7 +97,8 @@
 #define PIN_ADC	GPIO_NONE	//GPIO_NUM_32 TO GPIO_NUM_39 or GPIO_NONE if not used.
 
 // LCD backlight control
-#define PIN_LCD_BACKLIGHT	GPIO_NUM_27 // the gpio to be used in custom.c
+// GPIO37 is free. Choice : GPIO_NUM_27
+#define PIN_LCD_BACKLIGHT	GPIO_NONE // the gpio to be used in custom.c
 
 // touch screen  T_DO is MISO, T_DIN is MOSI, T_CLK is CLk of the spi bus
 #define PIN_TOUCH_CS	GPIO_NONE //Chip select T_CS
