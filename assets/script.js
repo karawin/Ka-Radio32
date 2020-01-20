@@ -675,12 +675,28 @@ xhr.hardware = function (valid) {
 		// Update the output hardware
 		let device = document.forms.hardware.output.value;
 		params.push('coutput=' + device);
-		if(device == '4') {
-			// VS1053
-			alert('VS1053 is not still supported');
-		}
 	}
 	this.sendForm('hardware', params.join('&'));
+}
+xhr.setVS1053 = function(input) {
+	if(document.forms.hardware.output.value != 4) { return; }
+
+	let params = new Array();
+	const controls = ['bass', 'bassfreq', 'treble', 'treblefreq', 'spacial'];
+	if(typeof input != undefined) {
+		if(controls.indexOf(input.name) < 0) {
+			alert('Not a valid control');
+			return;
+		}
+		params.push(input.name + '=' + input.value);
+		// alert('input for vs1053 :\n' + input.name + ' control : ' + event.target.value);
+	} else {
+		elements = document.forms.namedItem('hardware').elements;
+		controls.forEach(function(item) {
+			params.push(item + '=' + elements[item].value);
+		});
+	}
+	this.sendForm('sound', params.join('&'));
 }
 xhr.getVersion = function() {
 	let url = (typeof IP_DEVICE != 'string') ? '/' : window.location.href;
@@ -790,6 +806,7 @@ xhr.onreadystatechange = function () {
 
 /* -------- download all the stations from the Ka-Radio device --------- */
 const xhrSta = new XMLHttpRequest();
+xhrSta.forceReload = false; // Reload the playlist after a /clear command
 
 xhrSta.loadStation = function (stationId) {
 	if (typeof stationId === 'number') {
@@ -799,10 +816,26 @@ xhrSta.loadStation = function (stationId) {
 	sendForm(this, 'getStation', 'idgp=' + this.stationId);
 }
 
+xhrSta.clear = function() {
+	this.forceReload = true;
+	sendForm(this, 'clear', null);
+}
+
 xhrSta.onreadystatechange = function () {
 	if (this.readyState === XMLHttpRequest.DONE) {
 		if (this.status === 200) {
 			// console.log(this.responseText);
+			if(
+				this.responseText.trim().length === 0 &&
+				this.getResponseHeader('Content-Type').startsWith('text/plain') &&
+				this.forceReload
+			) {
+				// StationsList is just cleaned up with /clear command
+				this.forceReload = false;
+				loadStationsList();
+				return;
+			}
+
 			if(
 				this.responseText.trim().length === 0 ||
 				!this.getResponseHeader('Content-Type').startsWith('application/json')
@@ -869,6 +902,7 @@ function saveStationsList(changedOnly) {
 	const xhrPlaylistSave = new XMLHttpRequest();
 	xhrPlaylistSave.currentRow = 0;
 	xhrPlaylistSave.clear = function() {
+		// Clear each station in the device before saving the all playlist
 		sendForm(this, 'clear', null);
 	};
 
@@ -1226,7 +1260,7 @@ function loadPlaylistFromUrl(url) {
 
 function clearPlaylist() {
 	if(isConnected && confirm('Erase all stations ?')) {
-		alert('Clear the playlist');
+		xhrSta.clear();
 	}
 }
 
@@ -1236,6 +1270,13 @@ document.forms.hardware.addEventListener('submit', function(event) {
 	event.preventDefault();
 	xhr.hardware(1);
 	alert('System is rebooting..');
+})
+
+document.forms.hardware.addEventListener('change', function(event) {
+	if(event.target.type == 'range') {
+		event.preventDefault();
+		xhr.setVS1053(event.target);
+	}
 })
 
 document.forms.wifi.addEventListener('submit', function(event) {
@@ -1368,7 +1409,12 @@ window.addEventListener('message', function(event) {
 
 /* ======= input[type="range"] ==================== */
 function displayRangeValue(el) {
-	if(typeof el.max == 'undefined' || typeof el.min == 'undefined') { return; }
+	if(
+		typeof el.max == 'undefined' ||
+		el.max.length == 0 ||
+		typeof el.min == 'undefined' ||
+		el.min.length == 0
+	) { return; }
 
 	const range = parseInt(el.max) - parseInt(el.min);
 	const ratio = (el.valueAsNumber - parseInt(el.min)) / range;
@@ -1384,7 +1430,11 @@ if(inputRanges.length > 0) {
 		caption.textContent = '';
 		caption.className = 'range-value';
 		const el = inputRanges[i];
-		el.parentElement.appendChild(caption);
+		if(el.nextElementSibling != null) {
+			el.parentElement.insertBefore(caption, el.nextElementSibling);
+		} else {
+			el.parentElement.appendChild(caption);
+		}
 		el.parentElement.style.position = 'relative';
 		displayRangeValue(el);
 
