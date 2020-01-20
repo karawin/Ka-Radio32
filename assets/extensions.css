@@ -210,11 +210,12 @@ form[name="hardware"] {
 #vs1053:checked ~ fieldset.vs1053 { display: block; }
 fieldset.vs1053 > div {
 	display: grid;
-	grid-template-columns: 8rem 1fr auto;
+	grid-template-columns: 8rem 1fr 2.5rem;
 	margin: 0.1rem;
 	padding: 0.1rem;
 	text-align: start;
 }
+fieldset.vs1053 span[id$="_span"] { text-align: end; }
 /* ------------- Wifi ------------------ */
 form[name="wifi"] fieldset > div,
 form[name="wifi"] > div:first-of-type {
