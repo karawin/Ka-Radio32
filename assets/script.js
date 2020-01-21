@@ -86,35 +86,64 @@ function pageReset() {
 }
 
 function icyDisplay(icy) {
-	for (var value in icy) {
-		const target = document.getElementById('icy-' + value);
-		if (target != null) {
-			switch (value) {
-				case 'auto':
-					target.checked = (icy[value] == 1);
-					break;
-				case 'curst':
-				case 'vol':
-					target.value = icy[value];
-					if (value == 'curst') {
-						currentStationId = icy[value];
-					}
-					break;
-				case 'not1':
-				case 'not2':
-				case 'descr':
-					target.innerHTML = icy[value].replace(/<br\s*\/?>/i, '').trim();
-					break;
-				case 'bitr':
-					target.textContent = icy[value].trim() + ' kB/s';
-					break;
-				case 'url1':
-					target.href = ((/^https?:\/\//.test(icy.url1.trim())) ? '' : 'http://') + icy.url1.trim();
-				default:
-					target.textContent = icy[value].trim();
+	for (var field in icy) {
+		const value = icy[field].trim();
+		if(['bass', 'treb', 'bfreq', 'tfreq', 'spac'].indexOf(field) < 0) {
+			const target = document.getElementById('icy-' + field);
+			if (target != null) {
+				switch (field) {
+					case 'auto':
+						target.checked = (value == 1);
+						break;
+					case 'curst':
+					case 'vol':
+						target.value = value;
+						if (field == 'curst') {
+							currentStationId = value;
+						}
+						break;
+					case 'not1':
+					case 'not2':
+					case 'descr':
+						target.innerHTML = value.replace(/<br\s*\/?>/i, '');
+						break;
+					case 'bitr':
+						target.textContent = value + ' kB/s';
+						break;
+					case 'url1':
+						if(value.length > 0) {
+							target.href = ((/^https?:\/\//.test(value.trim())) ? '' : 'http://') + value;
+							target.textContent = target.href;
+						} else {
+							target.href = '#';
+							target.textContent = '';
+						}
+						break;
+					default:
+						target.textContent = value;
+				}
+			} else {
+				console.error('icy-' + field + ' element not found');
 			}
 		} else {
-			console.error('icy-' + value + ' element not found');
+			if(field != 'spac') {
+				const el = document.getElementById('icy-' + field);
+				el.value = value;
+				let content = '';
+				switch(field) {
+					case 'bfreq':
+						content = value + '0 Hz';
+						break;
+					case 'tfreq':
+						content = value + ' KHz';
+						break;
+					default:
+						content = value + ' dB';
+				}
+				el.nextElementSibling.innerHTML = content;
+			} else {
+				document.forms.hardware.elements.spacial.value = value;
+			}
 		}
 	}
 	const playing = (icy.name.trim().length > 0);
@@ -1273,9 +1302,23 @@ document.forms.hardware.addEventListener('submit', function(event) {
 })
 
 document.forms.hardware.addEventListener('change', function(event) {
-	if(event.target.type == 'range') {
+	if(event.target.type == 'range' || event.target.type == 'radio') {
 		event.preventDefault();
-		xhr.setVS1053(event.target);
+		xhr.setVS1053(event.target); // Ka-Radio32 just answers 'ok'. No value in return !
+		// Hack against Ka-Radio32
+		if(event.target.name == 'spacial') { return; }
+		const value = event.target.value;
+		switch(event.target.name) {
+			case 'bassfreq':
+				content = value + '0 Hz';
+				break;
+			case 'treblefreq':
+				content = value + ' KHz';
+				break;
+			default:
+				content = value + ' dB';
+		}
+		event.target.nextElementSibling.innerHTML = content;
 	}
 })
 
@@ -1423,27 +1466,30 @@ function displayRangeValue(el) {
 	caption.style.left = Math.round(el.offsetLeft + el.offsetWidth * ratio) + 'px';
 }
 
-const inputRanges = document.querySelectorAll('input[type="range"]');
-if(inputRanges.length > 0) {
-	for(let i=0, iMax=inputRanges.length; i<iMax; i++) {
-		const caption = document.createElement('SPAN');
-		caption.textContent = '';
-		caption.className = 'range-value';
-		const el = inputRanges[i];
-		if(el.nextElementSibling != null) {
-			el.parentElement.insertBefore(caption, el.nextElementSibling);
-		} else {
-			el.parentElement.appendChild(caption);
-		}
-		el.parentElement.style.position = 'relative';
-		displayRangeValue(el);
+if(matchMedia('min-width: 48rem').matches) {
+	const inputRanges = document.querySelectorAll('input[type="range"]:not(.no-label)');
+	if(inputRanges.length > 0) {
+		for(let i=0, iMax=inputRanges.length; i<iMax; i++) {
+			const caption = document.createElement('SPAN');
+			caption.textContent = '';
+			caption.className = 'range-value';
+			const el = inputRanges[i];
+			if(el.nextElementSibling != null) {
+				el.parentElement.insertBefore(caption, el.nextElementSibling);
+			} else {
+				el.parentElement.appendChild(caption);
+			}
+			el.parentElement.style.position = 'relative';
+			displayRangeValue(el);
 
-		el.addEventListener('input', function(event) {
-			event.preventDefault();
-			displayRangeValue(event.target);
-		});
+			el.addEventListener('input', function(event) {
+				event.preventDefault();
+				displayRangeValue(event.target);
+			});
+		}
 	}
 }
+
 /* ============= Init ======================== */
 
 const REPO_URL = document.scripts[0].src.replace(/\/\w+\/script\.js$/, '/');

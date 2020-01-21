@@ -203,19 +203,21 @@ span.has-changed { padding: 0 0.3rem; border-radius: 0.3rem; }
 
 #settings fieldset > div { margin: 0; }
 /* ------------- hardware -------------- */
-form[name="hardware"] {
-	text-align: center;
-}
-#vs1053 ~ fieldset.vs1053 { display: none; }
-#vs1053:checked ~ fieldset.vs1053 { display: block; }
-fieldset.vs1053 > div {
+form[name="hardware"] { text-align: center; }
+#vs1053 + label + div {
 	display: grid;
-	grid-template-columns: 8rem 1fr 2.5rem;
-	margin: 0.1rem;
-	padding: 0.1rem;
-	text-align: start;
+	grid-template-columns: 6rem 1fr 4rem;
 }
-fieldset.vs1053 span[id$="_span"] { text-align: end; }
+#vs1053:not(:checked)  + label + div { display: none; }
+.vs1053 { margin: 0.3rem 0 0.5rem; }
+.vs1053 span { text-align: end; }
+input[name="spacial"] + label {
+	display: inline-block;
+	width: 4rem;
+	padding-left: 0.3rem;
+	text-align: start;
+	background-color: #e8e8e8;
+}
 /* ------------- Wifi ------------------ */
 form[name="wifi"] fieldset > div,
 form[name="wifi"] > div:first-of-type {
