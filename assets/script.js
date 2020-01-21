@@ -1466,7 +1466,7 @@ function displayRangeValue(el) {
 	caption.style.left = Math.round(el.offsetLeft + el.offsetWidth * ratio) + 'px';
 }
 
-if(matchMedia('min-width: 48rem').matches) {
+if(matchMedia('(min-width: 48rem)').matches) {
 	const inputRanges = document.querySelectorAll('input[type="range"]:not(.no-label)');
 	if(inputRanges.length > 0) {
 		for(let i=0, iMax=inputRanges.length; i<iMax; i++) {
