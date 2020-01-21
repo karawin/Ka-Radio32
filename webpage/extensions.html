@@ -164,25 +164,28 @@
 				<input type="radio" id="dac" name="output" value="2" /><label for="dac">DAC</label>
 				<input type="radio" id="pdm" name="output" value="3" /><label for="pdm">PDM</label>
 				<input type="radio" id="vs1053" name="output" value="4" /><label for="vs1053">VS1053</label>
-				<fieldset class="vs1053">
+				<div class="vs1053">
+					<span>Bass gain</span>
+					<input type="range" id="icy-bass" name="bass"  min="0" max="15" class="no-cursor" />
+					<span id="bass_span">0 dB</span>
+					<span>Bass freq.</span>
+					<input type="range" id="icy-bfreq" name="bassfreq"  min="2" max="15" class="no-cursor" />
+					<span id="bassfreq_span">0 Hz</span>
+					<span>Treble gain</span>
+					<input type="range" id="icy-treb" name="treble" min="-8" max="7" class="no-cursor" />
+					<span id="treble_span">0 dB</span>
+					<span>Treble freq.</span>
+					<input type="range" id="icy-tfreq" name="treblefreq"  min="1" max="15" class="no-cursor" />
+					<span id="treblefreq_span">0 Hz</span>
+					<span>Spacial</span>
 					<div>
-						<span>Treble control</span>
-						<input type="range" id="icy-treb" name="treble" />
-						<span id="treble_span">0 dB</span>
-						<span>Treble frequency</span>
-						<input type="range" id="icy-tfreq" name="treblefreq" />
-						<span id="treble_span">0 dB</span>
-						<span>Bass enhance</span>
-						<input type="range" id="icy-bass" name="bass" />
-						<span id="treble_span">0 dB</span>
-						<span>Bass frequency</span>
-						<input type="range" id="icy-bfreq" name="bassfreq" />
-						<span id="treble_span">0 dB</span>
-						<span>Spacialization</span>
-						<input type="range" id="icy-spac" name="spacial" />
-						<span id="spacial_span">Off</span>
+						<input type="radio" id="id_spacial0" name="spacial" value="0" checked /><label for="id_spacial0">Off</label>
+						<input type="radio" id="id_spacial1" name="spacial" value="1" /><label for="id_spacial1">Min.</label>
+						<input type="radio" id="id_spacial2" name="spacial" value="2" /><label for="id_spacial2">Normal</label>
+						<input type="radio" id="id_spacial3" name="spacial" value="3" /><label for="id_spacial3">Max.</label>
 					</div>
-				</fieldset>
+					<span>&nbsp;</span>
+				</div>
 				<div class="center">
 					<input type="submit" />
 				</div>
