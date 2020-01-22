@@ -47,6 +47,7 @@ const char jsonICY[]  = {"{\
 \"curst\":%d,\"descr\":\"%s\",\"name\":\"%s\",\"bitr\":\"%s\",\"url1\":\"%s\",\"not1\":\"%s\",\"not2\":\"%s\",\"genre\":\"%s\",\"meta\":\"%s\",\
 \"vol\":%d,\"treb\":%d,\"bass\":%d,\"tfreq\":%d,\"bfreq\":%d,\"spac\":%d,\"auto\":%d}\
 "};
+const char jsonVS1053[]  = {"{\"treb\":%d,\"bass\":%d,\"tfreq\":%d,\"bfreq\":%d,\"spac\":%d}"};
 const char strsWIFI[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:%d\r\n\r\n{\"ssid\":\"%s\",\"pasw\":\"%s\",\"ssid2\":\"%s\",\"pasw2\":\"%s\",\
 \"ip\":\"%s\",\"msk\":\"%s\",\"gw\":\"%s\",\"ip2\":\"%s\",\"msk2\":\"%s\",\"gw2\":\"%s\",\"ua\":\"%s\",\"dhcp\":\"%s\",\"dhcp2\":\"%s\",\"mac\":\"%s\"\
 ,\"host\":\"%s\",\"tzo\":\"%s\"}"};
@@ -476,69 +477,67 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 		return;
 	} else if(strcmp(name, "/sound") == 0) {
 		if(data_size > 0) {
-			char bass[6];
-			char treble[6];
-			char bassfreq[6];
-			char treblefreq[6];
-			char spacial[6];
+			char value[6];
 			changed = false;
-			if(getSParameterFromResponse(bass,6,"bass=", data, data_size)) {
-				if (g_device->bass != atoi(bass))
-				{
-					if (get_audio_output_mode() == VS1053)
-					{
-						VS1053_SetBass(atoi(bass));
+			if (get_audio_output_mode() == VS1053) {
+				if(getSParameterFromResponse(value, 6, "bass=", data, data_size)) {
+					int uVal = atoi(value);
+					if(g_device->bass != uVal) {
+						VS1053_SetBass(uVal);
+						g_device->bass = uVal;
 						changed = true;
-						g_device->bass = atoi(bass);
 					}
 				}
-			}
-			if(getSParameterFromResponse(treble,6,"treble=", data, data_size)) {
-				if (g_device->treble != atoi(treble))
-				{
-					if (get_audio_output_mode() == VS1053)
-					{
-						VS1053_SetTreble(atoi(treble));
+				if(getSParameterFromResponse(value, 6, "treble=", data, data_size)) {
+					int uVal = atoi(value);
+					if (g_device->treble != uVal) {
+						VS1053_SetTreble(uVal);
+						g_device->treble = uVal;
 						changed = true;
-						g_device->treble = atoi(treble);
 					}
 				}
-			}
-			if(getSParameterFromResponse(bassfreq,6,"bassfreq=", data, data_size)) {
-				if (g_device->freqbass != atoi(bassfreq))
-				{
-					if (get_audio_output_mode() == VS1053)
-					{
-						VS1053_SetBassFreq(atoi(bassfreq));
+				if(getSParameterFromResponse(value, 6, "bassfreq=", data, data_size)) {
+					int uVal = atoi(value);
+					if (g_device->freqbass != uVal) {
+						VS1053_SetBassFreq(uVal);
+						g_device->freqbass = uVal;
 						changed = true;
-						g_device->freqbass = atoi(bassfreq);
 					}
 				}
-			}
-			if(getSParameterFromResponse(treblefreq,6,"treblefreq=", data, data_size)) {
-				if (g_device->freqtreble != atoi(treblefreq))
-				{
-					if (get_audio_output_mode() == VS1053)
-					{
-						VS1053_SetTrebleFreq(atoi(treblefreq));
+				if(getSParameterFromResponse(value, 6, "treblefreq=", data, data_size)) {
+					int uVal = atoi(value);
+					if (g_device->freqtreble != uVal) {
+						VS1053_SetTrebleFreq(uVal);
+						g_device->freqtreble = uVal;
 						changed = true;
-						g_device->freqtreble = atoi(treblefreq);
 					}
 				}
-			}
-			if(getSParameterFromResponse(spacial,6,"spacial=", data, data_size)) {
-				if (g_device->spacial != atoi(spacial))
-				{
-						if (get_audio_output_mode() == VS1053)
-						{
-							VS1053_SetSpatial(atoi(spacial));
-							changed = true;
-							g_device->spacial = atoi(spacial);
-						}
+				if(getSParameterFromResponse(value, 6, "spacial=", data, data_size)) {
+					int uVal = atoi(value);
+					if (g_device->spacial != uVal) {
+						VS1053_SetSpatial(uVal);
+						g_device->spacial = uVal;
+						changed = true;
+					}
 				}
+				if(changed) {
+					saveDeviceSettings(g_device);
+					// jsonVS1053: {"treb":%d,"bass":%d,"tfreq":%d,"bfreq":%d,"spac":%d}
+					int json_length = 52;
+					char *buf;
+					buf = inmalloc(json_length);
+					sprintf(buf, jsonVS1053,
+						VS1053_GetTreble(),
+						VS1053_GetBass(),
+						VS1053_GetTrebleFreq(),
+						VS1053_GetBassFreq(),
+						VS1053_GetSpatial()
+					);
+					respJSON(conn, buf);
+					infree(buf);
+				}
+				return;
 			}
-			if (changed)
-				saveDeviceSettings(g_device);
 		}
 	} else if(strcmp(name, "/getStation") == 0) {
 		if(data_size > 0) {
