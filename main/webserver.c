@@ -716,7 +716,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 		 * }
 		 * */
 		/* jsonICY: {"curst":,"descr":"","name":"","bitr":"","url1":"","not1":"","not2":"","genre":"","meta":"","vol":,"treb":,"bass":,"tfreq":,"bfreq":,"spac":,"auto":%d} */
-		int json_length = 150 + 21; // json_length += strlen(currentSt) + strlen(vol) + strlen(treble) + strlen(bass) + strlen(tfreq) + strlen(bfreq) + strlen(spac);
+		int json_length = 175; // json_length += strlen(currentSt) + strlen(vol) + strlen(treble) + strlen(bass) + strlen(tfreq) + strlen(bfreq) + strlen(spac);
 		if(header->members.single.description != NULL) { json_length += strlen(header->members.single.description); }
 		if(header->members.single.name != NULL) { json_length += strlen(header->members.single.name); }
 		if(header->members.single.bitrate != NULL) { json_length += strlen(header->members.single.bitrate); }
