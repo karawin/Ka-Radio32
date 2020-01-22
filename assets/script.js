@@ -87,7 +87,7 @@ function pageReset() {
 
 function icyDisplay(icy) {
 	for (var field in icy) {
-		const value = icy[field].trim();
+		const value = (typeof icy[field] == 'string') ? icy[field].trim() : icy[field];
 		if(['bass', 'treb', 'bfreq', 'tfreq', 'spac'].indexOf(field) < 0) {
 			const target = document.getElementById('icy-' + field);
 			if (target != null) {
@@ -499,8 +499,14 @@ function addStation(stationId, datas) {
 
 	if(!datas.hasOwnProperty('fullUrl')) {
 		let port = '';
-		if(datas.hasOwnProperty('Port') && datas.Port.trim() != '80') {
-			port = ':' + datas.Port.trim();
+		if(datas.hasOwnProperty('Port')) {
+			if(typeof datas.Port == 'string') {
+				if(datas.Port.trim() != '80') {
+					port = ':' + datas.Port.trim();
+				}
+			} else if(datas.Port != 80) {
+				port = ':' + datas.Port;
+			}
 		}
 		datas.fullUrl = datas.URL + port + datas.File;
 	}
@@ -870,25 +876,27 @@ xhrSta.onreadystatechange = function () {
 				!this.getResponseHeader('Content-Type').startsWith('application/json')
 			) { return; }
 
-			let datas = JSON.parse(this.responseText);
-			// console.log(datas);
-			if ('URL' in datas) {
-				/* loads each station in the table and the select's options */
-				if (datas.URL.length > 0) {
+			try {
+				let datas = JSON.parse(this.responseText);
+				// console.log(datas);
+				if ('URL' in datas && datas.URL.length > 0) {
+					/* loads each station in the table and the select's options */
 					addStation(this.stationId, datas);
 				}
-				if (this.stationId < MAX_STATIONS) {
-					this.stationId++;
-					if (this.stationId < MAX_STATIONS) {
-						this.loadStation();
-					} else {
-						progressBar.value = MAX_STATIONS;
-						stationsBtn.disabled = false;
-						isLoading = false;
-					}
-				}
-				return;
+			} catch (error) {
+				console.error(error, this.responseText);
 			}
+			if (this.stationId < MAX_STATIONS) {
+				this.stationId++;
+				if (this.stationId < MAX_STATIONS) {
+					this.loadStation();
+				} else {
+					progressBar.value = MAX_STATIONS;
+					stationsBtn.disabled = false;
+					isLoading = false;
+				}
+			}
+			return;
 		}
 		console.error(this.status, this.statusText + ' from ' + this.responseURL);
 	}
@@ -1467,7 +1475,7 @@ function displayRangeValue(el) {
 }
 
 if(matchMedia('(min-width: 48rem)').matches) {
-	const inputRanges = document.querySelectorAll('input[type="range"]:not(.no-label)');
+	const inputRanges = document.querySelectorAll('input[type="range"]:not(.no-cursor)');
 	if(inputRanges.length > 0) {
 		for(let i=0, iMax=inputRanges.length; i<iMax; i++) {
 			const caption = document.createElement('SPAN');
