@@ -55,7 +55,7 @@ nav ul {
 	margin: 0.15rem 0.15rem 0.8rem;
 	padding: 0;
 	text-align: center;
-	white-space: nowrap;
+	/* white-space: nowrap; */
 }
 nav li {
 	display: inline-block;
