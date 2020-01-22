@@ -34,6 +34,7 @@ xSemaphoreHandle semfile = NULL ;
 
 const char strsROK[]  =  {"HTTP/1.1 200 OK\r\nContent-Type: %s\r\nContent-Length: %d\r\nConnection: keep-alive\r\n\r\n%s"};
 const char tryagain[] = {"try again"};
+const char strsJSON[] = {"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %d\r\nConnection: keep-alive\r\n\r\n%s"};
 
 const char lowmemory[]  = { "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/plain\r\nContent-Length: 11\r\n\r\nlow memory\n"};
 const char strsMALLOC[]  = {"WebServer inmalloc fails for %d\n"};
@@ -41,11 +42,16 @@ const char strsMALLOC1[]  = {"WebServer %s malloc fails\n"};
 const char strsSOCKET[]  = {"WebServer Socket fails %s errno: %d\n"};
 const char strsID[]  = {"getstation, no id or Wrong id %d\n"};
 const char strsR13[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:13\r\n\r\n{\"%s\":\"%c\"}"};
-const char strsICY[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:%d\r\n\r\n{\"curst\":\"%s\",\"descr\":\"%s\",\"name\":\"%s\",\"bitr\":\"%s\",\"url1\":\"%s\",\"not1\":\"%s\",\"not2\":\"%s\",\"genre\":\"%s\",\"meta\":\"%s\",\"vol\":\"%s\",\"treb\":\"%s\",\"bass\":\"%s\",\"tfreq\":\"%s\",\"bfreq\":\"%s\",\"spac\":\"%s\",\"auto\":\"%c\"}"};
+// const char strsICY[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:%d\r\n\r\n{\"curst\":\"%s\",\"descr\":\"%s\",\"name\":\"%s\",\"bitr\":\"%s\",\"url1\":\"%s\",\"not1\":\"%s\",\"not2\":\"%s\",\"genre\":\"%s\",\"meta\":\"%s\",\"vol\":\"%s\",\"treb\":\"%s\",\"bass\":\"%s\",\"tfreq\":\"%s\",\"bfreq\":\"%s\",\"spac\":\"%s\",\"auto\":\"%c\"}"};
+const char jsonICY[]  = {"{\
+\"curst\":%d,\"descr\":\"%s\",\"name\":\"%s\",\"bitr\":\"%s\",\"url1\":\"%s\",\"not1\":\"%s\",\"not2\":\"%s\",\"genre\":\"%s\",\"meta\":\"%s\",\
+\"vol\":%d,\"treb\":%d,\"bass\":%d,\"tfreq\":%d,\"bfreq\":%d,\"spac\":%d,\"auto\":%d}\
+"};
 const char strsWIFI[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:%d\r\n\r\n{\"ssid\":\"%s\",\"pasw\":\"%s\",\"ssid2\":\"%s\",\"pasw2\":\"%s\",\
 \"ip\":\"%s\",\"msk\":\"%s\",\"gw\":\"%s\",\"ip2\":\"%s\",\"msk2\":\"%s\",\"gw2\":\"%s\",\"ua\":\"%s\",\"dhcp\":\"%s\",\"dhcp2\":\"%s\",\"mac\":\"%s\"\
 ,\"host\":\"%s\",\"tzo\":\"%s\"}"};
-const char strsGSTAT[]  = {"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %d\r\n\r\n{\"Name\":\"%s\",\"URL\":\"%s\",\"File\":\"%s\",\"Port\":\"%d\",\"ovol\":\"%d\"}"};
+// const char strsGSTAT[]  = {"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %d\r\n\r\n{\"Name\":\"%s\",\"URL\":\"%s\",\"File\":\"%s\",\"Port\":\"%d\",\"ovol\":\"%d\"}"};
+const char jsonGSTAT[] = {"{\"Name\":\"%s\",\"URL\":\"%s\",\"File\":\"%s\",\"Port\":%d,\"ovol\":%d}"};
 
 static int8_t clientOvol = 0;
 
@@ -65,8 +71,6 @@ void infree(void *p)
 	if (p != NULL)free(p);
 }
 
-
-
 static struct servFile* findFile(char* name)
 {
 	struct servFile* f = (struct servFile*)&indexFile;
@@ -77,7 +81,6 @@ static struct servFile* findFile(char* name)
 		if(f == NULL) return NULL;
 	}
 }
-
 
 static void respOk(int conn,const char* message)
 {
@@ -92,6 +95,14 @@ static void respOk(int conn,const char* message)
 static void respKo(int conn)
 {
 	write(conn, lowmemory, strlen(lowmemory));
+}
+
+static void respJSON(int conn,const char* message) {
+	if (message == NULL || strlen(message) == 0) return;
+	char fresp[strlen(strsJSON) - 4 + strlen(message) + 1]; // = inmalloc(strlen(strsROK)+strlen(message)+15);
+	sprintf(fresp, strsJSON, strlen(message), message);
+	ESP_LOGV(TAG, "respOk %s", fresp);
+	write(conn, fresp, strlen(fresp));
 }
 
 static void serveFile(char* name, int conn)
@@ -169,15 +180,15 @@ static bool getSParameter(char* result,uint32_t len,const char* sep,const char* 
 		if(p_end ==NULL) p_end = data_length + data;
 		if(p_end != NULL ) {
 			if (p_end==p) return false;
-			int i;
 			if (len > (p_end-p )) len = p_end-p ;
-			for(i=0; i<len; i++) result[i] = 0;
+			for(int i=0; i<len; i++) result[i] = 0;
 			strncpy(result, p, len);
 			result[len]=0;
 			ESP_LOGV(TAG,"getSParam: in: \"%s\"   \"%s\"",data,result);
 			return true;
-		} else return false;
-	} else return false;
+		}
+	}
+	return false;
 }
 
 static char* getParameter(const char* sep,const char* param, char* data, uint16_t data_length) {
@@ -417,10 +428,10 @@ static void pathParse(char* str) {
 
 static void handlePOST(char* name, char* data, int data_size, int conn) {
 	ESP_LOGD(TAG,"HandlePost %s\n",name);
-	bool tst;
 	bool changed = false;
 	if(strcmp(name, "/instant_play") == 0) {
 		if(data_size > 0) {
+			bool tst;
 			char url[100];
 			tst = getSParameterFromResponse(url,100,"url=", data, data_size);
 			char path[200];
@@ -532,10 +543,8 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 	} else if(strcmp(name, "/getStation") == 0) {
 		if(data_size > 0) {
 			char id[6];
-			if (getSParameterFromResponse(id,6,"idgp=", data, data_size) )
-			{
-				if ((atoi(id) >=0) && (atoi(id) < 255))
-				{
+			if (getSParameterFromResponse(id,6,"idgp=", data, data_size) ) {
+				if ((atoi(id) >=0) && (atoi(id) < 255)) {
 					char ibuf [6];
 					char *buf;
 					for(int i = 0; i<sizeof(ibuf); i++) ibuf[i] = 0;
@@ -545,27 +554,32 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 					if (strlen(si->file) > sizeof(si->file)) si->file[sizeof(si->file)-1] = 0; //truncate if any (rom crash)
 					if (strlen(si->name) > sizeof(si->name)) si->name[sizeof(si->name)-1] = 0; //truncate if any (rom crash)
 					sprintf(ibuf, "%d%d", si->ovol,si->port);
-					int json_length = strlen(si->domain) + strlen(si->file) + strlen(si->name) + strlen(ibuf) + 50;
-					buf = inmalloc(json_length + 75);
+					// jsonGSTAT: {"Name":"%s","URL":"%s","File":"%s","Port":%d,"ovol":%d}
+					int json_length = strlen(jsonGSTAT) + strlen(si->domain) + strlen(si->file) + strlen(si->name) + strlen(ibuf) - 2 * 5 + 1;
+					buf = inmalloc(json_length);
 
-					if (buf == NULL)
-					{
-						ESP_LOGE(TAG," %s malloc fails","getStation");
+					if (buf == NULL) {
+						ESP_LOGE(TAG," %s malloc fails (%d bytes)","getStation", json_length);
 						respKo(conn);
 						//return;
-					}
-					else {
-
+					} else {
 						for(int i = 0; i<sizeof(buf); i++) buf[i] = 0;
-						sprintf(buf, strsGSTAT,
-						json_length, si->name, si->domain, si->file,si->port,si->ovol);
+						sprintf(buf, jsonGSTAT,
+							si->name,
+							si->domain,
+							si->file,
+							si->port,
+							si->ovol
+						);
 						ESP_LOGV(TAG,"getStation Buf len:%d : %s",strlen(buf),buf);
-						write(conn, buf, strlen(buf));
-						infree(buf);
+						respJSON(conn, buf);
 					}
+					infree(buf);
 					infree(si);
 					return;
-				} else printf(strsID,atoi(id));
+				} else {
+					printf(strsID,atoi(id));
+				}
 //				infree (id);
 			}
 		}
@@ -605,26 +619,27 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			char ovol[6];
 			for (int i=0;i<unb;i++) {
 				nsi = si + i;
-				if(getSParameterFromResponse(id,6,"id=", data, data_size)) {
-					ESP_LOGV(TAG,"nb:%d, id:%s",i,id);
-					if ((atoi(id) >=0) && (atoi(id) < 255)) {
-						if (i == 0) uid = atoi(id);
+				if(getSParameterFromResponse(id,6,"id=", data, data_size) && strlen(id) > 0) {
+					int idNum = atoi(id);
+					ESP_LOGV(TAG,"nb:%d, id:%s", i, id);
+					if (idNum >=0 && idNum < 255) {
+						if (i == 0) uid = idNum;
 						url = getParameterFromResponse("url=", data, data_size);
 						file = getParameterFromResponse("file=", data, data_size);
-						pathParse(file);
 						name = getParameterFromResponse("name=", data, data_size);
-						pathParse(name);
 						if(url && file && name && getSParameterFromResponse(port,6,"port=", data, data_size)) {
-							if (strlen(url) > sizeof(nsi->domain)) url[sizeof(nsi->domain)-1] = 0; //truncate if any
+							if (strlen(url) >= sizeof(nsi->domain)) url[sizeof(nsi->domain)-1] = 0; //truncate if any
 							strcpy(nsi->domain, url);
-							if (strlen(file) > sizeof(nsi->file)) url[sizeof(nsi->file)-1] = 0; //truncate if any
+							pathParse(file);
+							if (strlen(file) >= sizeof(nsi->file)) url[sizeof(nsi->file)-1] = 0; //truncate if any
 							strcpy(nsi->file, file);
-							if (strlen(name) > sizeof(nsi->name)) url[sizeof(nsi->name)-1] = 0; //truncate if any
+							pathParse(name);
+							if (strlen(name) >= sizeof(nsi->name)) url[sizeof(nsi->name)-1] = 0; //truncate if any
 							strcpy(nsi->name, name);
-							nsi->ovol = (getSParameterFromResponse(ovol,6,"ovol=", data, data_size))?atoi(ovol):0;
-							nsi->port = atoi(port);
+							nsi->ovol = (getSParameterFromResponse(ovol,6,"ovol=", data, data_size) && strlen(ovol) > 0) ? atoi(ovol) : 0;
+							nsi->port = (strlen(port) > 0) ? atoi(port) : 80;
 //							ESP_LOGW(TAG,"nb:%d,si:%x,nsi:%x,id:%s,url:%s,file:%s",i,(int)si,(int)nsi,id,url,file);
-							ESP_LOGV(TAG,"id:%s => url:%s, port:%d, file:%s", id, url, atoi(port), file);
+							ESP_LOGV(TAG,"id:%3d => url:%s, port:%d, file:%s", idNum, nsi->domain, nsi->port, nsi->file);
 						}
 						infree(name);
 						infree(file);
@@ -688,70 +703,63 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 		}
 	} else if(strcmp(name, "/upgrade") == 0) {
 		update_firmware((char*)"KaRadio32");  // start the OTA
-	} else if(strcmp(name, "/icy") == 0)
-	{
+	} else if(strcmp(name, "/icy") == 0) {
 		ESP_LOGV(TAG,"icy vol");
-		char currentSt[5]; sprintf(currentSt,"%d",getCurrentStation());
-		char vol[5]; sprintf(vol,"%d",(getVolume() ));
-		char treble[5]; sprintf(treble,"%d",(get_audio_output_mode() == VS1053)?VS1053_GetTreble():0);
-		char bass[5]; sprintf(bass,"%d",(get_audio_output_mode() == VS1053)?VS1053_GetBass():0);
-		char tfreq[5]; sprintf(tfreq,"%d",(get_audio_output_mode() == VS1053)?VS1053_GetTrebleFreq():0);
-		char bfreq[5]; sprintf(bfreq,"%d",(get_audio_output_mode() == VS1053)?VS1053_GetBassFreq():0);
-		char spac[5]; sprintf(spac,"%d",(get_audio_output_mode() == VS1053)?VS1053_GetSpatial():0);
-
+		bool isVS1053 = (get_audio_output_mode() == VS1053);
 		struct icyHeader *header = clientGetHeader();
 		ESP_LOGV(TAG,"icy start header %x",(int)header);
-		char* not2;
-		not2 = header->members.single.notice2;
-		if (not2 ==NULL) not2=header->members.single.audioinfo;
+		char* not2 = (header->members.single.notice2 != NULL) ? header->members.single.notice2 : header->members.single.audioinfo;
 		//if ((header->members.single.notice2 != NULL)&&(strlen(header->members.single.notice2)==0)) not2=header->members.single.audioinfo;
-		int json_length ;
-		json_length =166+ //
-		((header->members.single.description ==NULL)?0:strlen(header->members.single.description)) +
-		((header->members.single.name ==NULL)?0:strlen(header->members.single.name)) +
-		((header->members.single.bitrate ==NULL)?0:strlen(header->members.single.bitrate)) +
-		((header->members.single.url ==NULL)?0:strlen(header->members.single.url))+
-		((header->members.single.notice1 ==NULL)?0:strlen(header->members.single.notice1))+
-		((not2 ==NULL)?0:strlen(not2))+
-		((header->members.single.genre ==NULL)?0:strlen(header->members.single.genre))+
-		((header->members.single.metadata ==NULL)?0:strlen(header->members.single.metadata))
-		+ strlen(currentSt)+	strlen(vol) +strlen(treble)+strlen(bass)+strlen(tfreq)+strlen(bfreq)+strlen(spac)
-		;
-		ESP_LOGD(TAG,"icy start header %x  len:%d vollen:%d vol:%s",(int)header,json_length,strlen(vol),vol);
+		/* jsonICY: {
+		 *	"curst":%d,"descr":"%s","name":"%s","bitr":"%s","url1":"%s","not1":"%s","not2":"%s",
+		 *	"genre":"%s","meta":"%s",
+		 *	"vol":%d,"treb":%d,"bass":%d,"tfreq":%d,"bfreq":%d,"spac":%d,"auto":%d
+		 * }
+		 * */
+		/* jsonICY: {"curst":,"descr":"","name":"","bitr":"","url1":"","not1":"","not2":"","genre":"","meta":"","vol":,"treb":,"bass":,"tfreq":,"bfreq":,"spac":,"auto":%d} */
+		int json_length = 150 + 21; // json_length += strlen(currentSt) + strlen(vol) + strlen(treble) + strlen(bass) + strlen(tfreq) + strlen(bfreq) + strlen(spac);
+		if(header->members.single.description != NULL) { json_length += strlen(header->members.single.description); }
+		if(header->members.single.name != NULL) { json_length += strlen(header->members.single.name); }
+		if(header->members.single.bitrate != NULL) { json_length += strlen(header->members.single.bitrate); }
+		if(header->members.single.url != NULL) { json_length += strlen(header->members.single.url); }
+		if(header->members.single.notice1 != NULL) { json_length += strlen(header->members.single.notice1); }
+		if(not2 != NULL) { json_length += strlen(not2); }
+		if(header->members.single.genre != NULL) { json_length += strlen(header->members.single.genre); }
+		if(header->members.single.metadata != NULL) { json_length += strlen(header->members.single.metadata); }
+		ESP_LOGD(TAG,"icy start header %x  len:%d - vol:%d", (int)header, json_length, getVolume());
 
-		char *buf = inmalloc( json_length + 75);
-		if (buf == NULL)
-		{
+		char *buf = inmalloc( json_length);
+		if (buf == NULL) {
 			ESP_LOGE(TAG," %s malloc fails","post icy");
 			infree(buf);
 			respKo(conn);
 			return;
-		}
-		else
-		{
-			uint8_t vauto = 0;
-			vauto = (g_device->autostart)?'1':'0' ;
-			sprintf(buf, strsICY,
-			json_length,
-			currentSt,
-			(header->members.single.description ==NULL)?"":header->members.single.description,
-			(header->members.single.name ==NULL)?"":header->members.single.name,
-			(header->members.single.bitrate ==NULL)?"":header->members.single.bitrate,
-			(header->members.single.url ==NULL)?"":header->members.single.url,
-			(header->members.single.notice1 ==NULL)?"":header->members.single.notice1,
-			(not2 ==NULL)?"":not2 ,
-			(header->members.single.genre ==NULL)?"":header->members.single.genre,
-			(header->members.single.metadata ==NULL)?"":header->members.single.metadata,
-			vol,treble,bass,tfreq,bfreq,spac,
-			vauto );
-			ESP_LOGV(TAG,"test: len fmt:%d %d\n%s\n",strlen(strsICY),strlen(strsICY),buf);
-			write(conn, buf, strlen(buf));
+		} else {
+			sprintf(buf, jsonICY,
+				getCurrentStation(),
+				(header->members.single.description != NULL) ? header->members.single.description : "",
+				(header->members.single.name != NULL) ? header->members.single.name : "",
+				(header->members.single.bitrate != NULL) ? header->members.single.bitrate : "",
+				(header->members.single.url != NULL) ? header->members.single.url : "",
+				(header->members.single.notice1 != NULL) ? header->members.single.notice1 : "",
+				(not2 != NULL) ? not2 : "",
+				(header->members.single.genre != NULL) ? header->members.single.genre : "",
+				(header->members.single.metadata != NULL) ? header->members.single.metadata : "",
+				getVolume(),
+				(isVS1053) ? VS1053_GetTreble() : 0,
+				(isVS1053) ? VS1053_GetBass() : 0,
+				(isVS1053) ? VS1053_GetTrebleFreq() : 0,
+				(isVS1053) ? VS1053_GetBassFreq() : 0,
+				(isVS1053) ? VS1053_GetSpatial() : 0,
+				(g_device->autostart) ? 1 : 0
+			);
+			ESP_LOGV(TAG,"test: len fmt:%d %d\n%s\n", strlen(buf), strlen(jsonICY), buf);
+			respJSON(conn, buf);
 			infree(buf);
 			wsMonitor();
 			return;
 		}
-	} else if(strcmp(name, "/hardware") == 0)
-	{
+	} else if(strcmp(name, "/hardware") == 0) {
 		bool val = false;
 		uint8_t cout;
 		changed = false;
@@ -786,8 +794,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			}
 			return;
 		}
-	} else if(strcmp(name, "/wifi") == 0)
-	{
+	} else if(strcmp(name, "/wifi") == 0) {
 		bool val = false;
 		char tmpip[16],tmpmsk[16],tmpgw[16];
 		char tmpip2[16],tmpmsk2[16],tmpgw2[16],tmptzo[10];
@@ -941,13 +948,11 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			);
 
 			char *buf = inmalloc( json_length + 95+39+10);
-			if (buf == NULL)
-			{
+			if (buf == NULL) {
 				ESP_LOGE(TAG," %s malloc fails","post wifi");
 				respKo(conn);
 				//return;
-			}
-			else {
+			} else {
 				sprintf(buf, strsWIFI,
 				json_length,
 				g_device->ssid1,g_device->pass1,g_device->ssid2,g_device->pass2,tmpip,tmpmsk,tmpgw,tmpip2,tmpmsk2,tmpgw2,g_device->ua,adhcp,adhcp2,macstr,g_device->hostname,tmptzo);
@@ -956,7 +961,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 				infree(buf);
 			}
 
-			if (val){
+			if (val) {
 				// set current_ap to the first filled ssid
 				ESP_LOGD(TAG,"currentAP: %d",g_device->current_ap);
 				if (g_device->current_ap == APMODE)
@@ -973,8 +978,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			}
 			return;
 		}
-	} else if(strcmp(name, "/clear") == 0)
-	{
+	} else if(strcmp(name, "/clear") == 0) {
 		eeEraseStations();	//clear all stations
 	}
 	respOk(conn,NULL);
