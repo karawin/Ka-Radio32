@@ -543,20 +543,16 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 		if(data_size > 0) {
 			char id[6];
 			if (getSParameterFromResponse(id,6,"idgp=", data, data_size) ) {
-				if ((atoi(id) >=0) && (atoi(id) < 255)) {
-					char ibuf [6];
+				int uid = atoi(id);
+				if (uid >=0 && uid < 255) {
 					char *buf;
-					for(int i = 0; i<sizeof(ibuf); i++) ibuf[i] = 0;
-					struct shoutcast_info* si;
-					si = getStation(atoi(id));
+					struct shoutcast_info* si = getStation(uid);
 					if (strlen(si->domain) > sizeof(si->domain)) si->domain[sizeof(si->domain)-1] = 0; //truncate if any (rom crash)
 					if (strlen(si->file) > sizeof(si->file)) si->file[sizeof(si->file)-1] = 0; //truncate if any (rom crash)
 					if (strlen(si->name) > sizeof(si->name)) si->name[sizeof(si->name)-1] = 0; //truncate if any (rom crash)
-					sprintf(ibuf, "%d%d", si->ovol,si->port);
 					// jsonGSTAT: {"Name":"%s","URL":"%s","File":"%s","Port":%d,"ovol":%d}
-					int json_length = strlen(jsonGSTAT) + strlen(si->domain) + strlen(si->file) + strlen(si->name) + strlen(ibuf) - 2 * 5 + 1;
+					int json_length =  - 2 * 5 + 8 + 1 + strlen(jsonGSTAT) + strlen(si->domain) + strlen(si->file) + strlen(si->name);
 					buf = inmalloc(json_length);
-
 					if (buf == NULL) {
 						ESP_LOGE(TAG," %s malloc fails (%d bytes)","getStation", json_length);
 						respKo(conn);
