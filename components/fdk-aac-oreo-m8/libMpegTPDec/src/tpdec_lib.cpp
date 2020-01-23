@@ -601,7 +601,8 @@ static TRANSPORTDEC_ERROR transportDec_readHeader(
         hTp->parser.latm.m_audioMuxLengthBytes = syncLayerFrameBits;
         syncLayerFrameBits <<= 3;
       }
-    case TT_MP4_LATM_MCP1:
+    /*fall through*/
+	case TT_MP4_LATM_MCP1:
     case TT_MP4_LATM_MCP0:
       if (hTp->numberOfRawDataBlocks <= 0)
       {
@@ -1340,7 +1341,7 @@ TRANSPORTDEC_ERROR transportDec_CrcCheck(HANDLE_TRANSPORTDEC pTp)
   case TT_MP4_ADTS:
     if ( (pTp->parser.adts.bs.num_raw_blocks > 0) && (pTp->parser.adts.bs.protection_absent == 0) )
     {
-      HANDLE_FDK_BITSTREAM hBs = &pTp->bitStream[0];
+      //HANDLE_FDK_BITSTREAM hBs = &pTp->bitStream[0];
       
       transportDec_AdjustEndOfAccessUnit(pTp);
     }

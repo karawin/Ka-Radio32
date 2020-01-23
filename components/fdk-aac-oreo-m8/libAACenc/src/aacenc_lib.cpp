@@ -1780,12 +1780,14 @@ AACENC_ERROR aacEncoder_SetParam(
                   err = AACENC_INVALID_CONFIG;
                   goto bail;
                 }
-              case AOT_SBR:
+			  /* fall through */
+			  case AOT_SBR:
                 if (!(hAacEncoder->encoder_modis & (ENC_MODE_FLAG_SBR))) {
                   err = AACENC_INVALID_CONFIG;
                   goto bail;
                 }
-              case AOT_AAC_LC:
+              /* fall through */
+			  case AOT_AAC_LC:
               case AOT_ER_AAC_LD:
               case AOT_ER_AAC_ELD:
                 if (!(hAacEncoder->encoder_modis & (ENC_MODE_FLAG_AAC))) {
@@ -1793,6 +1795,7 @@ AACENC_ERROR aacEncoder_SetParam(
                   goto bail;
                 }
                 break;
+			  /* fall through */
               default:
                 err = AACENC_INVALID_CONFIG;
                 goto bail;

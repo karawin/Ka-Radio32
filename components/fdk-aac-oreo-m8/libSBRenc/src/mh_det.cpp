@@ -468,8 +468,9 @@ static INT isDetectionOfNewToneAllowed(const SBR_FRAME_INFO *pFrameInfo,
    *****************************************************************************/
   transientFrame = 0;
   if(transientFlag){
-    if(transientPos + transientPosOffset < pFrameInfo->borders[pFrameInfo->nEnvelopes])
+    if(transientPos + transientPosOffset < pFrameInfo->borders[pFrameInfo->nEnvelopes]){
       transientFrame = 1;
+	}
       if(noEstPerFrame > 1){
         if(transientPos + transientPosOffset > h_sbrMissingHarmonicsDetector->timeSlots >> 1){
           *pDetectionStartPos = noEstPerFrame;
@@ -504,7 +505,7 @@ static INT isDetectionOfNewToneAllowed(const SBR_FRAME_INFO *pFrameInfo,
     if(prevTransientFrame &&
        fixp_abs(pFrameInfo->borders[0] - (prevTransientPos + transientPosOffset -
                                      h_sbrMissingHarmonicsDetector->timeSlots)) < deltaTime)
-      newDetectionAllowed = 1;
+									 {newDetectionAllowed = 1;}
       *pDetectionStartPos = 0;
   }
 

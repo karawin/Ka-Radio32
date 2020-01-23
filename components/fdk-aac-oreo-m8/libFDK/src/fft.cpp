@@ -103,7 +103,7 @@ amm-info@iis.fraunhofer.de
 
 /* Performs the FFT of length 3 according to the algorithm after winograd.
    No scaling of the input vector because the scaling is already done in the rotation vector. */
-static FORCEINLINE void fft3(FIXP_DBL *RESTRICT pDat)
+static inline void fft3(FIXP_DBL *RESTRICT pDat)
 {
   FIXP_DBL r1,r2;
   FIXP_DBL s1,s2;
@@ -136,7 +136,7 @@ static FORCEINLINE void fft3(FIXP_DBL *RESTRICT pDat)
 #define     C55       (F5C(0xb0000001))      /* FL2FXCONST_DBL(-1.25/2)       */
 
 /* performs the FFT of length 5 according to the algorithm after winograd */
-static FORCEINLINE void fft5(FIXP_DBL *RESTRICT pDat)
+static inline void fft5(FIXP_DBL *RESTRICT pDat)
 {
   FIXP_DBL r1,r2,r3,r4;
   FIXP_DBL s1,s2,s3,s4;

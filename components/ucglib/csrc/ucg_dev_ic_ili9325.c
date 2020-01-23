@@ -238,7 +238,7 @@ ucg_int_t xxxxxx_ucg_handle_ili9325_l90tc(ucg_t *ucg)
 
 
 /* with CmdDataSequence */ 
-static ucg_int_t ucg_handle_ili9325_l90tc(ucg_t *ucg)
+/*static ucg_int_t ucg_handle_ili9325_l90tc(ucg_t *ucg)
 {
   if ( ucg_clip_l90tc(ucg) != 0 )
   {
@@ -247,8 +247,10 @@ static ucg_int_t ucg_handle_ili9325_l90tc(ucg_t *ucg)
     ucg_int_t i;
     unsigned char pixmap;
     uint8_t bitcnt;
-    ucg_com_SetCSLineStatus(ucg, 0);		/* enable chip */
-    ucg_com_SendCmdSeq(ucg, ucg_ili9325_set_pos_seq);	
+*/
+//    ucg_com_SetCSLineStatus(ucg, 0);		/* enable chip */
+
+/*    ucg_com_SendCmdSeq(ucg, ucg_ili9325_set_pos_seq);
     buf[0] = 0x001;	// change to 0 (cmd mode)
     buf[1] = 0x020;	// set x
     buf[2] = 0x002;	// change to 1 (arg mode)
@@ -331,8 +333,10 @@ static ucg_int_t ucg_handle_ili9325_l90tc(ucg_t *ucg)
       buf[17] = ucg->arg.pixel.rgb.color[1];
       buf[19] = ucg->arg.pixel.rgb.color[2];
     }
+*/
     //ucg_com_SetCSLineStatus(ucg, 0);		/* enable chip */
-    
+
+/*
     for( i = 0; i < ucg->arg.len; i++ )
     {
       if ( (pixmap & 128) != 0 )
@@ -361,12 +365,13 @@ static ucg_int_t ucg_handle_ili9325_l90tc(ucg_t *ucg)
 	bitcnt = 0;
       }
     }
-    ucg_com_SetCSLineStatus(ucg, 1);		/* disable chip */
-    return 1;
+    */
+    //ucg_com_SetCSLineStatus(ucg, 1);		/* disable chip */
+    /* return 1;
   }
   return 0;
 }
-
+*/
 
 static ucg_int_t ucg_handle_ili9325_l90se(ucg_t *ucg)
 {

@@ -537,13 +537,15 @@ void StatisticalEstimation (CAacDecoderChannelInfo *pAacDecoderChannelInfo)
   int sumNrgFwd,sumNrgBwd;          /* sum of noise energy data forward/backward */
   int sumScfFwd,sumScfBwd;          /* sum of scalefactor data forward/backward */
   int useIsFwd,useNrgFwd,useScfFwd; /* the flags signals the elements which are used for the final result */
+  /*
   int MaximumScaleFactorBands;
 
   if (GetWindowSequence(&pAacDecoderChannelInfo->icsInfo) == EightShortSequence)
     MaximumScaleFactorBands = 16;
   else
     MaximumScaleFactorBands = 64;
-
+   */
+  
   sumIsFwd = sumIsBwd = sumNrgFwd = sumNrgBwd = sumScfFwd = sumScfBwd = 0;
   useIsFwd = useNrgFwd = useScfFwd = 0;
 
@@ -641,13 +643,15 @@ void PredictiveInterpolation (
 {
   CErRvlcInfo *pRvlc = &pAacDecoderChannelInfo->pComData->overlay.aac.erRvlcInfo;
   int band,bnds,group;
-  int MaximumScaleFactorBands;
   int commonMin;
+/*
+  int MaximumScaleFactorBands;
 
   if (GetWindowSequence(&pAacDecoderChannelInfo->icsInfo) == EightShortSequence)
     MaximumScaleFactorBands = 16;
   else
     MaximumScaleFactorBands = 64;
+ */
 
   for (group=0; group<pRvlc->numWindowGroups; group++) {
     for (band=0; band < pRvlc->maxSfbTransmitted; band++) {

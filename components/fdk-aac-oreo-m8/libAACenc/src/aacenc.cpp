@@ -926,8 +926,9 @@ AAC_ENCODER_ERROR FDKaacEnc_EncodeFrame( HANDLE_AAC_ENC       hAacEnc,          
                                                hAacEnc->qcKernel->elementBits,
                                                hAacEnc->qcOut);
         if (ErrorStatus != AAC_ENC_OK)
-            return ErrorStatus;
-
+		{
+			return ErrorStatus;
+		}
             /*-------------------------------------------- */
             ErrorStatus = FDKaacEnc_FinalizeBitConsumption(cm,
                                                            hAacEnc->qcKernel,
@@ -938,8 +939,10 @@ AAC_ENCODER_ERROR FDKaacEnc_EncodeFrame( HANDLE_AAC_ENC       hAacEnc,          
                                                            hAacEnc->config->syntaxFlags,
                                                            hAacEnc->config->epConfig);
             if (ErrorStatus != AAC_ENC_OK)
-                return ErrorStatus;
-            /*-------------------------------------------- */
+			{
+				return ErrorStatus;
+            }
+			/*-------------------------------------------- */
             totalBits += qcOut->totalBits;
 
 
@@ -970,8 +973,10 @@ AAC_ENCODER_ERROR FDKaacEnc_EncodeFrame( HANDLE_AAC_ENC       hAacEnc,          
                     hAacEnc->config->epConfig);
 
               if (ErrorStatus != AAC_ENC_OK)
-                return ErrorStatus;
-
+                
+				{
+					return ErrorStatus;
+				}
               /* transportEnc_EndAccessUnit() is being called inside FDKaacEnc_WriteBitstream() */
               transportEnc_GetFrame(hTpEnc, nOutBytes);
 

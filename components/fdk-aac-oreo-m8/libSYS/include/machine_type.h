@@ -301,7 +301,7 @@ amm-info@iis.fraunhofer.de
 #endif
 
   /* for all other platforms */
-  #define FDK_INLINE inline
+  #define FDK_INLINE   __attribute__((always_inline)) inline
 
 
 /*!

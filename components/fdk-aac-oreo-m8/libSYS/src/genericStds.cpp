@@ -273,12 +273,11 @@ void  FDKafree (void *ptr)
  *--------------------------------------------------------------------------*/
 void *FDKcalloc_L(const UINT dim, const UINT size, MEMORY_SECTION s)
 {
-  int a_size;
-
+ 
   if (s == SECT_DATA_EXTERN)
     goto fallback;
 
-  a_size = ((dim*size+3)&0xfffffffc); /* force 4 byte alignment (1111 .... 1111 1100) */
+  //int a_size = ((dim*size+3)&0xfffffffc); /* force 4 byte alignment (1111 .... 1111 1100) */
 
 
 
@@ -405,6 +404,21 @@ char* FDKfgets(void *dst, INT size, FDKFILE *fp) { return fgets((char *)dst, siz
 #if !defined(FUNCTION_FDKrewind)
 void FDKrewind(FDKFILE *fp) { FDKfseek((FILE*)fp,0,FDKSEEK_SET); }
 #endif
+
+int IS_LITTLE_ENDIAN(void) { int __dummy = 1; return (*((UCHAR*)(&(__dummy)))); }
+
+/*!
+ 
+ *  Check platform for endianess.
+ *
+ * \return  1 if platform is little endian, non-1 if platform is big endian.
+
+ * \Convert input value to little endian format.
+ *
+ * \param val  Value to be converted. It may be in both big or little endian.
+ * \return     Value in little endian format.
+ */
+ #define TO_LITTLE_ENDIAN(val) ((IS_LITTLE_ENDIAN()) ? (val) : ((((val) & 0xff) << 24) || (((val) & 0xff00)<< 8) || (((val) & 0xff0000)>>8) || (((val) & 0xff000000) >> 24)))
 
 
 UINT FDKfwrite_EL(void *ptrf, INT size, UINT nmemb, FDKFILE *fp) {
