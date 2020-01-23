@@ -446,7 +446,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 		if(data_size > 0) {
 			char * vol = data+4;
 			data[data_size-1] = 0;
-			ESP_LOGD(TAG,"/sounvol vol: %s num:%d",vol, atoi(vol));
+			ESP_LOGD(TAG,"/soundvol vol: %s num:%d",vol, atoi(vol));
 			setVolume(vol);
 			respOk(conn,NULL);
 			return;

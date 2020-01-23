@@ -95,19 +95,19 @@ extern uint32_t wakeDelay;
 #define PRIO_MAD 		5
 #define PRIO_VS1053 	4
 #define PRIO_RMT		5
-#define PRIO_UART		3
+#define PRIO_UART		2
 #define PRIO_CLIENT		5
 #define PRIO_SERVER		6
 #define PRIO_ADDON		6
 #define PRIO_LCD		4
 #define PRIO_SUBSERV	6
 #define PRIO_TIMER		11
-#define PRIO_OTA		10
+#define PRIO_OTA		8
 
 // CPU for task
-#define CPU_MAD			1  // internal decoder and vs1053
+#define CPU_MAD			0  // internal decoder and vs1053
 #define CPU_RMT			1
-#define CPU_UART		0
+#define CPU_UART		1
 #define CPU_CLIENT		1
 #define CPU_SERVER		0
 #define CPU_ADDON		1
