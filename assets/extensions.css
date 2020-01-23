@@ -52,13 +52,14 @@ iframe { border: none;  height: 100vh; overflow-Y: auto; }
 #loadPlaylist { background-color: #fff; }
 nav ul {
 	list-style: none;
-	margin: 0.15rem 0.15rem 0.8rem;
+	margin: 0 0.15rem;
 	padding: 0;
 	text-align: center;
-	/* white-space: nowrap; */
 }
+#menu-list { white-space: nowrap; }
 nav li {
 	display: inline-block;
+	margin: 0.2rem 0;
 }
 #menu {
 	position: sticky;
@@ -122,7 +123,7 @@ form[name="icy"] div > * {
 #instantPlayBtn { font-size: 70%; }
 
 /* playlist */
-#playlist nav button { min-width: 5.2rem; }
+#playlist nav button { min-width: 5.1rem; }
 #playlist table { border-collapse: collapse; }
 #playlist > p:last-of-type {
 	position: sticky;
