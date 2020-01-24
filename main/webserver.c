@@ -44,15 +44,15 @@ const char strsID[]  = {"getstation, no id or Wrong id %d\n"};
 const char strsR13[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:13\r\n\r\n{\"%s\":\"%c\"}"};
 // const char strsICY[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:%d\r\n\r\n{\"curst\":\"%s\",\"descr\":\"%s\",\"name\":\"%s\",\"bitr\":\"%s\",\"url1\":\"%s\",\"not1\":\"%s\",\"not2\":\"%s\",\"genre\":\"%s\",\"meta\":\"%s\",\"vol\":\"%s\",\"treb\":\"%s\",\"bass\":\"%s\",\"tfreq\":\"%s\",\"bfreq\":\"%s\",\"spac\":\"%s\",\"auto\":\"%c\"}"};
 const char jsonICY[]  = {"{\
-\"curst\":%d,\"descr\":\"%s\",\"name\":\"%s\",\"bitr\":\"%s\",\"url1\":\"%s\",\"not1\":\"%s\",\"not2\":\"%s\",\"genre\":\"%s\",\"meta\":\"%s\",\
-\"vol\":%d,\"treb\":%d,\"bass\":%d,\"tfreq\":%d,\"bfreq\":%d,\"spac\":%d,\"auto\":%d}\
+\"curst\":%u,\"descr\":\"%s\",\"name\":\"%s\",\"bitr\":\"%s\",\"url1\":\"%s\",\"not1\":\"%s\",\"not2\":\"%s\",\"genre\":\"%s\",\"meta\":\"%s\",\
+\"vol\":%u,\"treb\":%d,\"bass\":%d,\"tfreq\":%d,\"bfreq\":%d,\"spac\":%d,\"auto\":%d}\
 "};
 const char jsonVS1053[]  = {"{\"treb\":%d,\"bass\":%d,\"tfreq\":%d,\"bfreq\":%d,\"spac\":%d}"};
 const char strsWIFI[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:%d\r\n\r\n{\"ssid\":\"%s\",\"pasw\":\"%s\",\"ssid2\":\"%s\",\"pasw2\":\"%s\",\
 \"ip\":\"%s\",\"msk\":\"%s\",\"gw\":\"%s\",\"ip2\":\"%s\",\"msk2\":\"%s\",\"gw2\":\"%s\",\"ua\":\"%s\",\"dhcp\":\"%s\",\"dhcp2\":\"%s\",\"mac\":\"%s\"\
 ,\"host\":\"%s\",\"tzo\":\"%s\"}"};
 // const char strsGSTAT[]  = {"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %d\r\n\r\n{\"Name\":\"%s\",\"URL\":\"%s\",\"File\":\"%s\",\"Port\":\"%d\",\"ovol\":\"%d\"}"};
-const char jsonGSTAT[] = {"{\"Name\":\"%s\",\"URL\":\"%s\",\"File\":\"%s\",\"Port\":%d,\"ovol\":%d}"};
+const char jsonGSTAT[] = {"{\"Name\":\"%s\",\"URL\":\"%s\",\"File\":\"%s\",\"Port\":%u,\"ovol\":%u}"};
 
 static int8_t clientOvol = 0;
 
@@ -100,9 +100,9 @@ static void respKo(int conn)
 
 static void respJSON(int conn,const char* message) {
 	if (message == NULL || strlen(message) == 0) return;
-	char fresp[strlen(strsJSON) - 4 + strlen(message) + 1]; // = inmalloc(strlen(strsROK)+strlen(message)+15);
+	char fresp[strlen(strsJSON) + strlen(message) + 15]; // = inmalloc(strlen(strsROK)+strlen(message)+15);
 	sprintf(fresp, strsJSON, strlen(message), message);
-	ESP_LOGV(TAG, "respOk %s", fresp);
+	ESP_LOGV(TAG, "respJSON %s", fresp);
 	write(conn, fresp, strlen(fresp));
 }
 
@@ -550,7 +550,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 					if (strlen(si->domain) > sizeof(si->domain)) si->domain[sizeof(si->domain)-1] = 0; //truncate if any (rom crash)
 					if (strlen(si->file) > sizeof(si->file)) si->file[sizeof(si->file)-1] = 0; //truncate if any (rom crash)
 					if (strlen(si->name) > sizeof(si->name)) si->name[sizeof(si->name)-1] = 0; //truncate if any (rom crash)
-					// jsonGSTAT: {"Name":"%s","URL":"%s","File":"%s","Port":%d,"ovol":%d}
+					// jsonGSTAT: {"Name":"%s","URL":"%s","File":"%s","Port":%u,"ovol":%u}
 					int json_length =  - 2 * 5 + 8 + 1 + strlen(jsonGSTAT) + strlen(si->domain) + strlen(si->file) + strlen(si->name);
 					buf = inmalloc(json_length);
 					if (buf == NULL) {
@@ -609,11 +609,9 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			for (int j=0;j< sizeof(struct shoutcast_info)*unb;j++) bsi[j]=0; //clean
 
 			char* url; char* file; char* name;
-			char id[6];
-			char port[6];
-			char ovol[6];
 			for (int i=0;i<unb;i++) {
 				nsi = si + i;
+				char id[6] = "";
 				if(getSParameterFromResponse(id,6,"id=", data, data_size) && strlen(id) > 0) {
 					int idNum = atoi(id);
 					ESP_LOGV(TAG,"nb:%d, id:%s", i, id);
@@ -622,6 +620,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 						url = getParameterFromResponse("url=", data, data_size);
 						file = getParameterFromResponse("file=", data, data_size);
 						name = getParameterFromResponse("name=", data, data_size);
+						char port[6] = "80";
 						if(url && file && name && getSParameterFromResponse(port,6,"port=", data, data_size)) {
 							if (strlen(url) >= sizeof(nsi->domain)) url[sizeof(nsi->domain)-1] = 0; //truncate if any
 							strcpy(nsi->domain, url);
@@ -631,6 +630,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 							pathParse(name);
 							if (strlen(name) >= sizeof(nsi->name)) url[sizeof(nsi->name)-1] = 0; //truncate if any
 							strcpy(nsi->name, name);
+							char ovol[6] = "";
 							nsi->ovol = (getSParameterFromResponse(ovol,6,"ovol=", data, data_size) && strlen(ovol) > 0) ? atoi(ovol) : 0;
 							nsi->port = (strlen(port) > 0) ? atoi(port) : 80;
 //							ESP_LOGW(TAG,"nb:%d,si:%x,nsi:%x,id:%s,url:%s,file:%s",i,(int)si,(int)nsi,id,url,file);
