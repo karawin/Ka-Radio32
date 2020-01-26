@@ -4,15 +4,17 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<meta name="apple-mobile-web-app-capable" content="yes" >
-	<meta name="apple-mobile-web-app-status-bar-style" content="default" >
-	<link rel="apple-touch-icon" type="image/png" href="logo.png" >
+	<meta name="application-name" content="Ka-Radio32" />
+	<meta name="keywords" content="esp32,vs-1053,webradio,ka-radio32" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+	<link rel="apple-touch-icon" type="image/png" href="logo.png" />
 	<link rel="icon" type="image/png" href="favicon.png" />
 	<link type="text/css" rel="stylesheet" title="base" href="https://bazooka07.github.io/Ka-Radio32/assets/extensions.css" />
 	<title>Karadio, the ultimate Wifi Webradio</title>
 </head><body>
 	<header class="no-print" id="header">
-		<div title="Click on the logo to change the theme">
+		<div>
 			<img id="logo" alt="Ka-Radio" src="logo.png" />
 		</div><div id="icy-meta" class="center no-print">
 			Ka-Radio
@@ -176,7 +178,7 @@
 					<span id="treble_span">0 dB</span>
 					<span>Treble freq.</span>
 					<input type="range" id="icy-tfreq" name="treblefreq"  min="1" max="15" class="no-cursor" />
-					<span id="treblefreq_span">0 Hz</span>
+					<span id="treblefreq_span">0 KHz</span>
 					<span>Spacial</span>
 					<div>
 						<input type="radio" id="id_spacial0" name="spacial" value="0" checked /><label for="id_spacial0">Off</label>
@@ -228,7 +230,7 @@
 							<span>Hostname</span>
 							<input name="host" />
 							<span>Time zone</span>
-							<input name="tzo" />
+							<input type="number" name="tzo" min="-12" max="13" step="1" />
 						</div>
 					 </fieldset>
 				</div>
