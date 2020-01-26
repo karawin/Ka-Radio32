@@ -52,8 +52,7 @@ const char strsWIFI[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nC
 \"ip\":\"%s\",\"msk\":\"%s\",\"gw\":\"%s\",\"ip2\":\"%s\",\"msk2\":\"%s\",\"gw2\":\"%s\",\"ua\":\"%s\",\"dhcp\":\"%s\",\"dhcp2\":\"%s\",\"mac\":\"%s\"\
 ,\"host\":\"%s\",\"tzo\":\"%s\"}"};
 // const char strsGSTAT[]  = {"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %d\r\n\r\n{\"Name\":\"%s\",\"URL\":\"%s\",\"File\":\"%s\",\"Port\":\"%d\",\"ovol\":\"%d\"}"};
-const char jsonGSTAT[] = {"{\"Name\":\"%s\",\"URL\":\"%s\",\"File\":\"%s\",\"Port\":%u,\"ovol\":%u}"};
-
+const char jsonGSTAT[] = {"{\"station\":%u,\"Name\":\"%s\",\"URL\":\"%s\",\"File\":\"%s\",\"Port\":%u,\"ovol\":%u}"};
 static int8_t clientOvol = 0;
 
 
@@ -309,6 +308,7 @@ void websockethandle(int socket, wsopcode_t opcode, uint8_t * payload, size_t le
 {
 	//wsvol
 	ESP_LOGV(TAG,"websocketHandle: %s",payload);
+	char value[6] = "";
 	if (strstr((char*)payload,"wsvol=")!= NULL)
 	{
 		char answer[17];
@@ -318,6 +318,37 @@ void websockethandle(int socket, wsopcode_t opcode, uint8_t * payload, size_t le
 //		setVolume(payload+6);
 		sprintf(answer,"{\"wsvol\":\"%s\"}",payload+6);
 		websocketlimitedbroadcast(socket,answer, strlen(answer));
+	}
+	else if(getSParameterFromResponse(value, 6, "getStation=", (char*)payload, length)) {
+		int uid = atoi(value);
+		if (uid >=0 && uid < 255) {
+			char *buf;
+			struct shoutcast_info* si = getStation(uid);
+			if (strlen(si->domain) > sizeof(si->domain)) si->domain[sizeof(si->domain)-1] = 0; //truncate if any (rom crash)
+			if (strlen(si->file) > sizeof(si->file)) si->file[sizeof(si->file)-1] = 0; //truncate if any (rom crash)
+			if (strlen(si->name) > sizeof(si->name)) si->name[sizeof(si->name)-1] = 0; //truncate if any (rom crash)
+			// jsonGSTAT: {"Name":"%s","URL":"%s","File":"%s","Port":%u,"ovol":%u}
+			int json_length =  - 2 * 5 + 8 + 1 + strlen(jsonGSTAT) + strlen(si->domain) + strlen(si->file) + strlen(si->name);
+			buf = inmalloc(json_length);
+			if (buf == NULL) {
+				ESP_LOGE(TAG," %s malloc fails (%d bytes)","getStation", json_length);
+			} else {
+				for(int i = 0; i<sizeof(buf); i++) buf[i] = 0;
+				sprintf(buf, jsonGSTAT,
+					uid,
+					si->name,
+					si->domain,
+					si->file,
+					si->port,
+					si->ovol
+				);
+				ESP_LOGV(TAG,"getStation Buf len:%d : %s",strlen(buf),buf);
+				websocketwrite(socket, buf, strlen(buf));
+			}
+			infree(buf);
+			infree(si);
+		}
+		return;
 	}
 	else if (strstr((char*)payload,"startSleep=")!= NULL)
 	{
@@ -550,7 +581,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 					if (strlen(si->domain) > sizeof(si->domain)) si->domain[sizeof(si->domain)-1] = 0; //truncate if any (rom crash)
 					if (strlen(si->file) > sizeof(si->file)) si->file[sizeof(si->file)-1] = 0; //truncate if any (rom crash)
 					if (strlen(si->name) > sizeof(si->name)) si->name[sizeof(si->name)-1] = 0; //truncate if any (rom crash)
-					// jsonGSTAT: {"Name":"%s","URL":"%s","File":"%s","Port":%u,"ovol":%u}
+					// jsonGSTAT: {"station":%u,"Name":"%s","URL":"%s","File":"%s","Port":%u,"ovol":%u}
 					int json_length =  - 2 * 5 + 8 + 1 + strlen(jsonGSTAT) + strlen(si->domain) + strlen(si->file) + strlen(si->name);
 					buf = inmalloc(json_length);
 					if (buf == NULL) {
@@ -560,6 +591,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 					} else {
 						for(int i = 0; i<sizeof(buf); i++) buf[i] = 0;
 						sprintf(buf, jsonGSTAT,
+							uid,
 							si->name,
 							si->domain,
 							si->file,

@@ -478,7 +478,7 @@ void wsMonitor()
 		memset(answer,0,300);
 		if ((clientPath[0]!= 0))
 		{
-			sprintf(answer,"{\"monitor\":\"http://%s:%d%s\"}",clientURL,clientPort,clientPath);
+			sprintf(answer,"{\"monitor\":\"http://%s:%u%s\",\"curst\":%u}",clientURL,clientPort,clientPath, getCurrentStation());
 			websocketbroadcast(answer, strlen(answer));
 		}
 }
