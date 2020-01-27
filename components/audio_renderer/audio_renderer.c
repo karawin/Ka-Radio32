@@ -19,11 +19,12 @@
 #include "gpio.h"
 #include "app_main.h"
 #include "MerusAudio.h"
-
+/*
 #include "audio_player.h"
 #include "audio_renderer.h"
 #include "ac101.h"
 #include "audio_hal.h"
+*/
 
 #define TAG "renderer"
 
@@ -31,7 +32,7 @@
 static renderer_config_t *renderer_instance = NULL;
 static component_status_t renderer_status = UNINITIALIZED;
 //static QueueHandle_t i2s_event_queue;
-static audio_board_handle_t a101_handle = 0;
+//static audio_board_handle_t a101_handle = 0;
 
 static void init_i2s(renderer_config_t *config)
 {
@@ -54,7 +55,8 @@ static void init_i2s(renderer_config_t *config)
 		comm_fmt = I2S_COMM_FORMAT_PCM | I2S_COMM_FORMAT_PCM_SHORT;
     }
 
-	if ((config->output_mode == I2S)||(config->output_mode == A1S)||(config->output_mode == I2S_MERUS))
+//	if ((config->output_mode == I2S)||(config->output_mode == A1S)||(config->output_mode == I2S_MERUS))
+	if ((config->output_mode == I2S)||(config->output_mode == I2S_MERUS))
 	{
 	/* don't use audio pll on buggy rev0 chips */
 	// don't do it for PDM
@@ -64,6 +66,7 @@ static void init_i2s(renderer_config_t *config)
 		} else
 			ESP_LOGI(TAG, "chip revision %d, cannot enable APLL", out_info.revision);
 	}
+/*
 	if (config->output_mode == A1S)
 	{
 		ESP_LOGI(TAG, "Start a101 codec chip");
@@ -76,7 +79,7 @@ static void init_i2s(renderer_config_t *config)
   	    ESP_LOGI(TAG, "ac101 value: %d",player_volume );
 
 	}
-
+*/
 	/*
      * Allocate just enough to decode AAC+, which has huge frame sizes.
      *
@@ -140,14 +143,14 @@ static void init_i2s(renderer_config_t *config)
 }
 
 //KaraDio32
-void renderer_volume(uint32_t vol, uint8_t mod)
+void renderer_volume(uint32_t vol)
 {
-	if (mod == 5)
+/*	if (mod == 5)
 	{
 		audio_hal_set_volume(a101_handle->audio_hal, vol/4);
 		vol = 254;
 	}
-
+*/
 	// log volume (magic)
 	if (vol == 1) return;  // volume 0
 //	ESP_LOGI(TAG, "Renderer vol: %d %X",vol,vol );

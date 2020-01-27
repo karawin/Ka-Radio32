@@ -47,7 +47,7 @@ void render_samples(char *buf, uint32_t len, pcm_format_t *format);
 /* render callback for libmad */
 void render_sample_block(short *sample_buff_ch0, short *sample_buff_ch1, int num_samples, unsigned int num_channels);
 
-void renderer_volume(uint32_t volume, uint8_t mod);
+void renderer_volume(uint32_t volume);
 void renderer_init(renderer_config_t *config);
 void renderer_start();
 void renderer_stop();

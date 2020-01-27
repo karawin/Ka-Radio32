@@ -524,7 +524,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			{
 				if ((atoi(id) >=0) && (atoi(id) < 255))
 				{
-					char ibuf [6];
+					char ibuf [10];
 					char *buf;
 					for(i = 0; i<sizeof(ibuf); i++) ibuf[i] = 0;
 					struct shoutcast_info* si;
@@ -683,8 +683,8 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 	} else if(strcmp(name, "/icy") == 0)
 	{
 		ESP_LOGV(TAG,"icy vol");
-		char currentSt[5]; sprintf(currentSt,"%d",getCurrentStation());
-		char vol[5]; sprintf(vol,"%d",(getVolume() ));
+		char currentSt[6]; sprintf(currentSt,"%d",getCurrentStation());
+		char vol[6]; sprintf(vol,"%d",(getVolume() ));
 		char treble[5]; sprintf(treble,"%d",(get_audio_output_mode() == VS1053)?VS1053_GetTreble():0);
 		char bass[5]; sprintf(bass,"%d",(get_audio_output_mode() == VS1053)?VS1053_GetBass():0);
 		char tfreq[5]; sprintf(tfreq,"%d",(get_audio_output_mode() == VS1053)?VS1053_GetTrebleFreq():0);

@@ -241,6 +241,9 @@ error:
     return -1;
 }
 
+int IS_LITTLE_ENDIAN(void) { int __dummy = 1; return (*((UCHAR*)(&(__dummy)))); }
+
+
 /*!
  *
  *  \brief Read samples from a WAVEfile. The samples are automatically reorder to the native
