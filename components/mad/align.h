@@ -1,2 +1,2 @@
-char unalChar(char const *adr);
-short unalShort(short const *adr);
+char unalChar(const unsigned char *adr);
+short unalShort(short const unsigned int *adr);

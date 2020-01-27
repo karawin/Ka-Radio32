@@ -3,7 +3,7 @@
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 #include "sdkconfig.h"
 #include "esp_log.h"
-#include "rom/ets_sys.h"
+#include "esp32/rom/ets_sys.h"
 #include "esp_heap_caps.h"
 
 #include "freertos/FreeRTOS.h"

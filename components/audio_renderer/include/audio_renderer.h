@@ -13,7 +13,7 @@
 #include "common_component.h"
 
 typedef enum {
-    I2S, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053, BTOOTH
+    I2S, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053, A1S
 } output_mode_t;
 
 

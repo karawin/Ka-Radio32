@@ -958,7 +958,7 @@ SBR_ERROR sbrDecoder_Parse(
         int fGlobalIndependencyFlag
         )
 {
-  SBR_DECODER_ELEMENT   *hSbrElement;
+  SBR_DECODER_ELEMENT   *hSbrElement = 0;
   HANDLE_SBR_HEADER_DATA hSbrHeader = NULL;
   HANDLE_SBR_CHANNEL    *pSbrChannel;
 

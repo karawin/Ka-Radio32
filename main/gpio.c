@@ -330,7 +330,7 @@ void gpio_get_joysticks(gpio_num_t *enca,gpio_num_t *enca1)
 // get the active level of buttons
 void gpio_get_active_buttons(bool *abtn0, bool *abtn1)
 {
-	esp_err_t err;
+//	esp_err_t err;
 	nvs_handle hardware_handle;	
 	
 	*abtn0 = 0;

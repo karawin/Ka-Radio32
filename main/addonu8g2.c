@@ -236,7 +236,7 @@ static void screenBottomU8g2()
 //TIME
 	if (yy != 32) // not enough room
 	{
-		char strsec[30]; 		
+		char strsec[73];
 		if (getDdmm())
 			sprintf(strsec,"%02d-%02d-%04d  %02d:%02d:%02d",dt->tm_mday,dt->tm_mon+1,dt->tm_year+1900, dt->tm_hour, dt->tm_min,dt->tm_sec);
 		else 
@@ -384,7 +384,7 @@ void drawStationU8g2(uint8_t mTscreen,char* snum,char* ddot)
 void drawVolumeU8g2(uint8_t mTscreen)
 {
   char vlstr[] = {"Volume"}; 
-  char aVolume[4];
+  char aVolume[6];
 //  volume = atoi(aVolume);
   sprintf(aVolume,"%d",volume);
   
@@ -401,7 +401,7 @@ void drawVolumeU8g2(uint8_t mTscreen)
 
 void drawTimeU8g2(uint8_t mTscreen,unsigned timein)
 {
-  char strdate[23];
+  char strdate[36];
   char strtime[20];
 //  printf("DRAW TIME U8G2  mtscreen : %d\n",mTscreen);
 	u8g2_ClearBuffer(&u8g2);
@@ -527,6 +527,9 @@ void lcd_initU8g2(uint8_t *lcd_type)
 	{
 		gpio_get_spi_bus(&spi_no,&miso,&mosi,&sclk);
 		gpio_get_spi_lcd(&cs ,&a0,&rstlcd);
+
+		if(miso == GPIO_NONE || mosi == GPIO_NONE || sclk == GPIO_NONE || spi_no > 2) return;
+
 		u8g2_esp32_hal.spi_no   = spi_no;
 		u8g2_esp32_hal.clk   = sclk;
 		u8g2_esp32_hal.mosi  = mosi;
@@ -536,6 +539,8 @@ void lcd_initU8g2(uint8_t *lcd_type)
 	} else //BW I2C
 	{
 		gpio_get_i2c(&scl,&sda,&rsti2c);
+		if(scl == GPIO_NONE || sda == GPIO_NONE) return;
+
 		u8g2_esp32_hal.sda  = sda;
 		u8g2_esp32_hal.scl  = scl;
 		u8g2_esp32_hal.reset = rsti2c;

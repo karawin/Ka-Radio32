@@ -166,7 +166,7 @@ typedef enum {
   #define C_ALLOC_MEM_STATIC(name,type,num) \
     static type * Get ## name(int n) { FDK_ASSERT((n) == 0); return ((type*)FDKcalloc(num, sizeof(type))); } \
     static void Free ## name(type** p) { if (p != NULL) { FDKfree(*p); *p=NULL; } } \
-    static UINT GetRequiredMem ## name(void) { return ALGN_SIZE_EXTRES((num) * sizeof(type)); }
+//    static UINT GetRequiredMem ## name(void) { return ALGN_SIZE_EXTRES((num) * sizeof(type)); }
 
   /** See #H_ALLOC_MEM for description. */
   #define C_ALLOC_MEM2(name,type,n1,n2) \
@@ -389,31 +389,14 @@ float FDKatof(const char *nptr);
 
 /* FILE I/O */
 
-/*!
- *  Check platform for endianess.
- *
- * \return  1 if platform is little endian, non-1 if platform is big endian.
- */
-#ifdef __cplusplus
-inline
-#else
-static
-#endif
-int IS_LITTLE_ENDIAN(void) {
-  int __dummy = 1;
-  return ( *( (UCHAR*)(&(__dummy) ) ) );
-}
 
-/*!
- *  Convert input value to little endian format.
- *
- * \param val  Value to be converted. It may be in both big or little endian.
- * \return     Value in little endian format.
- */
-#define TO_LITTLE_ENDIAN(val) \
-  ( (IS_LITTLE_ENDIAN()) ? \
-     (val) \
-   : ( (((val) & 0xff) << 24) || (((val) & 0xff00)<< 8) || (((val) & 0xff0000)>>8) || (((val) & 0xff000000) >> 24) ) )
+//#ifdef __cplusplus
+//inline
+//#else
+//static
+//#endif
+
+//
 
 
 /*!
@@ -432,7 +415,9 @@ int IS_LITTLE_ENDIAN(void) {
  * \fn     UINT FDKfread(void *dst, INT size, UINT nmemb, FDKFILE *fp);
  *         Standard fread() wrapper.
  */
+
 typedef void FDKFILE;
+
 extern const INT FDKSEEK_SET, FDKSEEK_CUR, FDKSEEK_END;
 
 FDKFILE *FDKfopen(const char *filename, const char *mode);

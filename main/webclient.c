@@ -474,8 +474,8 @@ void wsVol(char* vol)
 // websocket: broadcast monitor url
 void wsMonitor()
 {
-		char answer[300];
-		memset(answer,0,300);
+		char answer[540];
+		memset(answer,0,540);
 		if ((clientPath[0]!= 0))
 		{
 			sprintf(answer,"{\"monitor\":\"http://%s:%d%s\"}",clientURL,clientPort,clientPath);
@@ -812,6 +812,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 			break;
 		}
 		//no break here
+		/* fall through */
 	case C_HEADER1:  // not ended
 		{
 			int i = 0;

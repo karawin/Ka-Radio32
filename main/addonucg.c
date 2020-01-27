@@ -78,7 +78,6 @@ void setfont(sizefont size)
 		switch(inX)
 		{
 			case 320:
-			case 240:
 			ucg_SetFont(&ucg,ucg_font_6x13_mf);
 			break;
 			case 128:
@@ -98,7 +97,6 @@ void setfont(sizefont size)
 		switch(inX)
 		{
 			case 320:
-			case 240:
 			switch (charset){ 	
 								case Cyrillic: ucg_SetFont(&ucg,ucg_font_crox5h );break; 
 								case Greek:ucg_SetFont(&ucg,ucg_font_helvR18_gr );break;
@@ -150,7 +148,6 @@ void setfont(sizefont size)
 		switch(inX)
 		{
 			case 320:
-			case 240:
 			switch (charset){ 	
 								case Cyrillic: ucg_SetFont(&ucg,ucg_font_crox5h );break; 
 								case Greek:ucg_SetFont(&ucg,ucg_font_helvR24_gr );break;
@@ -195,7 +192,6 @@ void setfont(sizefont size)
 		switch(inX)
 		{
 			case 320:
-			case 240:
 			ucg_SetFont(&ucg,ucg_font_inr53_mf); 
 			break;
 			case 128:
@@ -548,7 +544,8 @@ int i;
 		ucg_DrawBox(&ucg,0,0,x-1,15);  
 		for (i=0;i<LINES;i++) draw(i);
 		// no break
-	case MTREFRESH:	
+		/* fall through */
+    case MTREFRESH:
 		markDrawResetUcg(TIME);
 		drawLinesUcg();
 		break;
@@ -584,6 +581,7 @@ void drawNumberUcg(uint8_t mTscreen,char* irStr)
 		TTitleStr[0] = 0;   
         drawTTitleUcg(ststr);   
       // no break
+		/* fall through */
       case 2:  
         xxx = (x/2)-(ucg_GetStrWidth(&ucg,irStr)/2); 
         ucg_SetColor(&ucg,0,CBLACK);  
@@ -611,6 +609,7 @@ void drawStationUcg(uint8_t mTscreen,char* snum,char* ddot)
 		TTitleStr[0] = 0;        
         drawTTitleUcg(ststr);
       // no break
+		/* fall through */
       case 2:   
         ucg_SetColor(&ucg,0,CBLACK); 
         ucg_DrawBox(&ucg,0,HHeader,x,yy);     
@@ -641,13 +640,14 @@ void drawVolumeUcg(uint8_t mTscreen)
 {
   char vlstr[] = {"Volume"};
 //  volume = atoi(aVolume);
-  char aVolume[4];
+  char aVolume[6];
   sprintf(aVolume,"%d",volume);
     switch (mTscreen){
       case 1: 
 		ucg_ClearScreen(&ucg);
 		TTitleStr[0] = 0;
         drawTTitleUcg(vlstr) ;		
+		/* fall through */
       case 2:
 //        ucg_SetFont(&ucg,ucg_font_inr49_tf);
         setfont(large); 
@@ -672,7 +672,7 @@ static  void drawSecond(unsigned timein)
   static unsigned insec;
   if (insec != timein)
   {
-  char strseco[3]; 
+  char strseco[13];
   uint16_t len;
   sprintf(strseco,":%02d",dt->tm_sec);
   setfont(text);
@@ -689,7 +689,7 @@ static  void drawSecond(unsigned timein)
 
 void drawTimeUcg(uint8_t mTscreen,unsigned timein)
 {
-  char strdate[23];
+  char strdate[36];
   char strtime[20];
     sprintf(strtime,"%02d:%02d", dt->tm_hour, dt->tm_min);
     switch (mTscreen){
@@ -705,6 +705,7 @@ void drawTimeUcg(uint8_t mTscreen,unsigned timein)
         // draw ip
         //ucg_SetFont(&ucg,ucg_font_6x13_tf);
         ucg_DrawString(&ucg,4,yy-18,0,strdate);		
+		/* fall through */
       case 2:
 	    if (getDdmm())
 			sprintf(strdate,"%02d-%02d-%04d", dt->tm_mday, dt->tm_mon+1,  dt->tm_year+1900);
@@ -895,6 +896,9 @@ void lcd_initUcg(uint8_t *lcd_type)
 	{
 		gpio_get_spi_bus(&spi_no,&miso,&mosi,&sclk);
 		gpio_get_spi_lcd(&cs ,&a0,&rstlcd);
+		if(miso == GPIO_NONE || mosi == GPIO_NONE || sclk == GPIO_NONE || spi_no > 2) return;
+		
+			
 		ucg_esp32_hal.spi_no   = spi_no;
 		ucg_esp32_hal.clk   = sclk;
 		ucg_esp32_hal.mosi  = mosi;
@@ -904,6 +908,7 @@ void lcd_initUcg(uint8_t *lcd_type)
 	} else //Color I2c (never seen this one)
 	{
 		gpio_get_i2c(&scl,&sda,&rsti2c);
+		if(scl == GPIO_NONE || sda == GPIO_NONE) return;
 		ucg_esp32_hal.sda  = sda;
 		ucg_esp32_hal.scl  = scl;
 		ucg_esp32_hal.reset = rsti2c;

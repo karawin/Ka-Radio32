@@ -509,7 +509,7 @@ AAC_DECODER_ERROR  CBlock_ReadSpectralData(HANDLE_FDK_BITSTREAM bs,
   const SHORT *RESTRICT BandOffsets = GetScaleFactorBandOffsets(&pAacDecoderChannelInfo->icsInfo, pSamplingRateInfo);
 
   SPECTRAL_PTR pSpectralCoefficient = pAacDecoderChannelInfo->pSpectralCoefficient;
-  FIXP_DBL locMax;
+ // FIXP_DBL locMax;
 
   int ScaleFactorBandsTransmitted = GetScaleFactorBandsTransmitted(&pAacDecoderChannelInfo->icsInfo);
 
@@ -550,7 +550,7 @@ AAC_DECODER_ERROR  CBlock_ReadSpectralData(HANDLE_FDK_BITSTREAM bs,
 
             FIXP_DBL *mdctSpectrum = SPEC(pSpectralCoefficient, window, pAacDecoderChannelInfo->granuleLength);
 
-            locMax = (FIXP_DBL)0 ;
+           // locMax = (FIXP_DBL)0 ;
 
             for (index=BandOffsets[band]; index < BandOffsets[band+1]; index+=step)
             {
@@ -680,8 +680,9 @@ void CBlock_FrequencyToTime(CAacDecoderStaticChannelInfo *pAacDecoderStaticChann
                             const int frameOk,
                             FIXP_DBL *pWorkBuffer1 )
 {
-  int fr, fl, tl, nSamples, nSpec;
-
+  int fr, fl, tl, nSpec;
+  //nSamples,
+  
   /* Determine left slope length (fl), right slope length (fr) and transform length (tl).
      USAC: The slope length may mismatch with the previous frame in case of LPD / FD
            transitions. The adjustment is handled by the imdct implementation.
@@ -716,7 +717,8 @@ void CBlock_FrequencyToTime(CAacDecoderStaticChannelInfo *pAacDecoderStaticChann
     {
       FIXP_DBL *tmp = pAacDecoderChannelInfo->pComData->workBufferCore1->mdctOutTemp;
 
-      nSamples = imdct_block(
+      //nSamples = 
+		  imdct_block(
              &pAacDecoderStaticChannelInfo->IMdct,
               tmp,
               SPEC_LONG(pAacDecoderChannelInfo->pSpectralCoefficient),

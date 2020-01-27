@@ -399,7 +399,7 @@ static void InitNonPCWSideInformationForCurrentSet(H_HCR_INFO pHcr)
   int        extendedSortedCodebookIdx           =   pHcr->sectionInfo.extendedSortedCodebookIdx;
   USHORT    *pNumExtendedSortedSectionsInSets    =   pHcr->sectionInfo.pNumExtendedSortedSectionsInSets;
   int        numExtendedSortedSectionsInSetsIdx  =   pHcr->sectionInfo.numExtendedSortedSectionsInSetsIdx;
-  FIXP_DBL  *pQuantizedSpectralCoefficients      =   SPEC_LONG(pHcr->decInOut.pQuantizedSpectralCoefficientsBase);
+  //FIXP_DBL  *pQuantizedSpectralCoefficients      =   SPEC_LONG(pHcr->decInOut.pQuantizedSpectralCoefficientsBase);
   int        quantizedSpectralCoefficientsIdx    =   pHcr->decInOut.quantizedSpectralCoefficientsIdx;
   const UCHAR     *pCbDimension                  =   pHcr->tableInfo.pCbDimension;
   int iterationCounter = 0;

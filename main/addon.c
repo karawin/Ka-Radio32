@@ -41,7 +41,6 @@ static void evtClearScreen();
 
 
 
-#define isColor (lcd_type&LCD_COLOR)
 const char *stopped = "STOPPED";	
 
 char irStr[4];
@@ -50,6 +49,9 @@ xQueueHandle event_lcd = NULL;
 u8g2_t u8g2; // a structure which will contain all the data for one display
 ucg_t  ucg;
 static uint8_t lcd_type;
+
+#define isColor (lcd_type&LCD_COLOR)
+
 static xTaskHandle  pxTaskLcd;
 // list of screen
 typedef  enum typeScreen {smain,svolume,sstation,snumber,stime,snull} typeScreen ;
@@ -193,8 +195,9 @@ void lcd_init(uint8_t Type)
 	lcd_type = Type;
 
 	// init the gpio for backlight
-	LedBacklightInit();
 	if (lcd_type == LCD_NONE) return;
+
+	LedBacklightInit();
 	
 	if (lcd_type & LCD_COLOR) // Color one
 	{
@@ -347,7 +350,7 @@ void drawNumber()
 // draw the station screen
 void drawStation()
 {
-  char sNum[4] ; 
+  char sNum[7] ;
   char* ddot;
   char* ptl ;
   struct shoutcast_info* si;

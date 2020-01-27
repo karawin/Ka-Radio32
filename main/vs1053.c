@@ -59,7 +59,7 @@ void spi_give_semaphore(xSemaphoreHandle isSPI) {
 }
 
 
-void VS1053_spi_init(){
+void Spi_init(){
 	esp_err_t ret;
 	gpio_num_t miso;
 	gpio_num_t mosi;
@@ -109,8 +109,8 @@ bool VS1053_HW_init()
 		ESP_LOGE(TAG,"VS1053 not used");
 		return false;
 	}
-	uint32_t freq =spi_cal_clock(APB_CLK_FREQ, 1400000, 128, NULL);
-//	uint32_t freq =spi_cal_clock(APB_CLK_FREQ, 1600000, 128, NULL);
+	uint32_t freq =spi_get_actual_clock(APB_CLK_FREQ, 1400000, 128);
+//	uint32_t freq =spi_get_actual_clock(APB_CLK_FREQ, 1600000, 128);
 	ESP_LOGI(TAG,"VS1053 LFreq: %d",freq);
 	spi_device_interface_config_t devcfg={
         .clock_speed_hz=freq,               //Clock out at x MHz
@@ -133,7 +133,7 @@ bool VS1053_HW_init()
 	ESP_ERROR_CHECK(spi_bus_add_device(spi_no, &devcfg, &vsspi));
 	
 	//high speed	
-	freq =spi_cal_clock(APB_CLK_FREQ, 6100000, 128, NULL);
+	freq =spi_get_actual_clock(APB_CLK_FREQ, 6100000, 128);
 	ESP_LOGI(TAG,"VS1053 HFreq: %d",freq);
 	devcfg.clock_speed_hz = freq;
 	devcfg.spics_io_num= xdcs;               //XDCS pin

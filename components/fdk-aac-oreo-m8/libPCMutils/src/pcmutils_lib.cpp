@@ -484,18 +484,21 @@ PCMDMX_ERROR getChannelMode (
     switch (channelType[ch]) {
     case ACT_FRONT_TOP:
       chGrpIdx += numChInGrp[CH_GROUP_FRONT];  /* Append after normal plain */
-    case ACT_FRONT:
+    /*fall through*/
+	case ACT_FRONT:
       grpIdx = CH_GROUP_FRONT;
       break;
 #if (PCM_DMX_MAX_CHANNEL_GROUPS > 1)
     case ACT_SIDE_TOP:
       chGrpIdx += numChInGrp[CH_GROUP_SIDE];   /* Append after normal plain */
-    case ACT_SIDE:
+    /*fall through*/
+	case ACT_SIDE:
       grpIdx = CH_GROUP_SIDE;
       break;
     case ACT_BACK_TOP:
       chGrpIdx += numChInGrp[CH_GROUP_REAR];   /* Append after normal plain */
-    case ACT_BACK:
+    /*fall through*/
+	case ACT_BACK:
       grpIdx = CH_GROUP_REAR;
       break;
     case ACT_LFE:
@@ -1986,8 +1989,7 @@ PCMDMX_ERROR pcmDmx_ApplyFrame (
   if ( (pParam->expiryFrame > 0)
     && (++self->bsMetaData[0].expiryCount > pParam->expiryFrame) )
   { /* The metadata read from bitstream is too old. */
-    PCMDMX_ERROR err = pcmDmx_Reset(self, PCMDMX_RESET_BS_DATA);
-    FDK_ASSERT(err == PCMDMX_OK);
+    FDK_ASSERT(pcmDmx_Reset(self, PCMDMX_RESET_BS_DATA) == PCMDMX_OK);
   }
   FDKmemcpy(&bsMetaData, &self->bsMetaData[pParam->frameDelay], sizeof(DMX_BS_META_DATA));
   /* Maintain delay line */

@@ -169,7 +169,7 @@ TRANSPORTDEC_ERROR adtsRead_DecodeHeader(
         const INT             ignoreBufferFullness
         )
 {
-  INT crcReg;
+  INT crcReg = 0;
 
   INT valBits;
   INT cmp_buffer_fullness;
