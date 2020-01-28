@@ -43,6 +43,7 @@ var instantPlaying = false;
 var saveAsText = null;
 var currentStationId = null;
 var isConnected = false;
+var wsPrior = false;
 
 var isLoading = false; // displayed webradios are not saving in the Ka-Radio device if true
 
@@ -108,7 +109,7 @@ function icyDisplay(icy) {
 						target.innerHTML = value.replace(/<br\s*\/?>/i, '');
 						break;
 					case 'bitr':
-						target.textContent = value + ' kB/s';
+						target.textContent = (value.length > 0 && value > 0) ? value + ' kB/s' : '';
 						break;
 					case 'url1':
 						if(value.length > 0) {
@@ -146,9 +147,11 @@ function icyDisplay(icy) {
 			}
 		}
 	}
-	const playing = (icy.name.trim().length > 0);
-	stationsBtn.playing = playing;
-	stationsBtn.textContent = (playing) ? 'Stop' : 'Play';
+	if('name' in icy) {
+		const playing = (icy.name.trim().length > 0);
+		stationsBtn.playing = playing;
+		stationsBtn.textContent = (playing) ? 'Stop' : 'Play';
+	}
 }
 
 document.getElementById('logo').addEventListener('click', function (event) {
@@ -299,12 +302,25 @@ function openSocket() {
 	if (websocket != null) {
 		websocket.onopen = function (event) {
 			console.log(this.url + ' opened');
-			this.send('opencheck');
 		}
 
 		websocket.onmessage = function (event) {
 			try {
+				// console.log('msg', event.data);
 				let msg = JSON.parse(event.data);
+				if('station' in msg && 'URL' in msg) {
+					if(msg.URL.trim().length > 0) {
+						addStation(msg.station, msg);
+					}
+					const i = msg.station + 1;
+					progressBar.value = i;
+					if(i<MAX_STATIONS) {
+						this.send('getStation=' + i);
+					} else {
+						stationsBtn.disabled = false;
+					}
+					return;
+				}
 				if(!'wsrssi' in msg) {
 					console.log('websocket:', msg);
 				}
@@ -337,6 +353,11 @@ function openSocket() {
 					let caption = document.getElementById('monitor-url');
 					if (caption != null) {
 						caption.textContent = msg.monitor;
+					}
+
+					if(stationsList != null && stationsList.rows.length == 0) {
+						wsPrior = ('curst' in msg);
+						loadStationsList();
 					}
 					return;
 				}
@@ -373,7 +394,7 @@ function openSocket() {
 					return
 				}
 			} catch (err) {
-				console.log('Error on message: ', err);
+				console.error('Error on message: ', err);
 			}
 		}
 
@@ -382,7 +403,7 @@ function openSocket() {
 		}
 
 		websocket.onerror = function (event) {
-			console.log('Websocker error: ', event.originalTarget);
+			console.error('Websocker error: ', event.originalTarget);
 			this.close();
 		}
 
@@ -497,18 +518,20 @@ function addStation(stationId, datas) {
 		stationId++;
 	}
 
-	if(!datas.hasOwnProperty('fullUrl')) {
+	if(!datas.hasOwnProperty('fullUrl') && datas.URL.length > 0) {
 		let port = '';
 		if(datas.hasOwnProperty('Port')) {
 			if(typeof datas.Port == 'string') {
 				if(datas.Port.trim() != '80') {
 					port = ':' + datas.Port.trim();
 				}
-			} else if(datas.Port != 80) {
+			} else if(datas.Port != 0 && datas.Port != 80) {
 				port = ':' + datas.Port;
 			}
 		}
 		datas.fullUrl = datas.URL + port + datas.File;
+	} else {
+		datas.fullUrl = '';
 	}
 
 	let tr = document.createElement('TR');
@@ -543,7 +566,7 @@ function addStation(stationId, datas) {
 	let urlCell = document.createElement('TD');
 	let volCell = document.createElement('TD');
 
-	urlCell.textContent = ((/^https?:\/\//.test(datas.fullUrl)) ? '' : 'http://') + datas.fullUrl;
+	urlCell.textContent = (datas.fullUrl.length == 0 ) ? '' : ((/^https?:\/\//.test(datas.fullUrl)) ? '' : 'http://') + datas.fullUrl;
 	volCell.textContent = (datas.hasOwnProperty('ovol')) ? datas.ovol : '0';
 	tr.appendChild(urlCell);
 	tr.appendChild(volCell);
@@ -682,20 +705,28 @@ xhr.valueChange = function (action, params) {
 	this.sendForm(action, params);
 }
 xhr.wifi = function (valid) {
-	if (typeof valid == 'undefined') {
-		valid = '0';
+	if (typeof valid == 'undefined') { valid = '0'; }
+	const params = ['valid=' + valid];
+	if(valid > 0) {
+		const elements = document.forms.wifi.elements;
+		['', '2'].forEach(function(col) {
+			let dhcp = false;
+			['ssid', 'pasw', 'dhcp', 'ip', 'msk', 'gw', 'ua', 'host', 'tzo'].forEach(function(field) {
+				if(col == '2' && ['ua', 'host', 'tzo'].indexOf(field) >= 0) { return; }
+				if(dhcp && ['ip', 'msk', 'gw'].indexOf(field) >= 0) { return; }
+				const el = elements.namedItem(field + col);
+				if(field == 'dhcp') {
+					dhcp = el.checked; // type="checkbox"
+					const value = (dhcp) ? 'true' : ''; // Hack against Ka-Radio
+					params.push('dhcp' + col + '=' + value);
+				} else {
+					params.push(el.name + '=' + el.value);
+				}
+			});
+		});
 	}
-	let params = [
-		'valid=' + valid
-	];
-	['ssid', 'ssid2', 'pasw', 'pasw2', 'dhcp', 'dhcp2', 'ip', 'msk', 'gw', 'ip2', 'msk2', 'gw2', 'ua', 'host', 'tzo'].forEach(function (name) {
-		let el = document.forms.wifi.elements[name];
-		if (el != null) {
-			params.push(name + '=' + el.value);
-		} else {
-			console.log('No input with name=' + name);
-		}
-	});
+
+	console.log(params);
 	this.sendForm('wifi', params.join('&'));
 }
 xhr.hardware = function (valid) {
@@ -758,7 +789,7 @@ xhr.onreadystatechange = function () {
 					displayCurrentStation();
 					displayHardware();
 					setRssiInterval();
-					loadStationsList();
+					// loadStationsList(); look at : websocket.send('wsmonitor')
 					return;
 				}
 				console.error('Unattented response from '+ this.responseURL, this.responseText);
@@ -772,6 +803,12 @@ xhr.onreadystatechange = function () {
 			if ('curst' in datas) {
 				icyDisplay(datas);
 				meta.textContent = datas.meta;
+				return;
+			}
+
+			// for VS1053
+			if ('treb' in datas) {
+				icyDisplay(datas);
 				return;
 			}
 
@@ -910,7 +947,11 @@ function loadStationsList() {
 	stationsList.innerHTML = '';
 	stationsSelect.innerHTML = '';
 	progressBar.max = MAX_STATIONS;
-	xhrSta.loadStation(0);
+	if(wsPrior) {
+		websocket.send('getStation=0');
+	} else {
+		xhrSta.loadStation(0);
+	}
 }
 
 function reloadStationsList() {
@@ -1010,7 +1051,24 @@ function saveStationsList(changedOnly) {
 		}
 	}
 
+	// Push stations with empty url at the end of the list
+	let j = -1;
+	for(let i=stationsList.rows.length - 2; i>=0; i--) {
+		const row = stationsList.rows[i];
+		const url = row.cells[2].textContent.trim();
+		if(url.length == 0) {
+			stationsList.removeChild(row);
+			stationsList.appendChild(row);
+			j = i;
+		}
+	}
+
 	if(changedOnly) {
+		if(j>=0) {
+			for(let i=j, iMax=stationsList.rows.length; i<iMax; i++) {
+				stationsList.rows[i].classList.add('has-changed');
+			}
+		}
 		xhrPlaylistSave.saveStation();
 	} else {
 		for(let i=0, iMax=stationsList.rows.length; i<iMax; i++) {
@@ -1310,7 +1368,7 @@ document.forms.hardware.addEventListener('submit', function(event) {
 })
 
 document.forms.hardware.addEventListener('change', function(event) {
-	if(event.target.type == 'range' || event.target.type == 'radio') {
+	if(event.target.type == 'range' || (event.target.type == 'radio' && event.target.name == 'spacial')) {
 		event.preventDefault();
 		xhr.setVS1053(event.target); // Ka-Radio32 just answers 'ok'. No value in return !
 		// Hack against Ka-Radio32
@@ -1332,24 +1390,7 @@ document.forms.hardware.addEventListener('change', function(event) {
 
 document.forms.wifi.addEventListener('submit', function(event) {
 	event.preventDefault();
-	const lines = ['valid=1'];
-	const elements = event.target.elements;
-	['', '2'].forEach(function(col) {
-		let dhcp = false;
-		['ssid', 'pasw', 'dhcp', 'ip', 'msk', 'gw', 'ua', 'host', 'tzo'].forEach(function(field) {
-			if(col == '2' && ['ua', 'host', 'tzo'].indexOf(field) >= 0) { return; }
-			if(!dhcp && ['ip', 'msk', 'gw'].indexOf(field) >= 0) { return; }
-			const el = elements.namedItem(field + col);
-			if(field == 'dhcp') {
-				dhcp = el.checked;
-				if(dhcp) { lines.push('dhcp' + col + '=true'); }
-			} else {
-				lines.push(el.name + '=' + el.value);
-			}
-		});
-	});
-	// console.log(lines);
-	xhr.sendForm('wifi', lines.join('&'));
+	xhr.wifi(1);
 })
 
 /* -------------- Sleep / Awake ------- */
@@ -1515,7 +1556,7 @@ const CLOUD_URL = 'https://bazooka07.github.io/Ka-Radio32/'; // must end with '/
 
 if(document.body.hasAttribute('data-ip')) {
 	IP_DEVICE = document.body.dataset.ip;
-	console.log('IP Address for the device : ', IP_DEVICE);
+	console.log('URI for the device : ', IP_DEVICE);
 }
 
 // Display the first tab
