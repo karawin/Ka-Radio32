@@ -1,5 +1,5 @@
 /******************************************************************************
- * 
+ *
  * Copyright 2018 karawin (http://www.karawin.fr)
  *
 *******************************************************************************/
@@ -18,9 +18,10 @@
 
 #define RELEASE "1.9"
 #define REVISION "6"
+#define WS_SOCKET_VERSION "2"
 
 uint32_t checkUart(uint32_t speed);
-extern unsigned short adcdiv;	
+extern unsigned short adcdiv;
 void switchCommand(void );
 void checkCommand(int size, char* s);
 esp_log_level_t getLogLevel();
@@ -52,12 +53,11 @@ void setHostname(char* s);
 		telnetWrite(2*MAXDATAT,fmt, ##__VA_ARGS__); \
 		addonParse(fmt, ##__VA_ARGS__);\
 	} while (0)
-		
+
 #define kprintfl(fmt, ...) do {    \
         printf(fmt, ##__VA_ARGS__);   \
 		telnetWrite(1024,fmt, ##__VA_ARGS__); \
 		addonParse(fmt, ##__VA_ARGS__);\
 	} while (0)
-		
+
 #endif
-		

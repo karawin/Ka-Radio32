@@ -304,13 +304,11 @@ static void theme() {
 }
 
 // treat the received message of the websocket
-void websockethandle(int socket, wsopcode_t opcode, uint8_t * payload, size_t length)
-{
+void websockethandle(int socket, wsopcode_t opcode, uint8_t * payload, size_t length) {
 	//wsvol
 	ESP_LOGV(TAG,"websocketHandle: %s",payload);
 	char value[6] = "";
-	if (strstr((char*)payload,"wsvol=")!= NULL)
-	{
+	if (strstr((char*)payload,"wsvol=")!= NULL) {
 		char answer[17];
 		if (strstr((char*)payload,"&") != NULL)
 			*strstr((char*)payload,"&")=0;
@@ -318,40 +316,119 @@ void websockethandle(int socket, wsopcode_t opcode, uint8_t * payload, size_t le
 //		setVolume(payload+6);
 		sprintf(answer,"{\"wsvol\":\"%s\"}",payload+6);
 		websocketlimitedbroadcast(socket,answer, strlen(answer));
-	}
-	else if(getSParameterFromResponse(value, 6, "getStation=", (char*)payload, length)) {
+	} else if(getSParameterFromResponse(value, 6, "getStationsFrom=", (char*)payload, length)) {
 		int uid = atoi(value);
 		if (uid >=0 && uid < 255) {
-			char *buf;
-			struct shoutcast_info* si = getStation(uid);
-			if (strlen(si->domain) > sizeof(si->domain)) si->domain[sizeof(si->domain)-1] = 0; //truncate if any (rom crash)
-			if (strlen(si->file) > sizeof(si->file)) si->file[sizeof(si->file)-1] = 0; //truncate if any (rom crash)
-			if (strlen(si->name) > sizeof(si->name)) si->name[sizeof(si->name)-1] = 0; //truncate if any (rom crash)
-			// jsonGSTAT: {"Name":"%s","URL":"%s","File":"%s","Port":%u,"ovol":%u}
-			int json_length =  - 2 * 5 + 8 + 1 + strlen(jsonGSTAT) + strlen(si->domain) + strlen(si->file) + strlen(si->name);
-			buf = inmalloc(json_length);
-			if (buf == NULL) {
-				ESP_LOGE(TAG," %s malloc fails (%d bytes)","getStation", json_length);
+			int max_length = 1024;
+			char *output;
+			output = inmalloc(max_length);
+			if (output == NULL) {
+				ESP_LOGE(TAG," %s malloc fails (%d bytes)","getStation", max_length);
 			} else {
-				for(int i = 0; i<sizeof(buf); i++) buf[i] = 0;
-				sprintf(buf, jsonGSTAT,
-					uid,
-					si->name,
-					si->domain,
-					si->file,
-					si->port,
-					si->ovol
-				);
-				ESP_LOGV(TAG,"getStation Buf len:%d : %s",strlen(buf),buf);
-				websocketwrite(socket, buf, strlen(buf));
+				/*
+					struct shoutcast_info {
+						char domain[73]; //url
+						char file[116];  //path
+						char name[64];
+						int8_t ovol; // offset volume
+						uint16_t port;	//port
+					};
+				 * */
+				int json_length = 335; // 73 + 116 + 64 + 8 + 16 + 68 - 12 + 2
+				char *buf;
+				buf = inmalloc(json_length);
+				if(buf == NULL) {
+					ESP_LOGE(TAG," %s malloc fails (%d bytes)", "getStation", json_length);
+				} else {
+					strcpy(output, "{\"stations\":[");
+					bool not_first = false;
+					bool isFull = false;
+					for(int uid_cc=uid, sta_max=255; uid_cc<sta_max; uid_cc++) {
+						struct shoutcast_info* si = getStation(uid_cc); // getStation uses malloc() !!!!
+						if(si != NULL && strlen(si->domain) > 0) {
+							if (strlen(si->domain) > sizeof(si->domain)) si->domain[sizeof(si->domain)-1] = 0; //truncate if any (rom crash)
+							if (strlen(si->file) > sizeof(si->file)) si->file[sizeof(si->file)-1] = 0; //truncate if any (rom crash)
+							if (strlen(si->name) > sizeof(si->name)) si->name[sizeof(si->name)-1] = 0; //truncate if any (rom crash)
+							// jsonGSTAT: {"station":%u,"Name":"%s","URL":"%s","File":"%s","Port":%u,"ovol":%u};
+							sprintf(buf, "{\"station\":%u,\"Name\":\"%s\",\"URL\":\"%s\",\"File\":\"%s\"",
+								uid_cc,
+								si->name,
+								si->domain,
+								si->file
+							);
+							char uval[12];
+							if(si->port != 80 && si->port != 0) {
+								sprintf(uval, ",\"Port\":%u", si->port);
+								strcat(buf, uval);
+							}
+							if(si->ovol > 0) {
+								sprintf(uval, ",\"ovol\":%u", si->ovol);
+								strcat(buf, uval);
+							}
+							strcat(buf, "}");
+
+							isFull = (strlen(output) + strlen(buf) >= max_length - 10);
+							if(!isFull) {
+								if(not_first) {
+									strcat(output, ",");
+								}
+								strcat(output, buf);
+								not_first = true;
+							}
+						}
+						infree(si);
+						if(isFull) { break; }
+					}
+
+					infree(buf);
+
+					strcat(output, "]}");
+					ESP_LOGV(TAG,"getStation Buf len:%d : %s", strlen(output), output);
+					websocketwrite(socket, output, strlen(output));
+				}
+				infree(output);
 			}
-			infree(buf);
-			infree(si);
 		}
 		return;
-	}
-	else if (strstr((char*)payload,"startSleep=")!= NULL)
-	{
+	} else if(getSParameterFromResponse(value, 6, "getStation=", (char*)payload, length)) {
+		int uid = atoi(value);
+		if (uid >=0 && uid < 255) {
+			char noStation = "{\"Name\":\"\",\"URL\":\"\",\"File\":\"\",\"Port\":0,\"ovol\":0}";
+			struct shoutcast_info* si = getStation(uid);
+			if(si == NULL) {
+				// A response must always sent for getting the next station
+				websocketwrite(socket, noStation, strlen(noStation));
+			} else {
+				if (strlen(si->domain) > sizeof(si->domain)) si->domain[sizeof(si->domain)-1] = 0; //truncate if any (rom crash)
+				if (strlen(si->file) > sizeof(si->file)) si->file[sizeof(si->file)-1] = 0; //truncate if any (rom crash)
+				if (strlen(si->name) > sizeof(si->name)) si->name[sizeof(si->name)-1] = 0; //truncate if any (rom crash)
+				// jsonGSTAT: {"Name":"%s","URL":"%s","File":"%s","Port":%u,"ovol":%u}
+				int json_length =  - 2 * 5 + 8 + 1 + strlen(jsonGSTAT) + strlen(si->domain) + strlen(si->file) + strlen(si->name);
+				char *buf;
+				buf = inmalloc(json_length);
+				if (buf == NULL) {
+					ESP_LOGE(TAG," %s malloc fails (%d bytes)","getStation", json_length);
+					websocketwrite(socket, noStation, strlen(noStation));
+				} else {
+					// for(int i = 0; i<sizeof(buf); i++) buf[i] = 0;
+					sprintf(buf, jsonGSTAT,
+						uid,
+						si->name,
+						si->domain,
+						si->file,
+						si->port,
+						si->ovol
+					);
+					ESP_LOGV(TAG,"getStation Buf len:%d : %s",strlen(buf),buf);
+					// A response must always sent for getting the next station
+					websocketwrite(socket, buf, strlen(buf));
+					infree(buf);
+				}
+				infree(si);
+			}
+		}
+		return;
+	} else if (strstr((char*)payload,"startSleep=")!= NULL) {
 		if (strstr((char*)payload,"&") != NULL)
 			*strstr((char*)payload,"&")=0;
 		else return;
@@ -1023,8 +1100,7 @@ static bool httpServerHandleConnection(int conn, char* buf, uint16_t buflen) {
 			websocketAccept(conn,buf,buflen);
 			ESP_LOGD(TAG,"websocketAccept socket: %d",conn);
 			return false;
-		} else
-		{
+		} else {
 			c += 4;
 			char* c_end = strstr(c, "HTTP");
 			if(c_end == NULL) return true;
@@ -1078,7 +1154,7 @@ static bool httpServerHandleConnection(int conn, char* buf, uint16_t buflen) {
 				param = strstr(c,"version") ;
 				if (param != NULL) {
 					char vr[30];// = malloc(30);
-					sprintf(vr,"Release: %s, Revision: %s\n",RELEASE,REVISION);
+					sprintf(vr,"Release: %s, Revision: %s (%s)", RELEASE, REVISION, WS_SOCKET_VERSION);
 					printf("Version:%s\n",vr);
 					respOk(conn,vr);
 					return true;
