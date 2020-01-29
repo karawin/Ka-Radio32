@@ -43,7 +43,7 @@ var instantPlaying = false;
 var saveAsText = null;
 var currentStationId = null;
 var isConnected = false;
-var wsPrior = false;
+var wsVersion = -1;
 
 var isLoading = false; // displayed webradios are not saving in the Ka-Radio device if true
 
@@ -302,6 +302,9 @@ function openSocket() {
 	if (websocket != null) {
 		websocket.onopen = function (event) {
 			console.log(this.url + ' opened');
+			if(wsVersion > 0) {
+				loadStationsList();
+			}
 		}
 
 		websocket.onmessage = function (event) {
@@ -318,6 +321,32 @@ function openSocket() {
 						this.send('getStation=' + i);
 					} else {
 						stationsBtn.disabled = false;
+					}
+					return;
+				}
+				if('stations' in msg && typeof msg.stations.forEach != 'undefined') {
+					if(msg.stations.length > 0) {
+						let i = 0;
+						msg.stations.forEach(function(item) {
+							console.log(item);
+							addStation(item.station, item);
+							progressBar.value = i;
+							if(i<item.station) {
+								i = item.station;
+							}
+						});
+						i++;
+						if(i<MAX_STATIONS) {
+							if(wsVersion >= 2) {
+								this.send('getStationsFrom=' + i);
+							} else {
+								this.send('getStation=' + i);
+							}
+						} else {
+							stationsBtn.disabled = false;
+						}
+					} else {
+						progressBar.value = MAX_STATIONS;
 					}
 					return;
 				}
@@ -353,11 +382,6 @@ function openSocket() {
 					let caption = document.getElementById('monitor-url');
 					if (caption != null) {
 						caption.textContent = msg.monitor;
-					}
-
-					if(stationsList != null && stationsList.rows.length == 0) {
-						wsPrior = ('curst' in msg);
-						loadStationsList();
 					}
 					return;
 				}
@@ -505,7 +529,7 @@ function addStation(stationId, datas) {
 	let newStation = (stationId == null || stationId.length === 0);
 	if (newStation) {
 		let rows = stationsList.rows;
-		stationId = 0;
+		stationId = -1;
 		// searches the max value for stationId
 		for (let i = 0, iMax = rows.length; i < iMax; i++) {
 			if (rows[i].id.startsWith('station-')) {
@@ -530,8 +554,10 @@ function addStation(stationId, datas) {
 			}
 		}
 		datas.fullUrl = datas.URL + port + datas.File;
+	/*
 	} else {
 		datas.fullUrl = '';
+	 * */
 	}
 
 	let tr = document.createElement('TR');
@@ -717,7 +743,7 @@ xhr.wifi = function (valid) {
 				const el = elements.namedItem(field + col);
 				if(field == 'dhcp') {
 					dhcp = el.checked; // type="checkbox"
-					const value = (dhcp) ? 'true' : ''; // Hack against Ka-Radio
+					const value = (dhcp) ? 'true' : 'false'; // Hack against Ka-Radio
 					params.push('dhcp' + col + '=' + value);
 				} else {
 					params.push(el.name + '=' + el.value);
@@ -778,8 +804,9 @@ xhr.onreadystatechange = function () {
 			}
 
 			if(this.getResponseHeader('Content-Type').startsWith('text/plain')) {
-				const PATTERN = /^release\b.*?(\d+)\.(\d+).*?(\d+).*/i;
+				const PATTERN = /^release\b.*?(\d+)\.(\d+).*?(\d+)(.*)/i;
 				if(PATTERN.test(this.responseText)) {
+					console.log('Version inside the ESP32 : ', this.responseText); // = version. Don't comment !!!
 					const el = document.getElementById('version');
 					el.textContent = this.responseText.trim().replace(PATTERN, 'Ver. $1.$2.$3');
 
@@ -789,7 +816,14 @@ xhr.onreadystatechange = function () {
 					displayCurrentStation();
 					displayHardware();
 					setRssiInterval();
-					// loadStationsList(); look at : websocket.send('wsmonitor')
+					const suffixe = this.responseText.trim().replace(PATTERN, '$4');
+					if(suffixe.length == 0) {
+						wsVersion = -1;
+						loadStationsList();
+					} else {
+						// use websocket for downloading the playlist quickly
+						wsVersion = suffixe.replace(/.*\b(\d+)\b.*/, '$1');
+					}
 					return;
 				}
 				console.error('Unattented response from '+ this.responseURL, this.responseText);
@@ -947,10 +981,15 @@ function loadStationsList() {
 	stationsList.innerHTML = '';
 	stationsSelect.innerHTML = '';
 	progressBar.max = MAX_STATIONS;
-	if(wsPrior) {
-		websocket.send('getStation=0');
-	} else {
-		xhrSta.loadStation(0);
+	switch(wsVersion) {
+		case '1' :
+			websocket.send('getStation=0');
+			break;
+		case '2' :
+			websocket.send('getStationsFrom=0');
+			break;
+		default:
+			xhrSta.loadStation(0);
 	}
 }
 
@@ -1053,13 +1092,21 @@ function saveStationsList(changedOnly) {
 
 	// Push stations with empty url at the end of the list
 	let j = -1;
+	let id = 0;
+	const buf = new Array();
 	for(let i=stationsList.rows.length - 2; i>=0; i--) {
 		const row = stationsList.rows[i];
 		const url = row.cells[2].textContent.trim();
 		if(url.length == 0) {
+			buf.push(row);
 			stationsList.removeChild(row);
-			stationsList.appendChild(row);
 			j = i;
+			id = parseInt(row.id.replace(/.*-(\d+)/, '$1'));
+		}
+	}
+	if(buf.length > 0) {
+		for(let i=0, iMax = buf.length; i<iMax; i++) {
+			stationsList.appendChild(buf[i]);
 		}
 	}
 
@@ -1067,6 +1114,9 @@ function saveStationsList(changedOnly) {
 		if(j>=0) {
 			for(let i=j, iMax=stationsList.rows.length; i<iMax; i++) {
 				stationsList.rows[i].classList.add('has-changed');
+				stationsList.rows[i].cells[0].textContent = id;
+				stationsList.rows[i].id = 'station-' + id;
+				id++;
 			}
 		}
 		xhrPlaylistSave.saveStation();
