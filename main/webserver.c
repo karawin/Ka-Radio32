@@ -53,6 +53,7 @@ const char strsWIFI[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nC
 ,\"host\":\"%s\",\"tzo\":\"%s\"}"};
 // const char strsGSTAT[]  = {"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %d\r\n\r\n{\"Name\":\"%s\",\"URL\":\"%s\",\"File\":\"%s\",\"Port\":\"%d\",\"ovol\":\"%d\"}"};
 const char jsonGSTAT[] = {"{\"station\":%u,\"Name\":\"%s\",\"URL\":\"%s\",\"File\":\"%s\",\"Port\":%u,\"ovol\":%u}"};
+const char jsonNEW_STAT[] = {"{\"newstation\":%u,\"Name\":\"%s\",\"URL\":\"%s\",\"File\":\"%s\",\"Port\":%u,\"ovol\":%u}"};
 static int8_t clientOvol = 0;
 
 
@@ -222,6 +223,45 @@ static char* getParameterFromComment(const char* param, char* data, uint16_t dat
 	return getParameter("\"",param,data, data_length) ;
 }
 
+// https://circuits4you.com/2019/03/21/esp8266-url-encode-decode-example/
+unsigned char h2int(char c) {
+    if (c >= '0' && c <='9'){
+        return((unsigned char)c - '0');
+    }
+    if (c >= 'a' && c <='f'){
+        return((unsigned char)c - 'a' + 10);
+    }
+    if (c >= 'A' && c <='F'){
+        return((unsigned char)c - 'A' + 10);
+    }
+    return(0);
+}
+
+// decode URI like Javascript
+static void pathParse(char* str) {
+    char c;
+    char code0;
+    char code1;
+    int j=0;
+	if (str == NULL) return;
+	for (int i=0; i< strlen(str);i++) {
+		if(str[i] == '+') {
+			c = ' ';
+		} else if(str[i] == '%') {
+			i++;
+			code0 = str[i];
+			i++;
+			code1 = str[i];
+			c = (h2int(code0) << 4) | h2int(code1);
+		} else {
+			c = str[i];
+		}
+		str[j] = c;
+		j++;
+	}
+	str[j] = 0;
+}
+
 // volume offset
 static void clientSetOvol(int8_t ovol)
 {
@@ -305,10 +345,15 @@ static void theme() {
 
 // treat the received message of the websocket
 void websockethandle(int socket, wsopcode_t opcode, uint8_t * payload, size_t length) {
-	//wsvol
-	ESP_LOGV(TAG,"websocketHandle: %s",payload);
+	// Commands to add : volume, setStation, hardware, updateOk, erase, timerOn, timerOff, sound, auto, ...
+	ESP_LOGV(TAG,"websocketHandle: %s", payload);
+	char noStation[73+76+6] = {"{\"Name\":\"\",\"URL\":\"\",\"File\":\"\",\"Port\":0,\"ovol\":0}"};
 	char value[6] = "";
-	if (strstr((char*)payload,"wsvol=")!= NULL) {
+
+	if(strcmp((char*)payload,"wsrssi") == 0) {
+		rssi(socket);
+		return;
+	} else if(strstr((char*)payload,"wsvol=")!= NULL) {
 		char answer[17];
 		if (strstr((char*)payload,"&") != NULL)
 			*strstr((char*)payload,"&")=0;
@@ -316,7 +361,13 @@ void websockethandle(int socket, wsopcode_t opcode, uint8_t * payload, size_t le
 //		setVolume(payload+6);
 		sprintf(answer,"{\"wsvol\":\"%s\"}",payload+6);
 		websocketlimitedbroadcast(socket,answer, strlen(answer));
-	} else if(getSParameterFromResponse(value, 6, "getStationsFrom=", (char*)payload, length)) {
+	} else if(getSParameterFromResponse(value, sizeof(value), "play=", (char*)payload, length)) {
+		int uid = atoi(value);
+		if (uid >=0 && uid < 255) {
+			playStationInt(uid);
+		}
+		return;
+	} else if(getSParameterFromResponse(value, sizeof(value), "getStationsFrom=", (char*)payload, length)) {
 		int uid = atoi(value);
 		if (uid >=0 && uid < 255) {
 			int max_length = 1024;
@@ -390,10 +441,9 @@ void websockethandle(int socket, wsopcode_t opcode, uint8_t * payload, size_t le
 			}
 		}
 		return;
-	} else if(getSParameterFromResponse(value, 6, "getStation=", (char*)payload, length)) {
+	} else if(getSParameterFromResponse(value, sizeof(value), "getStation=", (char*)payload, length)) {
 		int uid = atoi(value);
 		if (uid >=0 && uid < 255) {
-			char noStation = "{\"Name\":\"\",\"URL\":\"\",\"File\":\"\",\"Port\":0,\"ovol\":0}";
 			struct shoutcast_info* si = getStation(uid);
 			if(si == NULL) {
 				// A response must always sent for getting the next station
@@ -402,8 +452,8 @@ void websockethandle(int socket, wsopcode_t opcode, uint8_t * payload, size_t le
 				if (strlen(si->domain) > sizeof(si->domain)) si->domain[sizeof(si->domain)-1] = 0; //truncate if any (rom crash)
 				if (strlen(si->file) > sizeof(si->file)) si->file[sizeof(si->file)-1] = 0; //truncate if any (rom crash)
 				if (strlen(si->name) > sizeof(si->name)) si->name[sizeof(si->name)-1] = 0; //truncate if any (rom crash)
-				// jsonGSTAT: {"Name":"%s","URL":"%s","File":"%s","Port":%u,"ovol":%u}
-				int json_length =  - 2 * 5 + 8 + 1 + strlen(jsonGSTAT) + strlen(si->domain) + strlen(si->file) + strlen(si->name);
+				// jsonGSTAT: {"station":%u,"Name":"%s","URL":"%s","File":"%s","Port":%u,"ovol":%u}
+				int json_length = 12 + strlen(jsonGSTAT) + strlen(si->domain) + strlen(si->file) + strlen(si->name);
 				char *buf;
 				buf = inmalloc(json_length);
 				if (buf == NULL) {
@@ -428,63 +478,132 @@ void websockethandle(int socket, wsopcode_t opcode, uint8_t * payload, size_t le
 			}
 		}
 		return;
-	} else if (strstr((char*)payload,"startSleep=")!= NULL) {
+	} else if(strstr((char*)payload,"newStationName=") != NULL && strstr((char*)payload,"newStationUrl=") != NULL) {
+		struct shoutcast_info* si;
+		for(uint16_t i=0; i<255; i++) {
+			si = getStation(i); // getStation uses malloc() !!!!
+			if(si != NULL && strlen(si->domain) == 0) {
+				char* url = getParameterFromResponse("newStationUrl=", (char *)payload, length);
+				char scheme[6] = "\0";
+				char domain[73] = "\0";
+				char path1[116] = "/";
+				uint port = 80;
+				if(
+					sscanf(url, "%5[a-z]://%73[^:]:%d%115s", scheme, domain, &port, path1) == 4 ||
+					sscanf(url, "%5[a-z]://%73[^/]%115s", scheme, domain, path1) == 3 ||
+					sscanf(url, "%5[a-z]://%73[^:]:%d", scheme, domain, &port) == 3 ||
+					sscanf(url, "%5[a-z]://%73[^/:]", scheme, domain) == 2
+				) {
+					// checks scheme !!!
+					strcpy(si->domain, domain);
+					si->port = port;
+					strcpy(si->file, path1);
+					si->ovol = 0;
+					char* name = getParameterFromResponse("newStationName=", (char *)payload, length);
+					pathParse(name);
+					if(strlen(name) > sizeof(si->name)) { // 64 bytes
+						name[sizeof(si->name)-1] = 0;
+					}
+					strcpy(si->name, name);
+					ESP_LOGI(TAG,"New station id: %u name: \"%s\" domain: %s port: %u path: %s", i, si->name, si->domain, si->port, si->file);
+					saveStation(si, i);
+
+					int json_length = 12 + strlen(jsonNEW_STAT) + strlen(si->domain) + strlen(si->file) + strlen(si->name);
+					char *buf;
+					buf = inmalloc(json_length);
+					if (buf == NULL) {
+						ESP_LOGE(TAG," %s malloc fails (%d bytes)","getStation", json_length);
+						websocketwrite(socket, noStation, strlen(noStation));
+					} else {
+						// for(int i = 0; i<sizeof(buf); i++) buf[i] = 0;
+						sprintf(buf, jsonNEW_STAT,
+							i,
+							si->name,
+							si->domain,
+							si->file,
+							si->port,
+							si->ovol
+						);
+
+						websocketwrite(socket, buf, strlen(buf));
+						infree(buf);
+					}
+				} else {
+					ESP_LOGW(TAG,"New station failed - id: %u - bad url: %s", i, url);
+				}
+				infree(si);
+				break;
+			}
+			infree(si);
+		}
+		return;
+	} else if(getSParameterFromResponse(noStation, sizeof(noStation), "instant=", (char*)payload, length)) {
+		clientDisconnect("Web Instant");
+		pathParse(noStation);
+		clientParsePlaylist(noStation);
+		clientSetName("Instant Play", 255);
+		clientConnectOnce();
+		vTaskDelay(1);
+		return;
+	} else if(strcmp((char*)payload, "stop") == 0) {
+		clientDisconnect("Web stop");
+		// wsicy message will be sent
+		return;
+	} else if(strcmp((char*)payload, "start") == 0) {
+		playStationInt(getCurrentStation());
+		// wsicy message will be sent
+		return;
+	} else if(strstr((char*)payload,"startSleep=")!= NULL) {
 		if (strstr((char*)payload,"&") != NULL)
 			*strstr((char*)payload,"&")=0;
 		else return;
 		startSleep(atoi((char*)payload+11));
-	}
-	else if (strstr((char*)payload,"stopSleep")!= NULL){stopSleep();}
-	else if (strstr((char*)payload,"startWake=")!= NULL)
-	{
+	} else if(strstr((char*)payload,"stopSleep")!= NULL) {
+		stopSleep();
+	} else if (strstr((char*)payload,"startWake=")!= NULL) {
 		if (strstr((char*)payload,"&") != NULL)
 			*strstr((char*)payload,"&")=0;
 		else return;
 		startWake(atoi((char*)payload+10));
+	} else if (strstr((char*)payload,"stopWake")!= NULL) {
+		stopWake();
+	} else if (strstr((char*)payload,"monitor")!= NULL) {
+		wsMonitor();
+	} else if (strstr((char*)payload,"theme")!= NULL) {
+		theme();
 	}
-	else if (strstr((char*)payload,"stopWake")!= NULL){stopWake();}
-	//monitor
-	else if (strstr((char*)payload,"monitor")!= NULL){wsMonitor();}
-	else if (strstr((char*)payload,"theme")!= NULL){theme();}
-	else if (strstr((char*)payload,"wsrssi")!= NULL){rssi(socket);}
 }
 
-
 void playStationInt(int sid) {
-	struct shoutcast_info* si;
-	char answer[24];
-	si = getStation(sid);
+	struct shoutcast_info* si = getStation(sid);
+	if(si != NULL && si->domain && si->file) {
+		vTaskDelay(4);
+		clientSilentDisconnect();
+		ESP_LOGV(TAG,"playstationInt: %d, name: %s, domain: %s, port: %u, file: %s", sid, si->name, si->domain, si->port, si->file);
+		clientSetName(si->name, sid);
+		clientSetURL(si->domain);
+		clientSetPath(si->file);
+		clientSetPort(si->port);
+		clientSetOvol(si->ovol);
+		infree(si);
 
-	if(si != NULL &&si->domain && si->file) {
-			int i;
-			vTaskDelay(4);
-			clientSilentDisconnect();
-			ESP_LOGV(TAG,"playstationInt: %d, new station: %s",sid,si->name);
-			clientSetName(si->name,sid);
-			clientSetURL(si->domain);
-			clientSetPath(si->file);
-			clientSetPort(si->port);
-			clientSetOvol(si->ovol);
-
-//printf("Name: %s, url: %s, path: %s\n",	si->name,	si->domain, si->file);
-
-			clientConnect();
-			setOffsetVolume();
-			for (i = 0;i<100;i++)
-			{
-				if (clientIsConnected()) break;
-				vTaskDelay(5);
-			}
-	}
-	infree(si);
-	sprintf(answer,"{\"wsstation\":\"%d\"}",sid);
-	websocketbroadcast(answer, strlen(answer));
-	ESP_LOGI(TAG,"playstationInt: %d, g_device: %d",sid,g_device->currentstation);
-	if (g_device->currentstation != sid)
-	{
-		g_device->currentstation = sid;
-		setCurrentStation( sid);
-		saveDeviceSettings(g_device);
+		clientConnect();
+		setOffsetVolume();
+		for(int i=0; i<100; i++) {
+			if (clientIsConnected()) break;
+			vTaskDelay(5);
+		}
+		char answer[24];
+		sprintf(answer,"{\"wsstation\":%u}", sid);
+		websocketbroadcast(answer, strlen(answer));
+		ESP_LOGI(TAG,"playstationInt: %u, g_device: %u", sid, g_device->currentstation);
+		if (g_device->currentstation != sid) {
+			g_device->currentstation = sid;
+			setCurrentStation(sid);
+			saveDeviceSettings(g_device);
+		}
+	} else {
+		ESP_LOGW(TAG, "PlaystationInt %u not found", sid);
 	}
 }
 
@@ -492,47 +611,8 @@ void playStation(char* id) {
 	int uid = atoi(id) ;
 	ESP_LOGV(TAG,"playstation: %d",uid);
 	if (uid < 255)
-		setCurrentStation (atoi(id)) ;
+		setCurrentStation(uid) ;
 	playStationInt(getCurrentStation());
-}
-
-// https://circuits4you.com/2019/03/21/esp8266-url-encode-decode-example/
-unsigned char h2int(char c) {
-    if (c >= '0' && c <='9'){
-        return((unsigned char)c - '0');
-    }
-    if (c >= 'a' && c <='f'){
-        return((unsigned char)c - 'a' + 10);
-    }
-    if (c >= 'A' && c <='F'){
-        return((unsigned char)c - 'A' + 10);
-    }
-    return(0);
-}
-
-// decode URI like Javascript
-static void pathParse(char* str) {
-    char c;
-    char code0;
-    char code1;
-    int j=0;
-	if (str == NULL) return;
-	for (int i=0; i< strlen(str);i++) {
-		if(str[i] == '+') {
-			c = ' ';
-		} else if(str[i] == '%') {
-			i++;
-			code0 = str[i];
-			i++;
-			code1 = str[i];
-			c = (h2int(code0) << 4) | h2int(code1);
-		} else {
-			c = str[i];
-		}
-		str[j] = c;
-		j++;
-	}
-	str[j] = 0;
 }
 
 static void handlePOST(char* name, char* data, int data_size, int conn) {
@@ -550,8 +630,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			tst &=getSParameterFromResponse(port,10,"port=", data, data_size);
 			if(tst) {
 				clientDisconnect("Post instant_play");
-				for (int i = 0;i<100;i++)
-				{
+				for (int i = 0; i<100; i++) {
 					if(!clientIsConnected())break;
 					vTaskDelay(4);
 				}
@@ -561,8 +640,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 				clientSetOvol(0);
 				clientConnectOnce();
 				setOffsetVolume();
-				for (int i = 0;i<100;i++)
-				{
+				for (int i = 0; i<100; i++) {
 					if (clientIsConnected()) break;
 					vTaskDelay(5);
 				}
@@ -710,7 +788,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			struct shoutcast_info *nsi ;
 
 			if (si == NULL) {
-				ESP_LOGE(TAG," %s malloc fails","setStation");
+				ESP_LOGE(TAG," %s malloc fails", "setStation");
 				respKo(conn);
 				return;
 			}
@@ -718,7 +796,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			for (int j=0;j< sizeof(struct shoutcast_info)*unb;j++) bsi[j]=0; //clean
 
 			char* url; char* file; char* name;
-			for (int i=0;i<unb;i++) {
+			for(int i=0; i<unb; i++) {
 				nsi = si + i;
 				char id[6] = "";
 				if(getSParameterFromResponse(id,6,"id=", data, data_size) && strlen(id) > 0) {
