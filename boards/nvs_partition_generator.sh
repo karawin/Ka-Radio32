@@ -4,33 +4,49 @@ NVS_PARTITION_GENERATOR="$IDF_PATH/components/nvs_flash/nvs_partition_generator/
 SIZE_PARTITION="0x3000"
 
 cd "$(dirname $0)"
-cat << EOT
+echo "Jump into $PWD directory"
 
-jump into $PWD directory
+build_binary () {
+	if [ ! -f "$1" ]; then
+		echo -e "\e[31m$1 file not found\e[m"
+		return
+	fi
 
-Minimum NVS Partition Size needed is 0x3000 bytes.
-https://docs.espressif.com/projects/esp-idf/en/latest/api-reference/storage/nvs_partition_gen.html#running-the-utility
-EOT
-
-# clean up !!
-rm -f build/*.bin
-
-for filename in $(ls *.csv); do
-	fname="${filename%.*}"
+	fname="${1%.*}"
 	echo -e "\nBoard \e[33m$fname\e[m"
-	comment="$(grep L_COMMENT $filename | sed -E 's/^.*,string,//; s/\s*\.\s*$//')"
+	comment="$(grep L_COMMENT $1 | sed -E 's/^.*,string,//; s/\s*\.\s*$//')"
 	echo -e "\e[34m${comment}\e[m"
 	python $NVS_PARTITION_GENERATOR\
 		--version v1\
 		--outdir build\
-		--input $filename\
-		--output $fname.bin\
+		--input "$1"\
+		--output "$fname.bin"\
 		--size $SIZE_PARTITION
-done
+}
+
+if [ "$#" -eq 0 ]; then
+	# clean up !!
+	rm -f build/*.bin
+
+	for filename in $(ls *.csv); do
+		build_binary "$filename"
+	done
+else
+	MY_BOARD="MY-BOARD"
+	if [ "$#" -eq 1 ]; then
+		MY_BOARD="${1%.*}"
+	fi
+	while [ ! -z "$1" ]; do
+		build_binary "$1"
+		shift
+	done
+fi
 
 cat << EOT
 
-for flashing :
-Select one board "MY-BOARD"
-esptool --chip esp32 write_flash 0x3a2000 build/MY-BOARD.bin
+Minimum NVS Partition Size needed is 0x3000 bytes. Look at this link :
+https://docs.espressif.com/projects/esp-idf/en/latest/api-reference/storage/nvs_partition_gen.html#running-the-utility
+
+For flashing, type :
+ esptool --chip esp32 write_flash 0x3a2000 build/${MY_BOARD}.bin
 EOT
