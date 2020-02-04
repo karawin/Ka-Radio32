@@ -1,0 +1,94 @@
+{"station":0,"Name":"BEAUB' FM","URL":"beaubfm2.ice.infomaniak.ch","File":"/beaubfm2-96.mp3","Port":80,"ovol":0}
+{"station":1,"Name":"RADIO PRIMITIVE","URL":"www.radioprimitive.fr","File":"/live","Port":8000,"ovol":0}
+{"station":2,"Name":"RADIO COTEAUX","URL":"str80.streamakaci.com","File":"/;stream.mp3","Port":7960,"ovol":0}
+{"station":3,"Name":"RADIO EN CONSTRUCTION","URL":"str0.creacast.com","File":"/rec","Port":80,"ovol":0}
+{"station":4,"Name":"R-Dwa","URL":"live.francra.org","File":"/R-Dwa","Port":8000,"ovol":0}
+{"station":5,"Name":"Radio UYLENSPIEGEL","URL":"serveur.wanastream.com","File":"/","Port":43100,"ovol":0}
+{"station":6,"Name":"Radio Bro Gwened","URL":"rbg.online.radiobreizh.bzh","File":"/live.mp3","Port":80,"ovol":0}
+{"station":7,"Name":"Radio Kreizh Breizh","URL":"rkb.online.radiobreizh.bzh","File":"/live.mp3","Port":80,"ovol":0}
+{"station":8,"Name":"Radio Kerne","URL":"kerne.online.radiobreizh.bzh","File":"/live.mp3","Port":80,"ovol":0}
+{"station":9,"Name":"Plum' FM","URL":"plumfm.online.stalig.net","File":"/live.mp3","Port":80,"ovol":0}
+{"station":10,"Name":"Celtic Moon Live","URL":"192.99.220.108","File":"/stream","Port":20004,"ovol":0}
+{"station":11,"Name":"Arvoriz FM","URL":"arvorig-fm.online.radiobreizh.bzh","File":"/live.mp3","Port":80,"ovol":0}
+{"station":12,"Name":"Radio Mega","URL":"live.francra.org","File":"/Radio-Mega","Port":8000,"ovol":0}
+{"station":13,"Name":"Radio Grésivaudan","URL":"live.francra.org","File":"/Radio-Gresivaudan","Port":8000,"ovol":0}
+{"station":14,"Name":"Radio_Chartreuse","URL":"live.francra.org","File":"/chartreuse.mp3","Port":8000,"ovol":0}
+{"station":15,"Name":"Radio Royans","URL":"live.francra.org","File":"/radioroyans","Port":8000,"ovol":0}
+{"station":16,"Name":"Radio Ondaine","URL":"live.francra.org","File":"/RadioOndaine","Port":8000,"ovol":0}
+{"station":17,"Name":"Krautrock-World","URL":"94.249.254.14","File":"/;","Port":7592,"ovol":0}
+{"station":18,"Name":"Radio Canut","URL":"live.francra.org","File":"/radiocanut","Port":8000,"ovol":0}
+{"station":19,"Name":"C’ROCK Radio","URL":"stric6.streamakaci.com","File":"/crock.mp3","Port":80,"ovol":0}
+{"station":20,"Name":"Déclic Radio - Tournon","URL":"live.francra.org","File":"/DeclicRadio","Port":8000,"ovol":0}
+{"station":21,"Name":"CANAL B","URL":"stream.levillage.org","File":"/canalb?13623084951917.mp3","Port":80,"ovol":0}
+{"station":22,"Name":"CIBL","URL":"stream02.ustream.ca","File":"/cibl128.mp3","Port":80,"ovol":0}
+{"station":23,"Name":"CISM","URL":"stream03.ustream.ca","File":"/cism128.mp3","Port":80,"ovol":0}
+{"station":24,"Name":"Radio Suisse Classique 2","URL":"stream.srg-ssr.ch","File":"/m/rsc_fr/mp3_128","Port":80,"ovol":0}
+{"station":25,"Name":"NRK Klassisk","URL":"nrk-mms-live.telenorcdn.net","File":"/nrk_radio_klassisk_mp3_h","Port":80,"ovol":0}
+{"station":26,"Name":"France-Musique Plus","URL":"direct.francemusique.fr","File":"/live/francemusiqueclassiqueplus-hifi.mp3","Port":80,"ovol":0}
+{"station":27,"Name":"Classique Easy [France-Musique]","URL":"direct.francemusique.fr","File":"/live/francemusiqueeasyclassique-hifi.mp3","Port":80,"ovol":0}
+{"station":28,"Name":"Classique Kids [France-Musique]","URL":"direct.francemusique.fr","File":"/live/francemusiquelevenementielle-hifi.mp3","Port":80,"ovol":0}
+{"station":29,"Name":"La Contemporaine [France-Musique]","URL":"direct.francemusique.fr","File":"/live/francemusiquelacontemporaine-hifi.mp3","Port":80,"ovol":0}
+{"station":30,"Name":"Ocora Musiques du monde [France-Musique]","URL":"direct.francemusique.fr","File":"/live/francemusiqueocoramonde-hifi.mp3","Port":80,"ovol":0}
+{"station":31,"Name":"Concerts Radio France [France-Musique]","URL":"direct.francemusique.fr","File":"/live/francemusiqueconcertsradiofrance-hifi.mp3","Port":80,"ovol":0}
+{"station":32,"Name":"La Jazz [France-Musique]","URL":"direct.francemusique.fr","File":"/live/francemusiquelajazz-hifi.mp3","Port":80,"ovol":0}
+{"station":33,"Name":"Venice Classic","URL":"144.217.49.251","File":"/stream1","Port":80,"ovol":0}
+{"station":34,"Name":"Adagio","URL":"hi5.adagio.fm","File":"/;stream.nsv","Port":80,"ovol":0}
+{"station":35,"Name":"Arpeggio Radio","URL":"146.185.18.251","File":"/stream","Port":7067,"ovol":0}
+{"station":36,"Name":"Radio Pulse","URL":"media.radiopulse.fr","File":"/pulse","Port":8080,"ovol":0}
+{"station":37,"Name":"FMR","URL":"www.giss.tv","File":"/radio-fmr.mp3","Port":8000,"ovol":0}
+{"station":38,"Name":"FRÉQUENCE MUTINE","URL":"icecast.infini.fr","File":"/mutine","Port":8000,"ovol":0}
+{"station":39,"Name":"L’EKO DES GARRIGUES","URL":"91.121.159.124","File":"/eko-des-garrigues-128k.mp3","Port":8000,"ovol":0}
+{"station":40,"Name":"RADIO ACTIV’","URL":"151.80.115.65","File":"/activ.mp3","Port":8000,"ovol":0}
+{"station":41,"Name":"RADIO ALPA","URL":"www.radioalpa.com","File":"/","Port":8000,"ovol":0}
+{"station":42,"Name":"RADIO BALLADE","URL":"149.202.186.120","File":"/Ballade","Port":80,"ovol":0}
+{"station":43,"Name":"RADIO BÉTON","URL":"51.254.220.198","File":"/stream","Port":8000,"ovol":0}
+{"station":44,"Name":"RADIO DIO","URL":"live.francra.org","File":"/RadioDio","Port":8000,"ovol":0}
+{"station":45,"Name":"RADIO PANIK","URL":"streaming.domainepublic.net","File":"/radiopanik.ogg","Port":8000,"ovol":0}
+{"station":46,"Name":"RADIO PFM","URL":"178.33.237.20","File":"/stream.mp3.m3u","Port":8000,"ovol":0}
+{"station":47,"Name":"RADIO PULSE","URL":"media.radiopulse.fr","File":"/pulse","Port":8080,"ovol":0}
+{"station":48,"Name":"RCV","URL":"www.radioking.com","File":"/play/rcv99fm","Port":80,"ovol":0}
+{"station":49,"Name":"RQC","URL":"5.39.80.55","File":"/flux.mp3","Port":8000,"ovol":0}
+{"station":50,"Name":"SOL FM","URL":"stric6.streamakaci.com","File":"/solfm64.mp3","Port":80,"ovol":0}
+{"station":51,"Name":"Radio Evasion","URL":"radioevasion.fr","File":"/","Port":8020,"ovol":0}
+{"station":52,"Name":"Radio Alto","URL":"live.francra.org","File":"/Radio-Alto","Port":8000,"ovol":0}
+{"station":53,"Name":"Couleurs FM","URL":"live.francra.org","File":"/CouleursFM","Port":8000,"ovol":0}
+{"station":54,"Name":"Fréquence 7","URL":"live.francra.org","File":"/Frequence7","Port":8000,"ovol":0}
+{"station":55,"Name":"Radio M Montélimar","URL":"live.francra.org","File":"/Radio-M-Montelimar","Port":8000,"ovol":0}
+{"station":56,"Name":"Radio M Nyons","URL":"live.francra.org","File":"/Radio-M-Nyons","Port":8000,"ovol":0}
+{"station":57,"Name":"Radio New's Fm","URL":"live.francra.org","File":"/RadioNewsFM","Port":8000,"ovol":0}
+{"station":58,"Name":"Radio Saint-Affrique","URL":"live.francra.org","File":"/RadioSaintAffrique","Port":8000,"ovol":0}
+{"station":59,"Name":"Radio Saint-Férreol","URL":"live.francra.org","File":"/RadioSaintFerreol","Port":8000,"ovol":0}
+{"station":60,"Name":"Radio d'Ici","URL":"live.francra.org","File":"/Radiodici","Port":8000,"ovol":0}
+{"station":61,"Name":"RVR Radio","URL":"live.francra.org","File":"/rvrradio","Port":8000,"ovol":0}
+{"station":62,"Name":"Tropiques FM","URL":"live.francra.org","File":"/TropiquesFM","Port":8000,"ovol":0}
+{"station":63,"Name":"Radio RDB","URL":"sv3.vestaradio.com","File":"/","Port":9450,"ovol":0}
+{"station":64,"Name":"Radio Pluriel","URL":"mp3.live.tv-radio.com","File":"/plurielfm/all/plurielfm.mp3","Port":80,"ovol":0}
+{"station":65,"Name":"Radio ZIG-ZAG","URL":"188.165.237.167","File":"/","Port":8020,"ovol":0}
+{"station":66,"Name":"Radio Pytagor","URL":"streaming.radiopytagor.net","File":"/fever-128.mp3","Port":8000,"ovol":0}
+{"station":67,"Name":"Radio Boomerang","URL":"109.190.81.136","File":"/radioboomerang.mp3","Port":8000,"ovol":0}
+{"station":68,"Name":"Radio SCARPE SENSEE","URL":"217.16.3.147","File":"/radioscarpesensee.mp3","Port":8000,"ovol":0}
+{"station":69,"Name":"Banquise FM","URL":"94.23.21.126","File":"/","Port":10050,"ovol":0}
+{"station":70,"Name":"Canal FM","URL":"mp3lg3.tdf-cdn.com","File":"/4532/canalfmhd.mp3","Port":80,"ovol":0}
+{"station":71,"Name":"Radio Club","URL":"radio-shoutcast2.cyber-streaming.com","File":"/","Port":8128,"ovol":0}
+{"station":72,"Name":"Planète FM Arras","URL":"ice4.infomaniak.ch","File":"/planetefm-64.aac","Port":80,"ovol":0}
+{"station":73,"Name":"Transat FM","URL":"91.121.62.121","File":"/","Port":9700,"ovol":0}
+{"station":74,"Name":"Radio Plus","URL":"91.121.62.121","File":"/","Port":7500,"ovol":0}
+{"station":75,"Name":"Instrumentals Forever","URL":"184.75.223.178","File":"/stream","Port":8151,"ovol":0}
+{"station":76,"Name":"Death Metal","URL":"hi5.death.fm","File":"/;stream.nsv","Port":80,"ovol":0}
+{"station":77,"Name":"Streaming Soundtracks","URL":"hi5.streamingsoundtracks.com","File":"/","Port":80,"ovol":0}
+{"station":78,"Name":"Zig-Zag Metal Phonic","URL":"listen.radioking.com","File":"/radio/3967/stream/11726","Port":80,"ovol":0}
+{"station":79,"Name":"RADIO ZIG ZAG FRANCHE-COMTE","URL":"stream.self-radio.com","File":"/;stream","Port":9002,"ovol":0}
+{"station":80,"Name":"Lush [SomaFM]","URL":"ice4.somafm.com","File":"/lush-128-aac","Port":80,"ovol":0}
+{"station":81,"Name":"Secret Agent [Soma-FM]","URL":"http","File":"//ice2.somafm.com:80/secretagent-128-mp3","Port":80,"ovol":0}
+{"station":82,"Name":"Thistle Radio [SomaFM]","URL":"ice4.somafm.com","File":"/thistle-128-mp3","Port":80,"ovol":0}
+{"station":83,"Name":"Vogue Radio","URL":"vogueradio.ice.infomaniak.ch","File":"/vogueradio-high.mp3","Port":80,"ovol":0}
+{"station":84,"Name":"PLANETE FM","URL":"planetefm.ice.infomaniak.ch","File":"/planetefm-128.mp3","Port":80,"ovol":0}
+{"station":85,"Name":"Radio Nova","URL":"broadcast.infomaniak.net","File":"/radionova-high.mp3","Port":80,"ovol":0}
+{"station":86,"Name":"Variance FM","URL":"streamingv2.shoutcast.com","File":"/variancefm","Port":80,"ovol":0}
+{"station":87,"Name":"Chromanova","URL":"176.31.123.212","File":"/","Port":8096,"ovol":0}
+{"station":88,"Name":"Radio La Quebrada","URL":"fine.entic.net","File":"/quebrada","Port":8000,"ovol":0}
+{"station":89,"Name":"Radio - Al otro lado del espejo","URL":"217.125.151.71","File":"/","Port":9990,"ovol":0}
+{"station":90,"Name":"Cause Commune","URL":"audio.libre-a-toi.org","File":"/voixdulat_mp3","Port":8000,"ovol":0}
+{"station":91,"Name":"Jonas Nordberg dipômé du Mozarteum de Salzbourg","URL":"media.radiofrance-podcast.net","File":"/podcast09/20016-05.09.2019-ITEMA_22140769-0.mp3","Port":80,"ovol":0}
+{"station":92,"Name":"la radio curieuse","URL":"80.82.229.202","File":"/jetfm.mp3","Port":8000,"ovol":0}
+{"station":93,"Name":"Radio Ondaine","URL":"live.francra.org","File":"/RadioOndaine","Port":8000,"ovol":0}
