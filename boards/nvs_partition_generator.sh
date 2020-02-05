@@ -1,6 +1,7 @@
 #!/bin/bash
 
 NVS_PARTITION_GENERATOR="$IDF_PATH/components/nvs_flash/nvs_partition_generator/nvs_partition_gen.py"
+#NVS_PARTITION_GENERATOR="nvs_partition_gen.py"
 SIZE_PARTITION="0x3000"
 
 cd "$(dirname $0)"
