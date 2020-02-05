@@ -110,7 +110,7 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 
       /* This message is sent once at the uC startup and for power up. */
       /* setup i/o or do any other setup */
-	  ESP_LOGI(TAG, "UCG_COM_MSG_POWER_UP: %d ns so in Hz: %d", ((ucg_com_info_t *)data)->serial_clk_speed,1000000000/((ucg_com_info_t *)data)->serial_clk_speed);
+	  ESP_LOGI(TAG, "UCG_COM_MSG_POWER_UP: %d ns ", ((ucg_com_info_t *)data)->serial_clk_speed);
 	  	if (ucg_esp32_hal.clk == UCG_ESP32_HAL_UNDEFINED ||
 				ucg_esp32_hal.mosi == UCG_ESP32_HAL_UNDEFINED ||
 				ucg_esp32_hal.cs == UCG_ESP32_HAL_UNDEFINED) {
@@ -162,7 +162,8 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 		dev_config.cs_ena_posttrans = 1;
 		dev_config.cs_ena_pretrans  = 0;
 //		dev_config.clock_speed_hz   = (1000000000/((ucg_com_info_t *)data)->serial_clk_speed) ;
-		dev_config.clock_speed_hz   = (2000000000/((ucg_com_info_t *)data)->serial_clk_speed) ; // test at double speed
+		dev_config.clock_speed_hz   = (4000000000/((ucg_com_info_t *)data)->serial_clk_speed) ; // test at double speed
+//		dev_config.clock_speed_hz   = 80000000 ; // test at double speed
 		dev_config.spics_io_num     = ucg_esp32_hal.cs;
 		dev_config.flags            = SPI_DEVICE_NO_DUMMY;
 		dev_config.queue_size       = 1;

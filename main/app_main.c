@@ -60,8 +60,7 @@ Copyright (C) 2017  KaraWin
 #include "u8g2_esp32_hal.h"
 #include "addon.h"
 #include "addonu8g2.h"
-
-
+#include "ClickButtons.h"
 
 #include "eeprom.h"
 
@@ -83,6 +82,7 @@ Copyright (C) 2017  KaraWin
 #include "vs1053.h"
 #include "ClickEncoder.h"
 #include "addon.h"
+
 //#include "rda5807Task.h"
 
 /* The event group allows multiple bits for each event*/
@@ -118,7 +118,7 @@ static char localIp[20];
 // 4MB sram?
 static bool bigRam = false;
 // timeout to save volume in flash
-static uint32_t ctimeVol = 0;
+//static uint32_t ctimeVol = 0;
 static uint32_t ctimeMs = 0;	
 static bool divide = false;
 // disable 1MS timer interrupt
@@ -130,7 +130,7 @@ IRAM_ATTR void interrupt1Ms() {timer_enable_intr(TIMERGROUP1MS, msTimer);}
 
 IRAM_ATTR char* getIp() {return (localIp);}
 IRAM_ATTR uint8_t getIvol() {return clientIvol;}
-IRAM_ATTR void setIvol( uint8_t vol) {clientIvol = vol;ctimeVol = 0;}
+IRAM_ATTR void setIvol( uint8_t vol) {clientIvol = vol;}; //ctimeVol = 0;}
 IRAM_ATTR output_mode_t get_audio_output_mode() { return audio_output_mode;}
 
 /*
@@ -158,7 +158,7 @@ IRAM_ATTR void   msCallback(void *pArg) {
 	if (divide)
 	{
 		ctimeMs++;	// for led
-		ctimeVol++; // to save volume
+//		ctimeVol++; // to save volume
 	}	
 	divide = !divide;
 	if (serviceAddon != NULL) serviceAddon(); // for the encoders and buttons
@@ -486,7 +486,8 @@ static void start_wifi()
 			vTaskDelay(1);
 			ESP_ERROR_CHECK( esp_wifi_start() );			
 			
-			audio_output_mode = I2S;
+//			audio_output_mode = I2S;
+			option_get_audio_output(&audio_output_mode);
 		}
 		else
 		{
@@ -663,11 +664,12 @@ void timerTask(void* p) {
 //	struct device_settings *device;	
 	uint32_t cCur;
 	bool stateLed = false;
+	bool isEsplay;
 	gpio_num_t gpioLed;
 //	int uxHighWaterMark;
 	
 	initTimers();
-
+	isEsplay = option_get_esplay();
 	gpio_get_ledgpio(&gpioLed);
 	setLedGpio(gpioLed);
 /*
@@ -695,12 +697,6 @@ void timerTask(void* p) {
 					case TIMER_WAKE:
 					clientConnect(); // start the player	
 					break;
-//					case TIMER_1MS: // 1 ms 
-//					  ctimeMs++;	// for led
-//					  ctimeVol++; // to save volume
-//					break;
-//					case TIMER_1mS:  //1µs
-//					break;
 					default:
 					break;
 			}
@@ -726,17 +722,21 @@ void timerTask(void* p) {
 			}			
 		} 
 		
-		if (ctimeVol >= TEMPO_SAVE_VOL)
+/*		if (ctimeVol >= TEMPO_SAVE_VOL)
 		{
 			if (g_device->vol != getIvol())
 			{ 			
 				g_device->vol = getIvol();
-				saveDeviceSettingsVolume(g_device);
+//				saveDeviceSettingsVolume(g_device);
 //				ESP_LOGD("timerTask",striWATERMARK,uxTaskGetStackHighWaterMark( NULL ),xPortGetFreeHeapSize( ));
 			}
 			ctimeVol = 0;
 		}	
-	vTaskDelay(1);		
+*/
+		vTaskDelay(10);	
+		
+		if (isEsplay) // esplay board only
+			rexp = i2c_keypad_read(); // read the expansion
 	}
 //	printf("t0 end\n");
 	
@@ -867,7 +867,8 @@ void app_main()
 			g_device = getDeviceSettings();	
 			g_device->cleared = 0xAABB; //marker init done
 			g_device->uartspeed = 115200; // default
-			g_device->audio_output_mode = I2S; // default
+//			g_device->audio_output_mode = I2S; // default
+			option_get_audio_output(&(g_device->audio_output_mode));
 			g_device->trace_level = ESP_LOG_ERROR; //default
 			g_device->vol = 100; //default
 			g_device->led_gpio = GPIO_NONE;
@@ -906,6 +907,32 @@ void app_main()
 	//lcd rotation
 	setRotat(rt) ;	
 	lcd_init(g_device->lcd_type);
+	
+	// the esplay board needs I2C for gpio extension
+	if (option_get_esplay())
+	{
+		gpio_num_t scl;
+		gpio_num_t sda;
+		gpio_num_t rsti2c;	
+		gpio_get_i2c(&scl,&sda,&rsti2c);
+		ESP_LOGD(TAG,"I2C GPIO SDA: %d, SCL: %d\n",sda,scl);
+		i2c_config_t conf;
+		conf.mode = I2C_MODE_MASTER;
+		conf.sda_io_num = sda;
+		conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
+		conf.scl_io_num = scl;
+		conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
+		conf.master.clk_speed = I2C_MASTER_FREQ_HZ;
+		esp_err_t res = i2c_param_config(I2C_MASTER_NUM, &conf);
+		ESP_LOGD(TAG,"I2C setup : %d\n",res);
+		res = i2c_driver_install(I2C_MASTER_NUM, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0);
+		if (res != 0) ESP_LOGD(TAG,"I2C already installed. No problem \n");
+		else ESP_LOGD(TAG,"I2C installed: %d\n",res);
+
+		//init the amp shutdown gpio4 as output level 1
+		gpio_output_conf(PIN_AUDIO_SHDN);
+		
+	}	
 	
 /*	
 	// Init i2c if lcd doesn't not (spi) for rde5807=

@@ -154,10 +154,15 @@ O_DDMM_FLAG		The format of the date to display 0:MMDD, 1:DDMM.
 - **Buttons option**  
 O_BTN0			The active level of buttons: 0=LOW, 1:HIGH  ( 0=Default)  
 O_BTN1			The active level of buttons: 0=LOW, 1:HIGH  ( 0=Default)  
+- **Audio output**  
+O_AUDIO The initial Audio mode: 0=I2S (Default), 1=MERUS, 2=DAC, 3=PDM, 4=VS1053
+
+
 -------------------
 ## Special cases:
 -------------------
 ### GPIO
+
 - GPIOs 34 to 39 are input only pins.  
 These pins don’t have internal pull-ups or pull-down resistors.  
 They can’t be used as outputs, so use these pins only as inputs or ADC usage.  
@@ -165,9 +170,9 @@ They can’t be used as outputs, so use these pins only as inputs or ADC usage.
 There are 2 x 8 bits DAC channels on the ESP32 to convert digital signals into analog voltage signal outputs.  
 These are the DAC channels:  
 -    DAC1 (GPIO25)  
--    DAC2 (GPIO26)
-### SPI bus
+-    DAC2 (GPIO26)  
 
+### SPI bus
 K_SPI,data,u8,2  
 - 1 is the spi HSPI_HOST  
 - 2 is the spi VSPI_HOST (default)  
@@ -175,7 +180,7 @@ K_SPI,data,u8,2
    Prefered gpio for the spi bus (IOMUX):  
    HSPI: SCLK=14, MISO=12, MOSI=13  
    VSPI: SCLK=18, MISO=19, MOSI=23  
-   
+If MISO is not used , it can be ignored by a 255 value.     
 
 ### Encoders
 
@@ -196,7 +201,8 @@ click on button B and C: volume down and up for set 0 (P_BTN0), Station down and
 held on button A: click on button B and C: volume down and up for set 1 (P_BTN1), Station down and up for set 0 (P_BTN0)  
 A button may be active with a level of 0 volt (0) (default) or +3.3volt (1)  
 
-If a set is not used, P_BTNx_A must be set to 255. In this case P_BTNx_B P_BTNx_C are disabled too.
+If a set is not used, P_BTNx_A must be set to 255. In this case P_BTNx_B P_BTNx_C are disabled too.  
+If P_ENCx_B or P_ENCx_BTN are not used in a set, they can be set to 0.  
 
 ### Joystick
 A joystick is a set of two buttons but both cannot be pushed at the same time.  

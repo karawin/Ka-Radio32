@@ -94,6 +94,7 @@ static bool isButton0 = true;
 static bool isButton1 = true;
 static bool isJoystick0 = true;
 static bool isJoystick1 = true;
+static bool isEsplay = false;
 
 void Screen(typeScreen st); 
 void drawScreen();
@@ -105,6 +106,10 @@ Button_t* button0 = NULL;
 Button_t* button1 = NULL;
 Joystick_t* joystick1 = NULL;
 Joystick_t* joystick0 = NULL;
+
+Button_t* expButton0 = NULL;
+Button_t* expButton1 = NULL;
+Button_t* expButton2 = NULL;
 
 struct tm* getDt() { return dt;}
 
@@ -616,8 +621,8 @@ void adcLoop() {
 }
 
 //-----------------------
- // Compute the Buttons
- //----------------------
+// Compute the Joystick
+//----------------------
  void joystickCompute(Joystick_t *enc,bool role)
  {
 	int16_t newValue = 0;
@@ -642,12 +647,15 @@ void adcLoop() {
  }
 
 //-----------------------
- // Compute the Buttons
- //----------------------
- void buttonCompute(Button_t *enc,bool role)
+// Compute the Buttons
+//----------------------
+ void buttonCompute(Button_t *enc,uint8_t role)
 {	
 	int16_t newValue = 0;
-	Button state0 = getButtons(enc,0);	
+	Button state0;
+	if (role != ECTRL)
+	{
+	state0 = getButtons(enc,0);	
 	if (state0 != Open)
 	{
 		ESP_LOGD(TAG,"Button0: %i",state0);	
@@ -656,16 +664,16 @@ void adcLoop() {
 		if (state0 == DoubleClicked) toggletime();	
 		if (state0 == Held)
 		{   
-			if (stateScreen!= (role?sstation:svolume))
+			if (stateScreen!= ((role)?sstation:svolume))
 			{	
-				role?evtStation(newValue):setRelVolume(newValue);
+				(role)?evtStation(newValue):setRelVolume(newValue);
 			}
 		} 			
 	} else
 	{
 		Button state1 = getButtons(enc,1);
 		Button state2 = getButtons(enc,2);
-//		ESP_LOGD(TAG,"Button1: %i, Button2: %i",state1,state2);	
+		if ((state1 != Open)||(state2 != Open))  ESP_LOGD(TAG,"Button1: %i, Button2: %i",state1,state2);	
 		newValue=((state1!=Open)?5:0)+((state2!=Open)?-5:0); // sstation take + or - in any value
 		typeScreen estate;
 		if (role) estate = sstation; else estate = svolume;
@@ -678,18 +686,13 @@ void adcLoop() {
 			if(role) evtStation(newValue); else setRelVolume(newValue);		
 		} 			
 	}
+	} else //third control of esplay
+	{
+		state0 = getButtons(enc,0);	
+		if (state0 != Open) toggletime();
+	}
 }
  
-void buttonsLoop()
-{	
-// button0 = volume control or station when pushed
-// button1 = station control or volume when pushed
-	if (isButton0) buttonCompute(button0,VCTRL);
-	if (isButton1) buttonCompute(button1,SCTRL);
-	if (isJoystick0) joystickCompute(joystick0,VCTRL);
-	if (isJoystick1) joystickCompute(joystick1,SCTRL);
-}
-
 //-----------------------
  // Compute the encoder
  //----------------------
@@ -727,12 +730,28 @@ void encoderCompute(Encoder_t *enc,bool role)
 	}		
 }
 
-void encoderLoop()
+void periphLoop()
 {
 // encoder0 = volume control or station when pushed
 // encoder1 = station control or volume when pushed
+// button0 = volume control or station when pushed
+// button1 = station control or volume when pushed
 	if (isEncoder0) encoderCompute(encoder0,VCTRL);
-	if (isEncoder1) encoderCompute(encoder1,SCTRL);
+	if (isEncoder1) encoderCompute(encoder1,SCTRL);	
+	if (isButton0) buttonCompute(button0,VCTRL);
+	if (isButton1) buttonCompute(button1,SCTRL);
+	if (!isEsplay)
+	{
+		if (isJoystick0) joystickCompute(joystick0,VCTRL);
+		if (isJoystick1) joystickCompute(joystick1,SCTRL);	
+	} else
+	{
+//		rexp = i2c_keypad_read(); // read the expansion
+//		ESP_LOGI(TAG,"rexp: 0x%x",rexp);
+		buttonCompute(expButton0,VCTRL);
+		buttonCompute(expButton1,SCTRL);
+		buttonCompute(expButton2,ECTRL);
+	}
 }
 
 
@@ -890,24 +909,33 @@ void initButtonDevices()
 	bool abtn0,abtn1;
 	gpio_get_encoders(&enca0, &encb0, &encbtn0,&enca1, &encb1, &encbtn1);
 	if (enca1 == GPIO_NONE) isEncoder1 = false; //no encoder
+	else encoder1 = ClickEncoderInit(enca1, encb1, encbtn1,((g_device->options32&T_ENC1)==0)?false:true );      
 	if (enca0 == GPIO_NONE) isEncoder0 = false; //no encoder
-	if (isEncoder0)	encoder0 = ClickEncoderInit(enca0, encb0, encbtn0,((g_device->options32&T_ENC0)==0)?false:true );	
-	if (isEncoder1)	encoder1 = ClickEncoderInit(enca1, encb1, encbtn1,((g_device->options32&T_ENC1)==0)?false:true );	
+	else encoder0 = ClickEncoderInit(enca0, encb0, encbtn0,((g_device->options32&T_ENC0)==0)?false:true );
 	
 	gpio_get_buttons(&enca0, &encb0, &encbtn0,&enca1, &encb1, &encbtn1);
-	if (enca1 == GPIO_NONE) isButton1 = false; //no encoder
-	if (enca0 == GPIO_NONE) isButton0 = false; //no encoder	
-	
 	gpio_get_active_buttons(&abtn0, &abtn1);
-	if (isButton0)	button0 = ClickButtonsInit(enca0, encb0, encbtn0,abtn0);	
-	if (isButton1)	button1 = ClickButtonsInit(enca1, encb1, encbtn1,abtn1 );	
-	
-	gpio_get_joysticks(&enca0,&enca1);
-	if (enca0 == GPIO_NONE) isJoystick0 = false; //no encoder
-	if (enca1 == GPIO_NONE) isJoystick1 = false; //no encoder
-	if (isJoystick0)	joystick0 = ClickJoystickInit(enca0 );	
-	if (isJoystick1)	joystick1 = ClickJoystickInit(enca1);	
-	
+	if (enca1 == GPIO_NONE) isButton1 = false; //no buttons
+	else button1 = ClickButtonsInit(enca1, encb1, encbtn1,abtn1 );
+	if (enca0 == GPIO_NONE) isButton0 = false; //no buttons	
+	else button0 = ClickButtonsInit(enca0, encb0, encbtn0,abtn0);
+
+	if (!option_get_esplay())
+	{
+		gpio_get_joysticks(&enca0,&enca1);
+		if (enca0 == GPIO_NONE) isJoystick0 = false; //no joystick
+		else joystick0 = ClickJoystickInit(enca0 );	
+		if (enca1 == GPIO_NONE) isJoystick1 = false; //no joystick
+		else joystick1 = ClickJoystickInit(enca1);
+	}	
+	else	//esplay joystick on simple expanded gpio buttons
+	{
+		//1:start 2:select 3:up 4:down 5:left 6:right 7:a 8:b
+		isEsplay = true;
+		expButton0 = ClickexpButtonsInit(1,6,5,0);
+		expButton1 = ClickexpButtonsInit(0,3,4,0);
+		expButton2 = ClickexpButtonsInit(2,7,8,0);
+	}
 }
 
 
@@ -977,8 +1005,17 @@ IRAM_ATTR void multiService()  // every 1ms
 	{
 		if (isButton0) serviceBtn(button0);
 		if (isButton1) serviceBtn(button1);
-		if (isJoystick0) serviceJoystick(joystick0);
-		if (isJoystick1) serviceJoystick(joystick1);
+		if (!isEsplay)
+		{
+			if (isJoystick0) serviceJoystick(joystick0);
+			if (isJoystick1) serviceJoystick(joystick1);
+		} else
+		{
+			serviceBtn(expButton0);
+			serviceBtn(expButton1);
+			serviceBtn(expButton2);
+		}
+			
 		divide = 0;
 	}
 }
@@ -1132,8 +1169,7 @@ void task_addon(void *pvParams)
 	while (1)
 	{
 		adcLoop();  // compute the adc keyboard
-		encoderLoop(); // compute the encoder
-		buttonsLoop(); // compute the buttons and joysticks
+		periphLoop(); // compute the encoder the buttons and joysticks
 		irLoop();  // compute the ir		
 		touchLoop(); // compute the touch screen
 		if (itAskTime) // time to ntp. Don't do that in interrupt.

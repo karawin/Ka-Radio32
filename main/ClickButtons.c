@@ -17,13 +17,15 @@
 #include "app_main.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-
+#include <driver/i2c.h>
 // ----------------------------------------------------------------------------
 
 #define TAG "ClickButton"
-bool getPinStates(Button_t *enc,uint8_t index);  
+bool getPinStates(Button_t *enc,uint8_t index);
+uint8_t i2c_keypad_read();  
 // ----------------------------------------------------------------------------
-
+uint8_t rexp; // expansion ports for esplay
+	
 //bool getpinsActives(Button_t *enc) {return enc->pinsActive;}
 
 Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C, bool Active)
@@ -32,7 +34,7 @@ Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C, bool Active)
 	enc->pinBTN[0] = A; 
 	enc->pinBTN[1] = B;
 	enc->pinBTN[2] = C;
-
+	enc->expGpio = false;
 	enc->pinsActive = Active; 
 	for (int i=0;i<3;i++)
 	{
@@ -68,6 +70,27 @@ Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C, bool Active)
   return enc;
 }
 
+//Buttons on a gpio expander
+Button_t* ClickexpButtonsInit(int8_t A, int8_t B, int8_t C, bool Active)
+{
+	Button_t* enc = malloc(sizeof(Button_t));
+	enc->pinBTN[0] = A; 
+	enc->pinBTN[1] = B;
+	enc->pinBTN[2] = C;
+	enc->expGpio = true;
+	enc->pinsActive = Active; 
+	for (int i=0;i<3;i++)
+	{
+		enc->button[i] = Open;
+		enc->keyDownTicks[i] = 0;
+		enc->doubleClickTicks[i] = 0;
+//		enc->lastButtonCheck[i] = 0;
+	}
+	enc->doubleClickEnabled = true; enc->buttonHeldEnabled = true;
+  
+  return enc;
+}
+
 // ----------------------------------------------------------------------------
 // call this every 1 millisecond via timer ISR
 //
@@ -77,11 +100,13 @@ IRAM_ATTR void serviceBtn(Button_t *enc)
   // handle enc->button
   //
 //  unsigned long currentMillis = xTaskGetTickCount()* portTICK_PERIOD_MS;
+
+//  if (enc->expGpio) rexp = i2c_keypad_read(); // read the expansion
   
   for(uint8_t i = 0; i < 3; i++) 
   {
 //	if (currentMillis < enc->lastButtonCheck[i]) enc->lastButtonCheck[i] = 0;        // Handle case when millis() wraps back around to zero
-	if ((enc->pinBTN[i] > 0 ))        // check enc->button only, if a pin has been provided
+	if (enc->pinBTN[i] > 0 )        // check enc->button only, if a pin has been provided
 //		&& ((currentMillis - enc->lastButtonCheck[i]) >= ENC_BUTTONINTERVAL))            // checking enc->button is sufficient every 10-30ms
 	{ 
 //		enc->lastButtonCheck[i] = currentMillis;
@@ -141,14 +166,47 @@ Button getButtons(Button_t *enc,uint8_t index)
   return ret;
 }
 
+//----------------------------
+ // Read the esplay keypad
+ //---------------------------
+#define I2C_MASTER_TX_BUF_DISABLE 0 /*!< I2C master doesn't need buffer */
+#define I2C_MASTER_RX_BUF_DISABLE 0 /*!< I2C master doesn't need buffer */
+#define WRITE_BIT I2C_MASTER_WRITE  /*!< I2C master write */
+#define READ_BIT I2C_MASTER_READ    /*!< I2C master read */
+#define ACK_CHECK_EN 0x1            /*!< I2C master will check ack from slave*/
+#define ACK_CHECK_DIS 0x0           /*!< I2C master will not check ack from slave */
+#define ACK_VAL 0x0                 /*!< I2C ack value */
+#define NACK_VAL 0x1                /*!< I2C nack value */
+#define I2C_ADDR 0x40				// esplay i2c address
+
+uint8_t i2c_keypad_read()
+{
+uint8_t val;
+
+    i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+    i2c_master_start(cmd);
+    i2c_master_write_byte(cmd, I2C_ADDR  | READ_BIT, ACK_CHECK_EN);
+    i2c_master_read_byte(cmd, &val, NACK_VAL);
+    i2c_master_stop(cmd);
+    i2c_master_cmd_begin(I2C_NUM_0, cmd, 1000 / portTICK_RATE_MS);
+    i2c_cmd_link_delete(cmd);
+
+    return val;
+}
 
 
 bool getPinStates(Button_t *enc,uint8_t index) {
-  bool pinState;
+/*  bool pinState;
   {
-    pinState = digitalRead(enc->pinBTN[index]);
+    if (!enc->expGpio) 
+		pinState = digitalRead(enc->pinBTN[index]);
+	else 
+		pinState = (rexp >>enc->pinBTN[index]) & 1;
   }
   return pinState;
+*/  
+  if (enc->pinBTN[index] == 0) return false;
+  return (enc->expGpio?((rexp >> (enc->pinBTN[index]-1) & 1)):digitalRead(enc->pinBTN[index]));
 }
 
   

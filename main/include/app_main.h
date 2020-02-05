@@ -98,7 +98,7 @@ extern uint32_t wakeDelay;
 #define PRIO_UART		2
 #define PRIO_CLIENT		5
 #define PRIO_SERVER		6
-#define PRIO_ADDON		6
+#define PRIO_ADDON		7
 #define PRIO_LCD		4
 #define PRIO_SUBSERV	6
 #define PRIO_TIMER		11

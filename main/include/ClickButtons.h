@@ -54,7 +54,7 @@ typedef gpio_mode_t pinMode_t;
 
   typedef struct {
   int8_t pinBTN[3];
-  
+  bool expGpio;
   bool pinsActive;
   
   volatile Button button[3];
@@ -67,8 +67,10 @@ typedef gpio_mode_t pinMode_t;
   
   
   Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C , bool Active);
+  Button_t* ClickexpButtonsInit(int8_t A, int8_t B, int8_t C , bool Active);
   void serviceBtn(Button_t *enc); 
   Button getButtons(Button_t *enc,uint8_t index);
+  uint8_t i2c_keypad_read();
 // ----------------------------------------------------------------------------
-
+extern uint8_t rexp; // expansion ports for esplay
 #endif // __have__ClickButton_h__

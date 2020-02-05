@@ -74,14 +74,13 @@ void VS1053_spi_init(){
 	if(spi_no > 2) return; //Only VSPI and HSPI are valid spi modules. 	
 
 	spi_bus_config_t buscfg={
-        .miso_io_num=miso,
+        .miso_io_num=(miso!=GPIO_NONE)?miso:-1,
         .mosi_io_num=mosi,
         .sclk_io_num=sclk,
         .quadwp_io_num=-1,
         .quadhd_io_num=-1,
 //		.flags = SPICOMMON_BUSFLAG_NATIVE_PINS|SPICOMMON_BUSFLAG_MASTER
-		.flags = SPICOMMON_BUSFLAG_MASTER
-//		.max_transfer_sz = 1024		
+		.flags = SPICOMMON_BUSFLAG_MASTER	
 	};		
 	ret=spi_bus_initialize(spi_no, &buscfg, 1);	 // dma	
 	assert(ret==ESP_OK);

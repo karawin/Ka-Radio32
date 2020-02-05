@@ -13,6 +13,7 @@
 #include "app_main.h"
 #include "eeprom.h"
 
+
 static xSemaphoreHandle muxnvs= NULL;
 const char hardware[] = {"hardware"};
 const char option_space[] = {"option_space"};
@@ -121,6 +122,7 @@ void gpio_get_spi_bus(uint8_t *spi_no,gpio_num_t *miso,gpio_num_t *mosi,gpio_num
 	if (sclk != NULL)err |=nvs_get_u8(hardware_handle, "P_CLK", (uint8_t *)sclk);
 	if (err != ESP_OK) ESP_LOGD(TAG,"g_get_spi_bus err 0x%x",err);
 	close_partition(hardware_handle,hardware);
+	
 }
 
 
@@ -145,6 +147,39 @@ void gpio_get_vs1053(gpio_num_t * xcs,gpio_num_t *rst,gpio_num_t *xdcs,gpio_num_
 	err |=nvs_get_u8(hardware_handle, "P_DREQ", (uint8_t *)dreq);
 	if (err != ESP_OK) ESP_LOGD(TAG,"g_get_vs1053 err 0x%x",err);
 	close_partition(hardware_handle,hardware);	
+}
+
+void option_get_audio_output(output_mode_t *oom)
+{
+	esp_err_t err;
+	nvs_handle hardware_handle;
+	// init default
+	*oom = I2S;
+	if (open_partition(hardware, option_space,NVS_READONLY,&hardware_handle)!= ESP_OK) 
+	{
+		ESP_LOGD(TAG,"in get_audio");
+		return;
+	}				
+	err = nvs_get_u8(hardware_handle, "O_AUDIO",(uint8_t *) oom);
+	if (err != ESP_OK) ESP_LOGD(TAG,"get_audio err 0x%x",err);
+	close_partition(hardware_handle,hardware);		
+}
+
+bool option_get_esplay()
+{
+	esp_err_t err;
+	bool ret = false;
+	nvs_handle hardware_handle;
+
+	if (open_partition(hardware, option_space,NVS_READONLY,&hardware_handle)!= ESP_OK) 
+	{
+		ESP_LOGD(TAG,"in get_esplay");
+		return ret;
+	}				
+	err = nvs_get_u8(hardware_handle, "O_ESPLAY",(uint8_t *)&ret);
+	if (err != ESP_OK) ESP_LOGD(TAG,"get_esplay err 0x%x",err);
+	close_partition(hardware_handle,hardware);	
+	return ret;
 }
 
 
@@ -340,9 +375,10 @@ void gpio_get_active_buttons(bool *abtn0, bool *abtn1)
 		ESP_LOGD(TAG,"in buttons");
 		return;
 	}		 
-	nvs_get_u8(hardware_handle, "O_BTN0",(uint8_t *) abtn0);	 
-	nvs_get_u8(hardware_handle, "O_BTN1",(uint8_t *) abtn0);	
-
+	err = nvs_get_u8(hardware_handle, "O_BTN0",(uint8_t *) abtn0);	 
+	err = nvs_get_u8(hardware_handle, "O_BTN1",(uint8_t *) abtn0);	
+	if (err != ESP_OK) ESP_LOGD(TAG,"g_get_active_buttons err 0x%x",err);
+	
 	close_partition(hardware_handle,hardware);			
 }
 

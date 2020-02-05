@@ -9,6 +9,7 @@
 #include "nvs_flash.h"
 #include "driver/spi_master.h"
 #include "esp_adc_cal.h"
+#include "audio_renderer.h"
 
 #define GPIO_NONE 255
 
@@ -100,6 +101,9 @@
 // touch screen  T_DO is MISO, T_DIN is MOSI, T_CLK is CLk of the spi bus
 #define PIN_TOUCH_CS	GPIO_NONE //Chip select T_CS
 
+//esplay
+#define PIN_AUDIO_SHDN	GPIO_NUM_4
+
 // I2C rda5807 (if lcd is spi)
 // (removed)
 //----------------------------
@@ -119,6 +123,8 @@ void gpio_get_label(char** label);
 void gpio_get_comment(char** label);
 void gpio_get_spi_bus(uint8_t *spi_no,gpio_num_t *miso,gpio_num_t *mosi,gpio_num_t *sclk);
 void gpio_get_vs1053(gpio_num_t * xcs,gpio_num_t *rst,gpio_num_t *xdcs,gpio_num_t *dreq);
+void option_get_audio_output(output_mode_t *oom);
+bool option_get_esplay();
 void gpio_get_encoders(gpio_num_t *enca, gpio_num_t *encb, gpio_num_t *encbtn, gpio_num_t *enca1, gpio_num_t *encb1, gpio_num_t *encbtn1);
 void gpio_get_active_buttons(bool *abtn0, bool *abtn1);
 void gpio_get_buttons(gpio_num_t *enca, gpio_num_t *encb, gpio_num_t *encc, gpio_num_t *enca1, gpio_num_t *encb1, gpio_num_t *encc1);

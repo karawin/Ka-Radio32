@@ -84,6 +84,8 @@ typedef struct {
 
 #define VCTRL	true
 #define SCTRL	false
+#define ECTRL	2
+
 
 extern xQueueHandle event_ir;
 extern u8g2_t u8g2;

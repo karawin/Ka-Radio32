@@ -744,6 +744,14 @@ void clientDisconnect(const char* from)
 		if (!ledStatus) gpio_set_level(getLedGpio(),0);
 	esp_wifi_set_ps(WIFI_PS_MAX_MODEM);
 	vTaskDelay(5);
+	// save the volume if needed on stop state
+	if (g_device->vol != getIvol())
+	{ 			
+		g_device->vol = getIvol();
+		saveDeviceSettingsVolume(g_device);
+	}
+	
+	
 }
 
 void clientReceiveCallback(int sockfd, char *pdata, int len)

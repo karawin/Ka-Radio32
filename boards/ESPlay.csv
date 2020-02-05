@@ -4,7 +4,7 @@ L_LABEL,data,string,ESPlay.csv
 L_COMMENT,data,string,Configuration of the ESPlay board from https://www.makerfabs.com/esplay-micro.html?search=ESPlay .
 gpio_space,namespace,,
 K_SPI,data,u8,2
-P_MISO,data,u8,2
+P_MISO,data,u8,255
 P_MOSI,data,u8,23
 P_CLK,data,u8,18
 P_XCS,data,u8,255
@@ -23,8 +23,8 @@ P_BTN0_C,data,u8,36
 P_BTN1_A,data,u8,255
 P_BTN1_B,data,u8,255
 P_BTN1_C,data,u8,255
-P_I2C_SCL,data,u8,255
-P_I2C_SDA,data,u8,255
+P_I2C_SCL,data,u8,22
+P_I2C_SDA,data,u8,21
 P_I2C_RST,data,u8,255
 P_LCD_CS,data,u8,5
 P_LCD_A0,data,u8,12
@@ -45,6 +45,8 @@ O_LCD_TYPE,data,u8,194
 O_LCD_ROTA,data,u8,255
 O_LCD_OUT,data,u32,255
 O_DDMM_FLAG,data,u8,255
+O_AUDIO,data,u8,0
+O_ESPLAY,data,u8,1
 
 custom_ir_space,namespace,,
 K_UP,data,string,
