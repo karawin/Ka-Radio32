@@ -13,4 +13,4 @@ stations, 0x41,	     ,	 ,	       0X10000
 # the device partition copy
 device1,  0x42,      ,   ,         0x1000
 # the hardware configuration
-hardware, data, nvs  ,   ,         0x3000
+hardware, data, nvs  ,   ,         0x2000
