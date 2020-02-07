@@ -689,7 +689,7 @@ void adcLoop() {
 	} else //third control of esplay
 	{
 		state0 = getButtons(enc,0);	
-		if (state0 != Open) toggletime();
+		if (state0 == Clicked) toggletime();
 	}
 }
  
@@ -1122,15 +1122,15 @@ void task_lcd(void *pvParams)
 					defaultStateScreen = (stateScreen==smain)?stime:smain;
 					(stateScreen==smain)?Screen(stime):Screen(smain);
 					g_device->options32 = (defaultStateScreen== smain)?g_device->options32&NT_TOGGLETIME:g_device->options32|T_TOGGLETIME; 
-					saveDeviceSettings(g_device);
+//					saveDeviceSettings(g_device);
 					break;
 				default:;
 			}
 			if (evt.lline != NULL) free(evt.lline);
-			vTaskDelay(1);  			
+			vTaskDelay(4);  			
 		 }
-		 if ((event_lcd)&&(!uxQueueMessagesWaiting(event_lcd))) vTaskDelay(4);
-		vTaskDelay(1);	
+		 if ((event_lcd)&&(!uxQueueMessagesWaiting(event_lcd))) vTaskDelay(10);
+		vTaskDelay(4);	
 	}
 	vTaskDelete( NULL ); 	
 }

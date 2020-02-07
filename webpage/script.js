@@ -23,6 +23,8 @@ function openwebsocket(){
 			}
 		changeTitle(document.getElementById('meta').innerHTML);
 		if (arr["wsvol"]) onRangeVolChange(arr['wsvol'],false); 
+		if (arr["lsleep"]) labelSleep(arr["lsleep"]); 
+		if (arr["lwake"]) labelWake(arr["lwake"]); 
 		if (arr["wsicy"]) icyResp(arr["wsicy"]); 
 		if (arr["wssound"]) soundResp(arr["wssound"]); 
 		if (arr["monitor"]) playMonitor(arr["monitor"]); 
@@ -229,8 +231,8 @@ function startSleep(){
 			else valm = 1440;
 		} else valm = h0; // minute mode
 		websocket.send("startSleep=" +valm +"&");
-		labelSleep("Started, Good night!");
-		window.setTimeout(labelSleep, 2000 ,(valm*60)-2);	
+//		labelSleep("Started, Good night!");
+//		window.setTimeout(labelSleep, 2000 ,(valm*60)-2);	
 	} else
 	{
 		labelSleep("Error, try again");
@@ -270,8 +272,8 @@ function startWake(){
 			else valm = 1440;
 		} else valm = h0; // minute mode
 		websocket.send("startWake=" +valm +"&");
-		labelWake("Started");
-		window.setTimeout(labelWake, 2000 ,(valm*60)-2);	
+//		labelWake("Started");
+//		window.setTimeout(labelWake, 2000 ,(valm*60)-2);	
 	} else
 	{
 		labelWake("Error, try again");

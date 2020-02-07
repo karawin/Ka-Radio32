@@ -187,35 +187,67 @@ IRAM_ATTR void   wakeCallback(void *pArg) {
 	TIMERG0.hw_timer[timer_idx].config.alarm_en = 0;
 }
 
+//return the current timer value in sec
+uint64_t getSleep()
+{
+	uint64_t ret=0;
+	uint64_t tot=0;
+	timer_get_alarm_value(TIMERGROUP, sleepTimer,&tot);
+	timer_get_counter_value(TIMERGROUP, sleepTimer,&ret);
+	return ((tot-ret)/5000000);
+}
+uint64_t getWake()
+{
+	uint64_t ret=0;
+	uint64_t tot=0;
+	timer_get_alarm_value(TIMERGROUP, wakeTimer,&tot);
+	timer_get_counter_value(TIMERGROUP, wakeTimer,&ret);
+	return ((tot-ret)/5000000);
+}
 
+void tsocket(const char* lab, uint32_t cnt)
+{
+		char* title = malloc(88);
+		sprintf(title,"{\"%s\":\"%d\"}",lab,cnt*60); 
+		websocketbroadcast(title, strlen(title));
+		free(title);	
+}
+
+void stopSleep(){
+	ESP_LOGD(TAG,"stopDelayDelay\n");
+	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, sleepTimer));
+	tsocket("lsleep",0);
+}
 void startSleep(uint32_t delay)
 {
 	ESP_LOGD(TAG,"Delay:%d\n",delay);
 	if (delay == 0) return;
+	stopSleep();
 	ESP_ERROR_CHECK(timer_set_counter_value(TIMERGROUP, sleepTimer, 0x00000000ULL));
 	ESP_ERROR_CHECK(timer_set_alarm_value(TIMERGROUP, sleepTimer,TIMERVALUE(delay*60)));
 	ESP_ERROR_CHECK(timer_enable_intr(TIMERGROUP, sleepTimer));
 	ESP_ERROR_CHECK(timer_set_alarm(TIMERGROUP, sleepTimer,TIMER_ALARM_EN));
 	ESP_ERROR_CHECK(timer_start(TIMERGROUP, sleepTimer));
+	tsocket("lsleep",delay);
 }
-void stopSleep(){
-	ESP_LOGD(TAG,"stopDelayDelay\n");
-	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, sleepTimer));
+
+void stopWake(){
+	ESP_LOGD(TAG,"stopDelayWake\n");
+	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, wakeTimer));
+	tsocket("lwake",0);
 }
 void startWake(uint32_t delay)
 {
 	ESP_LOGD(TAG,"Wake Delay:%d\n",delay);
 	if (delay == 0) return;
+	stopWake();
 	ESP_ERROR_CHECK(timer_set_counter_value(TIMERGROUP, wakeTimer, 0x00000000ULL));
 	//TIMER_INTERVAL0_SEC * TIMER_SCALE - TIMER_FINE_ADJ
 	ESP_ERROR_CHECK(timer_set_alarm_value(TIMERGROUP, wakeTimer,TIMERVALUE(delay*60)));
 	ESP_ERROR_CHECK(timer_enable_intr(TIMERGROUP, wakeTimer));
 	ESP_ERROR_CHECK(timer_set_alarm(TIMERGROUP, wakeTimer,TIMER_ALARM_EN));
-	ESP_ERROR_CHECK(timer_start(TIMERGROUP, wakeTimer));	
-}
-void stopWake(){
-	ESP_LOGD(TAG,"stopDelayWake\n");
-	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, wakeTimer));
+	ESP_ERROR_CHECK(timer_start(TIMERGROUP, wakeTimer));
+	tsocket("lwake",delay);	
 }
 
 

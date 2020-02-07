@@ -139,6 +139,12 @@ cli.vol				: ask for  the current volume. respond with ##CLI.VOL# xxx
 cli.vol-			: Decrement the volume by 10
 cli.vol+			: Increment the volume by 10
 Every vol command from uart or web or browser respond with ##CLI.VOL#: xxx
+// Wake and sleep timers
+cli.wake(\"x\")		:  x in minutes. Start or stop the wake function. A value 0 stop the wake timer
+cli.sleep(\"x\")	:  x in minutes. Start or stop the sleep function. A value 0 stop the sleep timer
+cli.wake			: Display the current value in secondes\n\
+cli.Sleep			: Display the current value in secondes\n\
+
 // Client information
 cli.info			: Respond with nameset, all icy, meta, volume and stae playing or stopped. Used to refresh the lcd informations
 					: see Example of indications received

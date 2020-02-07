@@ -54,11 +54,6 @@
 #define sleepTimer  TIMER_0
 #define wakeTimer TIMER_1
 
-//extern os_timer_t sleepTimer;
-extern uint32_t sleepDelay;
-//extern os_timer_t wakeTimer;
-extern uint32_t wakeDelay;
-
 // event for timers and encoder
 #define TIMER_SLEEP   0   
 #define TIMER_WAKE    1 
@@ -131,6 +126,8 @@ bool bigSram();
 
 void sleepCallback(void *pArg);
 void wakeCallback(void *pArg);
+uint64_t getSleep();
+uint64_t getWake();
 void startSleep(uint32_t delay);
 void stopSleep();
 void startWake(uint32_t delay);

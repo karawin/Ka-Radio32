@@ -78,7 +78,13 @@ cli.vol(\"x\"): set the volume to x with x from 0 to 254 (volume max)\n\
 cli.vol: display the current volume. respond with ##CLI.VOL# xxx\n\
 cli.vol-: Decrement the volume by 10 \n\
 cli.vol+: Increment the volume by 10 \n\
+"};
+const char stritHELP2[]  = {"\
 Every vol command from uart or web or browser respond with ##CLI.VOL#: xxx\n\
+cli.wake(\"x\"):  x in minutes. Start or stop the wake function. A value 0 stop the wake timer\n\
+cli.sleep(\"x\"):  x in minutes. Start or stop the sleep function. A value 0 stop the sleep timer\n\
+cli.wake: Display the current value in secondes\n\
+cli.Sleep: Display the current value in secondes\n\
 cli.info: Respond with nameset, all icy, meta, volume and stae playing or stopped. Used to refresh the lcd informations \n\n\
 //////////////////\n\
   System commands\n\
@@ -88,7 +94,7 @@ sys.uart(\"x\"): Change the baudrate of the uart on the next reset.\n\
 sys.i2s: Display the current I2S speed\n\
 "};
 
-const char stritHELP2[]  = {"\
+const char stritHELP3[]  = {"\
 sys.i2s(\"x\"): Change and record the I2S clock speed of the vs1053 GPIO5 MCLK of the i2s interface to external dac.\n\
 : 0=48kHz, 1=96kHz, 2=192kHz, other equal 0\n\
 sys.erase: erase all recorded configuration and stations.\n\
@@ -104,7 +110,7 @@ sys.version: Display the Release and Revision numbers\n\
 sys.tzo and sys.tzo(\"xx\"): Display and Set the timezone offset of your country.\n\
 "};
 
-const char stritHELP3[]  = {"\
+const char stritHELP4[]  = {"\
 sys.date: Send a ntp request and Display the current locale time\n\
 sys.dlog: Display the current log level\n\
 sys.logx: Set log level to x with x=n for none, v for verbose, d for debug, i for info, w for warning, e for error\n\
@@ -114,7 +120,7 @@ sys.lcd and sys.lcd(\"x\"): Display and Change the lcd type to x on next reset\n
 sys.ledgpio and sys.ledgpio(\"x\"): Display and Change the default Led GPIO (4) to x\n\
 "};
 
-const char stritHELP4[]  = {"\
+const char stritHELP5[]  = {"\
 sys.ddmm and sys.ddmm(\"x\"):  Display and Change  the date format. 0:MMDD, 1:DDMM\n\
 sys.host and sys.host(\"your hostname\"): display and change the hostname for mDNS\n\
 sys.rotat and sys.rotat(\"x\"): Change and display the lcd rotation option (reset needed). 0:no rotation, 1: rotation\n\
@@ -605,9 +611,11 @@ char url[200];
 	ESP_LOGI(TAG,"%s",s);
 	tmp = s+10;
 	tmpend = strchr(tmp,':');
+	if ((tmp==NULL)||(tmpend==NULL)) return;
 	if (tmpend-tmp) id = atoi(tmp);	
 	tmp = ++tmpend;//:
 	tmpend = strchr(tmp,',');
+	if ((tmp==NULL)||(tmpend==NULL)) return;
 	if (tmpend-tmp) {strncpy(si->name,tmp,tmpend-tmp);} //*tmpend = 0; }
 	tmp = ++tmpend;//,
 	tmpend = strchr(tmp,'%');
@@ -767,6 +775,65 @@ void clientVol(char *s)
 		}	
 		free(vol);
     }	
+}
+
+void clientWake(char *s)
+{
+    char *t = strstr(s, parslashquote);
+	if(t == 0)
+	{
+		// no argument, no action
+		kprintf("#Wake in %lld s##\n",getWake());
+		return;
+	}
+	char *t_end  = strstr(t, parquoteslash)-2;
+    if(t_end <= (char*) 0)
+    {
+
+		kprintf(stritCMDERROR);
+		return;
+    }
+   char *label = (char*) malloc((t_end-t+1)*sizeof(char));
+    if (label != NULL)
+    {
+        uint8_t tmp;
+        for(tmp=0; tmp<(t_end-t+1); tmp++) label[tmp] = 0;
+        strncpy(label, t+2, (t_end-t));
+		if (atoi(label)==0)
+			stopWake();
+		else startWake(atoi(label));
+		free(label);
+    }	
+	kprintf("#Wake in %lld s##\n",getWake());
+}
+void clientSleep(char *s)
+{
+    char *t = strstr(s, parslashquote);
+	if(t == 0)
+	{
+		// no argument, no action
+		kprintf("#Sleep in %lld s##\n",getSleep());
+		return;
+	}
+	char *t_end  = strstr(t, parquoteslash)-2;
+    if(t_end <= (char*) 0)
+    {
+
+		kprintf(stritCMDERROR);
+		return;
+    }
+   char *label = (char*) malloc((t_end-t+1)*sizeof(char));
+    if (label != NULL)
+    {
+        uint8_t tmp;
+        for(tmp=0; tmp<(t_end-t+1); tmp++) label[tmp] = 0;
+        strncpy(label, t+2, (t_end-t));
+		if (atoi(label)==0)
+			stopSleep();
+		else startSleep(atoi(label));
+		free(label);
+    }
+	kprintf("#Sleep in %lld s##\n",getSleep());	
 }
 
 // option for loading or not the pacth of the vs1053
@@ -1268,6 +1335,8 @@ void checkCommand(int size, char* s)
 		else if(strcmp(tmp+4, "info") == 0) 	clientInfo();
 		else if(startsWith (  "vol",tmp+4)) 	clientVol(tmp);
 		else if(startsWith (  "edit",tmp+4)) 	clientEdit(tmp);
+		else if(startsWith (  "wake",tmp+4)) 	clientWake(tmp);
+		else if(startsWith (  "sleep",tmp+4)) 	clientSleep(tmp);
 		else printInfo(tmp);
 	} else
 	if(startsWith ("sys.", tmp))
@@ -1318,7 +1387,9 @@ void checkCommand(int size, char* s)
 			vTaskDelay(1);
 			kprintfl(stritHELP3);
 			vTaskDelay(1);
-			kprintfl(stritHELP4);		}
+			kprintfl(stritHELP4);		
+			vTaskDelay(1);
+			kprintfl(stritHELP5);		}
 		else printInfo(tmp);
 	}	
 	free(tmp);
