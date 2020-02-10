@@ -184,7 +184,7 @@ If MISO is not used , it can be ignored by a 255 value.
 
 ### Encoders
 
-Two encoders maximun are supported, each with different actions:  
+Two encoders maximum are supported, each with different actions:  
 Encoder0: the volume control and stations change when pushed and held,  
 Encoder1: the station control and volume change when pushed and held.  
 

@@ -175,21 +175,21 @@ uint16_t GetHeight()
 
 void wakeLcd()
 {
-//	if (lcd_type == LCD_NONE) return;
-	// add the gpio switch on here gpioLedBacklight can be directly a GPIO_NUM_xx or declared in gpio.h
-	LedBacklightOn();	
 	timerLcdOut = getLcdOut(); // rearm the tempo
-	if (itLcdOut) {mTscreen= MTNEW; evtScreen(defaultStateScreen);}
-	itLcdOut = 0;  //0 not activated, 1 sleep requested, 2 in sleep 
+	if (itLcdOut)
+	{
+		LedBacklightOn();
+		mTscreen= MTNEW; 
+		evtScreen(stateScreen);
+		itLcdOut = 0;  //0 not activated, 1 sleep requested, 2 in sleep ;
+	}
 }
 
 void sleepLcd()
 {
-//    if (lcd_type == LCD_NONE) return;
 	itLcdOut = 2;  // in sleep
-	// add the gpio switch off here
-	LedBacklightOff();
-	evtClearScreen();
+	if (!LedBacklightOff())	
+		evtClearScreen();
 
 }
 
@@ -305,7 +305,7 @@ void Screen(typeScreen st){
   if (stateScreen != st)
   {
 	mTscreen = MTNEW;
-	wakeLcd();
+//	wakeLcd();
   }
   else
   {
@@ -411,7 +411,7 @@ void drawTime()
 void drawScreen()
 {
 //  if (lcd_type == LCD_NONE) return;
-//  ESP_LOGW(TAG,"stateScreen: %d, mTscreen: %d",stateScreen,mTscreen);
+//  ESP_LOGD(TAG,"stateScreen: %d,defaultStateScreen: %d, mTscreen: %d, itLcdOut: %d",stateScreen,defaultStateScreen,mTscreen,itLcdOut);
   if ((mTscreen != MTNODISPLAY)&&(!itLcdOut))
   {
 	switch (stateScreen)
@@ -1057,9 +1057,9 @@ void task_lcd(void *pvParams)
 		{ 
 //			if (lcd_type == LCD_NONE) continue;
 			if (evt.lcmd != lmeta)
-				ESP_LOGV(TAG,"event_lcd: %x",(int)evt.lcmd);
+				ESP_LOGV(TAG,"event_lcd: %x, %d, mTscreen: %d",(int)evt.lcmd,(int)evt.lline,mTscreen);
 			else
-				ESP_LOGV(TAG,"event_lcd: %x  %s",(int)evt.lcmd,evt.lline); 
+				ESP_LOGV(TAG,"event_lcd: %x  %s, mTscreen: %d",(int)evt.lcmd,evt.lline,mTscreen); 
 			switch(evt.lcmd)
 			{
 				case lmeta:
@@ -1102,12 +1102,12 @@ void task_lcd(void *pvParams)
 					dvolume = false; // don't show volume on start station
 					break;
 				case estation:
-					wakeLcd();
 					if(xQueuePeek(event_lcd, &evt1, 0))
 						if (evt1.lcmd == estation) {evt.lline = NULL;break;}
 					ESP_LOGD(TAG,"estation val: %d",(uint32_t)evt.lline);
 					changeStation((uint32_t)evt.lline);	
 					Screen(sstation);
+					wakeLcd();
 					evt.lline = NULL;	// just a number			
 					break;
 				case eclrs:
@@ -1122,6 +1122,7 @@ void task_lcd(void *pvParams)
 					defaultStateScreen = (stateScreen==smain)?stime:smain;
 					(stateScreen==smain)?Screen(stime):Screen(smain);
 					g_device->options32 = (defaultStateScreen== smain)?g_device->options32&NT_TOGGLETIME:g_device->options32|T_TOGGLETIME; 
+					wakeLcd();
 //					saveDeviceSettings(g_device);
 					break;
 				default:;

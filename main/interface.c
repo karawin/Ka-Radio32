@@ -1057,7 +1057,7 @@ void syslcdout(char* s)
 		kprintf(stritCMDERROR);
 		return;
     }	
-	uint8_t value = atoi(t+2);
+	uint16_t value = atoi(t+2);
 	g_device->lcd_out = value; 
 	lcd_out = value;
 	saveDeviceSettings(g_device);	

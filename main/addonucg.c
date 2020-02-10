@@ -334,7 +334,7 @@ void removeUtf8(char *characters)
 {
   int Rindex = 0;
   uint16_t utf8;
-  ESP_LOGV(TAG,"removeUtf8 in : %s",characters);
+//  ESP_LOGV(TAG,"removeUtf8 in : %s",characters);
   ucEraseSlashes(characters) ; 
   while (characters[Rindex])
   {

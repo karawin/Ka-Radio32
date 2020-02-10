@@ -7,7 +7,7 @@
 #define __custom_h__
 
 void LedBacklightInit();
-void LedBacklightOn() ;
-void  LedBacklightOff();
+bool LedBacklightOn() ;
+bool  LedBacklightOff();
 
 #endif
