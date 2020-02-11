@@ -74,7 +74,7 @@ struct device_settings {
 	uint8_t trace_level;
 	uint8_t lcd_type; // the lcd in use
 	uint8_t led_gpio; // the gpio of the led
-	uint32_t lcd_out;	// timeout in seconds to switch off the lcd. 0 = no timeout
+	uint32_t filler;	// timeout in seconds to switch off the lcd. 0 = no timeout
 	uint8_t options32;	// bit0:0 = MMDD, 1 = DDMM  in the time display, bit1: 0= lcd without rotation  1 = lcd rotated 180
 						// bit 2: Half step of encoder0, bit3: Half step of encoder1, bit4: wifi auto reconnect
 						// bit5: TOGGLE time or main sreen

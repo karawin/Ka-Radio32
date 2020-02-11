@@ -765,7 +765,7 @@ void timerTask(void* p) {
 			ctimeVol = 0;
 		}	
 */
-		vTaskDelay(10);	
+		vTaskDelay(5);	
 		
 		if (isEsplay) // esplay board only
 			rexp = i2c_keypad_read(); // read the expansion
@@ -928,18 +928,11 @@ void app_main()
 	VS1053_spi_init();
 
     init_hardware(); 
-	ESP_LOGI(TAG, "Hardware init done...");
+	
 	
 	//ESP_LOGE(TAG,"Corrupt1 %d",heap_caps_check_integrity(MALLOC_CAP_DMA,1));
 	
-	// lcd init
-	uint8_t rt;
-	option_get_lcd_info(&g_device->lcd_type,&rt);
-	ESP_LOGI(TAG,"LCD Type %d",g_device->lcd_type);
-	//lcd rotation
-	setRotat(rt) ;	
-	lcd_init(g_device->lcd_type);
-	
+
 	// the esplay board needs I2C for gpio extension
 	if (option_get_esplay())
 	{
@@ -947,7 +940,7 @@ void app_main()
 		gpio_num_t sda;
 		gpio_num_t rsti2c;	
 		gpio_get_i2c(&scl,&sda,&rsti2c);
-		ESP_LOGD(TAG,"I2C GPIO SDA: %d, SCL: %d\n",sda,scl);
+		ESP_LOGD(TAG,"I2C GPIO SDA: %d, SCL: %d",sda,scl);
 		i2c_config_t conf;
 		conf.mode = I2C_MODE_MASTER;
 		conf.sda_io_num = sda;
@@ -958,8 +951,8 @@ void app_main()
 		esp_err_t res = i2c_param_config(I2C_MASTER_NUM, &conf);
 		ESP_LOGD(TAG,"I2C setup : %d\n",res);
 		res = i2c_driver_install(I2C_MASTER_NUM, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0);
-		if (res != 0) ESP_LOGD(TAG,"I2C already installed. No problem \n");
-		else ESP_LOGD(TAG,"I2C installed: %d\n",res);
+		if (res != 0) ESP_LOGD(TAG,"I2C already installed. No problem");
+		else ESP_LOGD(TAG,"I2C installed: %d",res);
 
 		//init the amp shutdown gpio4 as output level 1
 		gpio_output_conf(PIN_AUDIO_SHDN);
@@ -984,7 +977,14 @@ void app_main()
 		(i2c_driver_install(I2C_MASTER_NUM, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0));			
 	}
 */
-
+	// lcd init
+	uint8_t rt;
+	option_get_lcd_info(&g_device->lcd_type,&rt);
+	ESP_LOGI(TAG,"LCD Type %d",g_device->lcd_type);
+	//lcd rotation
+	setRotat(rt) ;	
+	lcd_init(g_device->lcd_type);
+	ESP_LOGI(TAG, "Hardware init done...");
 	
 	// output mode
 	//I2S, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053

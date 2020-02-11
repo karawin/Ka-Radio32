@@ -96,6 +96,8 @@ static bool isJoystick0 = true;
 static bool isJoystick1 = true;
 static bool isEsplay = false;
 
+static int blv = 100;
+
 void Screen(typeScreen st); 
 void drawScreen();
 static void evtScreen(typelcmd value);
@@ -112,6 +114,8 @@ Button_t* expButton1 = NULL;
 Button_t* expButton2 = NULL;
 
 struct tm* getDt() { return dt;}
+
+void setBlv(int val) {blv = val;}
 
 void* getEncoder(int num)
 {
@@ -175,10 +179,11 @@ uint16_t GetHeight()
 
 void wakeLcd()
 {
-	timerLcdOut = getLcdOut(); // rearm the tempo
-	if (itLcdOut)
+	if ((getLcdStop() != 0) && (!state))  timerLcdOut = getLcdStop(); // rearm the tempo
+	else timerLcdOut = getLcdOut(); // rearm the tempo
+	if (itLcdOut==2)
 	{
-		LedBacklightOn();
+		LedBacklightOn(blv);
 		mTscreen= MTNEW; 
 		evtScreen(stateScreen);
 		itLcdOut = 0;  //0 not activated, 1 sleep requested, 2 in sleep ;
@@ -688,8 +693,20 @@ void adcLoop() {
 	}
 	} else //third control of esplay
 	{
+		Button state1;
 		state0 = getButtons(enc,0);	
 		if (state0 == Clicked) toggletime();
+		
+		state0 = getButtons(enc,1);	
+		state1 = getButtons(enc,2);		
+		if (state0 != Open) blv -=2;
+		else if (state1 != Open) blv +=2;
+		else return;		
+		if (blv >100) blv = 100;
+		if (blv < 2) blv = 2;
+		wakeLcd();		
+		backlight_percentage_set(blv);
+		option_set_lcd_blv(blv);
 	}
 }
  
@@ -736,12 +753,12 @@ void periphLoop()
 // encoder1 = station control or volume when pushed
 // button0 = volume control or station when pushed
 // button1 = station control or volume when pushed
-	if (isEncoder0) encoderCompute(encoder0,VCTRL);
-	if (isEncoder1) encoderCompute(encoder1,SCTRL);	
 	if (isButton0) buttonCompute(button0,VCTRL);
 	if (isButton1) buttonCompute(button1,SCTRL);
 	if (!isEsplay)
 	{
+		if (isEncoder0) encoderCompute(encoder0,VCTRL);
+		if (isEncoder1) encoderCompute(encoder1,SCTRL);	
 		if (isJoystick0) joystickCompute(joystick0,VCTRL);
 		if (isJoystick1) joystickCompute(joystick1,SCTRL);	
 	} else
@@ -930,6 +947,7 @@ void initButtonDevices()
 	}	
 	else	//esplay joystick on simple expanded gpio buttons
 	{
+		// PCF8574 gpio expander
 		//1:start 2:select 3:up 4:down 5:left 6:right 7:a 8:b
 		isEsplay = true;
 		expButton0 = ClickexpButtonsInit(1,6,5,0);
@@ -1029,6 +1047,8 @@ void task_lcd(void *pvParams)
 	event_lcd_t evt1 ; // lcd event	
 	ESP_LOGD(TAG, "task_lcd Started, LCD Type %d",lcd_type);
 	defaultStateScreen = (g_device->options32&T_TOGGLETIME)? stime:smain;
+	option_get_lcd_blv(&blv); // init backlight value;
+	backlight_percentage_set(blv);
 	if (lcd_type != LCD_NONE)  drawFrame();
 
 	while (1)
@@ -1220,8 +1240,7 @@ void task_addon(void *pvParams)
 			if (itAskStime&&(stateScreen != stime)) // time start the time display. Don't do that in interrupt.  
 				evtScreen(stime);			
 		}
-
-		vTaskDelay(20);
+		vTaskDelay(10);
 	}	
 	vTaskDelete( NULL ); 
 }
@@ -1258,27 +1277,21 @@ void addonParse(const char *fmt, ...)
    {     
 		evt.lcmd = lmeta;
 		evt.lline = malloc(strlen(ici)+1);
-		//evt.lline = NULL;
 		strcpy(evt.lline,ici);
-//		xQueueSend(event_lcd,&evt, 0);
    } else 
  ////// ICY4 Description  ##CLI.ICY4#:
     if ((ici=strstr(line,"ICY4#: ")) != NULL)
     {
 		evt.lcmd = licy4;
 		evt.lline = malloc(strlen(ici)+1);
-		//evt.lline = NULL;
 		strcpy(evt.lline,ici);
-//		xQueueSend(event_lcd,&evt, 0);
     } else 
  ////// ICY0 station name   ##CLI.ICY0#:
    if ((ici=strstr(line,"ICY0#: ")) != NULL)
    {
 		evt.lcmd = licy0;
 		evt.lline = malloc(strlen(ici)+1);
-		//evt.lline = NULL;
 		strcpy(evt.lline,ici);
-//		xQueueSend(event_lcd,&evt, 0);
    } else
  ////// STOPPED  ##CLI.STOPPED#  
    if (((ici=strstr(line,"STOPPED")) != NULL)&&(strstr(line,"C_HDER") == NULL)&&(strstr(line,"C_PLIST") == NULL))
@@ -1286,7 +1299,6 @@ void addonParse(const char *fmt, ...)
 		state = false;	  
  		evt.lcmd = lstop;
 		evt.lline = NULL;
-//		xQueueSend(event_lcd,&evt, 0);
    }    
    else  
  //////Nameset    ##CLI.NAMESET#:
@@ -1294,9 +1306,7 @@ void addonParse(const char *fmt, ...)
    {   
 	  	evt.lcmd = lnameset;
 		evt.lline = malloc(strlen(ici)+1);
-		//evt.lline = NULL;
 		strcpy(evt.lline,ici);
-//		xQueueSend(event_lcd,&evt, 0);
    } else
  //////Playing    ##CLI.PLAYING#
    if ((ici=strstr(line,"YING#")) != NULL)  
@@ -1305,7 +1315,6 @@ void addonParse(const char *fmt, ...)
 		itAskStime = false;
  		evt.lcmd = lplay;
 		evt.lline = NULL;
-//		xQueueSend(event_lcd,&evt, 0);
    } else
    //////Volume   ##CLI.VOL#:
    if ((ici=strstr(line,"VOL#:")) != NULL)  
@@ -1315,7 +1324,6 @@ void addonParse(const char *fmt, ...)
 		volume = atoi(ici+6);
  		evt.lcmd = lvol;
 		evt.lline = NULL;//atoi(ici+6);
-//		xQueueSend(event_lcd,&evt, 0);
 	   }
    } else
   //////Volume offset    ##CLI.OVOLSET#:
@@ -1323,7 +1331,6 @@ void addonParse(const char *fmt, ...)
    {
 	    evt.lcmd = lovol;
 		evt.lline = NULL;
-//		xQueueSend(event_lcd,&evt, 0);
    }
    if (evt.lcmd != -1) xQueueSend(event_lcd,&evt, 0);
    free (line);

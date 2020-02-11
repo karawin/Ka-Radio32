@@ -143,8 +143,11 @@ void option_get_lcd_info(uint8_t *enca,uint8_t* rt);
 void option_set_lcd_info(uint8_t enca, uint8_t rt);
 void option_get_ddmm(uint8_t *enca);
 void option_set_ddmm(uint8_t enca);
-void option_get_lcd_out(uint32_t *enca);
+void option_get_lcd_out(uint32_t *enca,uint32_t *encb);
+void option_get_lcd_blv(int *blv);
+void option_set_lcd_stop(uint32_t enca);
 void option_set_lcd_out(uint32_t enca);
+void option_set_lcd_blv(int blv);
 uint8_t gpioToChannel(uint8_t gpio);
 
 #endif

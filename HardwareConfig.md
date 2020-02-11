@@ -149,7 +149,9 @@ P_LED_GPIO		GPIO of the status led
 - **LCD CONTROL**  
 O_LCD_TYPE		Type of lcd (see [addon.h](https://github.com/karawin/Ka-Radio32/blob/master/main/include/addon.h) file).  
 O_LCD_ROTA		Control the rotation of the LCD, 0 no rotation, 1: rotation.  
-O_LCD_OUT 		The tempo to light off the screen in seconds. 0 is no tempo.   
+O_LCD_OUT 		The tempo to light off the screen in seconds. 0 if no tempo. 
+O_LCD_STOP		The tempo to light off the screen on stop mode. 0 if no tempo  
+O_LCD_BLV		The percent of the backlight if hardware wired. range 0 to 100.
 O_DDMM_FLAG		The format of the date to display 0:MMDD, 1:DDMM.  
 - **Buttons option**  
 O_BTN0			The active level of buttons: 0=LOW, 1:HIGH  ( 0=Default)  
@@ -254,10 +256,11 @@ The ESP32 ADC can be sensitive to noise leading to large discrepancies in ADC re
 ### OLED
 If your B/W oled has an artefact on the left for type 0, change it to type 1 (command sys.lcd("1") or O_LCD_TYPE,data,u8,1  
 
-### Lcd backlight
+### Lcd backlight P_BACKLIGHT
 Thanks to Vadim Polyakovsky:
-> A small optional schematics update which allows to switch LCD backlight on and off in case of battery powered KaRadio. The switching off timeout in x sec could be defined by sys.lcdout("x") terminal command. The display and its' backlight will wake up automatically in case of new meta, encoder or IR event. This way the battery life on one charge will be extended. Obviously not needed for OLED displays and wall plug power socket operation. A software support is done by Jean-Pierre in the new custom.c file. A GPIO number could be chosen among not used ones and defined respectively. Enjoy!
+> A small optional schematics update which allows to switch LCD backlight on and off in case of battery powered KaRadio. The switching off timeout in x sec could be defined by sys.lcdout("x") terminal command. The display and its' backlight will wake up automatically in case of new meta, encoder or IR event. This way the battery life on one charge will be extended. Obviously not needed for OLED displays and wall plug power socket operation. A software support is done by Jean-Pierre in the new custom.c file. A GPIO number could be chosen among not used ones and defined respectively. Enjoy! 
  
+Additionally, a backlight value from 0 to 100 can be choosen with the O_LCD_BLV or the sys.lcdblv command.    
 This external device turns off the LCD backlight in addition to the screen clear.    
 Usefull if a battery is used.  
 If the hardware device is missing, set it to 255

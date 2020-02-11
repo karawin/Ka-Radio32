@@ -7,7 +7,7 @@
 #define __custom_h__
 
 void LedBacklightInit();
-bool LedBacklightOn() ;
+bool LedBacklightOn(int) ;
 bool  LedBacklightOff();
-
+void backlight_percentage_set(int value);
 #endif

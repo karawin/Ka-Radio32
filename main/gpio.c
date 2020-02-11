@@ -1,6 +1,6 @@
 /******************************************************************************
  * 
- * Copyright 2017 karawin (http://www.karawin.fr)
+ * Copyright 2017 karaw(http://www.karawin.fr)
  *
 *******************************************************************************/
 
@@ -67,7 +67,7 @@ void gpio_get_label(char** label)
 	*label = NULL;
 	if (open_partition(hardware, label_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
 	{
-		ESP_LOGD(TAG,"in get label");
+		ESP_LOGD(TAG,"get label");
 		return;
 	}	
 	nvs_get_str(hardware_handle, "L_LABEL", NULL, &required_size);
@@ -87,7 +87,7 @@ void gpio_get_comment(char** label)
 	*label = NULL;
 	if (open_partition(hardware, label_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
 	{
-		ESP_LOGD(TAG,"in get comment");
+		ESP_LOGD(TAG,"get comment");
 		return;
 	}	
 	nvs_get_str(hardware_handle, "L_COMMENT", NULL, &required_size);
@@ -112,7 +112,7 @@ void gpio_get_spi_bus(uint8_t *spi_no,gpio_num_t *miso,gpio_num_t *mosi,gpio_num
 	
 	if (open_partition(hardware, gpio_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
 	{
-		ESP_LOGD(TAG,"in spi_bus");
+		ESP_LOGD(TAG,"spi_bus");
 		return;
 	}
 	err = ESP_OK;
@@ -138,7 +138,7 @@ void gpio_get_vs1053(gpio_num_t * xcs,gpio_num_t *rst,gpio_num_t *xdcs,gpio_num_
 	
 	if (open_partition(hardware, gpio_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
 	{
-		ESP_LOGD(TAG,"in vs1053");
+		ESP_LOGD(TAG,"vs1053");
 		return;
 	}	
 	err = nvs_get_u8(hardware_handle, "P_XCS",(uint8_t *) xcs);
@@ -157,7 +157,7 @@ void option_get_audio_output(output_mode_t *oom)
 	*oom = I2S;
 	if (open_partition(hardware, option_space,NVS_READONLY,&hardware_handle)!= ESP_OK) 
 	{
-		ESP_LOGD(TAG,"in get_audio");
+		ESP_LOGD(TAG,"get_audio");
 		return;
 	}				
 	err = nvs_get_u8(hardware_handle, "O_AUDIO",(uint8_t *) oom);
@@ -173,7 +173,7 @@ bool option_get_esplay()
 
 	if (open_partition(hardware, option_space,NVS_READONLY,&hardware_handle)!= ESP_OK) 
 	{
-		ESP_LOGD(TAG,"in get_esplay");
+		ESP_LOGD(TAG,"get_esplay");
 		return ret;
 	}				
 	err = nvs_get_u8(hardware_handle, "O_ESPLAY",(uint8_t *)&ret);
@@ -193,7 +193,7 @@ void option_get_lcd_info(uint8_t *enca,uint8_t* rt)
 	*rt = ((g_device->options32)&T_ROTAT)?1:0;
 	if (open_partition(hardware, option_space,NVS_READONLY,&hardware_handle)!= ESP_OK) 
 	{
-		ESP_LOGD(TAG,"in lcd_info");
+		ESP_LOGD(TAG,"lcd_info");
 		return;
 	}			
 	
@@ -212,7 +212,7 @@ void option_set_lcd_info(uint8_t enca, uint8_t rt)
 
 	if (open_partition(hardware, option_space,NVS_READWRITE,&hardware_handle)!= ESP_OK) 
 	{
-		ESP_LOGD(TAG,"in set lcd_info");
+		ESP_LOGD(TAG,"set lcd_info");
 		return;
 	}	
 	
@@ -233,7 +233,7 @@ void option_get_ddmm(uint8_t *enca)
 	
 	if (open_partition(hardware, option_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
 	{
-		ESP_LOGD(TAG,"in ddmm");
+		ESP_LOGD(TAG,"ddmm");
 		return;
 	}	
 	
@@ -254,7 +254,7 @@ void option_set_ddmm(uint8_t enca)
 
 	if (open_partition(hardware, option_space,NVS_READWRITE,&hardware_handle)!= ESP_OK)
 	{
-		ESP_LOGD(TAG,"in set_ddmm");
+		ESP_LOGD(TAG,"set_ddmm");
 		return;
 	}	
 	
@@ -264,29 +264,7 @@ void option_set_ddmm(uint8_t enca)
 	close_partition(hardware_handle,hardware);		
 }
 
-void option_get_lcd_out(uint32_t *enca)
-{
-	esp_err_t err;
-	nvs_handle hardware_handle;
-	uint32_t lout;
-	// init default
-		*enca = g_device->lcd_out;	
-	
-	if (open_partition(hardware, option_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
-	{
-		ESP_LOGD(TAG,"in lcd_out");
-		return;
-	}	
-	
-	err = nvs_get_u32(hardware_handle, "O_LCD_OUT",(uint32_t *) &lout);
-	if (err != ESP_OK) ESP_LOGD(TAG,"oget_lcd_out err 0x%x",err);
-	else
-	{
-		if (lout == 255) lout = 0; // special case
-		*enca = lout;
-	}	
-	close_partition(hardware_handle,hardware);		
-}
+
 void option_set_lcd_out(uint32_t enca)
 {
 	esp_err_t err;
@@ -294,13 +272,118 @@ void option_set_lcd_out(uint32_t enca)
 
 	if (open_partition(hardware, option_space,NVS_READWRITE,&hardware_handle)!= ESP_OK)
 	{
-		ESP_LOGD(TAG,"in set_lcd_out");
+		ESP_LOGD(TAG,"set_lcd_out");
 		return;
 	}	
 	
 	err = nvs_set_u32(hardware_handle, "O_LCD_OUT",enca);
 	if (err != ESP_OK) ESP_LOGD(TAG,"oset_lcd_out err 0x%x",err);
 
+	close_partition(hardware_handle,hardware);		
+}
+void option_set_lcd_stop(uint32_t enca)
+{
+	esp_err_t err;
+	nvs_handle hardware_handle;
+
+	if (open_partition(hardware, option_space,NVS_READWRITE,&hardware_handle)!= ESP_OK)
+	{
+		ESP_LOGD(TAG,"set_lcd_stop");
+		return;
+	}	
+	
+	err = nvs_set_u32(hardware_handle, "O_LCD_STOP",enca);
+	if (err != ESP_OK) ESP_LOGD(TAG,"oset_lcd_stop err 0x%x",err);
+
+	close_partition(hardware_handle,hardware);		
+}
+void option_set_lcd_blv(int blv)
+{
+	esp_err_t err;
+	nvs_handle hardware_handle;
+	if (open_partition(hardware, option_space,NVS_READWRITE,&hardware_handle)!= ESP_OK)
+	{
+		ESP_LOGD(TAG,"set_lcd_blv");
+		return;
+	}	
+	err = nvs_set_i32(hardware_handle, "O_LCD_BLV",blv);
+	if (err != ESP_OK) ESP_LOGD(TAG,"oset_lcd_blv err 0x%x",err);
+	close_partition(hardware_handle,hardware);		
+}
+
+void option_get_lcd_out(uint32_t *enca, uint32_t *encb)
+{
+	esp_err_t err;
+	nvs_handle hardware_handle;
+	uint32_t lout;
+
+	// init default lcd_out
+//		*enca = g_device->lcd_out;	
+	*enca = 0;
+	// init default lcd_stop
+	*encb = 0;
+
+	if (open_partition(hardware, option_space,NVS_READWRITE,&hardware_handle)!= ESP_OK)
+	{
+		ESP_LOGD(TAG,"lcd_out");
+		return;
+	}	
+	
+	err = nvs_get_u32(hardware_handle, "O_LCD_OUT",(uint32_t *) &lout);
+	if (err == ESP_ERR_NVS_NOT_FOUND) 
+		err = nvs_set_u32(hardware_handle, "O_LCD_OUT",*enca);
+	if (err != ESP_OK)
+	{
+		ESP_LOGD(TAG,"oget_lcd_out err 0x%x",err);
+	}
+	else
+	{
+		if (lout == 255) lout = 0; // special case
+		*enca = lout;
+	}	
+		
+	err = nvs_get_u32(hardware_handle, "O_LCD_STOP",(uint32_t *) &lout);
+	if (err == ESP_ERR_NVS_NOT_FOUND) 
+		err = nvs_set_u32(hardware_handle, "O_LCD_STOP",*encb);
+	if (err != ESP_OK)
+	{
+		ESP_LOGI(TAG,"oget_lcd_STOP err 0x%x",err);
+	}
+	else
+	{
+		if (lout == 255) lout = 0; // special case
+		*encb = lout;
+	}
+	close_partition(hardware_handle,hardware);		
+}
+void option_get_lcd_blv(int *blv)
+{
+	esp_err_t err;
+	nvs_handle hardware_handle;
+	int lout;
+	*blv = 100;
+	if (open_partition(hardware, option_space,NVS_READWRITE,&hardware_handle)!= ESP_OK)
+	{
+		ESP_LOGD(TAG,"lcd_blv");
+		return;
+	}	
+	
+	err = nvs_get_i32(hardware_handle, "O_LCD_BLV",(int32_t *) &lout);
+	if (err == ESP_ERR_NVS_NOT_FOUND) 
+	{ 
+		err = nvs_set_i32(hardware_handle, "O_LCD_BLV",*blv);
+//		option_set_lcd_blv(*blv); err = 0;
+	}
+	if (err != ESP_OK)
+	{
+		ESP_LOGD(TAG,"oget_lcd_blv err 0x%x",err);
+	}
+	else
+	{
+ESP_LOGD(TAG,"lcd_blv3");
+		if (lout == 255) lout = 100; // special case
+		*blv = lout;
+	}	
 	close_partition(hardware_handle,hardware);		
 }
 
@@ -315,7 +398,7 @@ void gpio_get_ledgpio(gpio_num_t *enca)
 
 	if (open_partition(hardware, gpio_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
 	{
-		ESP_LOGD(TAG,"in ledgpio");
+		ESP_LOGD(TAG,"ledgpio");
 		return;
 	}	
 	
@@ -332,7 +415,7 @@ void gpio_set_ledgpio(gpio_num_t enca)
 
 	if (open_partition(hardware, gpio_space,NVS_READWRITE,&hardware_handle)!= ESP_OK)
 	{
-		ESP_LOGD(TAG,"in set_ledgpio");
+		ESP_LOGD(TAG,"set_ledgpio");
 		return;
 	}	
 	
@@ -351,7 +434,7 @@ void gpio_get_joysticks(gpio_num_t *enca,gpio_num_t *enca1)
 	
 	if (open_partition(hardware, gpio_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
 	{
-		ESP_LOGD(TAG,"in joys");
+		ESP_LOGD(TAG,"joys");
 		return;
 	}	
 	
@@ -372,7 +455,7 @@ void gpio_get_active_buttons(bool *abtn0, bool *abtn1)
 	*abtn1 = 0;
 	if (open_partition(hardware, option_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
 	{
-		ESP_LOGD(TAG,"in buttons");
+		ESP_LOGD(TAG,"buttons");
 		return;
 	}		 
 	err = nvs_get_u8(hardware_handle, "O_BTN0",(uint8_t *) abtn0);	 
@@ -396,7 +479,7 @@ void gpio_get_buttons(gpio_num_t *enca, gpio_num_t *encb, gpio_num_t *encc,gpio_
 	
 	if (open_partition(hardware, gpio_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
 	{
-		ESP_LOGD(TAG,"in buttons");
+		ESP_LOGD(TAG,"buttons");
 		return;
 	}	
 	
@@ -435,7 +518,7 @@ void gpio_get_encoders(gpio_num_t *enca, gpio_num_t *encb, gpio_num_t *encbtn, g
 	
 	if (open_partition(hardware, gpio_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
 	{
-		ESP_LOGD(TAG,"in enc");
+		ESP_LOGD(TAG,"enc");
 		return;
 	}	
 	
@@ -461,7 +544,7 @@ void gpio_get_i2c(gpio_num_t *scl,gpio_num_t *sda,gpio_num_t *rsti2c)
 
 	if (open_partition(hardware, gpio_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
 	{
-		ESP_LOGD(TAG,"in i2c");
+		ESP_LOGD(TAG,"i2c");
 		return;
 	}	
 	
@@ -484,7 +567,7 @@ void gpio_get_spi_lcd(gpio_num_t *cs ,gpio_num_t *a0,gpio_num_t *rstlcd)
 	
 	if (open_partition(hardware, gpio_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
 	{
-		ESP_LOGD(TAG,"in spi_lcd");
+		ESP_LOGD(TAG,"spi_lcd");
 		return;
 	}	
 	
@@ -505,7 +588,7 @@ void gpio_get_ir_signal(gpio_num_t *ir)
 	
 	if (open_partition(hardware, gpio_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
 	{
-		ESP_LOGD(TAG,"in ir");
+		ESP_LOGD(TAG,"ir");
 		return;
 	}	
 	
@@ -524,7 +607,7 @@ void gpio_get_adc(adc1_channel_t  *channel)
 	*channel = gpioToChannel(*channel);
 	if (open_partition(hardware, gpio_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
 	{
-		ESP_LOGD(TAG,"in adc");
+		ESP_LOGD(TAG,"adc");
 		return;
 	}	
 	
@@ -546,7 +629,7 @@ void gpio_get_i2s(gpio_num_t *lrck ,gpio_num_t *bclk ,gpio_num_t *i2sdata )
 	
 	if (open_partition(hardware, gpio_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
 	{
-		ESP_LOGD(TAG,"in i2s");
+		ESP_LOGD(TAG,"i2s");
 		return;
 	}	
 	
@@ -567,7 +650,7 @@ void gpio_get_lcd_backlightl(gpio_num_t *lcdb)
 	
 	if (open_partition(hardware, gpio_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
 	{
-		ESP_LOGD(TAG,"in lcdback");
+		ESP_LOGD(TAG,"lcdback");
 		return;
 	}	
 	
@@ -586,7 +669,7 @@ void gpio_get_touch(gpio_num_t *cs )
 	
 	if (open_partition(hardware, gpio_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
 	{
-		ESP_LOGD(TAG,"in touch");
+		ESP_LOGD(TAG,"touch");
 		return;
 	}	
 	

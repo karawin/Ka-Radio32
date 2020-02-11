@@ -195,6 +195,10 @@ sys.dlog		: Display the current log level
 sys.logx		: Set log level to x with x=n for none, v for verbose, d for debug, i for info, w for warning, e for error
 sys.lcdout		: Display the timer to switch off the lcd. 0= no timer
 sys.lcdout("x")	: Timer in seconds to switch off the lcd. 0= no timer
+sys.lcdstop		: Display the timer to switch off the lcd on stop. 0= no timer
+sys.lcdstop("x"): Timer in seconds to switch off the lcd on stop. 0= no timer
+sys.lcdblv		: Display current backlight percent value.
+sys.lcdblv("x")	: Set the backlight percent value (if the hardware provide it) (range 1 to 100)
 sys.lcd			: Display the current lcd type
 sys.lcd("x")	: Change the lcd type to x on next reset
 sys.ledgpio		: Display the default Led GPIO

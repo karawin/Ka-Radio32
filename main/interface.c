@@ -22,6 +22,7 @@
 #include "addon.h"
 #include "addonu8g2.h"
 #include "app_main.h"
+#include "custom.h"
 #include "xpt2046.h"
 //#include "rda5807Task.c"
 #include "ClickEncoder.h"
@@ -116,6 +117,8 @@ sys.dlog: Display the current log level\n\
 sys.logx: Set log level to x with x=n for none, v for verbose, d for debug, i for info, w for warning, e for error\n\
 sys.log: do nothing apart a trace on uart (debug use)\n\
 sys.lcdout and sys.lcdout(\"x\"): Timer in seconds to switch off the lcd. 0= no timer\n\
+sys.lcdstop and sys.lcdstop(\"x\"): Timer in seconds to switch off the lcd on stop mode. 0= no timer\n\
+sys.lcdblv and sys.lcdblv(\"x\"): Value in percent of the backlight.\n\
 sys.lcd and sys.lcd(\"x\"): Display and Change the lcd type to x on next reset\n\
 sys.ledgpio and sys.ledgpio(\"x\"): Display and Change the default Led GPIO (4) to x\n\
 "};
@@ -143,6 +146,8 @@ A command error display:\n\
 uint16_t currentStation = 0;
 static gpio_num_t led_gpio = GPIO_NONE;
 static IRAM_ATTR uint32_t lcd_out = 0xFFFFFFFF;
+static IRAM_ATTR uint32_t lcd_stop = 0xFFFFFFFF;
+static IRAM_ATTR int lcd_blv = 100;
 static esp_log_level_t s_log_default_level = CONFIG_LOG_BOOTLOADER_LEVEL;
 extern void wsVol(char* vol);
 extern void playStation(char* id);
@@ -1044,7 +1049,7 @@ void sysrotat(char* s)
 void syslcdout(char* s)
 {
     char *t = strstr(s, parslashquote);
-	lcd_out = g_device->lcd_out; 
+//	lcd_out = g_device->lcd_out; 
 	if(t == NULL)
 	{
 		kprintf("##LCD out is ");
@@ -1058,26 +1063,76 @@ void syslcdout(char* s)
 		return;
     }	
 	uint16_t value = atoi(t+2);
-	g_device->lcd_out = value; 
+	if ((value <5)&&value) value = 5; // min value
 	lcd_out = value;
-	saveDeviceSettings(g_device);	
+//	saveDeviceSettings(g_device);	
 	option_set_lcd_out(lcd_out);
 	syslcdout((char*) "");
+	wakeLcd();
+}
+// Timer in seconds to switch off the lcd on stop state
+void syslcdstop(char* s)
+{
+    char *t = strstr(s, parslashquote);
+	if(t == NULL)
+	{
+		kprintf("##LCD stop is ");
+		kprintf("%d#\n",lcd_stop);
+		return;
+	}
+	char *t_end  = strstr(t, parquoteslash);
+    if(t_end == NULL)
+    {
+		kprintf(stritCMDERROR);
+		return;
+    }	
+	uint16_t value = atoi(t+2); 
+	if ((value <5)&& value) value = 5;
+	lcd_stop = value;	
+	option_set_lcd_stop(lcd_stop);
+	syslcdstop((char*) "");
+	wakeLcd();
+}
+// Backlight value
+void syslcdblv(char* s)
+{
+    char *t = strstr(s, parslashquote);
+	if(t == NULL)
+	{
+		kprintf("##LCD blv is ");
+		kprintf("%d#\n",lcd_blv);
+		return;
+	}
+	char *t_end  = strstr(t, parquoteslash);
+    if(t_end == NULL)
+    {
+		kprintf(stritCMDERROR);
+		return;
+    }	
+	int value = atoi(t+2); 
+	if (value > 100) value = 100;
+	if (value < 2) value = 2;
+	lcd_blv = value;	
+	option_set_lcd_blv(lcd_blv);
+	backlight_percentage_set(lcd_blv);
+	setBlv(lcd_blv);  // in addon
+	syslcdblv((char*) "");
 	wakeLcd();
 }
 
 uint32_t getLcdOut()
 {
-	int increm = 0;
-	option_get_lcd_out(&lcd_out);
-	if (lcd_out == 0xFFFFFFFF)
-	{
-		lcd_out = g_device->lcd_out;
-	} 
-	if (lcd_out >0) increm++; //adjust
-	return lcd_out+increm;	
+	option_get_lcd_out(&lcd_out,&lcd_stop);
+	return lcd_out;
 }
-
+uint32_t getLcdStop()
+{
+	return lcd_stop;
+}
+int getLcdBlv()
+{
+	return lcd_blv;
+}
 // mode of the led indicator. Blink or play/stop
 void sysled(char* s)
 {
@@ -1367,6 +1422,8 @@ void checkCommand(int size, char* s)
 		else if(strncmp(tmp+4, "cali",4) == 0) 	xpt_calibrate();
 		else if(startsWith(   "log",tmp+4)) 	; // do nothing
 		else if(startsWith (  "lcdo",tmp+4)) 	syslcdout(tmp); // lcdout timer to switch off the lcd
+		else if(startsWith (  "lcds",tmp+4)) 	syslcdstop(tmp); // lcdout timer to switch off the lcd on stop state
+		else if(startsWith (  "lcdb",tmp+4)) 	syslcdblv(tmp); // lcd back light value
 		else if(startsWith (  "lcd",tmp+4)) 	syslcd(tmp);
 		else if(startsWith (  "ddmm",tmp+4)) 	sysddmm(tmp);
 		else if(startsWith (  "host",tmp+4)) 	hostname(tmp);
