@@ -754,18 +754,7 @@ void timerTask(void* p) {
 			}			
 		} 
 		
-/*		if (ctimeVol >= TEMPO_SAVE_VOL)
-		{
-			if (g_device->vol != getIvol())
-			{ 			
-				g_device->vol = getIvol();
-//				saveDeviceSettingsVolume(g_device);
-//				ESP_LOGD("timerTask",striWATERMARK,uxTaskGetStackHighWaterMark( NULL ),xPortGetFreeHeapSize( ));
-			}
-			ctimeVol = 0;
-		}	
-*/
-		vTaskDelay(5);	
+		vTaskDelay(10);	
 		
 		if (isEsplay) // esplay board only
 			rexp = i2c_keypad_read(); // read the expansion

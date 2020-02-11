@@ -103,6 +103,7 @@ void wakeLcd();
 uint16_t GetWidth();
 uint16_t GetHeight();
 void setBlv(int val);
+int getBlv();
 
 void* getEncoder(int num);
 struct tm* getDt();

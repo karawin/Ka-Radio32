@@ -35,7 +35,6 @@ uint8_t getLedGpio();
 void setLedGpio(uint8_t val);
 uint32_t getLcdOut();
 uint32_t getLcdStop();
-int getLcdBlv();
 bool getAutoWifi(void);
 void setAutoWifi();
 void fmSeekUp();

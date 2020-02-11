@@ -147,7 +147,7 @@ uint16_t currentStation = 0;
 static gpio_num_t led_gpio = GPIO_NONE;
 static IRAM_ATTR uint32_t lcd_out = 0xFFFFFFFF;
 static IRAM_ATTR uint32_t lcd_stop = 0xFFFFFFFF;
-static IRAM_ATTR int lcd_blv = 100;
+
 static esp_log_level_t s_log_default_level = CONFIG_LOG_BOOTLOADER_LEVEL;
 extern void wsVol(char* vol);
 extern void playStation(char* id);
@@ -1096,6 +1096,8 @@ void syslcdstop(char* s)
 // Backlight value
 void syslcdblv(char* s)
 {
+	int lcd_blv = getBlv();
+	
     char *t = strstr(s, parslashquote);
 	if(t == NULL)
 	{
@@ -1129,10 +1131,7 @@ uint32_t getLcdStop()
 {
 	return lcd_stop;
 }
-int getLcdBlv()
-{
-	return lcd_blv;
-}
+
 // mode of the led indicator. Blink or play/stop
 void sysled(char* s)
 {

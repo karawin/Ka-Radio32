@@ -87,15 +87,15 @@
 
 
 // Tasks priority
-#define PRIO_MAD 		5
+#define PRIO_MAD 		8
 #define PRIO_VS1053 	4
 #define PRIO_RMT		5
 #define PRIO_UART		2
 #define PRIO_CLIENT		5
-#define PRIO_SERVER		6
+#define PRIO_SERVER		5
 #define PRIO_ADDON		7
-#define PRIO_LCD		4
-#define PRIO_SUBSERV	6
+#define PRIO_LCD		6
+#define PRIO_SUBSERV	5
 #define PRIO_TIMER		11
 #define PRIO_OTA		8
 

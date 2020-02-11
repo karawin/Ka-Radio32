@@ -116,6 +116,7 @@ Button_t* expButton2 = NULL;
 struct tm* getDt() { return dt;}
 
 void setBlv(int val) {blv = val;}
+int getBlv() {return blv;}
 
 void* getEncoder(int num)
 {
@@ -202,8 +203,6 @@ void lcd_init(uint8_t Type)
 {	
 	lcd_type = Type;
 
-	// init the gpio for backlight
-	LedBacklightInit();
 	if (lcd_type == LCD_NONE) return;
 	
 	if (lcd_type & LCD_COLOR) // Color one
@@ -214,6 +213,8 @@ void lcd_init(uint8_t Type)
 		lcd_initU8g2(&lcd_type);
 	}
 	vTaskDelay(1);
+	// init the gpio for backlight
+	LedBacklightInit();
 //	dt=localtime(&timestamp);
 }
 
@@ -1225,7 +1226,7 @@ void task_addon(void *pvParams)
 					&& ( futurNum!= atoi(  isColor?getNameNumUcg():getNameNumU8g2()  ))) 
 				{
 					playStationInt(futurNum);
-					vTaskDelay(10);
+					vTaskDelay(2);
 				}	
 				if (!itAskStime)
 				{
