@@ -46,4 +46,9 @@ Station - : **Down**
 Start/Stop : **Start or Menu**  
 
 Toggle Time/Webradio : **Select**
+
+Backlight + : B
+Backlight - : A
+
+
    

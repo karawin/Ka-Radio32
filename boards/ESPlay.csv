@@ -44,6 +44,8 @@ option_space,namespace,,
 O_LCD_TYPE,data,u8,194
 O_LCD_ROTA,data,u8,255
 O_LCD_OUT,data,u32,255
+O_LCD_STOP,data,u32,255
+O_LCD_BLV,data,i32,80
 O_DDMM_FLAG,data,u8,255
 O_AUDIO,data,u8,0
 O_ESPLAY,data,u8,1
