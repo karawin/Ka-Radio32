@@ -88,7 +88,7 @@
 
 // Tasks priority
 #define PRIO_MAD 		9
-#define PRIO_VS1053 	7
+#define PRIO_VS1053 	9
 #define PRIO_RMT		5
 #define PRIO_UART		2
 #define PRIO_CLIENT		6
