@@ -82,6 +82,7 @@ void spiRamFifoReset() {
 	fifoFill=0;
 	fifoOvfCnt=0;
 	fifoUdrCnt=0;
+	memset( fakespiram, 0, SPIRAMSIZE );
 //	xSemaphoreGive(semCanWrite);
 //	xSemaphoreTake(semCanRead, portMAX_DELAY);
 	xSemaphoreGive(mux);
