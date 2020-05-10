@@ -168,7 +168,7 @@ void fdkaac_decoder_task(void *pvParameters)
         }
 //		vTaskDelay(1);
 //		taskYIELD ();	
-        render_samples((char *) pcm_buf->base, pcm_size, &pcm_format);
+        audio_player_play((char *) pcm_buf->base, pcm_size, &pcm_format);
 
         // ESP_LOGI(TAG, "fdk_aac_decoder stack: %d\n", uxTaskGetStackHighWaterMark(NULL));
         // ESP_LOGI(TAG, "%u free heap %u", __LINE__, esp_get_free_heap_size());
@@ -182,7 +182,7 @@ void fdkaac_decoder_task(void *pvParameters)
 
     cleanup:
 	ESP_LOGI(TAG, "fdk_aac_decoder stack: %d\n", uxTaskGetStackHighWaterMark(NULL));
-	//renderer_zero_dma_buffer();
+	//audio_player_clear();
     player->decoder_status = STOPPED;
     player->decoder_command = CMD_NONE;
     ESP_LOGD(TAG, "Decoder stopped.\n");

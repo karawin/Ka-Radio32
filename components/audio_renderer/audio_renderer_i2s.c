@@ -23,12 +23,13 @@
 #include "audio_player.h"
 #include "audio_renderer.h"
 
-#define TAG "renderer"
-
+#define TAG "i2s_renderer"
 
 static renderer_config_t *renderer_instance = NULL;
 static component_status_t renderer_status = UNINITIALIZED;
 //static QueueHandle_t i2s_event_queue;
+
+void renderer_i2s_stop();
 
 static void init_i2s(renderer_config_t *config)
 {
@@ -120,7 +121,7 @@ static void init_i2s(renderer_config_t *config)
 }
 
 //KaraDio32
-void renderer_volume(uint32_t vol)
+void renderer_i2s_volume(uint32_t vol)
 {
 	// log volume (magic)
 	if (vol == 1) return;  // volume 0
@@ -146,7 +147,7 @@ void renderer_volume(uint32_t vol)
  *
  * ESP32 is little-endian.
  */
-void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
+void render_i2s_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 {
 //    ESP_LOGV(TAG, "buf_desc: bit_depth %d format %d num_chan %d sample_rate %d", buf_desc->bit_depth, buf_desc->buffer_format, buf_desc->num_channels, buf_desc->sample_rate);
 //    ESP_LOGV(TAG, "renderer_instance: bit_depth %d, output_mode %d", renderer_instance->bit_depth, renderer_instance->output_mode);
@@ -233,7 +234,7 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
     // support only 16 bit buffers for now
     if(buf_desc->bit_depth != I2S_BITS_PER_SAMPLE_16BIT) {
         ESP_LOGD(TAG, "unsupported decoder bit depth: %d", buf_desc->bit_depth);
-		renderer_stop();
+		renderer_i2s_stop();
         return;
     }
 
@@ -267,7 +268,7 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 	if (outBuf8 == NULL) 
 	{
 		ESP_LOGE(TAG, "malloc buf failed len:%d ",buf_len);
-		renderer_stop();
+		renderer_i2s_stop();
 		return;
 	}
 //	outBuf16 =(uint16_t*)outBuf8;
@@ -357,20 +358,14 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 }
 
 
-void renderer_zero_dma_buffer()
+void renderer_i2s_zero_dma_buffer()
 {
     i2s_zero_dma_buffer(renderer_instance->i2s_num);
 }
 
 
-renderer_config_t *renderer_get()
-{
-    return renderer_instance;
-}
-
-
 /* init renderer sink */
-void renderer_init(renderer_config_t *config)
+void renderer_i2s_init(renderer_config_t *config)
 {
     // update global
     renderer_instance = config;
@@ -386,7 +381,7 @@ void renderer_init(renderer_config_t *config)
 }
 
 
-void renderer_start()
+void renderer_i2s_start()
 {
     if(renderer_status == RUNNING)
         return;
@@ -398,7 +393,7 @@ void renderer_start()
     renderer_status = RUNNING;		
 }
 
-void renderer_stop()
+void renderer_i2s_stop()
 {
     if(renderer_status == STOPPED)
         return;
@@ -407,9 +402,26 @@ void renderer_stop()
 	i2s_stop(renderer_instance->i2s_num);
 }
 
-void renderer_destroy()
+void renderer_i2s_destroy()
 {
     renderer_status = UNINITIALIZED;
     i2s_driver_uninstall(renderer_instance->i2s_num);
 }
+
+/* generic renderer interface */
+renderer_t i2s_renderer = {
+		.render_samples = render_i2s_samples,
+		.set_volume = renderer_i2s_volume,
+		.init = renderer_i2s_init,
+		.start = renderer_i2s_start,
+		.stop = renderer_i2s_stop,
+		.destroy = renderer_i2s_destroy,
+		.zero_dma_buffer = renderer_i2s_zero_dma_buffer
+};
+
+renderer_t *i2s_renderer_get(void)
+{
+	return &i2s_renderer;
+}
+
 

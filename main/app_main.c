@@ -299,29 +299,6 @@ timer_config_t config;
 //////////////////////////////////////////////////////////////////
 
 
-// Renderer config creation
-static renderer_config_t *create_renderer_config()
-{
-    renderer_config_t *renderer_config = calloc(1, sizeof(renderer_config_t));
-
-    renderer_config->bit_depth = I2S_BITS_PER_SAMPLE_16BIT;
-    renderer_config->i2s_num = I2S_NUM_0;
-    renderer_config->sample_rate = 44100;
-    renderer_config->sample_rate_modifier = 1.0;
-    renderer_config->output_mode = audio_output_mode;
-
-    if(renderer_config->output_mode == I2S_MERUS) {
-        renderer_config->bit_depth = I2S_BITS_PER_SAMPLE_32BIT;
-    }
-
-    if(renderer_config->output_mode == DAC_BUILT_IN) {
-        renderer_config->bit_depth = I2S_BITS_PER_SAMPLE_16BIT;
-    }
-
-    return renderer_config;
-}
-
-
 /******************************************************************************
  * FunctionName : checkUart
  * Description  : Check for a valid uart baudrate
@@ -657,9 +634,9 @@ void start_network(){
 			else	
 				tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info);
 		}		
-		ip_addr_t ipdns0 = dns_getserver(0);
+		ip_addr_t *ipdns0 = dns_getserver(0);
 //		ip_addr_t ipdns1 = dns_getserver(1);
-		printf("\nDNS: %s  \n",ip4addr_ntoa(( struct ip4_addr* ) &ipdns0));
+		printf("\nDNS: %s  \n",ip4addr_ntoa(( struct ip4_addr* ) ipdns0));
 		strcpy(localIp , ip4addr_ntoa(&ip_info.ip));
 		printf("IP: %s\n\n",ip4addr_ntoa(&ip_info.ip));
 
@@ -978,7 +955,7 @@ void app_main()
 	// output mode
 	//I2S, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053
 	audio_output_mode = g_device->audio_output_mode;
-	ESP_LOGI(TAG, "audio_output_mode %d\nOne of I2S=0, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053",audio_output_mode);
+	ESP_LOGI(TAG, "audio_output_mode %d\nOne of I2S=0, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053, SPDIF",audio_output_mode);
 
 	//Initialize the SPI RAM chip communications and see if it actually retains some bytes. If it
     //doesn't, warn user.
@@ -1071,9 +1048,11 @@ void app_main()
     player_config->decoder_command = CMD_NONE;
     player_config->buffer_pref = BUF_PREF_SAFE;
     player_config->media_stream = calloc(1, sizeof(media_stream_t));
-
+    player_config->output_mode = audio_output_mode;
+    player_config->renderer = (audio_output_mode == SPDIF) ? spdif_renderer_get() : i2s_renderer_get();
+	
 	audio_player_init(player_config);	  
-	renderer_init(create_renderer_config());
+
 	
 	// LCD Display infos
     lcd_welcome(localIp,"STARTED");

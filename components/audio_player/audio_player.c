@@ -30,6 +30,29 @@
 static player_t *player_instance = NULL;
 static component_status_t player_status = UNINITIALIZED;
 
+
+// Renderer config creation
+static renderer_config_t *create_renderer_config()
+{
+    renderer_config_t *renderer_config = calloc(1, sizeof(renderer_config_t));
+
+    renderer_config->bit_depth = I2S_BITS_PER_SAMPLE_16BIT;
+    renderer_config->i2s_num = I2S_NUM_0;
+    renderer_config->sample_rate = 44100;
+    renderer_config->sample_rate_modifier = 1.0;
+    renderer_config->output_mode = player_instance->output_mode;
+
+    if(renderer_config->output_mode == I2S_MERUS) {
+        renderer_config->bit_depth = I2S_BITS_PER_SAMPLE_32BIT;
+    }
+
+    if(renderer_config->output_mode == DAC_BUILT_IN) {
+        renderer_config->bit_depth = I2S_BITS_PER_SAMPLE_16BIT;
+    }
+
+    return renderer_config;
+}
+
 static int start_decoder_task(player_t *player)
 {
     TaskFunction_t task_func;
@@ -168,17 +191,19 @@ void audio_player_init(player_t *player)
 {
     player_instance = player;
     player_status = INITIALIZED;
+
+    player_instance->renderer->init(create_renderer_config());
 }
 
 void audio_player_destroy()
 {
-    if (get_audio_output_mode() != VS1053) renderer_destroy();
+    if (get_audio_output_mode() != VS1053) player_instance->renderer->destroy();
     player_status = UNINITIALIZED;
 }
 
 void audio_player_start()
 {
-		if (get_audio_output_mode() != VS1053) renderer_start();
+		if (get_audio_output_mode() != VS1053) player_instance->renderer->start();
 		player_instance->media_stream->eof = false;
 		player_instance->command = CMD_START;
 		player_instance->decoder_command = CMD_NONE;	
@@ -190,10 +215,24 @@ void audio_player_stop()
 		player_instance->decoder_command = CMD_STOP;
 		player_instance->command = CMD_STOP;
 		player_instance->media_stream->eof = true;
-		if (get_audio_output_mode() != VS1053)renderer_stop();
+		if (get_audio_output_mode() != VS1053)player_instance->renderer->stop();
 		player_instance->command = CMD_NONE;
 		player_status = STOPPED;
-	
+}
+
+void audio_player_clear()
+{
+	player_instance->renderer->zero_dma_buffer();
+}
+
+void audio_player_set_volume(uint32_t vol)
+{
+	player_instance->renderer->set_volume(vol);
+}
+
+void audio_player_play(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
+{
+	player_instance->renderer->render_samples(buf, buf_len, buf_desc);
 }
 
 component_status_t get_player_status()

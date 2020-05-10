@@ -81,7 +81,7 @@ static enum mad_flow input(struct mad_stream *stream, buffer_t *buf, player_t *p
 			buf_underrun_cnt++;
             //We both silence the output as well as wait a while by pushing silent samples into the i2s system.
             //This waits for about 200mS
-            renderer_zero_dma_buffer();
+			audio_player_clear();
 			vTaskDelay(20);
         } else {
             //Read some bytes from the FIFO to re-fill the buffer.
@@ -176,7 +176,7 @@ void mp3_decoder_task(void *pvParameters)
 	// exit on normal exit
 	cleanup:
     // avoid noise
-    renderer_zero_dma_buffer();
+	audio_player_clear();
 
     if (synth != NULL) free(synth);
     if (frame != NULL) free(frame);
@@ -209,7 +209,7 @@ void render_sample_block(short *sample_buff_ch0, short *sample_buff_ch1, int num
 {
 	mad_buffer_fmt.num_channels = num_channels;
     uint32_t len = num_samples * sizeof(short) * num_channels;
-    render_samples((char*) sample_buff_ch0, len, &mad_buffer_fmt);
+    audio_player_play((char*) sample_buff_ch0, len, &mad_buffer_fmt);
     return;
 }
 

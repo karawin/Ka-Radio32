@@ -11,7 +11,7 @@
 #include "servers.h"
 #include "driver/timer.h"
 #include "driver/uart.h"
-#include "audio_renderer.h"
+#include "audio_player.h"
 #include "app_main.h"
 #include "ota.h"
 #include "esp_wifi.h"
@@ -226,7 +226,7 @@ void setVolumei(int16_t vol) {
 	if (vol <0) vol = 1;
 	if (get_audio_output_mode() == VS1053) VS1053_SetVolume(vol);
 	if (vol <3) vol--;
-	renderer_volume(vol+2); // max 256
+	audio_player_set_volume(vol+2); // max 256
 }
 void setVolume(char* vol) {
 	int16_t uvol = atoi(vol);
@@ -237,7 +237,7 @@ void setVolume(char* vol) {
 	if(vol!= NULL) {
 		if (get_audio_output_mode() == VS1053) VS1053_SetVolume(uvol);
 		if (uvol <3) uvol--;
-		renderer_volume(uvol+2); // max 256
+		audio_player_set_volume(uvol+2); // max 256
 		kprintf("##CLI.VOL#: %d\n",getIvol());
 	}
 }

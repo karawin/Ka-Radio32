@@ -34,11 +34,13 @@ typedef struct {
 } media_stream_t;
 
 typedef struct {
+    output_mode_t output_mode;
     player_command_t command;
     player_command_t decoder_command;
     component_status_t decoder_status;
     buffer_pref_t buffer_pref;
     media_stream_t *media_stream;
+    renderer_t *renderer;
 } player_t;
 
 component_status_t get_player_status();
@@ -47,6 +49,8 @@ void audio_player_init(player_t *player_config);
 void audio_player_start();
 void audio_player_stop();
 void audio_player_destroy();
-
+void audio_player_set_volume(uint32_t vol);
+void audio_player_clear();
+void audio_player_play(char *buf, uint32_t buf_len, pcm_format_t *buf_desc);
 
 #endif /* INCLUDE_AUDIO_PLAYER_H_ */
