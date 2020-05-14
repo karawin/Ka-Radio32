@@ -588,8 +588,8 @@ function hardware(valid) {
 	}
 	xhr.open("POST","hardware",false);
 	xhr.setRequestHeader(content,ctype);
-	for (i=0 ;i<5;i++) if (document.getElementById('output'+i).checked) break;
-	if (i==5) coutput = 0;
+	for (i=0 ;i<6;i++) if (document.getElementById('output'+i).checked) break;
+	if (i==6) coutput = 0;
 	xhr.send("valid=" + valid 
 	+"&coutput=" + i
 	+"&");
