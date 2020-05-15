@@ -657,9 +657,9 @@ void start_network(){
 			else	
 				tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info);
 		}		
-		ip_addr_t *ipdns0 = dns_getserver(0);
+		ip_addr_t ipdns0 = dns_getserver(0);
 //		ip_addr_t ipdns1 = dns_getserver(1);
-		printf("\nDNS: %s  \n",ip4addr_ntoa(( struct ip4_addr* ) ipdns0));
+		printf("\nDNS: %s  \n",ip4addr_ntoa(( struct ip4_addr* ) &ipdns0));
 		strcpy(localIp , ip4addr_ntoa(&ip_info.ip));
 		printf("IP: %s\n\n",ip4addr_ntoa(&ip_info.ip));
 
@@ -978,7 +978,7 @@ void app_main()
 	// output mode
 	//I2S, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053
 	audio_output_mode = g_device->audio_output_mode;
-	ESP_LOGI(TAG, "audio_output_mode %d\nOne of I2S=0, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053, SPDIF", audio_output_mode);
+	ESP_LOGI(TAG, "audio_output_mode %d\nOne of I2S=0, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053",audio_output_mode);
 
 	//Initialize the SPI RAM chip communications and see if it actually retains some bytes. If it
     //doesn't, warn user.
