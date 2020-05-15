@@ -598,13 +598,16 @@ void gpio_get_ir_signal(gpio_num_t *ir)
 	close_partition(hardware_handle,hardware);		
 }
 
-void gpio_get_adc(adc1_channel_t  *channel)
+void gpio_get_adc(adc1_channel_t  *channel, adc1_channel_t *chanbatt)
 {
 	esp_err_t err;
 	nvs_handle hardware_handle;
-	// init default
+	// init default keyboard gpio
 	*channel = PIN_ADC;
 	*channel = gpioToChannel(*channel);
+	// battery gpio
+	*chanbatt = GPIO_NONE;
+	
 	if (open_partition(hardware, gpio_space,NVS_READONLY,&hardware_handle)!= ESP_OK)
 	{
 		ESP_LOGD(TAG,"adc");
@@ -614,6 +617,10 @@ void gpio_get_adc(adc1_channel_t  *channel)
 	err = nvs_get_u8(hardware_handle, "P_ADC_KBD",(uint8_t *) channel);
 	if (err != ESP_OK)ESP_LOGW(TAG,"g_get_adc err 0x%x",err);
 	else *channel = gpioToChannel(*channel);
+
+	err = nvs_get_u8(hardware_handle, "P_ADC_BAT",(uint8_t *) chanbatt);
+	if (err != ESP_OK)ESP_LOGW(TAG,"g_get_adc err 0x%x",err);
+	else *chanbatt = gpioToChannel(*chanbatt);
 
 	close_partition(hardware_handle,hardware);		
 }

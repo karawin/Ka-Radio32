@@ -136,7 +136,9 @@ P_I2S_LRCK		LRCK
 P_I2S_BCLK		BCLK  
 P_I2S_DATA		DATA  
 - **ADC keyboard:**  
-P_ADC_KBD			gpio32 to 39  or 255 if not used. 
+P_ADC_KBD		gpio32 to 39  or 255 if not used. 
+- **ADC Battery:**  
+P_ADC_BAT		gpio32 to 39  or 255 if not used. 
 - **LCD Backlight:**   
 P_BACKLIGHT		GPIO of the hardware device.
 - **TOUCH SCREEN:**  

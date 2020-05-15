@@ -208,17 +208,21 @@ uint8_t startsWith(const char *pre, const char *str)
     return lenstr < lenpre ? false : strncmp(pre, str, lenpre) == 0;
 }
 
-void readRssi()
+//get rssi
+int8_t get_rssi(void)
 {
-	int8_t rssi = -30;
 	wifi_ap_record_t wifidata;
     esp_wifi_sta_get_ap_info(&wifidata);
     if (wifidata.primary != 0) {
-        rssi = wifidata.rssi;
- //       info.channel = wifidata.primary;
+       return (wifidata.rssi);
     }
-//	rssi = wifi_station_get_rssi();
-	kprintf("##RSSI: %d\n",rssi);
+	return -30;
+}
+
+
+void readRssi()
+{
+	kprintf("##RSSI: %d\n",get_rssi());
 }
 
 void printInfo(char* s)
@@ -885,8 +889,7 @@ void sysledgpio(char* s)
 		kprintf(stritCMDERROR);
 		return;
     }	
-	g_device->led_gpio = value; 
-	led_gpio = value;
+	setLedGpio(value);
 	gpio_output_conf(value);
 	saveDeviceSettings(g_device);	
 	gpio_set_ledgpio(value); // write in nvs if any
@@ -1135,8 +1138,8 @@ uint32_t getLcdStop()
 // mode of the led indicator. Blink or play/stop
 void sysled(char* s)
 {
+	extern bool ledStatus, ledPolarity;
     char *t = strstr(s, parslashquote);
-	extern bool ledStatus;
 	if(t == NULL)
 	{
 		kprintf("##Led is in %s mode#\n",((g_device->options & T_LED)== 0)?"Blink":"Play");
@@ -1149,10 +1152,16 @@ void sysled(char* s)
 		return;
     }	
 	uint8_t value = atoi(t+2);
-	if (value !=0) 
-	{g_device->options |= T_LED; ledStatus = false; if (getState()) gpio_set_level(getLedGpio(),0);}
-	else 
-	{g_device->options &= NT_LED; ledStatus =true;} // options:0 = ledStatus true = Blink mode
+	if (value !=0) // play mode
+	{
+	 g_device->options |= T_LED; // set
+	 ledStatus = false; 
+	 if (getState()) 
+	 { if (getLedGpio() != GPIO_NONE) gpio_set_level(getLedGpio(), ledPolarity ? 0 : 1);}
+	}
+	else  // blink mode
+	{ g_device->options &= NT_LED;  // clear
+		ledStatus =true;} // options:0 = ledStatus true = Blink mode
 	
 	saveDeviceSettings(g_device);
 	sysled((char*) "");	
@@ -1165,7 +1174,7 @@ void sysledpol(char* s)
 	extern bool ledPolarity;
 	if(t == NULL)
 	{
-		kprintf("##Led polarity is %d#\n",((g_device->options & T_LEDPOL)== 0)?0:1);
+		kprintf("##Led polarity is %d#\n",(g_device->options & T_LEDPOL)?1:0);
 		return;
 	}
 	char *t_end  = strstr(t, parquoteslash);
@@ -1176,9 +1185,19 @@ void sysledpol(char* s)
     }	
 	uint8_t value = atoi(t+2);
 	if (value !=0) 
-	{g_device->options |= T_LEDPOL; ledPolarity = true; if (getState()) gpio_set_level(getLedGpio(),0);}
+	{
+		g_device->options |= T_LEDPOL; // set
+		ledPolarity = true; 
+		if (getState()) 
+		{ 
+			if (getLedGpio() != GPIO_NONE) gpio_set_level(getLedGpio(),ledPolarity ? 0 : 1);
+		}
+	}
 	else 
-	{g_device->options &= NT_LEDPOL; ledPolarity =false;} // options:0 = ledPolarity 
+	{
+		g_device->options &= NT_LEDPOL; 
+		ledPolarity =false;
+	} // options:0 = ledPolarity 
 	
 	saveDeviceSettings(g_device);	
 	sysledpol((char*) "");

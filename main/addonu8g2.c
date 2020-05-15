@@ -339,10 +339,23 @@ void drawTTitleU8g2(char* ttitle)
     u8g2_DrawUTF8(&u8g2,xxx,1,ttitle);	
     u8g2_SetDrawColor(&u8g2, 1);
 	
-    // draw ip
+    // draw ip 
 	setfont8(small);
 	sprintf(strIp,"IP: %s", getIp());
-	u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,strIp)/2),yy-getFontLineSpacing(),strIp);   	
+//	u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,strIp)/2),yy-getFontLineSpacing(),strIp);
+	u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,strIp)/2),yy-(2*getFontLineSpacing()),strIp);
+	// Rssi
+	sprintf(strIp,"%d dBm", get_rssi());
+	u8g2_DrawUTF8(&u8g2,4,yy-(getFontLineSpacing()),strIp);
+	
+	// Battery
+	if (getBatPercent() != -1)
+	{	
+		sprintf(strIp,"Bat: %d%%",getBatPercent());
+		uint16_t len = u8g2_GetUTF8Width(&u8g2,strIp);
+		u8g2_DrawUTF8(&u8g2,x-len-8,yy-(getFontLineSpacing()),strIp); 
+	}
+	
 }
 //////////////////////////
 void drawNumberU8g2(uint8_t mTscreen,char* irStr)
@@ -414,7 +427,7 @@ void drawTimeU8g2(uint8_t mTscreen,unsigned timein)
     sprintf(strtime,"%02d:%02d:%02d", dt->tm_hour, dt->tm_min,dt->tm_sec);
     drawTTitleU8g2(strdate); 
     setfont8(large);	
-    u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,strtime)/2),(yy/3)+6,strtime); 
+    u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,strtime)/2),(yy/3)+4,strtime); 
 	vTaskDelay(1);
   } while ( u8g2_NextPage(&u8g2) );	     
 }

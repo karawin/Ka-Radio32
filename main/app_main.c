@@ -108,8 +108,8 @@ xQueueHandle event_queue;
 
 //xSemaphoreHandle print_mux;
 static uint16_t FlashOn = 5,FlashOff = 5;
-bool ledStatus = true; // true: normal blink, false: led on when playing
-bool ledPolarity = false; // true: normal false: reverse
+bool ledStatus; // true: normal blink, false: led on when playing
+bool ledPolarity; // true: normal false: reverse
 player_t *player_config;
 static output_mode_t audio_output_mode; 
 static uint8_t clientIvol = 0;
@@ -657,9 +657,9 @@ void start_network(){
 			else	
 				tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info);
 		}		
-		ip_addr_t ipdns0 = dns_getserver(0);
+		ip_addr_t *ipdns0 = dns_getserver(0);
 //		ip_addr_t ipdns1 = dns_getserver(1);
-		printf("\nDNS: %s  \n",ip4addr_ntoa(( struct ip4_addr* ) &ipdns0));
+		printf("\nDNS: %s  \n",ip4addr_ntoa(( struct ip4_addr* ) ipdns0));
 		strcpy(localIp , ip4addr_ntoa(&ip_info.ip));
 		printf("IP: %s\n\n",ip4addr_ntoa(&ip_info.ip));
 
@@ -704,13 +704,11 @@ void timerTask(void* p) {
 	isEsplay = option_get_esplay();
 	gpio_get_ledgpio(&gpioLed);
 	setLedGpio(gpioLed);
-/*
-	printf("FIRST LED GPIO: %d, SSID:%d\n",gpioLed,g_device->current_ap);
-*/				
+				
 	if (gpioLed != GPIO_NONE)
 	{
 		gpio_output_conf(gpioLed);
-		gpio_set_level(gpioLed,0);
+		gpio_set_level(gpioLed, ledPolarity ? 1 : 0);
 	}	
 	cCur = FlashOff*10;
 
@@ -900,6 +898,16 @@ void app_main()
 	
 	copyDeviceSettings(); // copy in the safe partion
 
+	// led mode
+	if (g_device->options & T_LED)
+		ledStatus = false; // play mode
+	else
+		ledStatus = true; // blink mode
+	
+	if (g_device->options & T_LEDPOL)
+		ledPolarity = true;
+	else
+		ledPolarity = false;
 	
 	// init softwares
 	telnetinit();
@@ -966,14 +974,6 @@ void app_main()
 		(i2c_driver_install(I2C_MASTER_NUM, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0));			
 	}
 */
-	// lcd init
-	uint8_t rt;
-	option_get_lcd_info(&g_device->lcd_type,&rt);
-	ESP_LOGI(TAG,"LCD Type %d",g_device->lcd_type);
-	//lcd rotation
-	setRotat(rt) ;	
-	lcd_init(g_device->lcd_type);
-	ESP_LOGI(TAG, "Hardware init done...");
 	
 	// output mode
 	//I2S, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053
@@ -1015,6 +1015,15 @@ void app_main()
 	ESP_LOGI(TAG, "Release %s, Revision %s",RELEASE,REVISION);
 	ESP_LOGI(TAG, "SDK %s",esp_get_idf_version());
 	ESP_LOGI(TAG, "Heap size: %d",xPortGetFreeHeapSize());
+
+	// lcd init
+	uint8_t rt;
+	option_get_lcd_info(&g_device->lcd_type,&rt);
+	ESP_LOGI(TAG,"LCD Type %d",g_device->lcd_type);
+	//lcd rotation
+	setRotat(rt) ;	
+	lcd_init(g_device->lcd_type);
+	ESP_LOGI(TAG, "Hardware init done...");
 
 	lcd_welcome("","");
 	lcd_welcome("","STARTING");
@@ -1101,10 +1110,6 @@ void app_main()
 */	
 	vTaskDelay(60);// wait tasks init
 	ESP_LOGI(TAG," Init Done");
-	
-	// led mode
-	if(g_device->options & T_LED) ledStatus = false;
-	if(g_device->options & T_LEDPOL) ledPolarity = true;
 	
 	setIvol( g_device->vol);
 	kprintf("READY. Type help for a list of commands\n");

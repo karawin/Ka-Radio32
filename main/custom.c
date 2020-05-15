@@ -66,6 +66,7 @@ static void backlight_init()
 	// duty range is 0 ~ ((2**duty_resolution)-1)
 	ledc_set_fade_with_time(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, (LCD_BACKLIGHT_ON_VALUE) ? DUTY_MAX : 0, 500);
 	ledc_fade_start(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, LEDC_FADE_NO_WAIT);
+	
 }
 
 void backlight_percentage_set(int value)
@@ -87,7 +88,6 @@ void LedBacklightInit()
 	{
 		gpio_output_conf(lcdb);
 		gpio_set_level(lcdb,1);
-		
 		backlight_init();		
 	}
 }	 

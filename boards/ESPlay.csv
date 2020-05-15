@@ -38,6 +38,7 @@ P_JOY_0,data,u8,255
 P_JOY_1,data,u8,255
 P_LED_GPIO,data,u8,13
 P_ADC_KBD,data,u8,255
+P_ADC_BAT,data,u8,39
 P_BACKLIGHT,data,u8,27
 
 option_space,namespace,,
@@ -49,6 +50,8 @@ O_LCD_BLV,data,i32,80
 O_DDMM_FLAG,data,u8,255
 O_AUDIO,data,u8,0
 O_ESPLAY,data,u8,1
+O_BAT_R1,data,u8,100
+O_BAT_R2,data,u8,100
 
 custom_ir_space,namespace,,
 K_UP,data,string,

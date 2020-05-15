@@ -37,6 +37,7 @@ uint32_t getLcdOut();
 uint32_t getLcdStop();
 bool getAutoWifi(void);
 void setAutoWifi();
+int8_t get_rssi(void);
 void fmSeekUp();
 void fmSeekDown();
 void fmVol(char* tmp);

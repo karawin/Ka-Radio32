@@ -64,6 +64,11 @@
 #define LCD_SPI_ST7735W			202 // 128x160 shifted 2+1
 #define LCD_SPI_ST7789S			203 // 240x240
 		
+typedef struct
+{
+	int millivolts;
+	int percentage;
+} battery_state;
 
 typedef struct {
     int channel;             /*!< event type */
@@ -104,6 +109,7 @@ uint16_t GetWidth();
 uint16_t GetHeight();
 void setBlv(int val);
 int getBlv();
+int getBatPercent();
 
 void* getEncoder(int num);
 struct tm* getDt();

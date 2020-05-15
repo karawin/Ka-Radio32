@@ -720,7 +720,8 @@ void clientSilentConnect()
 void clientSilentDisconnect()
 {
 	xSemaphoreGive(sDisconnect);
-	audio_player_stop();
+	if (get_player_status()!=STOPPED)
+		audio_player_stop();
 	for (int i = 0;i<100;i++)
 	{
 		if(!clientIsConnected())break;
@@ -732,16 +733,20 @@ void clientSilentDisconnect()
 
 void clientDisconnect(const char* from)
 {
+	extern bool ledPolarity;
 	kprintf(CLISTOP,from);
 	xSemaphoreGive(sDisconnect);
-	audio_player_stop();
+	if (get_player_status()!=STOPPED)
+		audio_player_stop();
 	for (int i = 0;i<100;i++)
 	{
 		if(!clientIsConnected())break;
 		vTaskDelay(1);
 	}
 	if ((from[0]!='C') || (from[1]!='_'))
-		if (!ledStatus) gpio_set_level(getLedGpio(),0);
+		if (!ledStatus){ 
+			if (getLedGpio() != GPIO_NONE) gpio_set_level(getLedGpio(), ledPolarity ? 1 : 0);	
+		}		
 	esp_wifi_set_ps(WIFI_PS_MAX_MODEM);
 	vTaskDelay(5);
 	// save the volume if needed on stop state
@@ -756,6 +761,7 @@ void clientDisconnect(const char* from)
 
 void clientReceiveCallback(int sockfd, char *pdata, int len)
 {
+	extern bool ledPolarity;
 	static int metad ;
 	static int rest ;
 	static IRAM_ATTR  uint32_t chunked;
@@ -1087,7 +1093,11 @@ ESP_LOGD(TAG,"mt2 len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,cle
 
 			setVolumei(getVolume());
 			kprintf(CLIPLAY,0x0d,0x0a);
-			if (!ledStatus) gpio_set_level(getLedGpio(),1);
+
+			if (!ledStatus){ 
+			if (getLedGpio() != GPIO_NONE) gpio_set_level(getLedGpio(), ledPolarity ? 0 : 1);	
+		}		
+
 		}
 	}
 }
@@ -1250,7 +1260,8 @@ void clientTask(void *pvParams) {
 			if (playing)  // stop clean
 			{
 				setVolumei(0);
-				audio_player_stop();
+				if (get_player_status() != STOPPED)
+					audio_player_stop();
 				//if (get_audio_output_mode() == VS1053) spiRamFifoReset();
 				player_config->media_stream->eof = true;
 //				bufferReset();

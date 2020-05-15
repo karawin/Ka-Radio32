@@ -37,7 +37,6 @@
 #define CBLACK 0,0,0
 #define CWHITE 255,255,255
 #define CRED 255,10,10
- 
 
 // nams <--> num of line
 #define STATIONNAME 0
@@ -65,11 +64,101 @@ typedef enum Lang {Latin,Cyrillic,Greek} LANG;
 static LANG charset = Latin;  // latin or other
 
 
+/*
+// GP Voltage --------------------------------------------	
+void GP_Volt_Print(uint8_t mode){
+//
+// +V Bat ----
+//           |
+//         100K R1
+//           |-----> GPIO35 or GPIO36
+//          27K R2
+//           |
+// GND -------
+//
+//
+uint16_t volty;			//GP Edit
+uint16_t a,b,c;		    //GP Edit
+int16_t k;				//GP Edit
+float Volt; 			//GP Edit
+uint16_t Vmin = 2540; 	//GP Edit 2640 --> (min 3.2V)
+uint16_t Vmax = 3430; 	//GP Edit 3400 --> (max.4.2V)
+char test[50];
+	
+		//volty = adc1_get_raw(ADC1_CHANNEL_7);  // GPIO35
+		volty = adc1_get_raw(ADC1_CHANNEL_0);  // GPIO36 
+		a = ( (x/2)-2 ) / 5.5;  // red
+		b = ( (x/2)-2 ) / 2.8;  // yellow
+		c = ( (x/2)-2 );		// green
+		k = (volty - Vmin) / ((Vmax-Vmin) / c);
+		Volt = ((420.0/Vmax)*volty) / 100;
+		sprintf(test,"%.01fV                ",Volt);
+		ESP_LOGD(TAG,"Baterry: %.01fV -> %i  (%i/%i)",Volt,volty,Vmin,Vmax);
+		
+	if (mode == 1){
+			ucg_SetFontMode(&ucg,UCG_FONT_MODE_SOLID);
+			ucg_SetColor(&ucg,0,CRED);
+			if (yy > 128) ucg_DrawString(&ucg,5,yy-45,0,"BAT:");
+				else ucg_DrawString(&ucg,5,yy-35,0,"BAT:");
+			
+			if (k > 0) ucg_SetColori(&ucg,255,0,0);
+			if (k > a) ucg_SetColori(&ucg,255,255,0);
+			if (k > b) ucg_SetColori(&ucg,0,255,0);
+			if (k > 0){
+				if (yy > 128) ucg_DrawString(&ucg,60,yy-45,0,test);
+					else ucg_DrawString(&ucg,35,yy-35,0,test);
+			}
+			else {
+				ucg_SetColori(&ucg,255,0,0);				
+				if (yy > 128) ucg_DrawString(&ucg,60,yy-45,0,"Batt. Volt Is Low !");
+					else ucg_DrawString(&ucg,35,yy-35,0,"Batt. Volt Is Low !");
+			}
+			ucg_SetFontMode(&ucg,UCG_FONT_MODE_TRANSPARENT);		
+	}	
+	if (mode == 0){
+		if(k > 0)
+		{
+			if (k > 0)
+			{
+			  ucg_SetColori(&ucg,255,0,0);
+			  if (k > a) ucg_DrawBox(&ucg,2,yy-9,a,5);
+			  else ucg_DrawBox(&ucg,2,yy-9,k,5);
+			}
+ 			if (k > a)
+			{
+			  ucg_SetColori(&ucg,255,255,0);
+			  if (k > b) ucg_DrawBox(&ucg,(a+1),yy-9,b-a,5);
+			  else ucg_DrawBox(&ucg,(a+1),yy-9,k-a-1,5);
+			}
+			if (k > b)
+			{
+			  ucg_SetColori(&ucg,0,255,0);
+			  if (k > c) ucg_DrawBox(&ucg,(b+1),yy-9,c-(b+1),5);
+			  else ucg_DrawBox(&ucg,(b+1),yy-9,k-b-1,5);
+			}
+			if (yy > 128) ucg_DrawString(&ucg,2,yy-25,0,test);
+				else ucg_DrawString(&ucg,2,yy-19,0,test);
+			if (k <= c){
+				ucg_SetColori(&ucg,0,0,0);
+				ucg_DrawBox(&ucg,k,yy-9,c-k,6);
+			}
+		}
+		else{
+			ucg_SetColori(&ucg,0,0,0);
+			ucg_DrawBox(&ucg,1,yy-9,c,6);
+			ucg_SetColori(&ucg,255,0,0);
+			if (yy > 128) ucg_DrawString(&ucg,2,yy-25,0,"Batt. Volt Is Low !");
+				else ucg_DrawString(&ucg,2,yy-19,0,"Batt. Volt Is Low !");
+		}
+	}
+}
+// GP Voltage 																																*/											
 ////////////////////////////////////////
 typedef enum sizefont  {small, text,middle,large} sizefont;
 void setfont(sizefont size)
 {
 	int inX = x;
+	int inY = 0;
 	if (yy <=80) inX = 96; // corrected for small yy
 //	printf("setfont charset: %d, size: %d,yy: %d, x: %d,  inX: %d\n",charset,size,yy,x,inX);
 	switch(size)
@@ -99,47 +188,57 @@ void setfont(sizefont size)
 		{
 			case 320:
 			case 240:
+				ucg_SetFont(&ucg,ucg_font_inr16_mf );
+				inY = - ucg_GetFontDescent(&ucg)+ ucg_GetFontAscent(&ucg);
 			switch (charset){ 	
 								case Cyrillic: ucg_SetFont(&ucg,ucg_font_crox5h );break; 
 								case Greek:ucg_SetFont(&ucg,ucg_font_helvR18_gr );break;
-								default:
-								case Latin:ucg_SetFont(&ucg,ucg_font_inr16_mf );break;
+								default:;
+								//case Latin:ucg_SetFont(&ucg,ucg_font_inr16_mf );break;
 							}
 //			charset?ucg_SetFont(&ucg,ucg_font_crox5h ):ucg_SetFont(&ucg,ucg_font_inr16_mf ) ;
 			break;
 			case 128:
+				ucg_SetFont(&ucg,ucg_font_5x7_mf );
+				inY = - ucg_GetFontDescent(&ucg)+ ucg_GetFontAscent(&ucg);
 			switch (charset){
 								case Cyrillic: ucg_SetFont(&ucg,ucg_font_crox1c );break; 
 								case Greek:ucg_SetFont(&ucg,ucg_font_helvR14_gr );break;
-								default:
-								case Latin:ucg_SetFont(&ucg,ucg_font_5x7_mf );break;
+								default:;
+								//case Latin:ucg_SetFont(&ucg,ucg_font_5x7_mf );break;
 							}
 //			charset?ucg_SetFont(&ucg,ucg_font_crox1c ):ucg_SetFont(&ucg,ucg_font_5x7_mf) ;
 			break;
 			case 132:
+				ucg_SetFont(&ucg,ucg_font_5x7_mf );
+				inY = - ucg_GetFontDescent(&ucg)+ ucg_GetFontAscent(&ucg);
 			switch (charset){
 								case Cyrillic: ucg_SetFont(&ucg,ucg_font_crox1c );break; 
 								case Greek:ucg_SetFont(&ucg,ucg_font_helvR14_gr );break;
-								default:
-								case Latin:ucg_SetFont(&ucg,ucg_font_5x7_mf );break;
+								default:;
+								//case Latin:ucg_SetFont(&ucg,ucg_font_5x7_mf );break;
 							}
 //			charset?ucg_SetFont(&ucg,ucg_font_crox1c ):ucg_SetFont(&ucg,ucg_font_5x7_mf) ;
 			break;
 			case 96:
+				ucg_SetFont(&ucg,ucg_font_5x7_mf );
+				inY = - ucg_GetFontDescent(&ucg)+ ucg_GetFontAscent(&ucg);
 			switch (charset){
 								case Cyrillic: ucg_SetFont(&ucg,ucg_font_crox1c );break; 
 								case Greek:ucg_SetFont(&ucg,ucg_font_5x7_gr );break;
-								default:
-								case Latin:ucg_SetFont(&ucg,ucg_font_5x7_mf );break;
+								default:;
+								//case Latin:ucg_SetFont(&ucg,ucg_font_5x7_mf );break;
 							}
 //			charset?ucg_SetFont(&ucg,ucg_font_crox1c ):ucg_SetFont(&ucg,ucg_font_4x6_mf) ;
 			break;
 			default: // 160
+				ucg_SetFont(&ucg,ucg_font_6x13_mf );
+				inY = - ucg_GetFontDescent(&ucg)+ ucg_GetFontAscent(&ucg);
 			switch (charset){
 								case Cyrillic: ucg_SetFont(&ucg,ucg_font_crox1c );break; 
 								case Greek:ucg_SetFont(&ucg,ucg_font_6x13_gr );break;
-								default:
-								case Latin:ucg_SetFont(&ucg,ucg_font_6x13_mf );break;
+								default:;
+								//case Latin:ucg_SetFont(&ucg,ucg_font_6x13_mf );break;
 							}
 //			charset?ucg_SetFont(&ucg,ucg_font_crox1c ):ucg_SetFont(&ucg,ucg_font_6x13_mf) ;
 			;
@@ -196,17 +295,21 @@ void setfont(sizefont size)
 		{
 			case 320:
 			case 240:
-			ucg_SetFont(&ucg,ucg_font_inr53_mf); 
+//			ucg_SetFont(&ucg,ucg_font_inr53_mf); 
+			ucg_SetFont(&ucg,ucg_font_osr41_hn); 
 			break;
 			case 128:
-			ucg_SetFont(&ucg,ucg_font_helvR12_hf); 
+//			ucg_SetFont(&ucg,ucg_font_helvR12_hf); 
+			ucg_SetFont(&ucg,ucg_font_osr21_hn); 
 			break;
 			case 96:
-			ucg_SetFont(&ucg,ucg_font_helvR12_hf); 
+//			ucg_SetFont(&ucg,ucg_font_helvR12_hf); 
+			ucg_SetFont(&ucg,ucg_font_osr18_hn); 
 			break;
 			case 132:
 			default: // 160
-			ucg_SetFont(&ucg,ucg_font_inr38_mr); 
+//			ucg_SetFont(&ucg,ucg_font_inr38_mr); 
+			ucg_SetFont(&ucg,ucg_font_osr35_hn); 
 			//ucg_SetFont(&ucg, ucg_font_helvB18_tf);
 			;
 		}
@@ -215,11 +318,18 @@ void setfont(sizefont size)
 		ESP_LOGE(TAG,"Default for size %d\n",size);
 	}
 	
-		if (yy <= 80)
-			y = - ucg_GetFontDescent(&ucg)+ ucg_GetFontAscent(&ucg)+2 ; //interline
-		else
-			y = - ucg_GetFontDescent(&ucg)+ ucg_GetFontAscent(&ucg) +3; //interline
-	
+		if (inY != 0)
+		{
+			if (yy <= 80) y = inY+2;
+			else y = inY+3;
+		}
+		else 
+		{
+			if (yy <= 80)
+				y = - ucg_GetFontDescent(&ucg)+ ucg_GetFontAscent(&ucg)+2 ; //interline
+			else
+				y = - ucg_GetFontDescent(&ucg)+ ucg_GetFontAscent(&ucg) +3; //interline
+		}
 	
 }
 
@@ -281,11 +391,13 @@ struct _utf8To1251_t
 };
 typedef struct _utf8To1251_t utf8To1251_t;
 #define UTF8TO1251	30
-const utf8To1251_t utf8To1251[UTF8TO1251] = {{0x401,0x45/*0xa8*/},{0x402,0x80},{0x403,0x81},{0x404,0xaa},{0x405,0xbd},{0x406,0x49/*0xb2*/},{0x407,0xaf},{0x408,0xa3},
-									   {0x409,0x8a},{0x40a,0x8c},{0x40b,0x8e},{0x40c,0x8d},{0x40e,0xa1},{0x40f,0x8f},{0x452,0x90},{0x451,0x65/*0xb8*/},
-									   {0x453,0x83},{0x454,0xba},{0x455,0xbe},{0x456,0x69/*0xb3*/},{0x457,0xbf},{0x458,0x6a/*0xbc*/},{0x459,0x9a},{0x45a,0x9c},
-									   {0x45b,0x9e},{0x45c,0x9d},{0x45f,0x9f},{0x490,0xa5},{0x491,0xb4},
-									   {0,0}};
+const utf8To1251_t utf8To1251[UTF8TO1251] = {
+	{0x401,0x45/*0xa8*/},{0x402,0x80},{0x403,0x81},{0x404,0x45/*0xaa*/},{0x405,0xbd},{0x406,0x49/*0xb2*/},{0x407,0x49/*0xaf*/},{0x408,0xa3},
+	{0x409,0x8a},{0x40a,0x8c},{0x40b,0x8e},{0x40c,0x8d},{0x40e,0xa1},{0x40f,0x8f},{0x452,0x90},{0x451,0x65/*0xb8*/},
+	{0x453,0x83},{0x454,0xE5/*0xba*/},{0x455,0xbe},{0x456,0x69/*0xb3*/},{0x457,0x69/*0xbf*/},{0x458,0x6a/*0xbc*/},{0x459,0x9a},{0x45a,0x9c},
+	{0x45b,0x9e},{0x45c,0x9d},{0x45f,0x9f},{0x490,0xa5},{0x491,0xb4},
+	{0,0}
+	};
 
 //Cyrillic									   
 uint8_t to1251(uint16_t utf8)
@@ -649,41 +761,60 @@ void drawVolumeUcg(uint8_t mTscreen)
 		TTitleStr[0] = 0;
         drawTTitleUcg(vlstr) ;		
       case 2:
-//        ucg_SetFont(&ucg,ucg_font_inr49_tf);
         setfont(large); 
         uint16_t xxx;
         xxx = (x/2)-(ucg_GetStrWidth(&ucg,aVolume)/2);
-        ucg_SetColor(&ucg,0,CBLACK);  
-		//ucg_SetFontMode(&ucg,UCG_FONT_MODE_SOLID); 
-//        ucg_DrawBox(&ucg,0,HHeader,x,yy);     
+        ucg_SetColor(&ucg,0,CBLACK);     
         ucg_DrawBox(&ucg,0,yy/3,x,ucg_GetFontAscent(&ucg)+2);     
         ucg_SetColor(&ucg,0,CBODY);  
         ucg_DrawString(&ucg,xxx,yy/3,0,aVolume); 
-		//ucg_SetFontMode(&ucg,UCG_FONT_MODE_TRANSPARENT);
         break;
       default:; 
     }
-
-//  screenBottomUcg(); 
 }
 
-static  void drawSecond(unsigned timein)
+static  void drawInfo(unsigned timein)
 {
-  static unsigned insec;
-  if (insec != timein)
-  {
-  char strseco[3]; 
+  static unsigned inInfo;
   uint16_t len;
-  sprintf(strseco,":%02d",dt->tm_sec);
+  if (inInfo != timein)
+  {
+  char strinf[10]; 
+  LANG scharset;
+  scharset = charset;
+  charset = Latin;
   setfont(text);
-  len = ucg_GetStrWidth(&ucg,"xxx");
 
-  ucg_SetColor(&ucg,1,CBLACK); 
   ucg_SetFontMode(&ucg,UCG_FONT_MODE_SOLID); 
+
+// Second*  
+  sprintf(strinf,":%02d",dt->tm_sec);
+  len = ucg_GetStrWidth(&ucg,"000");
+  ucg_SetColor(&ucg,1,CBLACK); 
   ucg_SetColor(&ucg,0,CBODY);
-  ucg_DrawString(&ucg,x-len-8,yy-18,0,strseco); 
+  ucg_DrawString(&ucg,x-len-8,yy-(2*y),0,strinf); 
+
+
+//rssi  
+  sprintf(strinf,"%02d dBm",get_rssi());
+  ucg_SetColor(&ucg,1,CBLACK); 
+  ucg_SetColor(&ucg,0,CTTFONT);
+  ucg_DrawString(&ucg,4,yy-y,0,strinf); 
+
+// Battery 
+  int batPercent = getBatPercent();
+  if (batPercent != -1)
+  {
+	sprintf(strinf,"Bat: %3d%%",batPercent);
+	len = ucg_GetStrWidth(&ucg,strinf);
+	ucg_SetColor(&ucg,1,CBLACK); 
+	ucg_SetColor(&ucg,0,250,batPercent*25/10,0);
+	ucg_DrawString(&ucg,x-len-8,yy-y,0,strinf); 
+  }
   ucg_SetFontMode(&ucg,UCG_FONT_MODE_TRANSPARENT);
-  insec = timein; //to avoid redisplay
+
+  inInfo = timein; //to avoid redisplay
+  charset = scharset;		
   }    
 }
 
@@ -691,20 +822,20 @@ void drawTimeUcg(uint8_t mTscreen,unsigned timein)
 {
   char strdate[23];
   char strtime[20];
+  LANG scharset;
     sprintf(strtime,"%02d:%02d", dt->tm_hour, dt->tm_min);
     switch (mTscreen){
       case 1:
+		scharset = charset;
+		charset = Latin;
 		setfont(text);
 		sprintf(strdate,"IP: %s", getIp());
 		ucg_ClearScreen(&ucg);
         ucg_SetColor(&ucg,0,CRED);  
 		TTitleStr[0] = 0;
 		TTimeStr[0] = 0;
-//        ucg_SetColor(&ucg,0,CBLACK);  
-//        ucg_DrawBox(&ucg,0,HHeader,x,yy);     		
-        // draw ip
-        //ucg_SetFont(&ucg,ucg_font_6x13_tf);
-        ucg_DrawString(&ucg,4,yy-18,0,strdate);		
+        ucg_DrawString(&ucg,4,yy-(2*y),0,strdate);	
+		charset = scharset;		
       case 2:
 	    if (getDdmm())
 			sprintf(strdate,"%02d-%02d-%04d", dt->tm_mday, dt->tm_mon+1,  dt->tm_year+1900);
@@ -713,7 +844,6 @@ void drawTimeUcg(uint8_t mTscreen,unsigned timein)
 		drawTTitleUcg(strdate);
 		if (strcmp(TTimeStr,strtime)!= 0)
 		{	
-			//ucg_SetFont(&ucg,ucg_font_inr38_mf); 
 			setfont(large);
 			ucg_SetColor(&ucg,0,CBODY);		
 			ucg_SetFontMode(&ucg,UCG_FONT_MODE_SOLID); 
@@ -725,7 +855,8 @@ void drawTimeUcg(uint8_t mTscreen,unsigned timein)
 		break;
       default:;
     }
-	drawSecond(timein);;     	
+
+	drawInfo(timein);     	
 }
 
 
@@ -982,7 +1113,7 @@ void lcd_initUcg(uint8_t *lcd_type)
 		
 		HHeader = yy/5;		
 		
-		ESP_LOGI(TAG,"X: %d, yy: %d, y: %d\n",x,yy,y);
+		ESP_LOGI(TAG,"X: %d, yy: %d, y: %d",x,yy,y);
 		z = 0; 
 }
 
