@@ -101,6 +101,7 @@ static esp_adc_cal_characteristics_t characteristics;
 static float adc_value = 0.0f;
 battery_state out_state;
 
+//backlight value
 static int blv = 100;
 
 void Screen(typeScreen st); 
@@ -127,7 +128,8 @@ int getBatPercent()
 {
 	if (isAdcBatt) 
 	{
-		if (out_state.percentage > 100) return -1; // 
+		if (out_state.percentage > 105) return -1; // 
+		if (out_state.percentage > 100) return 100; // 		
 		return (out_state.percentage);
 	}
 	return -1;
@@ -597,6 +599,7 @@ if (isAdcBatt)
     {
         //adcSample += adc1_to_voltage(ADC1_CHANNEL_0, &characteristics) * 0.001f;
         adcSample += esp_adc_cal_raw_to_voltage(adc1_get_raw(chanBat), &characteristics) * 0.001f;
+		vTaskDelay(1);	
     }
     adcSample /= sampleCount;
 
@@ -610,20 +613,22 @@ if (isAdcBatt)
         adc_value /= 2.0f;
     }
 
-    const float R1 = 100000;
-    const float R2 = 100000;
-    const float Vs = adc_value / R2 * (R1 + R2);
-
-    const float FullVoltage = 4.1f;
-    const float EmptyVoltage = 3.2f;
+//    const float R1 = 100000;
+//    const float R2 = 100000;
+//    const float Vo = adc_value;
+//    const float Vs = (Vo / R2 * (R1 + R2));
+    const float Vs = adc_value * 2.0f;
+	
+	
+    const float FullVoltage = 4.2f;
+    const float EmptyVoltage = 3.05f;
 
     out_state.millivolts = (int)(Vs * 1000);
     out_state.percentage = (int)((Vs - EmptyVoltage) / (FullVoltage - EmptyVoltage) * 100.0f);
 	ESP_LOGD(TAG,"ADC Batt: %d%%, millivolt: %d, Sample: %f, Value: %f ", out_state.percentage, out_state.millivolts ,adcSample, adc_value );
-	kprintf("ADC Batt: %d%%, millivolt: %d, Sample: %f, Value: %f \n", out_state.percentage, out_state.millivolts ,adcSample, adc_value );
 
-//    if (out_state.percentage > 100)
-//        out_state.percentage = 100;
+    if (out_state.percentage > 100)
+        out_state.percentage = 100;
     if (out_state.percentage < 0)
         out_state.percentage = 0;
 	

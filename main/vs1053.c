@@ -149,7 +149,7 @@ bool VS1053_HW_init()
 	gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<rst));
 	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
 	
-	ControlReset(RESET);
+//	ControlReset(RESET);
     //gpio_set_direction(rst, GPIO_MODE_OUTPUT);
 		
 	gpio_conf.mode = GPIO_MODE_INPUT;
@@ -264,10 +264,11 @@ uint16_t VS1053_ReadRegister(uint8_t addressbyte){
 
 void WriteVS10xxRegister(unsigned short addr,unsigned short val)
 {
-	VS1053_WriteRegister((uint8_t)addr&0xff, (uint8_t)((val&0xFF00)>>8), (uint8_t)(val&0xFF));
+//	VS1053_WriteRegister((uint8_t)addr&0xff, (uint8_t)((val&0xFF00)>>8), (uint8_t)(val&0xFF));
+	VS1053_WriteRegister16((uint8_t)addr&0xff, val);
 }
 
-
+/*
 void VS1053_ResetChip(){
 	ControlReset(SET);
 	vTaskDelay(30);
@@ -276,6 +277,7 @@ void VS1053_ResetChip(){
 	if (VS1053_checkDREQ() == 1) return;
 	vTaskDelay(20);
 }
+*/
 
 uint16_t MaskAndShiftRight(uint16_t Source, uint16_t Mask, uint16_t Shift){
 	return ( (Source & Mask) >> Shift );
@@ -355,8 +357,10 @@ void VS1053_Start(){
 	else	
 		VS1053_WriteRegister16(SPI_CLOCKF,0xB000);
 	
-	VS1053_SoftwareReset();
-	while(VS1053_checkDREQ() == 0)taskYIELD ();
+	//VS1053_SoftwareReset
+//	VS1053_WriteRegister(SPI_MODE, (SM_SDINEW|SM_LINE1)>>8,SM_RESET);
+//	VS1053_WriteRegister(SPI_MODE, (SM_SDINEW|SM_LINE1)>>8, SM_LAYER12); //mode 
+//	while(VS1053_checkDREQ() == 0)taskYIELD ();
 	
 	VS1053_regtest();
 	
@@ -370,12 +374,9 @@ void VS1053_Start(){
 	// plugin patch
 		if  ((g_device->options&T_PATCH)==0) 
 		{	
-			LoadUserCodes() ;	// vs1053b patch and admix
-//			VS1053_SetVolumeLine(-31);
-//			VS1053_Admix(false);
+			LoadUserCodes() ;	// vs1053b patch
 		}
 	}
-	vTaskDelay(5);
 	ESP_LOGI(TAG,"volume: %d",g_device->vol);
 	setIvol( g_device->vol);
 	VS1053_SetVolume( g_device->vol);	
@@ -404,30 +405,6 @@ int VS1053_SendMusicBytes(uint8_t* music, uint16_t quantity){
 	return oo;
 }
 
-void VS1053_SoftwareReset(){
-	VS1053_WriteRegister(SPI_MODE, (SM_SDINEW|SM_LINE1)>>8,SM_RESET);
-	VS1053_WriteRegister(SPI_MODE, (SM_SDINEW|SM_LINE1)>>8, SM_LAYER12); //mode 
-}
-
-// activate or stop admix plugin (true = activate)
-/*
-void VS1053_Admix(bool val) {
-	uint16_t Mode = VS1053_ReadRegister(SPI_MODE);
-	VS1053_WriteRegister(SPI_MODE, MaskAndShiftRight(Mode|SM_LINE1,0xFF00,8), (Mode & 0x00FF));
-	if (val) 
-		VS1053_WriteRegister16(SPI_AIADDR,0x0F00);
-	else
-		VS1053_WriteRegister16(SPI_AIADDR,0x0F01);
-}
-
-// Set the volume of the line1 (for admix plugin) // -31 to -3
-void VS1053_SetVolumeLine(int16_t vol){
-	if (vol > -3) vol = -3;
-	if (vol < -31) vol = -31;
-	VS1053_WriteRegister(SPI_AICTRL0,(vol&0xFF00)>>8,vol&0xFF);
-}
-*/
-
 // Get volume and convert it in log one
 uint8_t VS1053_GetVolume(){
 uint8_t i,j;
@@ -435,7 +412,6 @@ uint8_t value =  VS1053_ReadRegister(SPI_VOL) & 0x00FF;
 	for (i = 0;i< 255; i++)
 	{
 		j = (log10(255/((float)i+1)) * 105.54571334); // magic no?
-//		printf("i=%d  j=%d value=%d\n",i,j,value);
 		if (value == j )
 		  return i;
 	}	
@@ -683,7 +659,7 @@ void vsTask(void *pvParams) {
 			{
 				s += VS1053_SendMusicBytes(b+s, size-s);	
 			}
-		}
+		} else vTaskDelay(10);
 		vTaskDelay(2);		
 	}	
 	

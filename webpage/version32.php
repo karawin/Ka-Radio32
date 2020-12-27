@@ -3,11 +3,67 @@
 <html>
 <body>
 
-    <p><span class="label label-success">Release <span id="firmware_last">1.9  Rev 2</span> - Built on 2019/03/09
+    <p><span class="label label-success">Release <span id="firmware_last">1.9  Rev 8</span> - Built on 2020/12/27
 	</span>
 	</p>	
     New:
     <ul id="ordered">
+		<li> 1.9 R8: 
+		<ul id="ordered">
+		<li>Add Battery level</li>
+		<li>Add SPDIF output. Thanks to R3D4</li>
+		<li>VS1053 patch V2.9 updated</li>
+		<li></li>
+		</ul></li>
+		<li> 1.9 R7: 
+		<ul id="ordered">
+		<li>New telnet or serial commands: cli.wake, cli.sleep:<BR>
+		cli.wake("x"):  x in minutes. Start or stop the wake function. A value 0 stop the wake timer<BR>
+cli.sleep("x"):  x in minutes. Start or stop the sleep function. A value 0 stop the sleep timer<BR>
+cli.wake: Display the current value in seconds<BR>
+cli.Sleep: Display the current value in seconds<BR>
+</li>
+		<li>sys.lcdstop, sys.lcdblv:<BR>
+sys.lcdstop and sys.lcdstop("x"): Timer in seconds to switch off the lcd on stop mode. 0= no timer<BR>
+sys.lcdblv and sys.lcdblv("x"): Value in percent of the backlight.<BR>	
+		</li>
+		<li>Fade in and out for backlight driven by a gpio.</li>
+		<li>New tool and hardware partition from Bazooka07:<BR>
+		Update for boards/nvs_generator.sh<BR>
+
+use nvs_partition_gen.py tool directly from $IDF_PATH folder<BR>
+can process one or all boards in one shot.<BR>
+Update size for binary partition : 0x3000 now ! Look at :<BR>
+https://docs.espressif.com/projects/esp-idf/en/latest/api-reference/storage/nvs_partition_gen.html#running-the-utility</li>
+		<li>Decode url correctly for /webStation. included name #149</li>
+		<li>Esp-idf Release 3.3.1</li>
+		</ul></li>
+		<li> 1.9 R6: 
+		<ul id="ordered">
+		<li>pull request from Bazooka07: Parse playlist fix.</li>
+		<li></li>
+		</ul></li>
+		<li> 1.9 R5: 
+		<ul id="ordered">
+		<li>json parsing correction for char " in a string</li>
+		<li></li>
+		</ul></li>
+		<li> 1.9 R4: 
+		<ul id="ordered">
+		<li>wifi.auto command now disable the AP mode if already connected to an AP in the past.</li>
+		<li>I2S corrected for 32bit output stream. Thanks to har-in-air github user. </li>
+		<li>Instant play: new button "Add/Edit", and update fields on cli commands. </li>
+		<li></li>
+		</ul></li>
+		<li> 1.9 R3: 
+		<ul id="ordered">
+		<li>blank password accepted.</li>
+		<li>New lcd types: LCD_I2C_ST7567, LCD_SPI_ST7567_pi , LCD_SPI_ST7567, LCD_SPI_ST7565_NHD_C12864</li>
+		<li>New nvs_partition_generator.sh and nvs_partition_gen.py: comment line # comment, now permitted. </li>
+		<li>cli.list correction.</li>
+		<li>Minor corrections.</li>
+		<li></li>
+		</ul></li>
 		<li> 1.9 R2: 
 		<ul id="ordered">
 		<li>New option for the active level of buttons.</li>

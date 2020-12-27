@@ -779,7 +779,7 @@ static  void drawInfo(unsigned timein)
   uint16_t len;
   if (inInfo != timein)
   {
-  char strinf[10]; 
+  char strinf[12]; 
   LANG scharset;
   scharset = charset;
   charset = Latin;
@@ -805,7 +805,7 @@ static  void drawInfo(unsigned timein)
   int batPercent = getBatPercent();
   if (batPercent != -1)
   {
-	sprintf(strinf,"Bat: %3d%%",batPercent);
+	sprintf(strinf,"Batt: %3d%%",batPercent);
 	len = ucg_GetStrWidth(&ucg,strinf);
 	ucg_SetColor(&ucg,1,CBLACK); 
 	ucg_SetColor(&ucg,0,250,batPercent*25/10,0);

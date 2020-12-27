@@ -70,7 +70,6 @@ void	VS1053_Start();
 void	VS1053_I2SRate(uint8_t speed);
 //void 	VS1053_SendMusicBytes(uint8_t* music,int quantity);
 int 	VS1053_SendMusicBytes(uint8_t* music,uint16_t quantity);
-void 	VS1053_SoftwareReset();
 uint16_t	VS1053_GetBitrate();
 uint16_t	VS1053_GetSampleRate();
 uint16_t	VS1053_GetDecodeTime();

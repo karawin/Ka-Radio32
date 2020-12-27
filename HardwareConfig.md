@@ -159,8 +159,7 @@ O_DDMM_FLAG		The format of the date to display 0:MMDD, 1:DDMM.
 O_BTN0			The active level of buttons: 0=LOW, 1:HIGH  ( 0=Default)  
 O_BTN1			The active level of buttons: 0=LOW, 1:HIGH  ( 0=Default)  
 - **Audio output**  
-O_AUDIO The initial Audio mode: 0=I2S (Default), 1=MERUS, 2=DAC, 3=PDM, 4=VS1053
-
+O_AUDIO The initial Audio mode: 0=I2S (Default), 1=MERUS, 2=DAC, 3=PDM, 4=VS1053		
 
 -------------------
 ## Special cases:
@@ -254,6 +253,11 @@ GPIO pin must be gpio32 to 39  or 255 if not used.
 Compatible with https://github.com/karawin/Ka-Radio/blob/master/Hardware/controles.pdf and the one found at https://www.drive2.ru/b/487463808323813881/  
 The stop button is replaced with "Toggle Time/Infos" and "start replaced with "Start/Stop"  
 The ESP32 ADC can be sensitive to noise leading to large discrepancies in ADC readings. To minimize noise, users may connect a 0.1uF capacitor to the ADC input pad in use
+
+### ADC Battery
+If the ADC Battery hardware is missing, set P_BAT to 255
+The hardware must be as follow:  Gnd<---R1--- to P-BAT ---R2--->VBat 
+with R1 = R2 >= 100000 ohms
 
 ### OLED
 If your B/W oled has an artefact on the left for type 0, change it to type 1 (command sys.lcd("1") or O_LCD_TYPE,data,u8,1  

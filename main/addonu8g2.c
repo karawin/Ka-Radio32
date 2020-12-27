@@ -351,7 +351,7 @@ void drawTTitleU8g2(char* ttitle)
 	// Battery
 	if (getBatPercent() != -1)
 	{	
-		sprintf(strIp,"Bat: %d%%",getBatPercent());
+		sprintf(strIp,"Batt: %d%%",getBatPercent());
 		uint16_t len = u8g2_GetUTF8Width(&u8g2,strIp);
 		u8g2_DrawUTF8(&u8g2,x-len-8,yy-(getFontLineSpacing()),strIp); 
 	}
