@@ -264,11 +264,10 @@ uint16_t VS1053_ReadRegister(uint8_t addressbyte){
 
 void WriteVS10xxRegister(unsigned short addr,unsigned short val)
 {
-//	VS1053_WriteRegister((uint8_t)addr&0xff, (uint8_t)((val&0xFF00)>>8), (uint8_t)(val&0xFF));
-	VS1053_WriteRegister16((uint8_t)addr&0xff, val);
+	VS1053_WriteRegister((uint8_t)addr&0xff, (uint8_t)((val&0xFF00)>>8), (uint8_t)(val&0xFF));
 }
 
-/*
+
 void VS1053_ResetChip(){
 	ControlReset(SET);
 	vTaskDelay(30);
@@ -277,7 +276,7 @@ void VS1053_ResetChip(){
 	if (VS1053_checkDREQ() == 1) return;
 	vTaskDelay(20);
 }
-*/
+
 
 uint16_t MaskAndShiftRight(uint16_t Source, uint16_t Mask, uint16_t Shift){
 	return ( (Source & Mask) >> Shift );
@@ -360,7 +359,7 @@ void VS1053_Start(){
 	//VS1053_SoftwareReset
 //	VS1053_WriteRegister(SPI_MODE, (SM_SDINEW|SM_LINE1)>>8,SM_RESET);
 //	VS1053_WriteRegister(SPI_MODE, (SM_SDINEW|SM_LINE1)>>8, SM_LAYER12); //mode 
-//	while(VS1053_checkDREQ() == 0)taskYIELD ();
+	while(VS1053_checkDREQ() == 0)taskYIELD ();
 	
 	VS1053_regtest();
 	
