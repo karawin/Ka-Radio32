@@ -1,0 +1,66 @@
+key 	type 	encoding 	value
+label_space 	namespace 		
+L_LABEL 	data 	string 	radiva52.csv
+L_COMMENT 	data 	string 	xcs:15 xdcs:2 rst:12 dreq:4 a/d:14 d_cs:13 d_rst:32 ir:36 lcd:194 led:22 bl:27 t_cs:21 miso:19 mosi:23 sck:18 disp:203
+gpio_space 	namespace 		
+K_SPI 	data 	u8 	2
+P_MISO 	data 	u8 	19
+P_MOSI 	data 	u8 	23
+P_CLK 	data 	u8 	18
+P_XCS 	data 	u8 	15
+P_RST 	data 	u8 	12
+P_XDCS 	data 	u8 	2
+P_DREQ 	data 	u8 	4
+P_ENC0_A 	data 	u8 	255
+P_ENC0_B 	data 	u8 	255
+P_ENC0_BTN 	data 	u8 	255
+P_ENC1_A 	data 	u8 	255
+P_ENC1_B 	data 	u8 	255
+P_ENC1_BTN 	data 	u8 	255
+P_BTN0_A 	data 	u8 	255
+P_BTN0_B 	data 	u8 	255
+P_BTN0_C 	data 	u8 	255
+P_BTN1_A 	data 	u8 	255
+P_BTN1_B 	data 	u8 	255
+P_BTN1_C 	data 	u8 	255
+P_I2C_SCL 	data 	u8 	255
+P_I2C_SDA 	data 	u8 	255
+P_I2C_RST 	data 	u8 	255
+P_LCD_CS 	data 	u8 	13
+P_LCD_A0 	data 	u8 	14
+P_LCD_RST 	data 	u8 	32
+P_IR_SIGNAL 	data 	u8 	36
+P_I2S_LRCK 	data 	u8 	255
+P_I2S_BCLK 	data 	u8 	255
+P_I2S_DATA 	data 	u8 	255
+P_TOUCH_CS 	data 	u8 	21
+P_JOY_0 	data 	u8 	255
+P_JOY_1 	data 	u8 	255
+P_LED_GPIO 	data 	u8 	22
+P_ADC_KBD 	data 	u8 	255
+P_BACKLIGHT 	data 	u8 	27
+option_space 	namespace 		
+O_BTN0 	data 	u8 	0
+O_LCD_TYPE 	data 	u8 	203
+O_LCD_ROTA 	data 	u8 	0
+O_LCD_OUT 	data 	u32 	0
+O_DDMM_FLAG 	data 	u8 	1
+custom_ir_space 	namespace 		
+K_UP 	data 	string 	
+K_LEFT 	data 	string 	
+K_OK 	data 	string 	
+K_RIGHT 	data 	string 	
+K_DOWN 	data 	string 	
+K_0 	data 	string 	
+K_1 	data 	string 	
+K_2 	data 	string 	
+K_3 	data 	string 	
+K_4 	data 	string 	
+K_5 	data 	string 	
+K_6 	data 	string 	
+K_7 	data 	string 	
+K_8 	data 	string 	
+K_9 	data 	string 	
+K_STAR 	data 	string 	
+K_DIESE 	data 	string 	
+K_INFO 	data 	string 	

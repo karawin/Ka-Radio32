@@ -173,7 +173,7 @@ uint8_t VS1053_checkDREQ() {
 	return gpio_get_level(dreq);
 }
 
-void VS1053_spi_write_char(spi_device_handle_t ivsspi, uint8_t *cbyte, uint16_t len)
+void VS1053_spi_write_char(uint8_t *cbyte, uint16_t len)
 {
 	esp_err_t ret;
     spi_transaction_t t;
@@ -184,8 +184,7 @@ void VS1053_spi_write_char(spi_device_handle_t ivsspi, uint8_t *cbyte, uint16_t 
     //t.rxlength=0;	
 	while(VS1053_checkDREQ() == 0)taskYIELD ();
 	spi_take_semaphore(hsSPI);
-//    ESP_ERROR_CHECK(spi_device_transmit(ivsspi, &t));  //Transmit!
-    ret = spi_device_transmit(ivsspi, &t);  //Transmit!
+    ret = spi_device_transmit(hvsspi, &t);  //Transmit!
 	if (ret != ESP_OK) ESP_LOGE(TAG,"err: %d, VS1053_spi_write_char(len: %d)",ret,len);
 	spi_give_semaphore(hsSPI);
 	while(VS1053_checkDREQ() == 0);
@@ -272,9 +271,9 @@ void VS1053_ResetChip(){
 	ControlReset(SET);
 	vTaskDelay(30);
 	ControlReset(RESET);
-	vTaskDelay(30);
+	vTaskDelay(10);
 	if (VS1053_checkDREQ() == 1) return;
-	vTaskDelay(20);
+	vTaskDelay(30);
 }
 
 
@@ -334,20 +333,45 @@ void VS1053_Start(){
 		ESP_LOGE(TAG,"NO VS1053 detected");
 		return;
 	} 
-	
-//	VS1053_ResetChip();
-// these 4 lines makes board to run on mp3 mode, no soldering required anymore
-	VS1053_WriteRegister16(SPI_WRAMADDR, 0xc017); //address of GPIO_DDR is 0xC017
-	VS1053_WriteRegister16(SPI_WRAM, 0x0003); //GPIO_DDR=3
-	VS1053_WriteRegister16(SPI_WRAMADDR, 0xc019); //address of GPIO_ODATA is 0xC019
-	VS1053_WriteRegister16(SPI_WRAM, 0x0000); //GPIO_ODATA=0
-	vTaskDelay(150);
+
+
+	VS1053_ResetChip();
 	
 	int MP3Status = VS1053_ReadRegister(SPI_STATUSVS);
 	vsVersion = (MP3Status >> 4) & 0x000F; //Mask out only the four version bits
 //0 for VS1001, 1 for VS1011, 2 for VS1002, 3 for VS1003, 4 for VS1053 and VS8053,
 //5 for VS1033, 7 for VS1103, and 6 for VS1063	
-	ESP_LOGI(TAG,"VS1053/VS1003 detected. MP3Status: %x, Version: %x",MP3Status,vsVersion);
+
+
+   if (vsVersion == 4) // only 1053b  
+   {   
+		uint16_t  aud;
+		VS1053_ResetChip();
+// these 4 lines makes board to run on mp3 mode, no soldering required anymore
+		VS1053_WriteRegister16(SPI_WRAMADDR, 0xc017); //address of GPIO_DDR is 0xC017
+		VS1053_WriteRegister16(SPI_WRAM, 0x0003); //GPIO_DDR=3
+		VS1053_WriteRegister16(SPI_WRAMADDR, 0xc019); //address of GPIO_ODATA is 0xC019
+		VS1053_WriteRegister16(SPI_WRAM, 0x0000); //GPIO_ODATA=0	
+		aud = VS1053_ReadRegister(SPI_AUDATA);
+		ESP_LOGI(TAG,"VS1053/SPI_AUDATE= %x",aud);
+		if (aud == 0xac45) 
+		{
+		VS1053_ResetChip();
+// these 4 lines makes board to run on mp3 mode, no soldering required anymore
+		VS1053_WriteRegister16(SPI_WRAMADDR, 0xc017); //address of GPIO_DDR is 0xC017
+		VS1053_WriteRegister16(SPI_WRAM, 0x0003); //GPIO_DDR=3
+		VS1053_WriteRegister16(SPI_WRAMADDR, 0xc019); //address of GPIO_ODATA is 0xC019
+		VS1053_WriteRegister16(SPI_WRAM, 0x0000); //GPIO_ODATA=0	
+		aud = VS1053_ReadRegister(SPI_AUDATA);
+		ESP_LOGI(TAG,"VS1053/SPI_AUDATE= %x",aud);
+		}
+		
+   }
+	
+	vTaskDelay(10);
+	ESP_LOGI(TAG,"VS1053/VS1003 detection. MP3Status: %x, Version: %x",MP3Status,vsVersion);
+	
+
    if (vsVersion == 4) // only 1053b  	
 //		VS1053_WriteRegister(SPI_CLOCKF,0x78,0x00); // SC_MULT = x3, SC_ADD= x2
 //		VS1053_WriteRegister16(SPI_CLOCKF,0xB800); // SC_MULT = x1, SC_ADD= x1
@@ -357,8 +381,8 @@ void VS1053_Start(){
 		VS1053_WriteRegister16(SPI_CLOCKF,0xB000);
 	
 	//VS1053_SoftwareReset
-//	VS1053_WriteRegister(SPI_MODE, (SM_SDINEW|SM_LINE1)>>8,SM_RESET);
-//	VS1053_WriteRegister(SPI_MODE, (SM_SDINEW|SM_LINE1)>>8, SM_LAYER12); //mode 
+	VS1053_WriteRegister(SPI_MODE, (SM_SDINEW|SM_LINE1)>>8,SM_RESET);
+	VS1053_WriteRegister(SPI_MODE, (SM_SDINEW|SM_LINE1)>>8, SM_LAYER12); //mode 
 	while(VS1053_checkDREQ() == 0)taskYIELD ();
 	
 	VS1053_regtest();
@@ -396,7 +420,7 @@ int VS1053_SendMusicBytes(uint8_t* music, uint16_t quantity){
 		{
 			int t = quantity;
 			if(t > CHUNK) t = CHUNK;	
-			VS1053_spi_write_char(hvsspi, &music[oo], t);
+			VS1053_spi_write_char(&music[oo], t);
 			oo += t;
 			quantity -= t;
 		} // else taskYIELD ();
@@ -619,11 +643,8 @@ void VS1053_flush_cancel(uint8_t mode) {  // 0 only fillbyte  1 before play    2
 	VS1053_WriteRegister(SPI_WRAMADDR,MaskAndShiftRight(para_endFillByte,0xFF00,8), (para_endFillByte & 0x00FF) );
 	endFillByte = (int8_t) VS1053_ReadRegister(SPI_WRAM) & 0xFF;
 	for (y = 0; y < 513; y++) buf[y] = endFillByte;	
-	for ( y = 0; y < 5; y++)	VS1053_SendMusicBytes( buf, 512); // 4*513 = 2052
-  } else
-  {
-	for ( y = 0; y < 5; y++)	VS1053_SendMusicBytes( buf, 512); // 4*513 = 2052
-  }	  
+  } 
+  for ( y = 0; y < 5; y++)	VS1053_SendMusicBytes( buf, 512); // 4*513 = 2052 
 }
 
 

@@ -674,7 +674,7 @@ void start_network(){
 				IPADDR2_COPY(&g_device->mask1, &info.netmask);
 				IPADDR2_COPY(&g_device->gate1, &info.gw);	
 			break;
-			case STA2: //ssid1 used			
+			case STA2: //ssid2 used			
 				IPADDR2_COPY(&g_device->ipAddr2, &info.ip);
 				IPADDR2_COPY(&g_device->mask2, &info.netmask);
 				IPADDR2_COPY(&g_device->gate2, &info.gw);	

@@ -12,6 +12,7 @@
 
 // 117
 /* not used in esp32*/
+/*
 const unsigned short admix[]    = { // Compressed plugin 
 
   0x0007, 0x0001, 0x8f00, 0x0006, 0x0070, 0x2803, 0xc2c0, 0x0030, //    0 
@@ -31,7 +32,7 @@ const unsigned short admix[]    = { // Compressed plugin
   0x0717, 0x2100, 0x0000, 0x3f05, 0xdbd7,
 };
 #define ADMIX_SIZE 117
-
+*/
 
 const unsigned short newpatch[]    = { /* Compressed plugin */
 	0x0007,0x0001, /*copy 1*/
@@ -661,9 +662,10 @@ void  LoadUserCode( const unsigned short* iplugin,uint16_t ssize) {
   int i = 0;
 
   ESP_LOGI(TAG,"plugin size %d, start: %x %x %x",ssize,*iplugin,*(iplugin+1),*(iplugin+2));
- 
+
+ unsigned short addr, n, val;
+addr = 0;val=0;
   while (i<ssize) {
-    unsigned short addr, n, val;
     addr = iplugin[i++];
     n =  iplugin[i++];
     if (n & 0x8000U) { /* RLE run, replicate n samples */
@@ -679,6 +681,8 @@ void  LoadUserCode( const unsigned short* iplugin,uint16_t ssize) {
       }
     }
   }
+  //VS1053_WriteRegister((uint8_t)addr&0xff, (uint8_t)((val&0xFF00)>>8), (uint8_t)(val&0xFF));
+  ESP_LOGI(TAG,"plugin end Addr: %x,  val:%x %x",(uint8_t)addr&0xff,(uint8_t)((val&0xFF00)>>8),(uint8_t)(val&0xFF)  );
 }
 void  LoadUserCodes(void)
 {
