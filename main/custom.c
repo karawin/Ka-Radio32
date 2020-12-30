@@ -73,6 +73,7 @@ void backlight_percentage_set(int value)
 {
 	if (lcdb != GPIO_NONE)
 	{
+		if (value > 100) value = 100;
 		int duty = DUTY_MAX * (value * 0.01f);
 //		printf("backlight_percentage_set  %d\n",value);
 		ledc_set_fade_with_time(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, duty, 20);

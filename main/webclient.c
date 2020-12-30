@@ -1262,17 +1262,14 @@ void clientTask(void *pvParams) {
 				setVolumei(0);
 				if (get_player_status() != STOPPED)
 					audio_player_stop();
-				//if (get_audio_output_mode() == VS1053) spiRamFifoReset();
 				player_config->media_stream->eof = true;
-//				bufferReset();
-				if (get_audio_output_mode() == VS1053)VS1053_flush_cancel(2);
+				if (get_audio_output_mode() == VS1053) VS1053_flush_cancel();
 				playing = 0;
-				vTaskDelay(40);	// stop without click
+				vTaskDelay(20);	// stop without click
 				//VS1053_LowPower();
 				setVolumei(getVolume());
 			}
-
-//			bufferReset();
+			spiRamFifoReset();
 			shutdown(sockfd,SHUT_RDWR); // stop the socket
 			vTaskDelay(1);
 			close(sockfd);

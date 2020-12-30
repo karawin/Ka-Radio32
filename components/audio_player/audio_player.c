@@ -107,7 +107,6 @@ static int start_decoder_task(player_t *player)
 		player->decoder_status = RUNNING;
 	}
 	
-	spiRamFifoReset();
 	ESP_LOGD(TAG, "decoder task created: %s", task_name);
 
     return 0;
@@ -193,7 +192,6 @@ void audio_player_stop()
 		if (get_audio_output_mode() != VS1053)renderer_stop();
 		player_instance->command = CMD_NONE;
 		player_status = STOPPED;
-	
 }
 
 component_status_t get_player_status()

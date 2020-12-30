@@ -148,10 +148,7 @@ bool VS1053_HW_init()
 	gpio_conf.intr_type = GPIO_INTR_DISABLE;	
 	gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<rst));
 	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
-	
-//	ControlReset(RESET);
-    //gpio_set_direction(rst, GPIO_MODE_OUTPUT);
-		
+			
 	gpio_conf.mode = GPIO_MODE_INPUT;
 	gpio_conf.pull_up_en =  GPIO_PULLUP_DISABLE;
 	gpio_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
@@ -169,8 +166,17 @@ void ControlReset(uint8_t State){
 	gpio_set_level(rst, State);
 }
 
-uint8_t VS1053_checkDREQ() {
+uint8_t CheckDREQ() {
 	return gpio_get_level(dreq);
+}
+#define TMAX 4096
+void  WaitDREQ() {
+	uint16_t  time_out = 0;
+	while(gpio_get_level(dreq) == 0 && time_out++ < TMAX)
+	{
+		taskYIELD();
+	}
+//	if (time_out >0) ESP_LOGI(TAG,"timeout: %d",time_out);
 }
 
 void VS1053_spi_write_char(uint8_t *cbyte, uint16_t len)
@@ -182,14 +188,12 @@ void VS1053_spi_write_char(uint8_t *cbyte, uint16_t len)
 	t.tx_buffer = cbyte;	
     t.length= len*8; 
     //t.rxlength=0;	
-	while(VS1053_checkDREQ() == 0)taskYIELD ();
+	while(gpio_get_level(dreq) == 0 )taskYIELD();
 	spi_take_semaphore(hsSPI);
     ret = spi_device_transmit(hvsspi, &t);  //Transmit!
 	if (ret != ESP_OK) ESP_LOGE(TAG,"err: %d, VS1053_spi_write_char(len: %d)",ret,len);
 	spi_give_semaphore(hsSPI);
-	while(VS1053_checkDREQ() == 0);
-	//printf("VS1053_spi_write val: %x  rxlen: %x \n",*cbyte,t.rxlength);
-   // return ret;
+//	while(gpio_get_level(dreq) == 0 );
 }
 
 void VS1053_WriteRegister(uint8_t addressbyte, uint8_t highbyte, uint8_t lowbyte)
@@ -206,13 +210,13 @@ void VS1053_WriteRegister(uint8_t addressbyte, uint8_t highbyte, uint8_t lowbyte
 	t.tx_data[0] = highbyte;
 	t.tx_data[1] = lowbyte;		
     t.length= 16;
-	while(VS1053_checkDREQ() == 0)taskYIELD ();
+	WaitDREQ();
 	spi_take_semaphore(vsSPI);
 //    ESP_ERROR_CHECK(spi_device_transmit(vsspi, &t));  //Transmit!
     ret = spi_device_transmit(vsspi, &t);  //Transmit!
 	if (ret != ESP_OK) ESP_LOGE(TAG,"err: %d, VS1053_WriteRegister(%d,%d,%d)",ret,addressbyte,highbyte,lowbyte);
 	spi_give_semaphore(vsSPI);	
-	while(VS1053_checkDREQ() == 0);
+	WaitDREQ();
 }
 
 void VS1053_WriteRegister16(uint8_t addressbyte, uint16_t value)
@@ -229,13 +233,13 @@ void VS1053_WriteRegister16(uint8_t addressbyte, uint16_t value)
 	t.tx_data[0] = (value>>8)&0xff;	
 	t.tx_data[1] = value&0xff;		
     t.length= 16;
-	while(VS1053_checkDREQ() == 0)taskYIELD ();
+	WaitDREQ();
 	spi_take_semaphore(vsSPI);	
 //    ESP_ERROR_CHECK(spi_device_transmit(vsspi, &t));  //Transmit!	
     ret = spi_device_transmit(vsspi, &t);  //Transmit!	
 	if (ret != ESP_OK) ESP_LOGE(TAG,"err: %d, VS1053_WriteRegister16(%d,%d)",ret,addressbyte,value);
 	spi_give_semaphore(vsSPI);
-	while(VS1053_checkDREQ() == 0);
+	WaitDREQ();
 
 }
 
@@ -249,14 +253,14 @@ uint16_t VS1053_ReadRegister(uint8_t addressbyte){
 	t.flags |= SPI_TRANS_USE_RXDATA	;
 	t.cmd = VS_READ_COMMAND;
 	t.addr = addressbyte;
-	while(VS1053_checkDREQ() == 0) taskYIELD ();
+	WaitDREQ();
 	spi_take_semaphore(vsSPI);
 	ret = spi_device_transmit(vsspi, &t);  //Transmit!
 	if (ret != ESP_OK) ESP_LOGE(TAG,"err: %d, VS1053_ReadRegister(%d), read: %d",ret,addressbyte,(uint32_t)*t.rx_data);
 	result =  (((t.rx_data[0]&0xFF)<<8) | ((t.rx_data[1])&0xFF)) ; 
 //	ESP_LOGI(TAG,"VS1053_ReadRegister data: %d %d %d %d",t.rx_data[0],t.rx_data[1],t.rx_data[2],t.rx_data[3]);
 	spi_give_semaphore(vsSPI);
-	while(VS1053_checkDREQ() == 0);
+	WaitDREQ();
 	return result;
 }
 
@@ -272,7 +276,7 @@ void VS1053_ResetChip(){
 	vTaskDelay(30);
 	ControlReset(RESET);
 	vTaskDelay(10);
-	if (VS1053_checkDREQ() == 1) return;
+	if (CheckDREQ() == 1) return;
 	vTaskDelay(30);
 }
 
@@ -327,7 +331,7 @@ void VS1053_Start(){
 	ControlReset(RESET);
 	vTaskDelay(200);	
 	//Check DREQ
-	if (VS1053_checkDREQ() == 0)
+	if (CheckDREQ() == 0)
 	{
 		vsVersion = 0; 
 		ESP_LOGE(TAG,"NO VS1053 detected");
@@ -376,22 +380,21 @@ void VS1053_Start(){
 //		VS1053_WriteRegister(SPI_CLOCKF,0x78,0x00); // SC_MULT = x3, SC_ADD= x2
 //		VS1053_WriteRegister16(SPI_CLOCKF,0xB800); // SC_MULT = x1, SC_ADD= x1
 		VS1053_WriteRegister16(SPI_CLOCKF,0x8800); // SC_MULT = x3.5, SC_ADD= x1
-//		VS1053_WriteRegister(SPI_CLOCKF,0x90,0x00); // SC_MULT = x3.5, SC_ADD= x1.5
 	else	
 		VS1053_WriteRegister16(SPI_CLOCKF,0xB000);
 	
 	//VS1053_SoftwareReset
 	VS1053_WriteRegister(SPI_MODE, (SM_SDINEW|SM_LINE1)>>8,SM_RESET);
 	VS1053_WriteRegister(SPI_MODE, (SM_SDINEW|SM_LINE1)>>8, SM_LAYER12); //mode 
-	while(VS1053_checkDREQ() == 0)taskYIELD ();
+	WaitDREQ();
 	
 	VS1053_regtest();
 	
 	// enable I2C dac output of the vs1053
 	if (vsVersion == 4) // only 1053
 	{
-		VS1053_WriteRegister16(SPI_WRAMADDR, 0xc017); //
-		VS1053_WriteRegister16(SPI_WRAM, 0x00F0); //
+		VS1053_WriteRegister16(SPI_WRAMADDR, 0xc017);
+		VS1053_WriteRegister16(SPI_WRAM, 0x00F0);
 		VS1053_I2SRate(g_device->i2sspeed);	
 
 	// plugin patch
@@ -413,17 +416,14 @@ void VS1053_Start(){
 int VS1053_SendMusicBytes(uint8_t* music, uint16_t quantity){
 	if(quantity ==0) return 0;
 	int oo = 0;
-//	while(VS1053_checkDREQ() == 0);taskYIELD ();
+
 	while(quantity)
 	{
-//		if(VS1053_checkDREQ()) 
-		{
-			int t = quantity;
-			if(t > CHUNK) t = CHUNK;	
-			VS1053_spi_write_char(&music[oo], t);
-			oo += t;
-			quantity -= t;
-		} // else taskYIELD ();
+		int t = quantity;
+		if(t > CHUNK) t = CHUNK;	
+		VS1053_spi_write_char(&music[oo], t);
+		oo += t;
+		quantity -= t;
 	}
 	return oo;
 }
@@ -610,41 +610,32 @@ uint16_t VS1053_GetSampleRate(){
 }
 
 /* to start and stop a new stream */
-void VS1053_flush_cancel(uint8_t mode) {  // 0 only fillbyte  1 before play    2 cancel play
-//  int8_t endFillByte = (int8_t) (Mp3ReadWRAM(para_endFillByte) & 0xFF);
+void VS1053_flush_cancel() {
 	int8_t endFillByte ;
 	int16_t y;
-	uint8_t buf[513];	
-	if (mode != 2)
-	{
-		VS1053_WriteRegister(SPI_WRAMADDR,MaskAndShiftRight(para_endFillByte,0xFF00,8), (para_endFillByte & 0x00FF) );		
-		endFillByte = (int8_t) VS1053_ReadRegister(SPI_WRAM) & 0xFF;
-		for (y = 0; y < 513; y++) buf[y] = endFillByte;
-	}
-
-  if (mode != 0) //set CANCEL
-  {
+	uint8_t buf[514];	
+	// set spimode with SM_CANCEL
 	uint16_t spimode = VS1053_ReadRegister(SPI_MODE)| SM_CANCEL;
   // set CANCEL
 	VS1053_WriteRegister(SPI_MODE,MaskAndShiftRight(spimode,0xFF00,8), (spimode & 0x00FF) );
 	// wait CANCEL
+	endFillByte = (int8_t) VS1053_ReadRegister(SPI_WRAM) & 0xFF;
+	for (y = 0; y < 33; y++) buf[y] = endFillByte;	 
 	y = 0;
 	while (VS1053_ReadRegister(SPI_MODE)& SM_CANCEL)
 	{	  
-		if (mode == 1) VS1053_SendMusicBytes( buf, CHUNK); //1
-		else vTaskDelay(1); //2  
-//		printf ("Wait CANCEL clear\n");
-		if (y++ > 200) 
+		VS1053_SendMusicBytes( buf, 32); 
+		if (y++ > 64) 
 		{
-			if (mode == 1) VS1053_Start();
+			ESP_LOGE(TAG,"VS1053 Reset");
+//			VS1053_Start();
 			break;
 		}		
 	}	
-	VS1053_WriteRegister(SPI_WRAMADDR,MaskAndShiftRight(para_endFillByte,0xFF00,8), (para_endFillByte & 0x00FF) );
+
 	endFillByte = (int8_t) VS1053_ReadRegister(SPI_WRAM) & 0xFF;
-	for (y = 0; y < 513; y++) buf[y] = endFillByte;	
-  } 
-  for ( y = 0; y < 5; y++)	VS1053_SendMusicBytes( buf, 512); // 4*513 = 2052 
+	for (y = 0; y < 513; y++) buf[y] = endFillByte;	 
+    for ( y = 0; y < 5; y++)	VS1053_SendMusicBytes( buf, 513); // 4*513 = 2052 
 }
 
 

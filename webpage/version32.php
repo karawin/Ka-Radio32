@@ -3,11 +3,18 @@
 <html>
 <body>
 
-    <p><span class="label label-success">Release <span id="firmware_last">1.9  Rev 8</span> - Built on 2020/12/27
+    <p><span class="label label-success">Release <span id="firmware_last">1.9  Rev 9</span> - Built on 2020/12/30
 	</span>
 	</p>	
     New:
     <ul id="ordered">
+		<li> 1.9 R9: 
+		<ul id="ordered">
+		<li>VS1053b detection improved.</li>
+		<li>Now ogg stream are played with the vs1053b</li>
+		<li>No more glitch with the vs1053b</li>
+		<li></li>
+		</ul></li>		
 		<li> 1.9 R8: 
 		<ul id="ordered">
 		<li>Add Battery level</li>

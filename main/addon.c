@@ -153,7 +153,6 @@ static void ClearBuffer()
 
 static int16_t DrawString(int16_t x, int16_t y,  const char *str)
 {
-// if (lcd_type == LCD_NONE) return -1;
   if (isColor)
 	return ucg_DrawString(&ucg,x,y,0,str);
   else
@@ -162,7 +161,6 @@ static int16_t DrawString(int16_t x, int16_t y,  const char *str)
 
 static void DrawColor(uint8_t color, uint8_t r, uint8_t g, uint8_t b)
 {
-//  if (lcd_type == LCD_NONE) return;
   if (isColor)
 	ucg_SetColor(&ucg, 0,r,g,b);
   else
@@ -171,7 +169,6 @@ static void DrawColor(uint8_t color, uint8_t r, uint8_t g, uint8_t b)
 
 static void DrawBox(ucg_int_t x, ucg_int_t y, ucg_int_t w, ucg_int_t h)
 {
-//  if (lcd_type == LCD_NONE) return;
   if (isColor)
 	ucg_DrawBox(&ucg, x,y,w,h);
   else
@@ -180,7 +177,6 @@ static void DrawBox(ucg_int_t x, ucg_int_t y, ucg_int_t w, ucg_int_t h)
 
 uint16_t GetWidth()
 {
-//  if (lcd_type == LCD_NONE) return 0;
   if (isColor)
 	  return ucg_GetWidth(&ucg);
 
@@ -188,7 +184,6 @@ uint16_t GetWidth()
 }
 uint16_t GetHeight()
 {
-//  if (lcd_type == LCD_NONE) return 0;
   if (isColor)
 	  return ucg_GetHeight(&ucg);
 
@@ -522,8 +517,7 @@ static void evtClearScreen()
 	event_lcd_t evt;
 	evt.lcmd = eclrs;	
 	evt.lline = NULL;
-//	xQueueSendToFront(event_lcd,&evt, 0);	
-	xQueueSend(event_lcd,&evt, 0);	
+	if (lcd_type != LCD_NONE) xQueueSend(event_lcd,&evt, 0);	
 }
 
 static void evtScreen(typelcmd value)
@@ -531,7 +525,7 @@ static void evtScreen(typelcmd value)
 	event_lcd_t evt;
 	evt.lcmd = escreen;	
 	evt.lline = (char*)((uint32_t)value);
-	xQueueSend(event_lcd,&evt, 0);
+	if (lcd_type != LCD_NONE) xQueueSend(event_lcd,&evt, 0);
 	
 }
 
@@ -540,7 +534,7 @@ static void evtStation(int16_t value)
 	event_lcd_t evt; 
 	evt.lcmd = estation;
 	evt.lline = (char*)((uint32_t)value);
-	xQueueSend(event_lcd,&evt, 0);			
+	if (lcd_type != LCD_NONE) xQueueSend(event_lcd,&evt, 0);			
 }
 
 // toggle main / time
@@ -549,7 +543,7 @@ static void toggletime()
 	event_lcd_t evt;
 	evt.lcmd = etoggle;	
 	evt.lline = NULL;
-	xQueueSend(event_lcd,&evt, 0);	
+	if (lcd_type != LCD_NONE) xQueueSend(event_lcd,&evt, 0);	
 }
 
 //----------------------------
@@ -1267,15 +1261,20 @@ void task_addon(void *pvParams)
 	// queue for events of the IR nec rx
 	event_ir = xQueueCreate(5, sizeof(event_ir_t));
 	ESP_LOGD(TAG,"event_ir: %x",(int)event_ir);
-	// queue for events of the lcd
-	event_lcd = xQueueCreate(20, sizeof(event_lcd_t));
-	ESP_LOGD(TAG,"event_lcd: %x",(int)event_lcd);	
-	
+
 	xTaskCreatePinnedToCore(rmt_nec_rx_task, "rmt_nec_rx_task", 2148, NULL, PRIO_RMT, &pxCreatedTask,CPU_RMT);
 	ESP_LOGI(TAG, "%s task: %x","rmt_nec_rx_task",(unsigned int)pxCreatedTask);		;
-	xTaskCreatePinnedToCore (task_lcd, "task_lcd", 2200, NULL, PRIO_LCD, &pxTaskLcd,CPU_LCD); 
-	ESP_LOGI(TAG, "%s task: %x","task_lcd",(unsigned int)pxTaskLcd);
-	getTaskLcd(&pxTaskLcd); // give the handle to xpt
+
+	if (g_device->lcd_type!=LCD_NONE)
+	{
+		// queue for events of the lcd
+		event_lcd = xQueueCreate(20, sizeof(event_lcd_t));
+		ESP_LOGD(TAG,"event_lcd: %x",(int)event_lcd);	
+
+		xTaskCreatePinnedToCore (task_lcd, "task_lcd", 2200, NULL, PRIO_LCD, &pxTaskLcd,CPU_LCD); 
+		ESP_LOGI(TAG, "%s task: %x","task_lcd",(unsigned int)pxTaskLcd);
+		getTaskLcd(&pxTaskLcd); // give the handle to xpt
+	}
 	
 	while (1)
 	{
@@ -1423,7 +1422,7 @@ void addonParse(const char *fmt, ...)
 	    evt.lcmd = lovol;
 		evt.lline = NULL;
    }
-   if (evt.lcmd != -1) xQueueSend(event_lcd,&evt, 0);
+   if (evt.lcmd != -1 && lcd_type !=LCD_NONE) xQueueSend(event_lcd,&evt, 0);
    free (line);
 }
 
