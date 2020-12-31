@@ -619,7 +619,8 @@ void VS1053_flush_cancel() {
   // set CANCEL
 	VS1053_WriteRegister(SPI_MODE,MaskAndShiftRight(spimode,0xFF00,8), (spimode & 0x00FF) );
 	// wait CANCEL
-	endFillByte = (int8_t) VS1053_ReadRegister(SPI_WRAM) & 0xFF;
+	VS1053_WriteRegister16(SPI_WRAMADDR, para_endFillByte);
+	endFillByte = (int8_t) (VS1053_ReadRegister(SPI_WRAM) & 0xFF);
 	for (y = 0; y < 33; y++) buf[y] = endFillByte;	 
 	y = 0;
 	while (VS1053_ReadRegister(SPI_MODE)& SM_CANCEL)
