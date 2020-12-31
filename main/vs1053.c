@@ -634,7 +634,6 @@ void VS1053_flush_cancel() {
 		}		
 	}	
 
-	endFillByte = (int8_t) VS1053_ReadRegister(SPI_WRAM) & 0xFF;
 	for (y = 0; y < 513; y++) buf[y] = endFillByte;	 
     for ( y = 0; y < 5; y++)	VS1053_SendMusicBytes( buf, 513); // 4*513 = 2052 
 }
