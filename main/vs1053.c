@@ -176,7 +176,6 @@ void  WaitDREQ() {
 	{
 		taskYIELD();
 	}
-//	if (time_out >0) ESP_LOGI(TAG,"timeout: %d",time_out);
 }
 
 void VS1053_spi_write_char(uint8_t *cbyte, uint16_t len)
@@ -338,7 +337,7 @@ void VS1053_Start(){
 		return;
 	} 
 
-
+	VS1053_DisableAnalog();
 	VS1053_ResetChip();
 	
 	int MP3Status = VS1053_ReadRegister(SPI_STATUSVS);
@@ -609,11 +608,11 @@ uint16_t VS1053_GetSampleRate(){
 	return (VS1053_ReadRegister(SPI_AUDATA) & 0xFFFE);
 }
 
-/* to start and stop a new stream */
+/* to  stop a  stream */
 void VS1053_flush_cancel() {
 	int8_t endFillByte ;
 	int16_t y;
-	uint8_t buf[514];	
+	uint8_t buf[33];	
 	// set spimode with SM_CANCEL
 	uint16_t spimode = VS1053_ReadRegister(SPI_MODE)| SM_CANCEL;
   // set CANCEL
@@ -621,7 +620,7 @@ void VS1053_flush_cancel() {
 	// wait CANCEL
 	VS1053_WriteRegister16(SPI_WRAMADDR, para_endFillByte);
 	endFillByte = (int8_t) (VS1053_ReadRegister(SPI_WRAM) & 0xFF);
-	for (y = 0; y < 33; y++) buf[y] = endFillByte;	 
+	for (y = 0; y < 32; y++) buf[y] = endFillByte;	 
 	y = 0;
 	while (VS1053_ReadRegister(SPI_MODE)& SM_CANCEL)
 	{	  
@@ -634,8 +633,9 @@ void VS1053_flush_cancel() {
 		}		
 	}	
 
-	for (y = 0; y < 513; y++) buf[y] = endFillByte;	 
-    for ( y = 0; y < 5; y++)	VS1053_SendMusicBytes( buf, 513); // 4*513 = 2052 
+	for (y = 0; y < 64; y++) 
+		VS1053_SendMusicBytes( buf, 32); //2080 bytes
+	
 }
 
 

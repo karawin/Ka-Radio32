@@ -1,7 +1,7 @@
 key,type,encoding,value
 
 label_space,namespace,,
-L_LABEL,data,string,standard_adb.csv
+L_LABEL,data,string,standard_adb.csv  Audio Developing board
 L_COMMENT,data,string,This is the standard default configuration as in the builtin conf.
 
 gpio_space,namespace,,

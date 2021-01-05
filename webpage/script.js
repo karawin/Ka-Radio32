@@ -160,6 +160,19 @@ function clickdhcp() {
       document.getElementById("gw").removeAttribute("disabled") ;
   }
 }  
+function clickdhcp2() {
+  if (document.getElementById("dhcp2").checked)
+  {
+    document.getElementById("ip2").setAttribute("disabled","") ;
+    document.getElementById("mask2").setAttribute("disabled","") ;
+    document.getElementById("gw2").setAttribute("disabled","") ;
+  } else {
+      document.getElementById("ip2").removeAttribute("disabled") ;
+      document.getElementById("mask2").removeAttribute("disabled") ;
+      document.getElementById("gw2").removeAttribute("disabled") ;
+  }
+}  
+
 
 function valid() {
 	wifi(1);
@@ -549,6 +562,7 @@ function wifi(valid) {
 				document.getElementById("dhcp2").removeAttribute("checked") ;
 			document.getElementById('Mac').innerHTML = arr["mac"];
 			clickdhcp();
+			clickdhcp2();
 		}
 	}
 	xhr.open("POST","wifi",false);

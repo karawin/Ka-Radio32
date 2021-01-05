@@ -38,6 +38,7 @@ P_I2S_BCLK,data,u8,26
 P_I2S_DATA,data,u8,19
 P_LED_GPIO,data,u8,22
 P_ADC_KBD,data,u8,255
+P_ADC_BAT,data,u8,35
 P_BACKLIGHT,data,u8,255
 P_JOY_0,data,u8,255
 P_JOY_1,data,u8,255
