@@ -272,11 +272,11 @@ void WriteVS10xxRegister(unsigned short addr,unsigned short val)
 
 void VS1053_ResetChip(){
 	ControlReset(SET);
-	vTaskDelay(30);
+	vTaskDelay(10);
 	ControlReset(RESET);
 	vTaskDelay(10);
 	if (CheckDREQ() == 1) return;
-	vTaskDelay(30);
+	vTaskDelay(100);
 }
 
 
@@ -323,66 +323,28 @@ void VS1053_HighPower(){
 		VS1053_WriteRegister16(SPI_CLOCKF,0xb000);	
 }
 
-
-void VS1053_Start(){
-	ControlReset(SET);
-	vTaskDelay(100);
-	ControlReset(RESET);
-	vTaskDelay(200);	
-	//Check DREQ
-	if (CheckDREQ() == 0)
-	{
-		vsVersion = 0; 
-		ESP_LOGE(TAG,"NO VS1053 detected");
-		return;
-	} 
-
-	VS1053_DisableAnalog();
-	VS1053_ResetChip();
-	
-	int MP3Status = VS1053_ReadRegister(SPI_STATUSVS);
-	vsVersion = (MP3Status >> 4) & 0x000F; //Mask out only the four version bits
-//0 for VS1001, 1 for VS1011, 2 for VS1002, 3 for VS1003, 4 for VS1053 and VS8053,
-//5 for VS1033, 7 for VS1103, and 6 for VS1063	
-
-
-   if (vsVersion == 4) // only 1053b  
-   {   
-		uint16_t  aud;
-		VS1053_ResetChip();
+// patch if GPIO1 is not wired to gnd
+void VS1053_GPIO1()
+{
 // these 4 lines makes board to run on mp3 mode, no soldering required anymore
 		VS1053_WriteRegister16(SPI_WRAMADDR, 0xc017); //address of GPIO_DDR is 0xC017
 		VS1053_WriteRegister16(SPI_WRAM, 0x0003); //GPIO_DDR=3
 		VS1053_WriteRegister16(SPI_WRAMADDR, 0xc019); //address of GPIO_ODATA is 0xC019
 		VS1053_WriteRegister16(SPI_WRAM, 0x0000); //GPIO_ODATA=0	
-		aud = VS1053_ReadRegister(SPI_AUDATA);
-		ESP_LOGI(TAG,"VS1053/SPI_AUDATE= %x",aud);
-		if (aud == 0xac45) 
-		{
-		VS1053_ResetChip();
-// these 4 lines makes board to run on mp3 mode, no soldering required anymore
-		VS1053_WriteRegister16(SPI_WRAMADDR, 0xc017); //address of GPIO_DDR is 0xC017
-		VS1053_WriteRegister16(SPI_WRAM, 0x0003); //GPIO_DDR=3
-		VS1053_WriteRegister16(SPI_WRAMADDR, 0xc019); //address of GPIO_ODATA is 0xC019
-		VS1053_WriteRegister16(SPI_WRAM, 0x0000); //GPIO_ODATA=0	
-		aud = VS1053_ReadRegister(SPI_AUDATA);
-		ESP_LOGI(TAG,"VS1053/SPI_AUDATE= %x",aud);
-		}
-		
-   }
-	
-	vTaskDelay(10);
-	ESP_LOGI(TAG,"VS1053/VS1003 detection. MP3Status: %x, Version: %x",MP3Status,vsVersion);
-	
+		ESP_LOGI(TAG,"SPI_AUDATA 1 = %x",VS1053_ReadRegister(SPI_AUDATA));
+}
 
+// First VS10xx configuration after reset
+void VS1053_InitVS()
+{
    if (vsVersion == 4) // only 1053b  	
 //		VS1053_WriteRegister(SPI_CLOCKF,0x78,0x00); // SC_MULT = x3, SC_ADD= x2
-//		VS1053_WriteRegister16(SPI_CLOCKF,0xB800); // SC_MULT = x1, SC_ADD= x1
-		VS1053_WriteRegister16(SPI_CLOCKF,0x8800); // SC_MULT = x3.5, SC_ADD= x1
+		VS1053_WriteRegister16(SPI_CLOCKF,0xB800); // SC_MULT = x1, SC_ADD= x1
+//		VS1053_WriteRegister16(SPI_CLOCKF,0x8800); // SC_MULT = x3.5, SC_ADD= x1
+//		VS1053_WriteRegister16(SPI_CLOCKF,0x9000); // SC_MULT = x3.5, SC_ADD= x1.5
 	else	
 		VS1053_WriteRegister16(SPI_CLOCKF,0xB000);
 	
-	//VS1053_SoftwareReset
 	VS1053_WriteRegister(SPI_MODE, (SM_SDINEW|SM_LINE1)>>8,SM_RESET);
 	VS1053_WriteRegister(SPI_MODE, (SM_SDINEW|SM_LINE1)>>8, SM_LAYER12); //mode 
 	WaitDREQ();
@@ -395,13 +357,62 @@ void VS1053_Start(){
 		VS1053_WriteRegister16(SPI_WRAMADDR, 0xc017);
 		VS1053_WriteRegister16(SPI_WRAM, 0x00F0);
 		VS1053_I2SRate(g_device->i2sspeed);	
+	}
+}
+
+
+void VS1053_Start(){
+	ControlReset(SET);
+	vTaskDelay(10);
+	ControlReset(RESET);
+	vTaskDelay(50);	
+	if (CheckDREQ() == 0) vTaskDelay(50);	// wait a bit more
+	//Check DREQ
+	if (CheckDREQ() == 0)
+	{
+		vsVersion = 0; 
+		ESP_LOGE(TAG,"NO VS1053 detected");
+		return;
+	} 
+
+// patch to mp3 mode id needed
+	if (VS1053_ReadRegister(SPI_AUDATA) == 0xac45) // midi mode?
+		VS1053_GPIO1();	// patch if GPIO1 is not wired to gnd
+	if (VS1053_ReadRegister(SPI_AUDATA) == 0xac45) // try again
+	{
+		VS1053_ResetChip();
+		VS1053_GPIO1();	// patch if GPIO1 is not wired to gnd
+	}
+
+	vsVersion = (VS1053_ReadRegister(SPI_STATUSVS) >> 4) & 0x000F; //Mask out only the four version bits
+//0 for VS1001, 1 for VS1011, 2 for VS1002, 3 for VS1003, 4 for VS1053 and VS8053,
+//5 for VS1033, 7 for VS1103, and 6 for VS1063	
+	ESP_LOGI(TAG,"VS10xx detection. Version: %x",vsVersion);
 
 	// plugin patch
-		if  ((g_device->options&T_PATCH)==0) 
-		{	
-			LoadUserCodes() ;	// vs1053b patch
+	if ((vsVersion == 4) && ((g_device->options&T_PATCH)==0)) 
+	{	
+		LoadUserCodes() ;	// vs1053b patch
+		ESP_LOGI(TAG,"SPI_AUDATA 2 = %x",VS1053_ReadRegister(SPI_AUDATA));
+		if (VS1053_ReadRegister(SPI_AUDATA) == 0xAC45) //midi mode?
+		{
+			VS1053_WriteRegister(SPI_AIADDR,0x00,0x50); // reset soft but let  patch loaded				
+			VS1053_GPIO1();	// patch if GPIO1 is not wired to gnd
+			if (VS1053_ReadRegister(SPI_AUDATA) == 0xAC45) // in midi mode
+			{	//fed up
+				ESP_LOGI(TAG,"midi mode on\n");
+				g_device->options |= T_PATCH; // force no patch
+				saveDeviceSettings(g_device);
+				esp_restart();
+			}
 		}
-	}
+	} 
+	
+	VS1053_InitVS();
+	// disable analog output
+	VS1053_WriteRegister16(SPI_VOL,0xFFFF);
+	VS1053_DisableAnalog();
+	vTaskDelay(1);
 	ESP_LOGI(TAG,"volume: %d",g_device->vol);
 	setIvol( g_device->vol);
 	VS1053_SetVolume( g_device->vol);	
