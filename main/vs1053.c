@@ -376,7 +376,7 @@ void VS1053_Start(){
 	} 
 
 // patch to mp3 mode id needed
-	if (VS1053_ReadRegister(SPI_AUDATA) == 0xac45) // midi mode?
+//	if (VS1053_ReadRegister(SPI_AUDATA) == 0xac45) // midi mode?
 		VS1053_GPIO1();	// patch if GPIO1 is not wired to gnd
 	if (VS1053_ReadRegister(SPI_AUDATA) == 0xac45) // try again
 	{
