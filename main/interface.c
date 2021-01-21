@@ -571,14 +571,23 @@ void clientList(char *s)
 // parse url
 bool parseUrl(char* src, char* url, char* path, uint16_t *port)
 {
-	char* teu,*tbu,*tbpa;
+	char* teu,*tbu,*tbus,*tbpa;
 	char* tmp = src;
-	tmp = strstr(src,"://");
-	if (tmp) tmp +=3;
-	else tmp = src;
-	tbu = tmp;
+	// https?
+	tmp = strstr(src,"https://");
+	if (!tmp) tmp = strstr(src,"HTTPS://");
+	if (tmp) {tbu = src; tbus = tbu+8;}
+	else  // http://  remove http://
+	{
+		tmp = strstr(src,"://");
+		if (tmp) tmp +=3;
+		else tmp = src;
+		tbu = tmp;
+		tbus = tbu;
+	}
 //printf("tbu: %s\n",tbu);
-	teu = strchr(tbu,':');
+	teu = strchr(tbus,':');
+	tmp = tbus;
 	if (teu)
 	{
 		tmp = teu+1;
@@ -600,6 +609,8 @@ bool parseUrl(char* src, char* url, char* path, uint16_t *port)
 }
 
 //edit a station
+// format:  cli.edit("num:Name,url:port/path{%offsetVol}
+// example: cli.edit("229:Hotmix Funky,http://streaming.hotmix-radio.net:80/hotmixradio-funky-128.mp3%0")
 void clientEdit(char *s)
 {
 struct shoutcast_info* si;
@@ -642,7 +653,7 @@ char url[200];
 	if (url[0] != 0)
 		parseUrl(url, si->domain, si->file, &(si->port));
 	
-//printf(" id: %d, name: %s, url: %s, port: %d, path: %s\n",id,si->name,si->domain,si->port,si->file);
+kprintf(" id: %d, name: %s, url: %s, port: %d, path: %s\n",id,si->name,si->domain,si->port,si->file);
 	if (id < 0xff) {
 		if (si->domain[0]==0) {si->port = 0;si->file[0] = 0;}
 		saveStation(si, id); 

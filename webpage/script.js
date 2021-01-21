@@ -616,7 +616,7 @@ function instantPlay() {
 		xhr.setRequestHeader(content,ctype);
 		curl = document.getElementById('instant_path').value;
 		if (!(curl.substring(0, 1) === "/")) curl = "/" + curl;
-		document.getElementById('instant_url').value = document.getElementById('instant_url').value.replace(/^https?:\/\//,'');
+//		document.getElementById('instant_url').value = document.getElementById('instant_url').value.replace(/^https?:\/\//,'');
 		curl = fixedEncodeURIComponent (curl);
 		xhr.send("url=" + document.getElementById('instant_url').value + "&port=" + document.getElementById('instant_port').value + "&path=" + curl+"&");
 	} catch(e){console.log("error"+e);}
@@ -628,8 +628,12 @@ function buildAddURL()
 		  document.getElementById('add_port').value= "80";
 	if (document.getElementById('add_path').value == "") 
 		  document.getElementById('add_path').value= "/";
-    document.getElementById('add_URL').value = "http://"+document.getElementById('add_url').value+':'+
-		document.getElementById('add_port').value + document.getElementById('add_path').value;
+	var str = document.getElementById('add_url').value;
+	if (str.toLowerCase().startsWith('https', 0))
+		document.getElementById('add_URL').value = document.getElementById('add_url').value+':'+
+			document.getElementById('add_port').value + document.getElementById('add_path').value;
+	else document.getElementById('add_URL').value = "http://"+document.getElementById('add_url').value+':'+
+			document.getElementById('add_port').value + document.getElementById('add_path').value;
 }
 
 function buildURL()
@@ -638,19 +642,53 @@ function buildURL()
 		  document.getElementById('instant_port').value= "80";
 	if (document.getElementById('instant_path').value == "") 
 		  document.getElementById('instant_path').value= "/";
-    document.getElementById('instant_URL').value = "http://"+document.getElementById('instant_url').value+':'+
-		document.getElementById('instant_port').value + document.getElementById('instant_path').value;
+	var str = document.getElementById('instant_url').value;
+	if (str.toLowerCase().startsWith('https', 0))
+		document.getElementById('instant_URL').value = document.getElementById('instant_url').value+':'+
+			document.getElementById('instant_port').value + document.getElementById('instant_path').value;
+	else document.getElementById('instant_URL').value = "http://"+document.getElementById('instant_url').value+':'+
+			document.getElementById('instant_port').value + document.getElementById('instant_path').value;
 }
 
-function parseURL()
+function parseEditURL()
+{
+	 var a = document.createElement('a');
+	 a.href = document.getElementById('add_URL').value;
+	 if (a.href.toLowerCase() !=location.hostname)
+	 {
+		if (a.href.startsWith("https"))
+			document.getElementById('add_url').value = "https://"+a.hostname;
+		else
+			document.getElementById('add_url').value = a.hostname;	 
+	 }
+	 else
+	 {
+		if (!a.href.toLowerCase().startsWith("https"))
+			document.getElementById('add_URL').value = "http://"+document.getElementById('add_URL').value;
+		a.href = document.getElementById('add_URL').value;
+		document.getElementById('add_url').value = a.hostname;
+	}
+	if (a.port == "")
+		 document.getElementById('add_port').value = "80";
+	else document.getElementById('add_port').value = a.port;
+	document.getElementById('add_path').value = a.pathname+a.search+a.hash;	 
+}
+
+function parseInstantURL()
 {
 	 var a = document.createElement('a');	 
 	 a.href = document.getElementById('instant_URL').value;
-	 if (a.hostname !=location.hostname)
-		document.getElementById('instant_url').value = a.hostname;
+	 if (a.href.toLowerCase() !=location.hostname)
+	 {
+		if (a.href.startsWith("https"))
+			document.getElementById('instant_url').value = "https://"+a.hostname;
+		else
+			document.getElementById('instant_url').value = a.hostname;	  
+	 }
 	 else
 	 {
-		document.getElementById('instant_URL').value = "http://"+document.getElementById('instant_URL').value;
+		if (!a.href.toLowerCase().startsWith("https"))
+			document.getElementById('instant_URL').value = "http://"+document.getElementById('instant_URL').value;		 	 
 		a.href = document.getElementById('instant_URL').value;
 		document.getElementById('instant_url').value = a.hostname;
 	 }
@@ -805,7 +843,7 @@ function saveStation() {
 	console.log("Path: "+file);
     jfile = fixedEncodeURIComponent (file);
 	console.log("JSON: "+jfile);
-	url = url.replace(/^https?:\/\//,'');
+//	url = url.replace(/^https?:\/\//,'');
 	try{
 		xhr = new XMLHttpRequest();
 		xhr.open("POST","setStation",false);
@@ -851,7 +889,12 @@ function editInstantStation() {
 		document.getElementById('add_slot').value = id;
 		
 		document.getElementById('ovol').value = '0';
-		document.getElementById('add_URL').value = "http://"+document.getElementById('instant_url').value+":"+document.getElementById('instant_port').value+document.getElementById('instant_path').value;
+		
+		var str = document.getElementById('instant_URL').value;
+		if (str.toLowerCase().startsWith("https"))
+			document.getElementById('add_URL').value = str;
+		else
+			document.getElementById('add_URL').value = "http://"+document.getElementById('instant_url').value+":"+document.getElementById('instant_port').value+document.getElementById('instant_path').value;
 		parseEditURL();
 	} else alert("No free slot.");
 }
@@ -868,7 +911,12 @@ function editStation(id) {
 			if (arr["Port"] == "0") arr["Port"] = "80";
 			document.getElementById('add_port').value = arr["Port"];
 			document.getElementById('ovol').value = arr["ovol"];
-			document.getElementById('add_URL').value = "http://"+document.getElementById('add_url').value+":"+document.getElementById('add_port').value+document.getElementById('add_path').value;
+			
+			var str = document.getElementById('add_url').value;
+			if (str.toLowerCase().startsWith('https', 0))
+				document.getElementById('add_URL').value = document.getElementById('add_url').value+":"+document.getElementById('add_port').value+document.getElementById('add_path').value;
+			else
+				document.getElementById('add_URL').value = "http://"+document.getElementById('add_url').value+":"+document.getElementById('add_port').value+document.getElementById('add_path').value;
 //			setMainHeight("tab-content2");
 	}
 	document.getElementById('add_slot').value = id;
@@ -897,24 +945,6 @@ function editStation(id) {
 	}
 }
 
-
-function parseEditURL()
-{
-	 var a = document.createElement('a');
-	 a.href = document.getElementById('add_URL').value;
-	 if (a.hostname !=location.hostname)
-		document.getElementById('add_url').value = a.hostname;
-	 else
-	 {
-		document.getElementById('add_URL').value = "http://"+document.getElementById('add_URL').value;
-		a.href = document.getElementById('add_URL').value;
-		document.getElementById('add_url').value = a.hostname;
-	}
-	if (a.port == "")
-		 document.getElementById('add_port').value = "80";
-	else document.getElementById('add_port').value = a.port;
-	document.getElementById('add_path').value = a.pathname+a.search+a.hash;	 
-}
 
 function refreshList() {
 	promptworking(working);
@@ -1103,7 +1133,10 @@ function stChanged()
 				id=tbody.rows[ind].cells[0].innerText;
 				name=tbody.rows[ind].cells[1].innerText;
 				furl=tbody.rows[ind].cells[2].innerText;
-				parser.href = "http://"+furl;
+				if (furl.startsWith("https"))
+					parser.href = furl;
+				else
+					parser.href = "http://"+furl;
 				url = parser.hostname;
 				file = parser.pathname+parser.hash+parser.search;
 				port = parser.port;

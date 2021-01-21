@@ -13,6 +13,12 @@
 #include "esp_wifi.h"
 #include "freertos/semphr.h"
 
+/* wolfSSL */
+#include "wolfssl/wolfcrypt/settings.h"
+#include "user_settings.h"
+#include "wolfssl/ssl.h"
+#include "wolfssl/certs_test.h"
+
 #include "vs1053.h"
 #include "eeprom.h"
 #include "interface.h"
@@ -34,6 +40,7 @@ xSemaphoreHandle sConnect, sConnected, sDisconnect, sHeader;
 
 static uint8_t once = 0;
 static uint8_t playing = 0;
+static bool https = false;
 
 static const char* icyHeaders[] = { "icy-name:", "icy-notice1:", "icy-notice2:",  "icy-url:", "icy-genre:", "icy-br:","icy-description:","ice-audio-info:", "icy-metaint:" };
 contentType_t contentType;
@@ -47,6 +54,7 @@ const char CLISTOP[]  = {"##CLI.STOPPED# from %s\n"};
 #define strcMALLOC  	"Client: incmalloc fails for %d"
 #define strcMALLOC1  	"%s malloc fails"
 
+
 /* TODO:
 	- METADATA HANDLING
 	- IP SETTINGS
@@ -59,6 +67,9 @@ static char clientURL[256]= {0,0};
 static char clientPath[256] = {0,0};
 static uint16_t clientPort = 80;
 
+/* declare wolfSSL objects */
+    WOLFSSL_CTX *ctx ;
+    WOLFSSL *ssl ;
 
 static struct hostent *server = NULL;
 
@@ -141,57 +152,44 @@ bool clientParsePlaylist(char* s)
   char path[255] = "/";
   char url[78] = "";
   char port[6] = "80";
-  int remove = 0;
+//  int remove = 0;
   int i = 0; int j = 0;
 
-  ESP_LOGV(TAG,"clientParsePlaylist  %s",s);
+  ESP_LOGV(TAG,"clientParsePlaylist\n%s",s);
 // for extm3u skip line with #EXTINF
   str = strstr(s,"#EXTINF");
   if (str != NULL) //skip to next line
   {
 	ns = str;
-    while ((strlen(ns) > 1) && (ns[0]!=0x0A)) ns++;
+    while ((strlen(ns) > 0) && (ns[0]!=0x0A)) ns++;
 	ESP_LOGV(TAG,"EXTM3U: %s",ns);
-	s= ns;
+	if (strlen(ns)>0) s= ns+1;// skip \n
   }
-  str = strstr(s,"<location>http://");  //for xspf
-  if (str != NULL) remove = 17;
-
-  if (str ==NULL)
+// skip if icy lines
+  if (strstr(s,"icy-") != NULL)
   {
-	str = strstr(s,"<REF href = \"http://");  //for asx
-	if (str != NULL) remove = 20;
-  }
-  if (str ==NULL)
-  {
-	str = strstr(s,"http://");
-	if (str != NULL) remove = 7;
-	else
-	{
-		str = strstr(s,"HTTP://");
-		if (str != NULL) remove = 7;
-	}
-  }
-/*
-  if (str ==NULL)
+	clientSetPath((char*)"/;");
+	return true;
+  }	
+	
+  str = strstr(s,"http://");
+  if (str ==NULL) str = strstr(s,"HTTP://");
+  if (str != NULL) {str += 7; j = 7; strcpy (url,"http://");}
+  else
   {
 	str = strstr(s,"https://");
-	if (str != NULL) remove = 8;
-	else
-	{
-		str = strstr(s,"HTTPS://");
-		if (str != NULL) remove = 8;
-	}
-  }
- */
+	if (str == NULL) str = strstr(s,"HTTPS://");
+	if (str != NULL) {str +=  8; j = 8; strcpy (url,"https://");}
+	else { j = 7; strcpy (url,"http://");} // no http found
+  } 
+  
+ 
   if (str != NULL)
   {
-	str += remove; //skip http://
-	ESP_LOGV(TAG,"parse str %s",str);
-
+//	ESP_LOGV(TAG,"parse str %s",str);
 	while ((str[i] != '/')&&(str[i] != ':')&&(str[i] != 0x0a)&&(str[i] != 0x0d)&&(j<77)) {url[j] = str[i]; i++ ;j++;}
 	url[j] = 0;
-	ESP_LOGV(TAG,"parse str url %s",url);
+//	ESP_LOGV(TAG,"parse str url %s",url);
 	j = 0;
 	if (str[i] == ':')  //port
 	{
@@ -199,7 +197,7 @@ bool clientParsePlaylist(char* s)
 		while ((str[i] != '/')&&(str[i] != 0x0a)&&(str[i] != 0x0d)&&(j<5)) {port[j] = str[i]; i++ ;j++;}
 		port[j] = 0;
 	}
-	ESP_LOGV(TAG,"parse str port %s",port);
+//	ESP_LOGV(TAG,"parse str port %s",port);
 	j = 0;
 	if (str[i] == '/')  //path
 	{
@@ -209,7 +207,7 @@ bool clientParsePlaylist(char* s)
 			path[j] = 0;
 		}
 	}
-	ESP_LOGV(TAG,"parse str path %s",path);
+//	ESP_LOGV(TAG,"parse str path %s",path);
 
 	if (strncmp(url,"localhost",9)!=0) clientSetURL(url);
 	clientSetPath(path);
@@ -478,7 +476,7 @@ void wsMonitor()
 		memset(answer,0,300);
 		if ((clientPath[0]!= 0))
 		{
-			sprintf(answer,"{\"monitor\":\"http://%s:%d%s\"}",clientURL,clientPort,clientPath);
+			sprintf(answer,"{\"monitor\":\"%s:%d%s\"}",clientURL,clientPort,clientPath);
 			websocketbroadcast(answer, strlen(answer));
 		}
 }
@@ -658,17 +656,37 @@ void clientSetName(const char* name,uint16_t index)
 	kprintf("##CLI.NAMESET#: %d %s\n",index,name);
 }
 
+// remove http(s)://
+char* cleanURL()
+{
+	char* ret ;
+	ret = strstr(clientURL,"http://");
+	if (ret != 0) return (clientURL+7);
+	ret = strstr(clientURL,"https://");
+	if (ret != 0) return (clientURL+8);
+	return clientURL;
+}
+
+// is it a https one?
+void test_https()
+{
+	if (strstr(clientURL,"https://"))
+	https = true;
+	else https = false;
+}
+
+
 void clientSetURL(char* url)
 {
-//remove	int l = strlen(url)+1;
+	clientURL[0] = 0;
+	if (strstr(url,"http") == NULL) strcat(clientURL,"http://");
 	if (url[0] == 0xff) return; // wrong url
-	strcpy(clientURL, url);
+	strcat(clientURL, url);
 	kprintf("##CLI.URLSET#: %s\n",clientURL);
 }
 
 void clientSetPath(char* path)
 {
-//remove	int l = strlen(path)+1;
 	if (path[0] == 0xff) return; // wrong path
 	strcpy(clientPath, path);
 	kprintf("##CLI.PATHSET#: %s\n",clientPath);
@@ -685,7 +703,7 @@ void clientConnect()
 {
 	cstatus = C_HEADER;
 	once = 0;
-	if((server = (struct hostent*)gethostbyname(clientURL))) {
+	if((server = (struct hostent*)gethostbyname(cleanURL()))) {
 		xSemaphoreGive(sConnect);
 		esp_wifi_set_ps (WIFI_PS_MIN_MODEM);
 	} else {
@@ -698,7 +716,7 @@ void clientConnect()
 void clientConnectOnce()
 {
 	cstatus = C_HEADER;
-	if((server = (struct hostent*)gethostbyname(clientURL))) {
+	if((server = (struct hostent*)gethostbyname(cleanURL()))) {
 		xSemaphoreGive(sConnect);
 		esp_wifi_set_ps (WIFI_PS_MIN_MODEM);
 	} else {
@@ -861,7 +879,13 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 						t1+= 4;
 						if ( t2 != NULL)
 						{
-							while (len -(t1-pdata)<8) {vTaskDelay(1);len += recv(sockfd, pdata+len, RECEIVE+8-len, 0); }
+							while (len -(t1-pdata)<8) {
+								vTaskDelay(1);
+								if (https)
+									len += wolfSSL_read(ssl, pdata+len, RECEIVE+8-len);
+								else
+									len += recv(sockfd, pdata+len, RECEIVE+8-len, 0); 
+							}
 							chunked = (uint32_t) strtol(t1, NULL, 16) +2;
 							if (strchr((t1),0x0A) != NULL)
 								*strchr(t1,0x0A) = 0;
@@ -879,7 +903,12 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 					t1 = NULL;
 					if (i++ > 20) {clientDisconnect("header1");break;}
 					vTaskDelay(1); //avoid watchdog is infernal loop
-					bread = recvfrom(sockfd, pdata+len, RECEIVE-len, 0,NULL,NULL);
+					
+					if (https)
+						bread = wolfSSL_read(ssl, pdata+len, RECEIVE-len);
+					else
+						bread = recvfrom(sockfd, pdata+len, RECEIVE-len, 0, NULL, NULL);					
+					
 					if (bread >0) len += bread;
 				}
 			} while (t1 == NULL);
@@ -916,7 +945,12 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 						while (lc < cchunk+9)
 						{
 							vTaskDelay(1);
-							bread = recvfrom(sockfd, pdata+len, 9, 0,NULL,NULL);
+							
+							if (https)
+								bread = wolfSSL_read(ssl, pdata+len, 9);
+							else
+								bread = recvfrom(sockfd, pdata+len, 9, 0, NULL, NULL);
+
 							if (bread >0) clen = bread;
 							else clen = 0;
 							lc+=clen;len+=clen;
@@ -1105,8 +1139,10 @@ ESP_LOGD(TAG,"mt2 len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,cle
 
 
 uint8_t bufrec[RECEIVE+20];
-static  char useragent[40];
-
+    /* declare wolfSSL objects */
+    WOLFSSL_CTX *ctx;
+    WOLFSSL *ssl;
+	
 void clientTask(void *pvParams) {
 	portBASE_TYPE uxHighWaterMark;
 	struct timeval timeout;
@@ -1115,27 +1151,44 @@ void clientTask(void *pvParams) {
 	int sockfd;
 	int bytes_read;
 	uint8_t cnterror;
-
+	char userAgent[40];
 	struct sockaddr_in dest;
 
 	vTaskDelay(300);
+	
+	
 
-	strcpy(useragent,g_device->ua);
-	if (strlen(useragent) == 0)
-	{
-		strcpy(useragent,"Karadio/1.5");
-		strcpy(g_device->ua,useragent);
-	}
+	int ret;
+	
+	if (strlen(g_device->ua) == 0) strcpy(g_device->ua,"Karadio32/1.9");
+	strcpy(userAgent, g_device->ua);
 
+					   /* Initialize wolfSSL */
+					if (wolfSSL_Init() != WOLFSSL_SUCCESS) {
+						ESP_LOGE(TAG,"ERROR: failed to init WOLFSSL\n");}
+
+				   /* Create and initialize WOLFSSL_CTX */
+					if ((ctx = wolfSSL_CTX_new(wolfSSLv23_client_method())) == NULL) {
+					ESP_LOGE(TAG,"ERROR: failed to create WOLFSSL_CTX\n");
+					}					
+					/* Load client certificates into WOLFSSL_CTX */
+					if ((ret = wolfSSL_CTX_load_verify_buffer(ctx, client_cert_der_1024,
+						sizeof_client_cert_der_1024, WOLFSSL_FILETYPE_ASN1)) != SSL_SUCCESS) {
+						ESP_LOGE(TAG,"ERROR: failed to load %d, please check the file.\n",ret);
+					}
+					/* not peer check */
+					wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_NONE, 0);
+					
 //	portBASE_TYPE uxHighWaterMark;
 //	uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
 //	printf("watermark webclient:%d  heap:%d\n",uxHighWaterMark,xPortGetFreeHeapSize( ));
 
 	while(1) {
 		xSemaphoreGive(sConnected);
-		if(xSemaphoreTake(sConnect, portMAX_DELAY)) {
-
+		if(xSemaphoreTake(sConnect, portMAX_DELAY)) 
+		{		
 			//VS1053_HighPower();
+			test_https();
 			xSemaphoreTake(sDisconnect, 0);
 			sockfd = socket(AF_INET, SOCK_STREAM, 0);
 			ESP_LOGI(TAG,"Webclient socket: %d, errno: %d", sockfd, errno);
@@ -1150,9 +1203,29 @@ void clientTask(void *pvParams) {
 			dest.sin_port = htons(clientPort);
 			dest.sin_addr.s_addr = inet_addr(inet_ntoa(*(struct in_addr*)(server -> h_addr_list[0])));
 			bytes_read = 0;
+
 			/*---Connect to server---*/
 			if(connect(sockfd, (struct sockaddr*)&dest, sizeof(dest)) >= 0)
 			{
+				if (https)
+				{
+
+					/* Create a WOLFSSL object */
+					if ((ssl = wolfSSL_new(ctx)) == NULL) {
+						ESP_LOGE(TAG,"ERROR: failed to create WOLFSSL object\n");
+						int err=wolfSSL_get_error(ssl, 0);
+						printf("wolfSSL_new err: %d\n",err);
+					}
+					wolfSSL_set_using_nonblock(ssl, 1);    
+					/* Attach wolfSSL to the socket */
+					wolfSSL_set_fd(ssl, sockfd);
+
+					/* Connect to wolfSSL on the server side */
+					if (wolfSSL_connect(ssl) != SSL_SUCCESS) {
+						ESP_LOGE(TAG,"ERROR: failed to connect to wolfSSL\n");
+					}				
+				}
+					
 //				printf("WebClient Socket connected\n");
 				memset(bufrec,0, RECEIVE+20);
 
@@ -1164,18 +1237,26 @@ void clientTask(void *pvParams) {
 				if (t0 != NULL)  // a playlist asked
 				{
 				  cstatus = C_PLAYLIST;
-//printf("sprint%d\n",6);
-				  sprintf((char*)bufrec, "GET %s HTTP/1.1\r\nHOST: %s\r\nUser-Agent: %s\r\n\r\n", clientPath,clientURL,useragent); //ask for the playlist
+
+				  sprintf((char*)bufrec, "GET %s HTTP/1.1\r\nHOST: %s\r\nUser-Agent: %s\r\n\r\n", clientPath,cleanURL(),g_device->ua); //ask for the playlist
 			    }
 				else
 				{
-					if (strcmp(clientURL,"stream.pcradio.biz") ==0) strcpy(useragent,"pcradio");
-//printf("sprint%d\n",7);
-					sprintf((char*)bufrec, "GET %s HTTP/1.1\r\nHost: %s\r\nicy-metadata: 1\r\nUser-Agent: %s\r\n\r\n", clientPath,clientURL,useragent);
+					if (strcmp(cleanURL(),"stream.pcradio.biz") ==0)
+						strcpy(userAgent,"pcradio");
+						
+					sprintf((char*)bufrec, "GET %s HTTP/1.1\r\nHost: %s\r\nicy-metadata: 1\r\nUser-Agent: %s\r\n\r\n", clientPath,cleanURL(),userAgent);
 				}
-//printf("st:%d, Client Sent:\n%s\n",cstatus,bufrec);
+//printf("st:%d, url: %s\nClient Sent:\n%s\n",cstatus,cleanURL(),bufrec);
 				xSemaphoreTake(sConnected, 0);
-				send(sockfd, (char*)bufrec, strlen((char*)bufrec), 0);
+				if (https)
+				{
+					if (wolfSSL_write(ssl, bufrec, strlen((char*)bufrec)) != strlen((char*)bufrec)) {
+						ESP_LOGE(TAG,"ERROR: failed to write\n");
+					}
+				}
+				else
+					send(sockfd, (char*)bufrec, strlen((char*)bufrec), 0);
 
 				if (setsockopt (sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0)
 					ESP_LOGE(TAG,"Client socket: %d  setsockopt: %d  errno:%d ",sockfd, bytes_read,errno);
@@ -1183,11 +1264,29 @@ void clientTask(void *pvParams) {
 				cnterror = 0;
 				do
 				{
-					bytes_read = recvfrom(sockfd, bufrec,RECEIVE, 0, NULL, NULL);
-					if ( bytes_read < 0 )
+					if (https)
 					{
-						ESP_LOGE(TAG,"Client socket: %d  read: %d  errno:%d ",sockfd, bytes_read,errno);
-						if (errno == 11) bytes_read = 0;
+						bytes_read = wolfSSL_read(ssl, bufrec, RECEIVE);
+						if ( bytes_read < 0 )
+						{   					    
+							int err;
+							char buffer[80];
+							err = wolfSSL_get_error(ssl, 0);
+							wolfSSL_ERR_error_string(err, buffer);
+							ESP_LOGE(TAG,"wolfSSL_read error: %d  read: %s errno:%d ",err, buffer,errno);
+							vTaskDelay(20);
+							if (wolfSSL_want_read(ssl) == 1) bytes_read = 0;
+						}						
+					}	
+					else
+					{
+						bytes_read = recvfrom(sockfd, bufrec,RECEIVE, 0, NULL, NULL);
+						
+						if ( bytes_read < 0 )
+						{
+							ESP_LOGE(TAG,"Client socket: %d  read: %d  errno:%d ",sockfd, bytes_read,errno);
+							if (errno == 11) bytes_read = 0;
+						}
 					}
 //if (bytes_read < 1000 )
 //	printf("Rec:%d\n%s\n",bytes_read,bufrec);
@@ -1201,9 +1300,10 @@ void clientTask(void *pvParams) {
 					{
 						ESP_LOGW(TAG,"No data in recv. Errno = %d",errno);
 						cnterror++;
-						if (errno != 11) vTaskDelay(20); //timeout
-						else vTaskDelay(2);
-						if ((errno == 128)||(cnterror > 9 )) break;
+						//if (errno != 11) vTaskDelay(20); //timeout
+						//else 
+						vTaskDelay(20);
+						if ((errno == 128)||(cnterror > 20 )) break;
 					}
 					vTaskDelay(2);
 					// if a stop is asked
@@ -1218,6 +1318,12 @@ void clientTask(void *pvParams) {
 				wsHeaders();
 				vTaskDelay(1);
 				clientDisconnect("Invalid");
+				if (https){
+					wolfSSL_free(ssl);     /* Free the wolfSSL object                  */
+//					wolfSSL_CTX_free(ctx); /* Free the wolfSSL context object          */
+//					wolfSSL_Cleanup();     /* Cleanup the wolfSSL environment          */
+					ESP_LOGE(TAG,"SSL Cleanup Client socket: %d",sockfd);
+				}
 				close(sockfd);
 				continue;
 			}
@@ -1268,12 +1374,18 @@ void clientTask(void *pvParams) {
 				vTaskDelay(20);	// stop without click
 				//VS1053_LowPower();
 				setVolumei(getVolume());
+				strcpy(userAgent,g_device->ua);
 			}
 			spiRamFifoReset();
 			shutdown(sockfd,SHUT_RDWR); // stop the socket
 			vTaskDelay(1);
+			if (https){
+				wolfSSL_free(ssl);     /* Free the wolfSSL object                  */
+//				wolfSSL_CTX_free(ctx); /* Free the wolfSSL context object          */
+//				wolfSSL_Cleanup();     /* Cleanup the wolfSSL environment          */
+				ESP_LOGE(TAG,"SSL Cleanup 1 Client socket: %d",sockfd);
+			}
 			close(sockfd);
-//printf("WebClient Socket closed\n");
 			if (cstatus == C_PLAYLIST)
 			{
 			  clientConnect();
