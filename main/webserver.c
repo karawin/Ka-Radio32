@@ -150,7 +150,7 @@ static void serveFile(char* name, int conn)
 		return;
 	}
 
-	ESP_LOGV(TAG,"File not found : %s",name);
+	ESP_LOGE(TAG,"File not found : %s",name);
 	if(write(conn, buf, strlen(buf)) == -1) {
 		respKo(conn);
 		ESP_LOGE(TAG,"semfile fails 0 errno:%d",errno);
@@ -290,7 +290,7 @@ static void theme() {
 void websockethandle(int socket, wsopcode_t opcode, uint8_t * payload, size_t length)
 {
 	//wsvol
-	ESP_LOGV(TAG,"websocketHandle: %s",payload);
+//	ESP_LOGV(TAG,"websocketHandle: %s",payload);
 	if (strstr((char*)payload,"wsvol=")!= NULL)
 	{
 		char answer[17];
@@ -415,15 +415,15 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 	bool changed = false;
 	if(strcmp(name, "/instant_play") == 0) {
 		if(data_size > 0) {
-			char url[100];
+			char url[256];
 			tst = getSParameterFromResponse(url,100,"url=", data, data_size);
-			char path[200];
+			char path[512];
 			tst &=getSParameterFromResponse(path,200,"path=", data, data_size);
 			pathParse(path);
 			char port[10];
 			tst &=getSParameterFromResponse(port,10,"port=", data, data_size);
 			if(tst) {
-				clientDisconnect("Post instant_play");
+				clientDisconnect("Post instPlay");
 				for (int i = 0;i<100;i++)
 				{
 					if(!clientIsConnected())break;

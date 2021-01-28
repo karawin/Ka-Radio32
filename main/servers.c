@@ -16,8 +16,8 @@
 #include "interface.h"
 #include "app_main.h"
 #include "eeprom.h"
-
-#define stack  4400
+//4400
+#define stack  	4900 
 #define TAG	"servers"
 
 #define  strsTELNET  "Servers Telnet Socket fails %s errno: %d"
@@ -176,7 +176,7 @@ void serversTask(void* pvParams) {
 
 			//wait for an activity on one of the sockets , 
 			activity = select( max_sd + 1 , &readfds , NULL , NULL , NULL);
-			if (activity != 0) ESP_LOGV(TAG,"Activity %d, max_fd: %d",activity,max_sd);
+//			if (activity != 0) ESP_LOGV(TAG,"Activity %d, max_fd: %d",activity,max_sd);
    
 			if ((activity < 0) && (errno!=EINTR) && (errno!=0)) 
 			{
@@ -190,7 +190,7 @@ void serversTask(void* pvParams) {
 			if (FD_ISSET(server_sock, &readfds)) 
 			{	
 				FD_CLR(server_sock , &readfds); 
-				ESP_LOGV(TAG,"Server web accept, socket: %d.",server_sock);				
+//				ESP_LOGV(TAG,"Server web accept, socket: %d.",server_sock);				
 				if ((client_sock = accept(server_sock, (struct sockaddr *) &client_addr, &sin_size)) < 0) {
 						ESP_LOGE(TAG,strsWSOCK,"accept",errno);
 						vTaskDelay(10);					
@@ -254,13 +254,13 @@ void serversTask(void* pvParams) {
 				if ((sd!=-1) &&(FD_ISSET( sd , &readfds))) 
 				{
 					FD_CLR(sd , &readfds);  
-					ESP_LOGV(TAG,"telnetclients .");	
+//					ESP_LOGV(TAG,"telnetclients .");	
 					ret =telnetRead(sd);
 //printf("Call telnetRead i: %d, socket: %d, ret: %d\n" ,i, sd,ret);  
 					if (ret == 0) 
 					{
 						telnetremoveclient(sd);						
-						ESP_LOGV(TAG,strsTELNET,"Clear",errno); 
+//						ESP_LOGV(TAG,strsTELNET,"Clear",errno); 
 					}
 				}
 			} 
@@ -274,9 +274,9 @@ void serversTask(void* pvParams) {
 				if ((sd!=-1) &&(FD_ISSET( sd , &readfds))) 
 				{
 					FD_CLR(sd , &readfds);  
-					ESP_LOGV(TAG,"webserverclients.");
+//					ESP_LOGV(TAG,"webserverclients.");
 					ret =websocketRead(sd);
-					ESP_LOGV(TAG,"Call websocketRead i: %d, socket: %d, ret: %d" ,i, sd,ret);  
+//					ESP_LOGV(TAG,"Call websocketRead i: %d, socket: %d, ret: %d" ,i, sd,ret);  
 					if (ret <= 0) 
 					{
 						websocketremoveclient(sd);						

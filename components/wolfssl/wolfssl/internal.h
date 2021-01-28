@@ -1250,9 +1250,10 @@ enum Misc {
     MAX_PLAINTEXT_SZ   = (1 << 14),        /* Max plaintext sz   */
     MAX_TLS_CIPHER_SZ  = (1 << 14) + 2048, /* Max TLS encrypted data sz */
 #ifdef WOLFSSL_TLS13
-    MAX_TLS13_PLAIN_SZ = (1 << 14) + 1,    /* Max unencrypted data sz */
+   MAX_TLS13_PLAIN_SZ = (1 << 14) + 1,    /* Max unencrypted data sz */
     MAX_TLS13_ENC_SZ   = (1 << 14) + 256,  /* Max encrypted data sz   */
 #endif
+
     MAX_MSG_EXTRA   = 38 + WC_MAX_DIGEST_SIZE,
                                 /* max added to msg, mac + pad  from */
                                 /* RECORD_HEADER_SZ + BLOCK_SZ (pad) + Max

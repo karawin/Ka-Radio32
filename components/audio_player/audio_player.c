@@ -64,9 +64,10 @@ static int start_decoder_task(player_t *player)
         case OCTET_STREAM: // probably .aac
 			if (!bigSram())
 			{
-            ESP_LOGW(TAG, "aac mime not supported type: %d", player->media_stream->content_type);
-			spiRamFifoReset();
-            return -1;				
+				ESP_LOGE(TAG, "aac mime not supported on WROOM cpu, type: %d", player->media_stream->content_type);
+				spiRamFifoReset();
+				clientDisconnect("AAC Not played");
+				return -1;				
 			}
 		
             task_func = fdkaac_decoder_task;
@@ -118,6 +119,7 @@ static int t;
 int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read,
         void *user_data)
 {
+//	ESP_LOGW(TAG,"audio_stream_consumer rec len: %d",bytes_read);
     player_t *player = user_data;
     // don't bother consuming bytes if stopped
     if(player->command == CMD_STOP) {
@@ -140,12 +142,13 @@ int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read,
 	if (player->decoder_status != RUNNING ) 
 	{
 		t = 0;
-		uint32_t trigger = (bigSram())? (70*1024):(20*1024);
-		bool buffer_ok = (bytes_in_buf > trigger);
+//		uint32_t trigger = (bigSram())? (70*1024):(20*1024);
+//		bool buffer_ok = (bytes_in_buf > trigger);
+		bool buffer_ok = (fill_level > bigSram()?20:50); // in %
 		if (buffer_ok)
 		{
 		// buffer is filled, start decoder
-			ESP_LOGV(TAG,"trigger: %d",trigger);
+//			ESP_LOGV(TAG,"trigger: %d",trigger);
 			if (start_decoder_task(player) != 0) {
 				ESP_LOGE(TAG, "failed to start decoder task");
 				audio_player_stop();

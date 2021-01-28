@@ -142,7 +142,7 @@ void fdkaac_decoder_task(void *pvParameters)
             continue;
         }
 
-        if (err != AAC_DEC_OK) {
+        if ((err != AAC_DEC_OK) && (err != AAC_DEC_INVALID_CODE_BOOK)){
             ESP_LOGI(TAG, "decode error 0x%08x", err);
 			//buf_clear(in_buf);
 			//buf_clear(pcm_buf);

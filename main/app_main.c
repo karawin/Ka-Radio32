@@ -186,6 +186,7 @@ IRAM_ATTR void   wakeCallback(void *pArg) {
 	xQueueSendFromISR(event_queue, &evt, NULL);
 	TIMERG0.hw_timer[timer_idx].config.alarm_en = 0;
 }
+	
 
 //return the current timer value in sec
 uint64_t getSleep()
@@ -207,7 +208,7 @@ uint64_t getWake()
 
 void tsocket(const char* lab, uint32_t cnt)
 {
-		char* title = malloc(88);
+		char* title = malloc(strlen(lab)+10);
 		sprintf(title,"{\"%s\":\"%d\"}",lab,cnt*60); 
 		websocketbroadcast(title, strlen(title));
 		free(title);	
@@ -982,21 +983,8 @@ void app_main()
 
 	//Initialize the SPI RAM chip communications and see if it actually retains some bytes. If it
     //doesn't, warn user.
-	if (bigRam)
-	{
-		setSPIRAMSIZE(420*1024);  // room in psram
-		ESP_LOGI(TAG, "Set Song buffer to 420k");
-	} else
-	{
-		if (audio_output_mode == VS1053)
-		setSPIRAMSIZE(50*1024);		// more free heap
-		ESP_LOGI(TAG, "Set Song buffer to 50k");			
-	}
 	
-    if (!spiRamFifoInit()) {
-        ESP_LOGE(TAG, "SPI RAM chip fail!");
-        esp_restart();
-    }
+//	ramInit();
 	
 
 	//uart speed
@@ -1093,7 +1081,7 @@ void app_main()
 	xTaskCreatePinnedToCore(uartInterfaceTask, "uartInterfaceTask", 2500, NULL, PRIO_UART, &pxCreatedTask,CPU_UART); 
 	ESP_LOGI(TAG, "%s task: %x","uartInterfaceTask",(unsigned int)pxCreatedTask);
 	vTaskDelay(1);
-	xTaskCreatePinnedToCore(clientTask, "clientTask", 3000, NULL, PRIO_CLIENT, &pxCreatedTask,CPU_CLIENT); 
+	xTaskCreatePinnedToCore(clientTask, "clientTask", 3100, NULL, PRIO_CLIENT, &pxCreatedTask,CPU_CLIENT); 
 	ESP_LOGI(TAG, "%s task: %x","clientTask",(unsigned int)pxCreatedTask);	
 	vTaskDelay(1);
     xTaskCreatePinnedToCore(serversTask, "serversTask", 3100, NULL, PRIO_SERVER, &pxCreatedTask,CPU_SERVER); 

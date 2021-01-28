@@ -17,6 +17,16 @@
 //2000 1440 1460 1436
 #define RECEIVE 1440
 //#define RECEIVE 3000
+// audio buffer size in k
+// default to 30
+#define DEFAULTRAM	37
+// for https
+#define HTTPSRAM	20
+#define HTTPSVSRAM	30
+// for vs1053 output on woover
+#define SMALLRAM 	42
+// for wrover
+#define BIGRAM		400
 
 
 typedef enum
@@ -60,6 +70,8 @@ bool clientPrintHeaders();
 void clientPrintState();
 bool getState();
 char* getMeta();
+void ramInit();
+
 
 struct icyHeader* clientGetHeader();
 void clientConnect();

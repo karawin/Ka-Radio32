@@ -81,7 +81,7 @@
 /* #define EBSNET */
 
 /* Uncomment next line if using lwip */
-/* #define WOLFSSL_LWIP */
+#define WOLFSSL_LWIP
 
 /* Uncomment next line if building wolfSSL for a game console */
 /* #define WOLFSSL_GAME_BUILD */
@@ -196,7 +196,7 @@
 
 /* Uncomment next line if building for using ESP-IDF */
 #define WOLFSSL_ESPIDF
-
+#define DEBUG_WOLFSSL 
 /* Uncomment next line if using Espressif ESP32-WROOM-32 */
 #define WOLFSSL_ESPWROOM32
 
@@ -281,6 +281,8 @@
     #define WC_RSA_BLINDING
 	#define NO_FILESYSTEM
 	#define USE_CERT_BUFFERS_1024
+	#define HAVE_ECC
+	#define HAVE_ALL_CURVES
 	
 #if defined(WOLFSSL_ESPWROOM32) || defined(WOLFSSL_ESPWROOM32SE)
    #ifndef NO_ESP32WROOM32_CRYPT

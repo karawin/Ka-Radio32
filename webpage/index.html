@@ -48,7 +48,7 @@
 			<div class="LEFT"><img title="Click on the logo to change the theme" onClick= "theme()" src="logo.png"></div>
 			<div class="RIGHT">
 			<a href="https://github.com/karawin/Ka-Radio32" target="_blank">KaraDio32</a><br/>
-			<a href="https://github.com/karawin/Ka-Radio32" target="_blank">V2.0 P0</a><br/>
+			<a href="https://github.com/karawin/Ka-Radio32" target="_blank">V2.0 R0</a><br/>
 			<div id="rssi" >0 dBm</div><br/>
 <!--			<a href="https://github.com/PiotrSperka/ESP8266-WebRadio" style="font-size:8px" target="_blank">From PiotrSperka</a> -->
 			</div>
@@ -136,7 +136,6 @@
 					<span class="bold1">Url: </span><input type="text" id="instant_url" name="url" onkeyup="buildURL()"><br>
 					<span class="bold1">Port: </span><input type="text" id="instant_port" name="port" value="80" onkeyup="buildURL()"><br>
 					<span class="bold1">Path: </span><input type="text" id="instant_path" name="path" value="/" onkeyup="buildURL()">
-
 					<br><br>
 					
 					<!-- Play icon by Icons8 -->
@@ -160,7 +159,7 @@
 						<input type="button" id="stsave" disabled="true" style="margin:0px auto" title="This will save all stations to the WebRadio" onClick="stChanged()"  value="Save the list(i)">
 						<input type="button" style="margin:0px auto" id="clear" title="Warning: This will erase all stations.\n Be sure to save them before." onClick="clearList()"  value="Erase all(i)">				
 						<input type="button" style="margin:0px auto" id="clear" title="Print the list" onClick="printList()"  value="Print all(i)"><br/>
-						</h1>			
+						</h1>
 
 						<span >You can Drag/Drop each line to sort the list</span><br/>
 						<table id = "stationsTable" style="table-layout: fixed; width: 100%;">
@@ -210,7 +209,7 @@
 						<input type="button" style="float:right;" id="clear" title="Warning: This will clear all stations.\n Be sure to save them before." onClick="clearList()"  value="Clear all stations"><br/>				
 						<br/>-->
 						</p>
-					<h1>Wifi & Network &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="Validate" onclick="valid()" /></h1>
+						<h1>Wifi & Network &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="Validate" onclick="valid()" /></h1>
 						<p>
 						<span class="bold">AP SSID:</span>
 						<input  id="ssid" type="text" /> <input  id="ssid2" type="text" />
@@ -243,7 +242,8 @@
 						<input id="host" type="text" value="" />
 						<span class="bold">.local</span><br/>
 						<span class="bold">Time Zone Offset:</span>
-						<input id="tzo" type="text" value="" />						
+						<input id="tzo" type="text" value="" />	
+						<span class="bold">Suggested: </span><span class="bold" id="atzo"> </span><br/>						
 						</p>
 					<h1>Update to: <span id="newrelease"></span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 					<input type=button value="Update now" onclick="upgrade()" /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
@@ -254,7 +254,7 @@
 						<input type=button value="Update now" onclick="upgrade()" /><br/>	
 						<span class="bold4" id="Infos"></span><br/>
 						</p>
-					<h1>History:</h1><BR/>
+						<h1>History:</h1><BR/>
 						<input type=button value="Read the history" onclick="checkhistory()" /><br/>
 						<span class="bold4" id="History"></span><br/>
 					</div>

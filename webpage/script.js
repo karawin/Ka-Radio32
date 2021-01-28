@@ -13,8 +13,8 @@ function openwebsocket(){
 
 	websocket.onmessage = function (event) {
 	try{	
-	    var arr = JSON.parse(event.data);		
 		console.log("onmessage:"+event.data);
+	    var arr = JSON.parse(event.data);		
 		if (arr["meta"] == "") 
 		{ document.getElementById('meta').innerHTML = karadio;setMainHeight(curtab);}
 		if (arr["meta"]) 
@@ -217,6 +217,15 @@ function dtime() {
 	if ((!isNaN(eltw.innerHTML))&&(eltw.innerHTML != "0") )
 		--eltw.innerHTML;
 	if ((!isNaN(eltw.innerHTML))&&(eltw.innerHTML == 0)) eltw.innerHTML = "0";
+}
+// return the timezone (+/-x)
+function timezone() {
+    var offset = new Date().getTimezoneOffset();
+    var minutes = Math.abs(offset);
+    var hours = Math.floor(minutes / 60);
+    var prefix = offset < 0 ? "+" : "-";
+	document.getElementById('atzo').innerHTML = prefix+hours;	
+//    return prefix+hours;
 }
 
 function labelSleep(label){
@@ -624,30 +633,46 @@ function instantPlay() {
 
 function buildAddURL()
 {
-	if (document.getElementById('add_port').value == "") 
-		  document.getElementById('add_port').value= "80";
+	
 	if (document.getElementById('add_path').value == "") 
 		  document.getElementById('add_path').value= "/";
 	var str = document.getElementById('add_url').value;
 	if (str.toLowerCase().startsWith('https', 0))
+	{
+		if (document.getElementById('add_port').value == "") 
+		  document.getElementById('add_port').value= "443";
 		document.getElementById('add_URL').value = document.getElementById('add_url').value+':'+
 			document.getElementById('add_port').value + document.getElementById('add_path').value;
-	else document.getElementById('add_URL').value = "http://"+document.getElementById('add_url').value+':'+
+	}
+	else 
+	{
+		if (document.getElementById('add_port').value == "") 
+		  document.getElementById('add_port').value= "80";
+		document.getElementById('add_URL').value = "http://"+document.getElementById('add_url').value+':'+
 			document.getElementById('add_port').value + document.getElementById('add_path').value;
+	}
 }
 
 function buildURL()
 {
-	if (document.getElementById('instant_port').value == "") 
-		  document.getElementById('instant_port').value= "80";
+
 	if (document.getElementById('instant_path').value == "") 
 		  document.getElementById('instant_path').value= "/";
 	var str = document.getElementById('instant_url').value;
 	if (str.toLowerCase().startsWith('https', 0))
+	{
+		if (document.getElementById('instant_port').value == "") 
+		  document.getElementById('instant_port').value= "443";
 		document.getElementById('instant_URL').value = document.getElementById('instant_url').value+':'+
 			document.getElementById('instant_port').value + document.getElementById('instant_path').value;
-	else document.getElementById('instant_URL').value = "http://"+document.getElementById('instant_url').value+':'+
+	}
+	else 
+	{
+		if (document.getElementById('instant_port').value == "") 
+		  document.getElementById('instant_port').value= "80";
+		document.getElementById('instant_URL').value = "http://"+document.getElementById('instant_url').value+':'+
 			document.getElementById('instant_port').value + document.getElementById('instant_path').value;
+	}
 }
 
 function parseEditURL()
@@ -669,7 +694,10 @@ function parseEditURL()
 		document.getElementById('add_url').value = a.hostname;
 	}
 	if (a.port == "")
-		 document.getElementById('add_port').value = "80";
+		if (a.href.toLowerCase().startsWith("https"))
+			document.getElementById('add_port').value = "443";
+		else
+			document.getElementById('add_port').value = "80";
 	else document.getElementById('add_port').value = a.port;
 	document.getElementById('add_path').value = a.pathname+a.search+a.hash;	 
 }
@@ -693,7 +721,10 @@ function parseInstantURL()
 		document.getElementById('instant_url').value = a.hostname;
 	 }
 	 if (a.port == "") 
-		  document.getElementById('instant_port').value= "80";
+		if (a.href.toLowerCase().startsWith("https"))
+			document.getElementById('instant_port').value= "443";
+		else
+			document.getElementById('instant_port').value= "80";
 	 else document.getElementById('instant_port').value = a.port;
 	 document.getElementById('instant_path').value = a.pathname+a.search+a.hash;	 
 }
@@ -864,7 +895,7 @@ function eraseStation() {
 			document.getElementById('add_url').value = "";
 			document.getElementById('add_name').value = "";
 			document.getElementById('add_path').value = "";
-			document.getElementById('add_port').value = "80";
+			document.getElementById('add_port').value = "";
 			document.getElementById('ovol').value = 0;
 			document.getElementById('add_URL').value = ""
 }
@@ -908,7 +939,7 @@ function editStation(id) {
 			document.getElementById('add_url').value = arr["URL"];
 			document.getElementById('add_name').value = arr["Name"];
 			document.getElementById('add_path').value = arr["File"];
-			if (arr["Port"] == "0") arr["Port"] = "80";
+			if (arr["Port"] == "0") arr["Port"] = "";
 			document.getElementById('add_port').value = arr["Port"];
 			document.getElementById('ovol').value = arr["ovol"];
 			
@@ -1140,7 +1171,11 @@ function stChanged()
 				url = parser.hostname;
 				file = parser.pathname+parser.hash+parser.search;
 				port = parser.port;
-				if (!port ) port = 80;
+				if (!port )
+					if (furl.startsWith("https"))
+						port = 443;
+					else
+						port = 80;
 /*				file=tbody.rows[ind].cells[3].innerText;
 				port= tbody.rows[ind].cells[4].innerText;*/
 				ovol = tbody.rows[ind].cells[3].innerText;
@@ -1399,6 +1434,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			wifi(0) ;
 			hardware(0);
 			checkversion();
+			timezone();
 			setMainHeight(curtab);	
 	});
 	window.addEventListener("keydown", function (event)

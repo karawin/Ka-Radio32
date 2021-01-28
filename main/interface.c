@@ -426,7 +426,8 @@ void clientParseUrl(char* s)
         for(tmp=0; tmp<(t_end-t+1); tmp++) url[tmp] = 0;
         strncpy(url, t+2, (t_end-t));
         clientSetURL(url);
-		char* title = malloc(88);
+//		char* title = malloc(88);
+		char* title = malloc(strlen(url)+13);
 		sprintf(title,"{\"iurl\":\"%s\"}",url); 
 		websocketbroadcast(title, strlen(title));
 		free(title);		
@@ -454,7 +455,8 @@ void clientParsePath(char* s)
         strncpy(path, t+2, (t_end-t));
 //kprintf("cli.path: %s\n",path);
         clientSetPath(path);
-		char* title = malloc(130);
+//		char* title = malloc(130);
+		char* title = malloc(strlen(path)+14);
 		sprintf(title,"{\"ipath\":\"%s\"}",path); 
 		websocketbroadcast(title, strlen(title));
 		free(title);		
@@ -482,7 +484,7 @@ void clientParsePort(char *s)
         strncpy(port, t+2, (t_end-t));
         uint16_t porti = atoi(port);
         clientSetPort(porti);
-		char* title = malloc(130);
+		char* title = malloc(24);
 		sprintf(title,"{\"iport\":\"%d\"}",porti); 
 		websocketbroadcast(title, strlen(title));
 		free(title);		

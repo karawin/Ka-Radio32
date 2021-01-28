@@ -9,8 +9,10 @@ unsigned  spiRamFifoFree();
 long  spiRamGetOverrunCt();
 long  spiRamGetUnderrunCt();
 void setSPIRAMSIZE(unsigned size);
+unsigned getSPIRAMSIZE();
 
 void spiRamFifoReset();
+void spiRamFifoDestroy();
 unsigned spiRamFifoLen();
 
 #endif
