@@ -10,6 +10,7 @@ COMPONENT_SRCDIRS += wolfcrypt/src/port/Espressif
 COMPONENT_SRCDIRS += wolfcrypt/src/port/atmel
 
 CFLAGS +=-DWOLFSSL_USER_SETTINGS
+CFLAGS  +=-DWOLFSSL_STATIC_RSA
 
 COMPONENT_OBJEXCLUDE := wolfcrypt/src/aes_asm.o
 COMPONENT_OBJEXCLUDE += wolfcrypt/src/evp.o

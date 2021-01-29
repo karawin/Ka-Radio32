@@ -262,12 +262,12 @@ bool clientParsePlaylist(char* s)
 	
   str = strstr(s,"http://");
   if (str ==NULL) str = strstr(s,"HTTP://");
-  if (str != NULL) {s= str+7; j = 7; strcpy (url,"http://");}
+  if (str != NULL) {s= str+7; j = 7; strcpy (url,"http://"); }
   else
   {
 	str = strstr(s,"https://");
 	if (str == NULL) str = strstr(s,"HTTPS://");
-	if (str != NULL) {s= str+8; j = 8; strcpy (url,"https://");}
+	if (str != NULL) {s= str+8; j = 8; strcpy (url,"https://");strcpy(port,"443");}
 	else {
 		j = 7;
 		strcpy (url,"http://");
