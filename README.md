@@ -31,6 +31,7 @@ Output mode set in Setting panel on web page of KaraDio32 :
 - VS1053 to connect to a vs1053 board, I2S output of the vs1053 enabled.
 - all VS1053 tones control
 - AAC decoding on I2S with a wrover cpu (4mB of external psram). Mp3 only on I2S with a wroom cpu.
+- https stations are played.  
 
 ### Others features :
 
