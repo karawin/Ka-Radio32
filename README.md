@@ -65,7 +65,7 @@ Output mode set in Setting panel on web page of KaraDio32 :
 |   CPU   |  vs1053b      |  other |  
 | ------- | -------       | ------ |  
 | Wroom   | mp3 aac ogg   | mp3 |  
-| Wrover  | mp3 aac ogg   | mp3 aac ogg |  
+| Wrover  | mp3 aac ogg   | mp3 aac  |  
 
 ### Buffering audio
 |   CPU        |  vs1053b      |  other |  
