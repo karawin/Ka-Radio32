@@ -1453,7 +1453,7 @@ void clientTask(void *pvParams) {
 				while (( bytes_read > 0 )||(playing && (bytes_read == 0)));
 			} else
 			{
-				ESP_LOGE(TAG,"Client socket: %d  connect: %d  errno:%d ",sockfd, bytes_read,errno);
+				ESP_LOGE(TAG,"Client socket: %d  connect errno:%d ",sockfd,errno);
 				clientSaveOneHeader("Invalid address",15,METANAME);
 				wsHeaders();
 				vTaskDelay(1);

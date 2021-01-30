@@ -59,6 +59,23 @@ Output mode set in Setting panel on web page of KaraDio32 :
 - Uses a 40 kB (I2S), 50 kB (vs1053) or 420 Kb (wrover) queue to provide smooth playback.
 - many more configurable parameters. See [Interfaces document](Interface.md )  
 
+
+### Played stream
+|   CPU   |  vs1053b      |  other |  
+| ------- | -------       | ------ |  
+| Wroom   | mp3 aac ogg   | mp3 |  
+| Wrover  | mp3 aac ogg   | mp3 aac ogg |  
+
+### Buffering audio
+|   CPU        |  vs1053b      |  other |  
+| -------      | -------       | ------ |  
+| Wroom http   | 42k           | 37k    |  
+| Wroom https  | 30k           | 20k    |  
+| Wrover http  | 400k          | 400k   |  
+| Wrover https | 400k          | 400k   |  
+
+
+
 ## Configure the hardware and IR codes
 If the default configuration doesn't fit your needs, you can externally configure the software to fit your hardware and peripherals to suit your needs.  
 The configuration file is to be flashed only one time. After, the standard delivery will become compatible with your hardware gpio use and peripherals configuration. A future standard OTA will automatically works for your configuration.  
