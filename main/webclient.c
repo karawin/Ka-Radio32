@@ -565,7 +565,7 @@ void wsMonitor()
 {
 		char *answer;
 		uint16_t len;
-		len = strlen(clientURL)+strlen(clientPath)+20;
+		len = strlen(clientURL)+strlen(clientPath)+30;
 		answer= malloc(len);
 		if (answer)
 		{
