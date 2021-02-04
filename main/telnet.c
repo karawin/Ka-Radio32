@@ -114,14 +114,31 @@ bool telnetAccept(int tsocket)
 	} else close(tsocket);
 	return false;
 }
-
+void vTelnetWrite(uint32_t lenb,const char *fmt, va_list ap)
+{
+	char *buf = NULL;
+	int i;
+	
+	buf = (char *)malloc(lenb+1);
+	if (buf == NULL) return;
+	buf[0] = 0;
+	vsprintf(buf,fmt, ap);	
+	// write to all clients
+	telnet_take_semaphore();
+	for (i = 0;i<NBCLIENTT;i++)	
+		if (istelnet( telnetclients[i]))
+		{
+			write( telnetclients[i],  buf, strlen(buf));
+		}	
+	telnet_give_semaphore();		
+	free (buf);
+}
 
 //broadcast a txt data to all clients
 void telnetWrite(uint32_t lenb,const char *fmt, ...)
 {
 	int i ;
 	char *buf = NULL;
-//	char* lfmt;
 	int rlen;
 	buf = (char *)malloc(lenb+1);
 	if (buf == NULL) return;

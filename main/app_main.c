@@ -110,6 +110,7 @@ xQueueHandle event_queue;
 static uint16_t FlashOn = 5,FlashOff = 5;
 bool ledStatus; // true: normal blink, false: led on when playing
 bool ledPolarity; // true: normal false: reverse
+bool logTel; // true = log also on telnet
 player_t *player_config;
 static output_mode_t audio_output_mode; 
 static uint8_t clientIvol = 0;
@@ -658,7 +659,7 @@ void start_network(){
 			else	
 				tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info);
 		}		
-		ip_addr_t *ipdns0 = dns_getserver(0);
+		ip_addr_t *ipdns0 = (ip_addr_t *)dns_getserver(0);
 //		ip_addr_t ipdns1 = dns_getserver(1);
 		printf("\nDNS: %s  \n",ip4addr_ntoa(( struct ip4_addr* ) ipdns0));
 		strcpy(localIp , ip4addr_ntoa(&ip_info.ip));
@@ -835,7 +836,7 @@ void autoPlay()
 		if ((g_device->autostart ==1)&&(g_device->currentstation != 0xFFFF))
 		{	
 			kprintf("autostart: playing:%d, currentstation:%d\n",g_device->autostart,g_device->currentstation);
-			vTaskDelay(50); // wait a bit
+			vTaskDelay(10); // wait a bit
 			playStationInt(g_device->currentstation);
 		} else clientSaveOneHeader("Ready",5,METANAME);			
 	}
@@ -909,6 +910,12 @@ void app_main()
 		ledPolarity = true;
 	else
 		ledPolarity = false;
+	
+	// log on telnet
+	if (g_device->options & T_LOGTEL)
+		logTel = true; // 
+	else
+		logTel = false; //
 	
 	// init softwares
 	telnetinit();
@@ -1101,7 +1108,8 @@ void app_main()
 	
 	setIvol( g_device->vol);
 	kprintf("READY. Type help for a list of commands\n");
-	
+	// error log on telnet
+	esp_log_set_vprintf( (vprintf_like_t)lkprintf);
 	//autostart		
 	autoPlay();
 // All done.

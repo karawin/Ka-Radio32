@@ -216,7 +216,7 @@ static void clientSetOvol(int8_t ovol)
 {
 	clientOvol = ovol;
 	kprintf("##CLI.OVOLSET#: %d\n",ovol);
-	vTaskDelay(10);
+	vTaskDelay(1);
 }
 
 // set the volume with vol,  add offset
@@ -330,7 +330,7 @@ void playStationInt(int sid) {
 	si = getStation(sid);
 
 	if(si != NULL &&si->domain && si->file) {
-			vTaskDelay(4);
+			vTaskDelay(1);
 			clientSilentDisconnect();
 			ESP_LOGV(TAG,"playstationInt: %d, new station: %s",sid,si->name);
 			clientSetName(si->name,sid);
@@ -346,7 +346,7 @@ void playStationInt(int sid) {
 			for (int i = 0;i<100;i++)
 			{
 				if (clientIsConnected()) break;
-				vTaskDelay(5);
+				vTaskDelay(1);
 			}
 	}
 	infree(si);
@@ -427,7 +427,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 				for (int i = 0;i<100;i++)
 				{
 					if(!clientIsConnected())break;
-					vTaskDelay(4);
+					vTaskDelay(1);
 				}
 				clientSetURL(url);
 				clientSetPath(path);
@@ -438,7 +438,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 				for (int i = 0;i<100;i++)
 				{
 					if (clientIsConnected()) break;
-					vTaskDelay(5);
+					vTaskDelay(1);
 				}
 			}
 		}
@@ -646,7 +646,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			ESP_LOGV(TAG,"save station return: %d, unb:%d, addr:%x",uid,unb,(int)si);
 			infree (si);
 			if (pState != getState())
-				if (pState) {clientConnect();vTaskDelay(200);}	 //we was playing so start again the play
+				if (pState) {clientConnect();vTaskDelay(100);}	 //we was playing so start again the play
 		}
 	} else if(strcmp(name, "/play") == 0) {
 		if(data_size > 4) {
@@ -976,7 +976,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 				}
 				ESP_LOGD(TAG,"currentAP: %d",g_device->current_ap);
 				copyDeviceSettings();	// save the current one
-				vTaskDelay(50);
+				vTaskDelay(20);
 				esp_restart();
 			}
 			return;

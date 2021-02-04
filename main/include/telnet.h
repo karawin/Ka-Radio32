@@ -31,6 +31,7 @@ bool istelnet( int socket);
 
 //write a txt data
 void telnetWrite(uint32_t len,const char *fmt, ...);
+void vTelnetWrite(uint32_t lenb,const char *fmt, va_list ap);
 
 int telnetRead(int tsocket);
 // the telnet server task

@@ -407,7 +407,7 @@ function icyResp(arr) {
 				document.getElementById('lgenre').style.display = "none";
 			else 	document.getElementById('lgenre').style.display = "inline-block";	
 			document.getElementById('genre').innerHTML = arr["genre"].replace(/\\/g,"");
-			if (arr["url1"] =="")
+			if ((arr["url1"] =="")|| (arr["url1"] ==" "))
 			{	
 				document.getElementById('lurl').style.display = "none";
 				document.getElementById('icon').style.display = "none";
@@ -419,7 +419,8 @@ function icyResp(arr) {
 				$url = arr["url1"].replace(/\\/g,"").replace(/ /g,"");
 				if ($url == 'http://www.icecast.org/') 
 					document.getElementById('icon').src = "/logo.png";
-				else document.getElementById('icon').src =  "http://www.google.com/s2/favicons?domain_url="+$url;
+				else
+				document.getElementById('icon').src =  "http://www.google.com/s2/favicons?domain_url="+$url;
 			}	
 			$url = arr["url1"].replace(/\\/g,"");
 			document.getElementById('url1').innerHTML = $url;

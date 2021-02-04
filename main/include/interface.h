@@ -17,7 +17,7 @@
 
 
 #define RELEASE "2.0"
-#define REVISION "1"
+#define REVISION "2"
 
 uint32_t checkUart(uint32_t speed);
 extern unsigned short adcdiv;	
@@ -50,16 +50,11 @@ uint8_t getRotat();
 void setHostname(char* s);
 
 #define kprintf(fmt, ...) do {    \
-        printf(fmt, ##__VA_ARGS__);   \
-		telnetWrite(2*MAXDATAT,fmt, ##__VA_ARGS__); \
+		telnetWrite(printf(fmt, ##__VA_ARGS__),fmt, ##__VA_ARGS__); \
 		addonParse(fmt, ##__VA_ARGS__);\
 	} while (0)
-		
-#define kprintfl(fmt, ...) do {    \
-        printf(fmt, ##__VA_ARGS__);   \
-		telnetWrite(1024,fmt, ##__VA_ARGS__); \
-		addonParse(fmt, ##__VA_ARGS__);\
-	} while (0)
-		
+
+void lkprintf(const char *format, va_list ap);
+	
 #endif
 		

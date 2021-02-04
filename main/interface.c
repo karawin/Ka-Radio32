@@ -115,15 +115,16 @@ const char stritHELP4[]  = {"\
 sys.date: Send a ntp request and Display the current locale time\n\
 sys.dlog: Display the current log level\n\
 sys.logx: Set log level to x with x=n for none, v for verbose, d for debug, i for info, w for warning, e for error\n\
+sys.logt and sys.logt(x\"): Display and Change the log on telnet toggle. 0 = no system log on telnet\n\
 sys.log: do nothing apart a trace on uart (debug use)\n\
 sys.lcdout and sys.lcdout(\"x\"): Timer in seconds to switch off the lcd. 0= no timer\n\
 sys.lcdstop and sys.lcdstop(\"x\"): Timer in seconds to switch off the lcd on stop mode. 0= no timer\n\
 sys.lcdblv and sys.lcdblv(\"x\"): Value in percent of the backlight.\n\
 sys.lcd and sys.lcd(\"x\"): Display and Change the lcd type to x on next reset\n\
-sys.ledgpio and sys.ledgpio(\"x\"): Display and Change the default Led GPIO (4) to x\n\
 "};
 
 const char stritHELP5[]  = {"\
+sys.ledgpio and sys.ledgpio(\"x\"): Display and Change the default Led GPIO (4) to x\n\
 sys.ddmm and sys.ddmm(\"x\"):  Display and Change  the date format. 0:MMDD, 1:DDMM\n\
 sys.host and sys.host(\"your hostname\"): display and change the hostname for mDNS\n\
 sys.rotat and sys.rotat(\"x\"): Change and display the lcd rotation option (reset needed). 0:no rotation, 1: rotation\n\
@@ -157,6 +158,19 @@ void clientVol(char *s);
 bool inside = false;
 static uint8_t ddmm;
 static uint8_t rotat;
+
+//log print
+void lkprintf(const char *format, va_list ap)
+{
+  extern bool logTel;
+//print to uart0
+  int i = vprintf(format,ap);
+  
+// send to all telnet clients
+  if (logTel) vTelnetWrite(i,format,ap); 
+}
+
+
 uint8_t getDdmm()
 {
 	return ddmm;
@@ -1331,6 +1345,39 @@ void setLogLevel(esp_log_level_t level)
 	displayLogLevel();
 } 
 
+void setLogTelnet(char* s)
+{
+	extern bool logTel;
+    char *t = strstr(s, parslashquote);
+	if(t == NULL)
+	{
+		kprintf("##Log Telnet is %s#\n",((g_device->options & T_LOGTEL)== 0)?"Off":"On");
+		return;
+	}
+	char *t_end  = strstr(t, parquoteslash);
+    if(t_end == NULL)
+    {
+		kprintf(stritCMDERROR);
+		return;
+    }	
+	uint8_t value = atoi(t+2);
+	if (value !=0) // log on telnet
+	{
+	 g_device->options |= T_LOGTEL; // set
+	 logTel = true; 
+	}
+	else  // no log on telnet
+	{ 
+		g_device->options &= NT_LOGTEL;  // clear
+		logTel = false;
+	} // options:0 = ledStatus true = Blink mode
+
+	setLogTelnet((char*)"");
+	saveDeviceSettings(g_device);
+}
+
+
+
 /*
 void fmSeekUp()
 {seekUp();seekingComplete(); kprintf("##FM.FREQ#: %3.2f MHz\n",getFrequency());}
@@ -1449,6 +1496,7 @@ void checkCommand(int size, char* s)
 		else if(strcmp(tmp+4, "logi") == 0) 	setLogLevel(ESP_LOG_INFO); 
 		else if(strcmp(tmp+4, "logd") == 0) 	setLogLevel(ESP_LOG_DEBUG); 
 		else if(strcmp(tmp+4, "logv") == 0) 	setLogLevel(ESP_LOG_VERBOSE); 
+		else if(startsWith(   "logt",tmp+4)) 	setLogTelnet(tmp); 
 		else if(strcmp(tmp+4, "dlog") == 0) 	displayLogLevel();
 		else if(strncmp(tmp+4, "cali",4) == 0) 	xpt_calibrate();
 		else if(startsWith(   "log",tmp+4)) 	; // do nothing
@@ -1467,17 +1515,17 @@ void checkCommand(int size, char* s)
 	{
 		if(strcmp(tmp, "help") == 0)
 		{
-			kprintfl(stritHELP0);
+			kprintf(stritHELP0);
 			vTaskDelay(1);
-			kprintfl(stritHELP1);
+			kprintf(stritHELP1);
 			vTaskDelay(1);
-			kprintfl(stritHELP2);
+			kprintf(stritHELP2);
 			vTaskDelay(1);
-			kprintfl(stritHELP3);
+			kprintf(stritHELP3);
 			vTaskDelay(1);
-			kprintfl(stritHELP4);		
+			kprintf(stritHELP4);		
 			vTaskDelay(1);
-			kprintfl(stritHELP5);		}
+			kprintf(stritHELP5);		}
 		else printInfo(tmp);
 	}	
 	free(tmp);

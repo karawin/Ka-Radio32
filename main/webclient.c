@@ -70,7 +70,7 @@ static uint16_t clientPort = 80;
     WOLFSSL *ssl ;
 
 static struct hostent *serverInfo = NULL;
-
+static char* pseudoUtf8(char* str,int *len);
 
 void *incmalloc(size_t n)
 {
@@ -117,7 +117,7 @@ void ramInit()
 	vTaskDelay(1);
 	if (!spiRamFifoInit())
 	{
-		vTaskDelay(20);
+		vTaskDelay(100);
 		ESP_LOGE(TAG, "SPIRAM fail for %dK",getSPIRAMSIZE()/1024);
 		setSPIRAMSIZE(getSPIRAMSIZE() - 10240);
 		ESP_LOGI(TAG, "Set Song buffer to %dk",getSPIRAMSIZE()/1024);
@@ -163,7 +163,7 @@ void ramSinit()
 		{	
 			setSPIRAMSIZE(getSPIRAMSIZE() - 10240);
 			ESP_LOGE(TAG, "SPIRAM fail for %dK",getSPIRAMSIZE()/1024);
-			vTaskDelay(20);				
+			vTaskDelay(200);				
 			if (!spiRamFifoInit()) 
 			{
 				ESP_LOGE(TAG, "SPIRAM fail for %dK",getSPIRAMSIZE()/1024);
@@ -342,12 +342,15 @@ static char* stringify(char* str,int len)
 					new[j++] = '\\';
 					new[j++] =(str)[i] ;
 				}
-/*				else 
+				else 
+//pseudoutf8
+/*
 				if ((str[i] > 192) && (str[i+1] < 0x80)){ // 128 = 0x80
 					new[j++] = 195; // 192 = 0xC0   195 = 0xC3
 					new[j++] =(str)[i]-64 ; // 64 = 0x40
-				} */				
-				else new[j++] =(str)[i] ;
+				} 				
+				else*/ 
+				new[j++] =(str)[i] ;
 
 				if ( j+MORE> nlen)
 				{
@@ -469,7 +472,7 @@ static void clientSaveMetadata(char* s,int len)
 
 // see if meta is != of the old one
 		char* tt;
-		tt = incmalloc((len+3)*sizeof(char));
+		tt = incmalloc((len+5)*sizeof(char));
 		if (tt != NULL)
 		{
 			strcpy(tt,t);
@@ -509,7 +512,9 @@ static void clientSaveMetadata(char* s,int len)
 			if (title != NULL) // broadcast to all websockets
 			{
 				sprintf(title,"{\"meta\":\"%s\"}",t_end);
-				websocketbroadcast(title, strlen(title));
+				int len;
+				title = pseudoUtf8(title,&len);
+				websocketbroadcast(title, len);
 				incfree(title,"title");
 			} else ESP_LOGV(TAG,strcMALLOC1,"Title");
 		}
@@ -563,53 +568,54 @@ void wsVol(char* vol)
 // websocket: broadcast monitor url
 void wsMonitor()
 {
-		char *answer;
-		uint16_t len;
-		len = strlen(clientURL)+strlen(clientPath)+30;
-		answer= malloc(len);
-		if (answer)
+	char *answer;
+	uint16_t len;
+	len = strlen(clientURL)+strlen(clientPath)+30;
+	answer= malloc(len);
+	if (answer)
+	{
+		memset(answer,0,len);
+		if ((clientPath[0]!= 0))
 		{
-			memset(answer,0,len);
-			if ((clientPath[0]!= 0))
-			{
-				sprintf(answer,"{\"monitor\":\"%s:%d%s\"}",clientURL,clientPort,clientPath);
-				websocketbroadcast(answer, strlen(answer));
-			}
-			free(answer);
+			sprintf(answer,"{\"monitor\":\"%s:%d%s\"}",clientURL,clientPort,clientPath);
+			websocketbroadcast(answer, strlen(answer));
 		}
+		free(answer);
+	}
 }
 
 
-
-static char* pseudoUtf8(char* str,int len)
+// websocket cannot send other char than utf8
+static char* pseudoUtf8(char* str, int* len) //,int len)
 {
 	#define MOREU	20
-//		if ((strchr(str,'"') == NULL)&&(strchr(str,'/') == NULL)) return str;
-        if (len == 0) return str;
-		char* new = incmalloc(len+MOREU);
-//		int nlen = len+MOREU;
-		if (new != NULL)
+ //       if (len == 0) return str;
+	*len = strlen(str);
+	char* new = incmalloc(strlen(str)+MOREU);
+	if (new != NULL)
+	{
+		ESP_LOGV(TAG,"pseudoUtf8: enter: \"%s\"",str);
+		int i=0 ,j =0;
+		for (i = 0;i< *len+10;i++) new[i] = 0;
+		for (i=0;i< *len;i++)
 		{
-			ESP_LOGV(TAG,"pseudoUtf8: enter: len:%d  \"%s\"",len,str);
-			int i=0 ,j =0;
-			for (i = 0;i< len+10;i++) new[i] = 0;
-			for (i=0;i< len;i++)
-			{
-				if ((str[i] > 192) && (str[i+1] < 0x80)){ // 128 = 0x80
-					new[j++] = 195; // 192 = 0xC0   195 = 0xC3
-					new[j++] =(str)[i]-64 ; // 64 = 0x40
-				} 
-				else new[j++] =(str)[i] ;				
-			}
-			incfree(str,"str");
-			new = realloc(new,j+1); // adjust
-			ESP_LOGV(TAG,"pseudoUtf8: exit: len:%d  \"%s\"",j,new);
-			return new;
-		} else
-		{
-			ESP_LOGV(TAG,strcMALLOC1,"pseudoUtf8");
+			if ((str[i] > 192) && (str[i+1] < 0x80)){ // 128 = 0x80
+				new[j++] = 195; // 192 = 0xC0   195 = 0xC3
+				new[j++] =(str)[i]-64 ; // 64 = 0x40
+			} 
+			else new[j++] =(str)[i] ;				
 		}
-		return str;
+		incfree(str,"str");
+		new = realloc(new,j+1); // adjust
+		*len = strlen(new);
+		ESP_LOGV(TAG,"pseudoUtf8: exit: \"%s\"",new);
+		return new;
+	} else
+	{
+		ESP_LOGV(TAG,strcMALLOC1,"pseudoUtf8");
+	}
+	*len = strlen(str);
+	return str;
 }
 
 
@@ -623,8 +629,6 @@ static void wsHeaders()
 	not2 = header.members.single.notice2;
 	if (not2 ==NULL) not2=header.members.single.audioinfo;
 	if ((header.members.single.notice2 != NULL)&&(strlen(header.members.single.notice2)==0)) not2=header.members.single.audioinfo;
-	
-	if (header.members.single.description !=NULL) header.members.single.description = pseudoUtf8(header.members.single.description,strlen(header.members.single.description));
 	
 	int json_length ;
 	json_length =104+ //93
@@ -651,7 +655,9 @@ static void wsHeaders()
 			(not2 ==NULL)?"":not2 ,
 			(header.members.single.genre ==NULL)?"":header.members.single.genre);
 	ESP_LOGV(TAG,"WSH: len:%d  \"%s\"",strlen(wsh),wsh);
-	websocketbroadcast(wsh, strlen(wsh));
+	int len;
+	wsh = pseudoUtf8(wsh, &len);
+	websocketbroadcast(wsh, len);
 	incfree (wsh,"wsh");
 }
 
@@ -664,7 +670,6 @@ static void clearHeaders()
 		if(header_num != METAINT)
 			if(header.members.mArr[header_num] != NULL) {
 				incfree(header.members.mArr[header_num],"header" );
-//				header.members.mArr[header_num][0] = 0;
 				header.members.mArr[header_num] = NULL;
 			}
 	}
@@ -708,7 +713,7 @@ bool clientSaveOneHeader(const char* t, uint16_t len, uint8_t header_num)
 	for(i = 0; i<len+1; i++) tt[i] = 0;
 	strncpy(tt, t, len);
 	header.members.mArr[header_num] = stringify(tt,len); //tt is freed here
-	vTaskDelay(10);
+	vTaskDelay(2);
 	clientPrintOneHeader(header_num);
 	ESP_LOGV(TAG,"header after num:%d addr:0x%x  cont:\"%s\"",header_num,(int)header.members.mArr[header_num],header.members.mArr[header_num]);
 	return true;
@@ -780,7 +785,6 @@ bool clientParseHeader(char* s)
 	if (ret == true)
 	{
 		wsHeaders();
-//		wsMonitor();
 	}
 	xSemaphoreGive(sHeader);
 		return ret;
@@ -842,7 +846,7 @@ void clientConnect()
 //		esp_wifi_set_ps (WIFI_PS_MIN_MODEM);
 	} else {
 		clientDisconnect("clientConnect");
-		clientSaveOneHeader("gethostbyname error",12,METANAME);
+		clientSaveOneHeader("No ip found",11,METANAME);
 		wsHeaders();
 		vTaskDelay(1);
 	}
@@ -900,7 +904,7 @@ void clientDisconnect(const char* from)
 			if (getLedGpio() != GPIO_NONE) gpio_set_level(getLedGpio(), ledPolarity ? 1 : 0);	
 		}		
 //	esp_wifi_set_ps(WIFI_PS_MAX_MODEM);
-	vTaskDelay(5);
+	vTaskDelay(1);
 	// save the volume if needed on stop state
 	if (g_device->vol != getIvol())
 	{ 			
@@ -996,7 +1000,6 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 
 						}
 						icyfound = 	clientParseHeader(pdata);
-//						wsMonitor();
 						if(header.members.single.metaint > 0)
 							metad = header.members.single.metaint;
 						ESP_LOGD(TAG,"t1: 0x%x, cstatus: %d, icyfound: %d  metad:%d Metaint:%d\n", (int) t1,cstatus, icyfound,metad,  (header.members.single.metaint));
@@ -1257,13 +1260,12 @@ ESP_LOGD(TAG,"mt2 len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,cle
 			kprintf(CLIPLAY,0x0d,0x0a);
 			setVolumei(0);
 			playing=1;
-			vTaskDelay(11);
+			vTaskDelay(20);
 			setVolumei(getVolume());
 
 			if (!ledStatus){ 
 			if (getLedGpio() != GPIO_NONE) gpio_set_level(getLedGpio(), ledPolarity ? 0 : 1);	
-		}		
-
+			}		
 		}
 	}
 }
@@ -1285,32 +1287,30 @@ void clientTask(void *pvParams) {
 	uint8_t cnterror;
 	char userAgent[40];
 	struct sockaddr_in dest;
-
-	vTaskDelay(300);
-	spiRamFifoInit();	
-	
-
 	int ret;
-	
-	if (strlen(g_device->ua) == 0) strcpy(g_device->ua,"Karadio32/1.9");
-	strcpy(userAgent, g_device->ua);
 
-					   /* Initialize wolfSSL */
-					if (wolfSSL_Init() != WOLFSSL_SUCCESS) {
-						ESP_LOGE(TAG,"ERROR: failed to init WOLFSSL\n");}
-					wolfSSL_Debugging_ON();
-				   /* Create and initialize WOLFSSL_CTX */
-					if ((ctx = wolfSSL_CTX_new(wolfSSLv23_client_method())) == NULL) {
-//					if ((ctx = wolfSSL_CTX_new(wolfTLSv1_1_client_method())) == NULL) {
-					ESP_LOGE(TAG,"ERROR: failed to create WOLFSSL_CTX\n");
-					}					
-					/* Load client certificates into WOLFSSL_CTX */
-					if ((ret = wolfSSL_CTX_load_verify_buffer(ctx, client_cert_der_1024,
-						sizeof_client_cert_der_1024, WOLFSSL_FILETYPE_ASN1)) != SSL_SUCCESS) {
-						ESP_LOGE(TAG,"ERROR: failed to load %d, please check the file.\n",ret);
-					}
-					/* not peer check */
-					wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_NONE, 0);
+	vTaskDelay(200);
+	spiRamFifoInit();	
+
+	if (strlen(g_device->ua) == 0) strcpy(g_device->ua,"Karadio32/2.0");
+	strcpy(userAgent, g_device->ua);
+//----------------------------------------------------------------------
+	/* Initialize wolfSSL */
+	if (wolfSSL_Init() != WOLFSSL_SUCCESS) {
+		ESP_LOGE(TAG,"ERROR: failed to init WOLFSSL\n");}
+	wolfSSL_Debugging_ON();
+	/* Create and initialize WOLFSSL_CTX */
+	if ((ctx = wolfSSL_CTX_new(wolfSSLv23_client_method())) == NULL) {
+		ESP_LOGE(TAG,"ERROR: failed to create WOLFSSL_CTX\n");
+	}					
+	/* Load client certificates into WOLFSSL_CTX */
+	if ((ret = wolfSSL_CTX_load_verify_buffer(ctx, client_cert_der_1024,
+		sizeof_client_cert_der_1024, WOLFSSL_FILETYPE_ASN1)) != SSL_SUCCESS) {
+		ESP_LOGE(TAG,"ERROR: failed to load %d, please check the file.\n",ret);
+	}
+	/* not peer check */
+	wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_NONE, 0);
+//----------------------------------------------------------------------
 					
 //	portBASE_TYPE uxHighWaterMark;
 //	uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
@@ -1320,13 +1320,11 @@ void clientTask(void *pvParams) {
 		xSemaphoreGive(sConnected);
 		if(xSemaphoreTake(sConnect, portMAX_DELAY)) 
 		{		
-			//VS1053_HighPower();
-			ssl = NULL;
-
+			VS1053_HighPower();
 			ramSinit();
 			xSemaphoreTake(sDisconnect, 0);
 			sockfd = socket(AF_INET, SOCK_STREAM, 0);
-			ESP_LOGI(TAG,"socket: %d", sockfd);
+			ESP_LOGD(TAG,"socket: %d", sockfd);
 			if(sockfd < 0)
 			{
 				ESP_LOGE(TAG,"socket create, errno: %d", errno);
@@ -1344,6 +1342,7 @@ void clientTask(void *pvParams) {
 			{
 				if (https)
 				{
+					ssl = NULL;
 					/* Create a WOLFSSL object */
 					if ((ssl = wolfSSL_new(ctx)) == NULL) {
 						ESP_LOGE(TAG,"Failed to create WOLFSSL object");
@@ -1420,8 +1419,7 @@ void clientTask(void *pvParams) {
 					}	
 					else
 					{
-						bytes_read = recvfrom(sockfd, bufrec,RECEIVE, 0, NULL, NULL);
-						
+						bytes_read = recvfrom(sockfd, bufrec,RECEIVE, 0, NULL, NULL);						
 						if ( bytes_read < 0 )
 						{
 							ESP_LOGE(TAG,"Client socket: %d  read: %d  errno:%d ",sockfd, bytes_read,errno);
@@ -1440,12 +1438,10 @@ void clientTask(void *pvParams) {
 					{
 						ESP_LOGW(TAG,"No data in recv. Errno = %d",errno);
 						cnterror++;
-						//if (errno != 11) vTaskDelay(20); //timeout
-						//else 
 						vTaskDelay(20);
 						if ((errno == 128)||(cnterror > 20 )) break;
 					}
-					vTaskDelay(2);
+					vTaskDelay(1);
 					// if a stop is asked
 					if(xSemaphoreTake(sDisconnect, 0))
 						{ clearHeaders(); break;	}
@@ -1483,8 +1479,8 @@ void clientTask(void *pvParams) {
 							vTaskDelay(1);
 							setVolumei(getVolume());
 							kprintf(CLIPLAY,0x0d,0x0a);
-							while (spiRamFifoFill()) vTaskDelay(100);
-							vTaskDelay(150);
+							while (spiRamFifoFill()) vTaskDelay(200);
+							vTaskDelay(100);
 							playing=0;
 							clientDisconnect("data not played");
 						}
@@ -1497,8 +1493,8 @@ void clientTask(void *pvParams) {
 							vTaskDelay(1);
 					}
 					else{  //playing & once=1 and no more received stream
-						while (spiRamFifoFill()) vTaskDelay(100);
-						vTaskDelay(200);
+						while (spiRamFifoFill()) vTaskDelay(200);
+						vTaskDelay(100);
 						clientDisconnect("once");
 					}
 			}//jpc
@@ -1511,14 +1507,13 @@ void clientTask(void *pvParams) {
 				player_config->media_stream->eof = true;
 				if (get_audio_output_mode() == VS1053) VS1053_flush_cancel();
 				playing = 0;
-				vTaskDelay(10);	// stop without click
-				//VS1053_LowPower();
+				vTaskDelay(1);	// stop without click
+				VS1053_LowPower();
 				setVolumei(getVolume());
 				strcpy(userAgent,g_device->ua);
 			}
 			
 			clearAll:
-//			spiRamFifoReset();
 			shutdown(sockfd,SHUT_RDWR); // stop the socket
 			vTaskDelay(10);
 			if (https){

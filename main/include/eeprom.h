@@ -18,6 +18,8 @@
 #define NT_LED		0xFB
 #define T_LEDPOL	8
 #define NT_LEDPOL	0xF7
+#define T_LOGTEL	0x10
+#define NT_LOGTEL	0xEF
 //define for bit array options32
 #define T_DDMM		1
 #define NT_DDMM		0xFE
