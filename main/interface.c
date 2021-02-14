@@ -47,6 +47,12 @@ const char stritCMDERROR[]  = {"##CMD_ERROR#\n"};
 const char stritHELP0[]  = {"\
 Commands:\n\
 ---------\n\
+//////////////////\n\
+  Debug commands   \n\
+//////////////////\n\
+dbg.ssl(\"x\"): Display or Tune the log level of the wolfssl component. 0: error to 3 full log.\n\
+dbg.fifo: Display the audio buffer level.\n\n\
+//////////////////\n\
  Wifi related commands\n\
 //////////////////\n\
 wifi.lis or wifi.scan: give the list of received SSID\n\
@@ -58,18 +64,17 @@ wifi.station: the current ssid and password\n\
 wifi.status: give the current IP GW and mask\n\
 wifi.rssi: print the rssi (power of the reception\n\
 wifi.auto[(\"x\")]  show the autoconnection  state or set it to x. x=0: reboot on wifi disconnect or 1: try reconnection.\n\n\
+"};
+const char stritHELP1[]  = {"\
 //////////////////\n\
   Station Client commands\n\
 //////////////////\n\
 cli.url(\"url\"): the name or ip of the station on instant play\n\
-cli.path(\"/path\"): the path of the station on instant play\n\
+cli.path(\"path\"): the path of the station on instant play\n\
 cli.port(\"xxxx\"): the port number of the station on instant play\n\
 cli.instant: play the instant station\n\
 cli.start: start to play the current station\n\
 cli.play(\"x\"): play the x recorded station in the list\n\
-"};
-
-const char stritHELP1[]  = {"\
 cli.prev (or cli.previous): select the previous station in the list and play it\n\
 cli.next: select the next station in the list and play it\
 cli.stop: stop the playing station or instant\n\
@@ -1412,6 +1417,31 @@ void sys_conf()
 	} else kprintf("no comment\n");
 }
 
+void dbgSSL(char* s)
+{
+	extern bool logTel;
+    char *t = strstr(s, parslashquote);
+	if(t == NULL)
+	{
+		kprintf("##dbg.ssl is %d#\n",(g_device->options&T_WOLFSSL)>>S_WOLFSSL);
+		return;
+	}
+	char *t_end  = strstr(t, parquoteslash);
+    if(t_end == NULL)
+    {
+		kprintf(stritCMDERROR);
+		return;
+    }	
+	uint8_t value = atoi(t+2);
+	if (value>3) value = 3;
+	g_device->options &= NT_WOLFSSL; //clear
+	g_device->options |= (value<<S_WOLFSSL)& T_WOLFSSL;
+
+	dbgSSL((char*)"");
+	saveDeviceSettings(g_device);	
+}
+
+
 void checkCommand(int size, char* s)
 {
 	char *tmp = (char*)malloc((size+1)*sizeof(char));
@@ -1434,7 +1464,7 @@ void checkCommand(int size, char* s)
 		if     (strcmp(tmp+4, "fifo") == 0) 	kprintf( "Buffer fill %u%%, %d bytes, OverRun: %ld, UnderRun: %ld\n",
 												(spiRamFifoFill() * 100) / spiRamFifoLen(), spiRamFifoFill(),spiRamGetOverrunCt(),spiRamGetUnderrunCt());
 		else if(strcmp(tmp+4, "clear") == 0) 	spiRamFifoReset();
-		
+		else if(startsWith (  "ssl",tmp+4)) 	dbgSSL(tmp);
 		else printInfo(tmp);
 	} else
 	if(startsWith ("wifi.", tmp))
@@ -1510,8 +1540,7 @@ void checkCommand(int size, char* s)
 		else if(startsWith (  "henc0",tmp+4)) 	syshenc(0,tmp);
 		else if(startsWith (  "henc1",tmp+4)) 	syshenc(1,tmp);
 		else printInfo(tmp);
-	}
-	else 
+	} else 
 	{
 		if(strcmp(tmp, "help") == 0)
 		{
@@ -1527,7 +1556,7 @@ void checkCommand(int size, char* s)
 			vTaskDelay(1);
 			kprintf(stritHELP5);		}
 		else printInfo(tmp);
-	}	
+	} 
 	free(tmp);
 	
 }

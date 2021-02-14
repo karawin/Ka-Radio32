@@ -29,6 +29,7 @@
 
 
 #define TAG "webserver"
+static char apMode[]= {"*Hidden*"};
 
 xSemaphoreHandle semfile = NULL ;
 
@@ -50,7 +51,7 @@ const char strsGSTAT[]  = {"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\
 static int8_t clientOvol = 0;
 
 
-void *inmalloc(size_t n)
+static void *inmalloc(size_t n)
 {
 	void* ret;
 //	ESP_LOGV(TAG, "server Malloc of %d %d,  Heap size: %d",n,((n / 32) + 1) * 32,xPortGetFreeHeapSize( ));
@@ -59,12 +60,13 @@ void *inmalloc(size_t n)
 //	if (n <4) printf("Server: incmalloc size:%d\n",n);
 	return ret;
 }
-void infree(void *p)
+static void infree(void *p)
 {
-	ESP_LOGV(TAG,"server free of   %x,            Heap size: %d",(int)p,xPortGetFreeHeapSize( ));
-	if (p != NULL)free(p);
+	if (p != NULL)
+	{	free(p);
+		ESP_LOGV(TAG,"server free of %x,  Heap size: %d",(int)p,xPortGetFreeHeapSize( ));
+	}
 }
-
 
 
 static struct servFile* findFile(char* name)
@@ -159,6 +161,7 @@ static void serveFile(char* name, int conn)
 
 //	ESP_LOGV(TAG,"serveFile socket:%d, end",conn);
 }
+
 
 static bool getSParameter(char* result,uint32_t len,const char* sep,const char* param, char* data, uint16_t data_length) {
 	if ((data == NULL) || (param == NULL))return false;
@@ -536,6 +539,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 	} else if(strcmp(name, "/getStation") == 0) {
 		if(data_size > 0) {
 			char id[6];
+			
 			if (getSParameterFromResponse(id,6,"idgp=", data, data_size) )
 			{
 				if ((atoi(id) >=0) && (atoi(id) < 255))
@@ -551,7 +555,6 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 					sprintf(ibuf, "%d%d", si->ovol,si->port);
 					int json_length = strlen(si->domain) + strlen(si->file) + strlen(si->name) + strlen(ibuf) + 50;
 					buf = inmalloc(json_length + 75);
-
 					if (buf == NULL)
 					{
 						ESP_LOGE(TAG," %s malloc fails","getStation");
@@ -559,11 +562,10 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 						//return;
 					}
 					else {
-
 						for(int i = 0; i<sizeof(buf); i++) buf[i] = 0;
 						sprintf(buf, strsGSTAT,
 						json_length, si->name, si->domain, si->file,si->port,si->ovol);
-						ESP_LOGV(TAG,"getStation Buf len:%d : %s",strlen(buf),buf);
+						ESP_LOGW(TAG,"getStation Buf len:%d : %s",strlen(buf),buf);
 						write(conn, buf, strlen(buf));
 						infree(buf);
 					}
@@ -593,7 +595,6 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			}
 
 			ESP_LOGV(TAG,"unb init:%d",unb);
-//			char* url; char* file; char* name;
 			struct shoutcast_info *si =  inmalloc(sizeof(struct shoutcast_info)*unb);
 			struct shoutcast_info *nsi ;
 
@@ -629,8 +630,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 							strcpy(nsi->name, name);
 							nsi->ovol = (getSParameterFromResponse(ovol,6,"ovol=", data, data_size))?atoi(ovol):0;
 							nsi->port = atoi(port);
-//							ESP_LOGW(TAG,"nb:%d,si:%x,nsi:%x,id:%s,url:%s,file:%s",i,(int)si,(int)nsi,id,url,file);
-							ESP_LOGV(TAG,"id:%s => url:%s, port:%d, file:%s", id, url, atoi(port), file);
+							ESP_LOGD(TAG,"Setstation nb:%d,name:%s,id:%s,url:%s,file:%s",i,name,id,url,file);
 						}
 						infree(name);
 						infree(file);
@@ -811,7 +811,6 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			char* tzo = getParameterFromResponse("tzo=", data, data_size);
 			pathParse(tzo);
 
-
 //			ESP_LOGV(TAG,"wifi received  valid:%s,val:%d, ssid:%s, pasw:%s, aip:%s, amsk:%s, agw:%s, adhcp:%s, aua:%s",valid,val,ssid,pasw,aip,amsk,agw,adhcp,aua);
 			if (val) {
 				char adhcp[4],adhcp2[4];
@@ -860,9 +859,14 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 					g_device->dhcpEn2 = 1; else g_device->dhcpEn2 = 0;}
 
 				strcpy(g_device->ssid1,(ssid==NULL)?"":ssid);
-				strcpy(g_device->pass1,(pasw==NULL)?"":pasw);
 				strcpy(g_device->ssid2,(ssid2==NULL)?"":ssid2);
-				strcpy(g_device->pass2,(pasw2==NULL)?"":pasw2);
+
+				if (pasw != NULL) {
+					if (strcmp(pasw,apMode)!=0) strcpy(g_device->pass1,pasw);
+				}
+				if (pasw2 != NULL){
+					if (strcmp(pasw2,apMode)!=0) strcpy(g_device->pass2,pasw2);
+				}						
 
 				infree(ssid); infree(pasw);infree(ssid2); infree(pasw2);
 				infree(aip);infree(amsk);infree(agw);
@@ -928,12 +932,11 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			char macstr[20]; // = inmalloc(20*sizeof(char));
 			char adhcp[4],adhcp2[4];
 			esp_wifi_get_mac(WIFI_IF_STA,macaddr);
+			
 			int json_length ;
 			json_length =95+ 39+ 19+
 			strlen(g_device->ssid1) +
-			strlen(g_device->pass1) +
 			strlen(g_device->ssid2) +
-			strlen(g_device->pass2) +
 			strlen(g_device->ua)+
 			strlen(g_device->hostname)+
 			sprintf(tmptzo,"%d",g_device->tzoffset)+
@@ -945,8 +948,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			sprintf(tmpmsk2,"%d.%d.%d.%d",g_device->mask2[0], g_device->mask2[1],g_device->mask2[2], g_device->mask2[3])+
 			sprintf(tmpgw2,"%d.%d.%d.%d",g_device->gate2[0], g_device->gate2[1],g_device->gate2[2], g_device->gate2[3])+
 			sprintf(adhcp2,"%d",g_device->dhcpEn2)+
-			sprintf(macstr,MACSTR,MAC2STR(macaddr)
-			);
+			sprintf(macstr,MACSTR,MAC2STR(macaddr));
 
 			char *buf = inmalloc( json_length + 95+39+10);
 			if (buf == NULL)
@@ -958,7 +960,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			else {
 				sprintf(buf, strsWIFI,
 				json_length,
-				g_device->ssid1,g_device->pass1,g_device->ssid2,g_device->pass2,tmpip,tmpmsk,tmpgw,tmpip2,tmpmsk2,tmpgw2,g_device->ua,adhcp,adhcp2,macstr,g_device->hostname,tmptzo);
+				g_device->ssid1,"",g_device->ssid2,"",tmpip,tmpmsk,tmpgw,tmpip2,tmpmsk2,tmpgw2,g_device->ua,adhcp,adhcp2,macstr,g_device->hostname,tmptzo); 
 				ESP_LOGV(TAG,"wifi Buf len:%d\n%s",strlen(buf),buf);
 				write(conn, buf, strlen(buf));
 				infree(buf);

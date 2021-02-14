@@ -407,7 +407,7 @@ function icyResp(arr) {
 				document.getElementById('lgenre').style.display = "none";
 			else 	document.getElementById('lgenre').style.display = "inline-block";	
 			document.getElementById('genre').innerHTML = arr["genre"].replace(/\\/g,"");
-			if ((arr["url1"] =="")|| (arr["url1"] ==" "))
+			if ((arr["url1"] =="")||(arr["url1"] ==" "))
 			{	
 				document.getElementById('lurl').style.display = "none";
 				document.getElementById('icon').style.display = "none";
@@ -544,9 +544,9 @@ function wifi(valid) {
 		if (xhr.readyState == 4 && xhr.status == 200) {	
 			var arr = JSON.parse(xhr.responseText);
 			document.getElementById('ssid').value = arr["ssid"];
-			document.getElementById('passwd').value = arr["pasw"];
+			document.getElementById('passwd').value = "*Hidden*";
 			document.getElementById('ssid2').value = arr["ssid2"];
-			document.getElementById('passwd2').value = arr["pasw2"];
+			document.getElementById('passwd2').value ="*Hidden*";
 			document.getElementById('ip').value = arr["ip"];
 			chkip(document.getElementById('ip'));
 			document.getElementById('mask').value = arr["msk"];
@@ -579,10 +579,10 @@ function wifi(valid) {
 	xhr.setRequestHeader(content,ctype);
 	xhr.send("valid=" + valid 
 	+"&ssid=" + encodeURIComponent(document.getElementById('ssid').value )
-	+"&pasw=" + encodeURIComponent(document.getElementById('passwd').value) 
+	+ "&pasw=" + encodeURIComponent( document.getElementById('passwd').value) 
 	+"&ssid2=" + encodeURIComponent(document.getElementById('ssid2').value) 
-	+"&pasw2=" + encodeURIComponent(document.getElementById('passwd2').value) 
-	+"&ip=" + document.getElementById('ip').value
+	+ "&pasw2=" + encodeURIComponent(document.getElementById('passwd2').value) 
+	+ "&ip=" + document.getElementById('ip').value
 	+"&msk=" + document.getElementById('mask').value
 	+"&gw=" + document.getElementById('gw').value
 	+"&ip2=" + document.getElementById('ip2').value
@@ -593,6 +593,7 @@ function wifi(valid) {
 	+"&tzo=" + encodeURIComponent(document.getElementById('tzo').value) 
 	+"&dhcp=" + document.getElementById('dhcp').checked
 	+"&dhcp2=" + document.getElementById('dhcp2').checked+"&");
+	
 }
 function hardware(valid) {
 	var i,coutput;
@@ -870,17 +871,21 @@ function fixedEncodeURIComponent (str) {
 }
 function saveStation() {
 	var file = document.getElementById('add_path').value,
-		url = document.getElementById('add_url').value,jfile;
+		url = document.getElementById('add_url').value,jfile,jname;
+		name = document.getElementById('add_name').value;
 	if (!(file.substring(0, 1) === "/")) file = "/" + file;
-	console.log("Path: "+file);
     jfile = fixedEncodeURIComponent (file);
+	jname = encodeURIComponent (name);
+	console.log("Path: "+file);
 	console.log("JSON: "+jfile);
+	console.log("Name: "+name);
+	console.log("JSON: "+jname);
 //	url = url.replace(/^https?:\/\//,'');
 	try{
 		xhr = new XMLHttpRequest();
 		xhr.open("POST","setStation",false);
 		xhr.setRequestHeader(content,ctype);
-		xhr.send("nb=" + 1+"&id=" + document.getElementById('add_slot').value + "&url=" + url + "&name=" + document.getElementById('add_name').value + "&file=" + jfile + "&ovol=" + document.getElementById('ovol').value+"&port=" + document.getElementById('add_port').value+"&&");
+		xhr.send("nb=" + 1+"&id=" + document.getElementById('add_slot').value + "&url=" + url + "&name=" + jname + "&file=" + jfile + "&ovol=" + document.getElementById('ovol').value+"&port=" + document.getElementById('add_port').value+"&&");
 		localStorage.setItem(document.getElementById('add_slot').value,"{\"Name\":\""+document.getElementById('add_name').value+"\",\"URL\":\""+url+"\",\"File\":\""+file+"\",\"Port\":\""+document.getElementById('add_port').value+"\",\"ovol\":\""+document.getElementById('ovol').value+"\"}");
 	} catch(e){console.log("error save "+e);}
 	abortStation(); // to erase the edit field
@@ -1166,10 +1171,16 @@ function stChanged()
 				name=tbody.rows[ind].cells[1].innerText;
 				furl=tbody.rows[ind].cells[2].innerText;
 				if (furl.startsWith("https"))
+				{
 					parser.href = furl;
+					url = "https://"+parser.hostname;
+				}
 				else
+				{
 					parser.href = "http://"+furl;
-				url = parser.hostname;
+					url = parser.hostname;
+				}
+
 				file = parser.pathname+parser.hash+parser.search;
 				port = parser.port;
 				if (!port )
@@ -1322,6 +1333,7 @@ function loadStations() {
 function loadStationsList(max) {
 	var foundNull = false,id,opt,arr,select, liste= [],i;
 	select = document.getElementById("stationsSelect");
+	//clear Select
     for(i = select.options.length - 1 ; i >= 0 ; i--)
     {
         select.remove(i);

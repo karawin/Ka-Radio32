@@ -281,6 +281,7 @@
     #define WC_RSA_BLINDING
 	#define NO_FILESYSTEM
 	#define USE_CERT_BUFFERS_1024
+	#define FP_MAX_BITS 8192 /* Set to largest RSA key size times 2 IE 4096*2 = 8192 */	
 	#define HAVE_ECC
 	#define HAVE_ALL_CURVES
 	

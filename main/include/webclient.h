@@ -14,17 +14,15 @@
 #define METAGENRE 4
 #define ICY_HEADERS_COUNT 9
 #define ICY_HEADER_COUNT 10
-//2000 1440 1460 1436
-#define RECEIVE 1440
-//#define RECEIVE 3000
+
 // audio buffer size in k
 // default to 30
-#define DEFAULTRAM	37
+#define DEFAULTRAM	40
 // for https
-#define HTTPSRAM	20
-#define HTTPSVSRAM	30
+#define HTTPSRAM	25
+#define HTTPSVSRAM	40
 // for vs1053 output on woover
-#define SMALLRAM 	42
+#define SMALLRAM 	50
 // for wrover
 #define BIGRAM		400
 
@@ -85,4 +83,7 @@ void wsVol(char* vol);
 void wsMonitor();
 void wsStationNext();
 void wsStationPrev();
+uint8_t wolfSSL_getLogState();
+
+
 #endif

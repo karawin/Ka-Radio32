@@ -541,8 +541,7 @@ static void start_wifi()
 				ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
 //				ESP_LOGI(TAG, "connecting %s, %d, %s, %d",ssid,strlen((char*)(wifi_config.sta.ssid)),pass,strlen((char*)(wifi_config.sta.password)));
 				ESP_LOGI(TAG, "connecting %s",ssid);
-				ESP_ERROR_CHECK( esp_wifi_start() );
-//			esp_wifi_connect();			
+				ESP_ERROR_CHECK( esp_wifi_start() );	
 			} else
 			{
 				g_device->current_ap++;
@@ -550,11 +549,12 @@ static void start_wifi()
 				
 				if (getAutoWifi() && (g_device->current_ap == APMODE))
 				{
+					if (fgetc(stdin)==0xFF) // if a char read, stop the autowifi
 					g_device->current_ap = STA1; // if autoWifi then wait for a reconnection to an AP
-					printf("Wait for the AP\n");
+					ESP_LOGI(TAG,"Wait for the AP");
 				}
 				else 
-					printf("Empty AP. Try next one\n");
+					ESP_LOGI(TAG,"Empty AP. Try next one");
 				
 				saveDeviceSettings(g_device);
 				continue;
@@ -562,13 +562,20 @@ static void start_wifi()
 		}
 
 		/* Wait for the callback to set the CONNECTED_BIT in the event group. */
-		if ( (xEventGroupWaitBits(wifi_event_group, CONNECTED_AP,false, true, 2000) & CONNECTED_AP) ==0) 
+		if ( (xEventGroupWaitBits(wifi_event_group, CONNECTED_AP,false, true, 1500) & CONNECTED_AP) ==0) 
 		//timeout . Try the next AP
 		{
 			g_device->current_ap++;
 			g_device->current_ap %=3;
+			if (getAutoWifi() && (g_device->current_ap == APMODE))
+			{
+				char inp = fgetc(stdin);
+				printf("\nfgetc : %x\n",inp);
+				if (inp==0xFF) // 
+					g_device->current_ap = STA1;//if a char read, stop the autowifi
+			}
 			saveDeviceSettings(g_device);
-			printf("\ndevice->current_ap: %d\n",g_device->current_ap);	
+			ESP_LOGI(TAG,"device->current_ap: %d",g_device->current_ap);	
 		}	else break;	// 					
 	}					
 }
@@ -614,10 +621,6 @@ void start_network(){
 			xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT,false, true, 3000);
 			IPADDR2_COPY(&info.ip,&ipAddr);
 			tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_AP, &info);
-//			g_device->dhcpEn1 = g_device->dhcpEn2 = 1;
-//			IPADDR2_COPY(&g_device->mask1, &mask);
-//			IPADDR2_COPY(&g_device->mask2, &mask);
-//			saveDeviceSettings(g_device);	
 			strcpy(localIp , ip4addr_ntoa(&info.ip));
 			printf("IP: %s\n\n",ip4addr_ntoa(&info.ip));	
 	
@@ -1088,7 +1091,7 @@ void app_main()
 	xTaskCreatePinnedToCore(uartInterfaceTask, "uartInterfaceTask", 2500, NULL, PRIO_UART, &pxCreatedTask,CPU_UART); 
 	ESP_LOGI(TAG, "%s task: %x","uartInterfaceTask",(unsigned int)pxCreatedTask);
 	vTaskDelay(1);
-	xTaskCreatePinnedToCore(clientTask, "clientTask", 3100, NULL, PRIO_CLIENT, &pxCreatedTask,CPU_CLIENT); 
+	xTaskCreatePinnedToCore(clientTask, "clientTask", 3700, NULL, PRIO_CLIENT, &pxCreatedTask,CPU_CLIENT); 
 	ESP_LOGI(TAG, "%s task: %x","clientTask",(unsigned int)pxCreatedTask);	
 	vTaskDelay(1);
     xTaskCreatePinnedToCore(serversTask, "serversTask", 3100, NULL, PRIO_SERVER, &pxCreatedTask,CPU_SERVER); 

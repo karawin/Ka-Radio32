@@ -184,6 +184,7 @@ void setfont(sizefont size)
 		break;
 
 		case text:
+		if ((yy==135)&&(x==240)) inX = 160;
 		switch(inX)
 		{
 			case 320:
@@ -1079,6 +1080,9 @@ void lcd_initUcg(uint8_t *lcd_type)
 		break;
 	case LCD_SPI_ST7789S:
 		ucg_Init(&ucg, ucg_dev_st7789_18x240x240, ucg_ext_st7789_24, ucg_com_hal);
+		break;
+	case LCD_SPI_ST7789T:
+		ucg_Init(&ucg, ucg_dev_st7789_13x135x240, ucg_ext_st7789_24, ucg_com_hal);
 		break;
 	default: 
 		ESP_LOGE(TAG,"lcd invalid type: %d, Fall back to LCD_NONE",*lcd_type);

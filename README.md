@@ -70,8 +70,8 @@ Output mode set in Setting panel on web page of KaraDio32 :
 ### Buffering audio
 |   CPU        |  vs1053b      |  other |  
 | -------      | -------       | ------ |  
-| Wroom http   | 42k           | 37k    |  
-| Wroom https  | 30k           | 20k    |  
+| Wroom http   | 50k           | 40k    |  
+| Wroom https  | 40k           | 25k    |  
 | Wrover http  | 400k          | 400k   |  
 | Wrover https | 400k          | 400k   |  
 
@@ -240,6 +240,8 @@ You can configure the kind of display used in your configuration with the comman
 #define LCD_SPI_ST7735S			200 // 128x128
 #define LCD_SPI_ST7735L			201 // 80x160
 #define LCD_SPI_ST7735W			202 // 128x160 shifted 2+1
+#define LCD_SPI_ST7789S			203 // 240x240
+#define LCD_SPI_ST7789T			204 // 135x240
 
 ```
   

@@ -79,8 +79,8 @@
 
 /* debug options */
 #define DEBUG_WOLFSSL 
-/* #define WOLFSSL_ESP32WROOM32_CRYPT_DEBUG */
-/* #define WOLFSSL_ATECC508A_DEBUG          */
+#define WOLFSSL_ESP32WROOM32_CRYPT_DEBUG
+#define WOLFSSL_ATECC508A_DEBUG
 
 /* date/time                               */
 /* if it cannot adjust time in the device, */

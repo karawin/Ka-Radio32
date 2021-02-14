@@ -20,6 +20,9 @@
 #define NT_LEDPOL	0xF7
 #define T_LOGTEL	0x10
 #define NT_LOGTEL	0xEF
+#define T_WOLFSSL	0x60
+#define NT_WOLFSSL	0x9F
+#define S_WOLFSSL	0x5 //Shift right 
 //define for bit array options32
 #define T_DDMM		1
 #define NT_DDMM		0xFE
@@ -40,6 +43,7 @@
 #define SSIDLEN		32
 #define PASSLEN		64
 #define HOSTLEN		24
+#define USERAGLEN	39
 
 struct device_settings {
 	uint16_t cleared; 		// 0xAABB if initialized
@@ -66,8 +70,9 @@ struct device_settings {
 	uint8_t autostart; // 0: stopped, 1: playing
 	uint8_t i2sspeed; // 0 = 48kHz, 1 = 96kHz, 2 = 128kHz
 	uint32_t uartspeed; // serial baud
-	uint8_t options;  // bit0:0 theme ligth blue, 1 Dark brown, bit1: 0 patch load  1 no patch, bit2: O blink led  1 led on On play, bit3:led polarity 0 normal 1 reverse 
-	char ua[39]; // user agent
+	uint8_t options;  // bit0:0 theme ligth blue, 1 Dark brown, bit1: 0 patch load  1 no patch, bit2: O blink led  1 led on On play, bit3:led polarity 0 normal 1 reverse, bit 4: log syst on telnet, 
+	// bit 3&4: log wolfssl  OFF(0)  ERROR&INFO(1) ENTER&LEAVE(2)  OTHER_LOG(3)
+	char ua[USERAGLEN]; // user agent
 	int8_t tzoffset; //timezone offset
 	uint32_t sleepValue; 	
 	uint32_t wakeValue;	
@@ -111,3 +116,8 @@ void saveDeviceSettings(struct device_settings *settings);
 void saveDeviceSettingsVolume(struct device_settings *settings);
 struct device_settings* getDeviceSettings();
 struct device_settings* getDeviceSettingsSilent();
+
+
+// Protect: html page is password protected.
+void setProtect(bool);
+bool getProtect();

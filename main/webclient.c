@@ -30,7 +30,9 @@
 
 extern player_t* player_config;
 #define min(a, b) (((a) < (b)) ? (a) : (b))
-
+//2000 1440 1460 1436
+#define RECEIVE 2048
+//#define RECEIVE 3000
 enum clientStatus cstatus;
 //static uint32_t metacount = 0;
 //static uint16_t metasize = 0;
@@ -90,7 +92,7 @@ void incfree(void *p,const char* from)
 }
 
 
-
+//compute the size of the audio buffer for http
 void ramInit()
 {
 	if (bigSram())
@@ -139,7 +141,7 @@ void test_https()
 	else https = false;
 }
 
-
+//compute the size of the audio buffer for https or http
 void ramSinit()
 {
 	test_https();
@@ -161,14 +163,18 @@ void ramSinit()
 		vTaskDelay(1);
 		if (!spiRamFifoInit()) 
 		{	
-			setSPIRAMSIZE(getSPIRAMSIZE() - 10240);
-			ESP_LOGE(TAG, "SPIRAM fail for %dK",getSPIRAMSIZE()/1024);
-			vTaskDelay(200);				
+			vTaskDelay(200);
 			if (!spiRamFifoInit()) 
 			{
-				ESP_LOGE(TAG, "SPIRAM fail for %dK",getSPIRAMSIZE()/1024);
-				ESP_LOGE(TAG, "REBOOT");
-				esp_restart();
+				setSPIRAMSIZE(getSPIRAMSIZE() - 10240);
+				ESP_LOGI(TAG, "SPIRAM retry for %dK",getSPIRAMSIZE()/1024);
+				vTaskDelay(200);				
+				if (!spiRamFifoInit()) 
+				{
+					ESP_LOGE(TAG, "SPIRAM fail for %dK",getSPIRAMSIZE()/1024);
+					ESP_LOGE(TAG, "REBOOT");
+					esp_restart();
+				}
 			}
 		}
 	}
@@ -226,7 +232,7 @@ struct icyHeader* clientGetHeader()
 	return &header;
 }
 
-
+// extract the url from a playlist m3u pls etc....
 bool clientParsePlaylist(char* s)
 {
   char* str;
@@ -262,7 +268,7 @@ bool clientParsePlaylist(char* s)
 	
   str = strstr(s,"http://");
   if (str ==NULL) str = strstr(s,"HTTP://");
-  if (str != NULL) {s= str+7; j = 7; strcpy (url,"http://"); }
+  if ((str != NULL))   {s= str+7; j = 7; strcpy (url,"http://"); }
   else
   {
 	str = strstr(s,"https://");
@@ -274,9 +280,9 @@ bool clientParsePlaylist(char* s)
 	} // no http found
   } 
   
-  str = s;
   if (str != NULL)
   {
+	str = s;
 	ESP_LOGD(TAG,"parse str %s",str);
 	while ((str[i] != '/')&&(str[i] != ':')&&(str[i] != 0x0a)&&(str[i] != 0x0d)&&(j<77)) {url[j] = str[i]; i++ ;j++;}
 	url[j] = 0;
@@ -314,7 +320,7 @@ bool clientParsePlaylist(char* s)
 }
 
 //---------------------------------------
-// add escape char to the string
+// add escape char to special char of the string
 static char* stringify(char* str,int len)
 {
 #define MORE	20
@@ -343,13 +349,6 @@ static char* stringify(char* str,int len)
 					new[j++] =(str)[i] ;
 				}
 				else 
-//pseudoutf8
-/*
-				if ((str[i] > 192) && (str[i+1] < 0x80)){ // 128 = 0x80
-					new[j++] = 195; // 192 = 0xC0   195 = 0xC3
-					new[j++] =(str)[i]-64 ; // 64 = 0x40
-				} 				
-				else*/ 
 				new[j++] =(str)[i] ;
 
 				if ( j+MORE> nlen)
@@ -406,118 +405,115 @@ static void removePartOfString(char* origine, const char* remove)
 // A metadata found. Extract the Stream title
 static void clientSaveMetadata(char* s,int len)
 {
-		char* t_end = NULL;
-		char* t ;
-		bool found = false;
-		if ((len == 0)||(s==NULL)) ESP_LOGV(TAG,"clientSaveMetadata:  len:%d",len);
-		if ((len > 256) ||(s == NULL) || (len == 0)) // if not valid
+	char* t_end = NULL;
+	char* t ;
+	bool found = false;
+	if ((len == 0)||(s==NULL)) ESP_LOGV(TAG,"clientSaveMetadata:  len:%d",len);
+	if ((len > 256) ||(s == NULL) || (len == 0)) // if not valid
+	{
+		if (header.members.mArr[METADATA] != NULL)
+		incfree(header.members.mArr[METADATA],"metad");  // clear the old one
+		header.members.mArr[METADATA] = NULL;  // and exit
+		return;
+	}
+
+	//remove all but title
+	t = s;
+	len = strlen(t);
+	ESP_LOGV(TAG,"clientSaveMetadata:  len:%d   char:%s",len,s);
+	t_end = strstr(t,"song_spot=");
+	if (t_end != NULL)
+	{
+		*t_end = 0;
+		found = true;
+		removePartOfString(t, "text=");
+		removePartOfString(t, "\"");
+	}
+	else
+	{
+		t_end = strstr(t,";StreamUrl='");
+		if (t_end != NULL)
 		{
-			if (header.members.mArr[METADATA] != NULL)
-			incfree(header.members.mArr[METADATA],"metad");  // clear the old one
-			header.members.mArr[METADATA] = NULL;  // and exit
+			*t_end = 0;found = true;
+		}
+	}
+	t = strstr(t,"StreamTitle='");
+	if (t!= NULL) {t += 13;found = true;} else t = s;
+	len = strlen(t);
+	if ((t_end != NULL)&&(len >=3)) t_end -= 3;
+	else {
+		if (t_end != NULL) t_end -=1;
+		else
+		if (len >=2) {t_end = t+len-2;found = true;}
+		else t_end = t+len;
+	}
+	if (found)
+	{
+		t_end = strstr(t_end,"'");
+		if (t_end !=NULL)
+		*t_end = 0;
+		if (t!=NULL)
+		{
+			t_end = strstr(t,"||");
+			if (t_end !=NULL)
+			*t_end = 0;
+		}
+	}
+	else
+	{
+		if (len >=2) len-=2;
+	}
+	// the expurged str
+	ESP_LOGV(TAG,"clientSaveMetadata0:  len:%d   char:%s",strlen(t),t);
+
+// see if meta is != of the old one
+	char* tt;
+	tt = incmalloc((len+5)*sizeof(char));
+	if (tt != NULL)
+	{
+		strcpy(tt,t);
+		tt = stringify(tt,len); // to compare we need to stringify
+	}
+	if  ((header.members.mArr[METADATA] == NULL)||
+		((header.members.mArr[METADATA] != NULL)&&(t!= NULL)&&(strcmp(tt,header.members.mArr[METADATA]) != 0)))
+	{
+		if (header.members.mArr[METADATA] != NULL)
+			incfree(header.members.mArr[METADATA],"metad"); //clear the old one
+		header.members.mArr[METADATA] = (char*)incmalloc((len+3)*sizeof(char));
+		if(header.members.mArr[METADATA] == NULL)
+		{	ESP_LOGV(TAG,strcMALLOC1,"metad");
 			return;
 		}
 
-		//remove all but title
-		t = s;
-		len = strlen(t);
-		ESP_LOGV(TAG,"clientSaveMetadata:  len:%d   char:%s",len,s);
-		t_end = strstr(t,"song_spot=");
-		if (t_end != NULL)
+		strcpy(header.members.mArr[METADATA], t);
+//		dump((uint8_t*)(header.members.mArr[METADATA]),strlen(header.members.mArr[METADATA]));
+		header.members.mArr[METADATA] = stringify(header.members.mArr[METADATA],len);
+		clientPrintMeta();
+		while ((header.members.mArr[METADATA][strlen(header.members.mArr[METADATA])-1] == ' ')||
+			(header.members.mArr[METADATA][strlen(header.members.mArr[METADATA])-1] == '\r')||
+		(header.members.mArr[METADATA][strlen(header.members.mArr[METADATA])-1] == '\n')
+		)
 		{
-			*t_end = 0;
-			found = true;
-			removePartOfString(t, "text=");
-			removePartOfString(t, "\"");
+			header.members.mArr[METADATA][strlen(header.members.mArr[METADATA])-1] = 0; // avoid blank at end
 		}
-		else
-		{
-			t_end = strstr(t,";StreamUrl='");
-			if (t_end != NULL)
-			{
-				*t_end = 0;found = true;
-			}
-		}
-		t = strstr(t,"StreamTitle='");
-		if (t!= NULL) {t += 13;found = true;} else t = s;
-		len = strlen(t);
-		if ((t_end != NULL)&&(len >=3)) t_end -= 3;
-		else {
-			if (t_end != NULL) t_end -=1;
-			else
-			if (len >=2) {t_end = t+len-2;found = true;}
-			else t_end = t+len;
-		}
-
-		if (found)
-		{
-			t_end = strstr(t_end,"'");
-			if (t_end !=NULL)
-			*t_end = 0;
-
-			if (t!=NULL)
-			{
-				t_end = strstr(t,"||");
-				if (t_end !=NULL)
-				*t_end = 0;
-			}
-
-		}
-		else
-		{
-			if (len >=2) len-=2;
-		}
-		// the expurged str
-		ESP_LOGV(TAG,"clientSaveMetadata0:  len:%d   char:%s",strlen(t),t);
-
-// see if meta is != of the old one
-		char* tt;
-		tt = incmalloc((len+5)*sizeof(char));
-		if (tt != NULL)
-		{
-			strcpy(tt,t);
-			tt = stringify(tt,len); // to compare we need to stringify
-		}
-		if  ((header.members.mArr[METADATA] == NULL)||
-			((header.members.mArr[METADATA] != NULL)&&(t!= NULL)&&(strcmp(tt,header.members.mArr[METADATA]) != 0)))
-		{
-			incfree(tt,"");
-			if (header.members.mArr[METADATA] != NULL)
-				incfree(header.members.mArr[METADATA],"metad"); //clear the old one
-			header.members.mArr[METADATA] = (char*)incmalloc((len+3)*sizeof(char));
-			if(header.members.mArr[METADATA] == NULL)
-			{	ESP_LOGV(TAG,strcMALLOC1,"metad");
-				return;
-			}
-
-			strcpy(header.members.mArr[METADATA], t);
-//			dump((uint8_t*)(header.members.mArr[METADATA]),strlen(header.members.mArr[METADATA]));
-			header.members.mArr[METADATA] = stringify(header.members.mArr[METADATA],len);
-			clientPrintMeta();
-			while ((header.members.mArr[METADATA][strlen(header.members.mArr[METADATA])-1] == ' ')||
-				(header.members.mArr[METADATA][strlen(header.members.mArr[METADATA])-1] == '\r')||
-			(header.members.mArr[METADATA][strlen(header.members.mArr[METADATA])-1] == '\n')
-			)
-			{
-				header.members.mArr[METADATA][strlen(header.members.mArr[METADATA])-1] = 0; // avoid blank at end
-			}
 
 // send station name if no metadata
-			if (strlen(header.members.mArr[METADATA])!=0)
-				t_end = header.members.mArr[METADATA];
-			else
-				t_end = (header.members.single.name ==NULL)?(char*)"":header.members.single.name;
+		if (strlen(header.members.mArr[METADATA])!=0)
+			t_end = header.members.mArr[METADATA];
+		else
+			t_end = (header.members.single.name ==NULL)?(char*)"":header.members.single.name;
 //
-			char* title = incmalloc(strlen(t_end)+15);
-			if (title != NULL) // broadcast to all websockets
-			{
-				sprintf(title,"{\"meta\":\"%s\"}",t_end);
-				int len;
-				title = pseudoUtf8(title,&len);
-				websocketbroadcast(title, len);
-				incfree(title,"title");
-			} else ESP_LOGV(TAG,strcMALLOC1,"Title");
-		}
+		char* title = incmalloc(strlen(t_end)+15);
+		if (title != NULL) // broadcast to all websockets
+		{
+			sprintf(title,"{\"meta\":\"%s\"}",t_end);
+			int len;
+			title = pseudoUtf8(title,&len);
+			websocketbroadcast(title, len);
+			incfree(title,"title");
+		} else ESP_LOGV(TAG,strcMALLOC1,"Title");
+	}
+	incfree(tt,"");
 }
 
 // websocket: next station
@@ -662,7 +658,6 @@ static void wsHeaders()
 }
 
 //Clear all ICY and META infos
-
 static void clearHeaders()
 {
 	uint8_t header_num;
@@ -700,6 +695,7 @@ bool clientPrintHeaders()
 bool clientSaveOneHeader(const char* t, uint16_t len, uint8_t header_num)
 {
 	char* tt;
+	int i;
 	if(header.members.mArr[header_num] != NULL)
 		incfree(header.members.mArr[header_num],"headernum");
 	tt = incmalloc((len+1)*sizeof(char));
@@ -709,13 +705,12 @@ bool clientSaveOneHeader(const char* t, uint16_t len, uint8_t header_num)
 		return false;
 	}
 
-	int i;
 	for(i = 0; i<len+1; i++) tt[i] = 0;
 	strncpy(tt, t, len);
 	header.members.mArr[header_num] = stringify(tt,len); //tt is freed here
 	vTaskDelay(2);
 	clientPrintOneHeader(header_num);
-	ESP_LOGV(TAG,"header after num:%d addr:0x%x  cont:\"%s\"",header_num,(int)header.members.mArr[header_num],header.members.mArr[header_num]);
+	ESP_LOGV(TAG,"Header after num:%d addr:0x%x  cont:\"%s\"",header_num,(int)header.members.mArr[header_num],header.members.mArr[header_num]);
 	return true;
 }
 
@@ -733,25 +728,23 @@ bool clientParseHeader(char* s)
 		clearHeaders();
 	}
 
-		t = strstr(s,"Content-Type:");
-		if (t == NULL) t = strstr(s,"content-type:");
-		if (t != NULL)
-		{
-			contentType = KMIME_UNKNOWN;
-			if (strstr(t, "application/octet-stream")) contentType = KOCTET_STREAM;
-			if (strstr(t, "audio/aac")) contentType = KAUDIO_AAC;
-			if (strstr(t, "audio/mp4")) contentType = KAUDIO_MP4;
-			if (strstr(t, "audio/x-m4a")) contentType = KAUDIO_MP4;
-			if (strstr(t, "audio/mpeg")) contentType = KAUDIO_MPEG;
+	t = strstr(s,"Content-Type:");
+	if (t == NULL) t = strstr(s,"content-type:");
+	if (t != NULL)
+	{
+		contentType = KMIME_UNKNOWN;
+		if (strstr(t, "application/octet-stream")) contentType = KOCTET_STREAM;
+		if (strstr(t, "audio/aac")) contentType = KAUDIO_AAC;
+		if (strstr(t, "audio/mp4")) contentType = KAUDIO_MP4;
+		if (strstr(t, "audio/x-m4a")) contentType = KAUDIO_MP4;
+		if (strstr(t, "audio/mpeg")) contentType = KAUDIO_MPEG;
 
-			if(contentType == KMIME_UNKNOWN) {
-				ESP_LOGD(TAG, "unknown contentType: %s", t);
-			}
-			ESP_LOGD(TAG, "contentType: %d", contentType);
-			player_config->media_stream->content_type = contentType;
+		if(contentType == KMIME_UNKNOWN) {
+			ESP_LOGD(TAG, "unknown contentType: %s", t);
 		}
-
-
+		ESP_LOGD(TAG, "contentType: %d", contentType);
+		player_config->media_stream->content_type = contentType;
+	}
 
 	for(header_num=0; header_num<ICY_HEADERS_COUNT; header_num++)
 	{
@@ -787,7 +780,7 @@ bool clientParseHeader(char* s)
 		wsHeaders();
 	}
 	xSemaphoreGive(sHeader);
-		return ret;
+	return ret;
 }
 
 
@@ -911,8 +904,6 @@ void clientDisconnect(const char* from)
 		g_device->vol = getIvol();
 		saveDeviceSettingsVolume(g_device);
 	}
-	
-	
 }
 
 void clientReceiveCallback(int sockfd, char *pdata, int len)
@@ -969,7 +960,8 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 		metad = -1;
 		t1 = strstr(pdata, "302 ");
 		if (t1 ==NULL) t1 = strstr(pdata, "301 ");
-		if (t1 != NULL) { // moved to a new address
+		if (t1 != NULL) 
+		{ // moved to a new address
 			if( strcmp(t1,"Found")||strcmp(t1,"Temporarily")||strcmp(t1,"Moved"))
 			{
 				ESP_LOGV(TAG,"Header Len=%d,\n %s",len,pdata);
@@ -1215,7 +1207,13 @@ ESP_LOGD(TAG,"mtlen len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,c
 //					if (spiRamFifoFree() < metad) ESP_LOGV(TAG,"metaout2 wait metad: %d, bufferfree: %d",metad,spiRamFifoFree());
 //					while(spiRamFifoFree()<metad)	 // wait some room
 //						vTaskDelay(20);
-					audio_stream_consumer((char*)inpdata, metad, (void*)player_config);
+					if (audio_stream_consumer((char*)inpdata, metad, (void*)player_config)<0)
+					{
+						playing=1;
+						clientSaveOneHeader("Cannot decode",13,METANAME);
+						wsHeaders();
+						vTaskDelay(100);
+					}
 				}
 				metad  = header.members.single.metaint;
 				inpdata = inpdata+clen-rest;
@@ -1236,7 +1234,13 @@ ESP_LOGD(TAG,"mt2 len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,cle
 //					if (spiRamFifoFree() < rest) ESP_LOGV(TAG,"metaout3 wait rest: %d, bufferfree: %d",rest,spiRamFifoFree());
 //					while(spiRamFifoFree()<rest)	 // wait some room
 //						vTaskDelay(20);//
-					audio_stream_consumer((char*)inpdata, rest, (void*)player_config);
+					if (audio_stream_consumer((char*)inpdata, rest, (void*)player_config)<0)
+					{
+						playing=1;
+						clientSaveOneHeader("Cannot decode",13,METANAME);
+						wsHeaders();
+						vTaskDelay(100);
+					}
 				}
 				rest = 0;
 			}
@@ -1251,7 +1255,13 @@ ESP_LOGD(TAG,"mt2 len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,cle
 //				if (spiRamFifoFree() < len) ESP_LOGV(TAG,"metaout1 wait len: %d, bufferfree: %d",len,spiRamFifoFree());
 //				while(spiRamFifoFree()<len)	 // wait some room
 //						vTaskDelay(20);
-				audio_stream_consumer((char*)(pdata+rest), len, (void*)player_config);
+				if (audio_stream_consumer((char*)(pdata+rest), len, (void*)player_config)<0)
+				{
+					playing=1;
+					clientSaveOneHeader("Cannot decode",13,METANAME);
+					wsHeaders();
+					vTaskDelay(100);
+				}
 			}
 		}
 // ---------------
@@ -1276,6 +1286,18 @@ uint8_t bufrec[RECEIVE+20];
     /* declare wolfSSL objects */
     WOLFSSL_CTX *ctx;
     WOLFSSL *ssl;
+
+void wolfSSL_log_function(const int logLevel, const char *const logMessage){
+//    ESP_LOGD(TAG,"WOLFSSL:%s\n",logMessage);
+if (logLevel <= wolfSSL_getLogState())
+	kprintf("WOLFSSL:%d %s\n",logLevel,logMessage);
+}
+
+uint8_t wolfSSL_getLogState()
+{
+	uint8_t level[4]= {0,1,3,4};
+	return (level[(g_device->options&T_WOLFSSL)>>S_WOLFSSL]);
+}
 	
 void clientTask(void *pvParams) {
 	portBASE_TYPE uxHighWaterMark;
@@ -1296,17 +1318,19 @@ void clientTask(void *pvParams) {
 	strcpy(userAgent, g_device->ua);
 //----------------------------------------------------------------------
 	/* Initialize wolfSSL */
-	if (wolfSSL_Init() != WOLFSSL_SUCCESS) {
-		ESP_LOGE(TAG,"ERROR: failed to init WOLFSSL\n");}
+//	wolfSSL_getLogState()?wolfSSL_Debugging_ON():wolfSSL_Debugging_OFF();
 	wolfSSL_Debugging_ON();
+	if (wolfSSL_Init() != WOLFSSL_SUCCESS) {
+		ESP_LOGE(TAG,"Failed to init WOLFSSL");}
 	/* Create and initialize WOLFSSL_CTX */
 	if ((ctx = wolfSSL_CTX_new(wolfSSLv23_client_method())) == NULL) {
-		ESP_LOGE(TAG,"ERROR: failed to create WOLFSSL_CTX\n");
-	}					
+		ESP_LOGE(TAG,"Failed to create WOLFSSL_CTX");
+	}
+    wolfSSL_SetLoggingCb(wolfSSL_log_function);	
 	/* Load client certificates into WOLFSSL_CTX */
 	if ((ret = wolfSSL_CTX_load_verify_buffer(ctx, client_cert_der_1024,
 		sizeof_client_cert_der_1024, WOLFSSL_FILETYPE_ASN1)) != SSL_SUCCESS) {
-		ESP_LOGE(TAG,"ERROR: failed to load %d, please check the file.\n",ret);
+		ESP_LOGE(TAG,"Failed to load %d, please check the file.",ret);
 	}
 	/* not peer check */
 	wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_NONE, 0);
@@ -1321,13 +1345,12 @@ void clientTask(void *pvParams) {
 		if(xSemaphoreTake(sConnect, portMAX_DELAY)) 
 		{		
 			VS1053_HighPower();
-			ramSinit();
 			xSemaphoreTake(sDisconnect, 0);
 			sockfd = socket(AF_INET, SOCK_STREAM, 0);
-			ESP_LOGD(TAG,"socket: %d", sockfd);
+			ESP_LOGD(TAG,"Socket: %d", sockfd);
 			if(sockfd < 0)
 			{
-				ESP_LOGE(TAG,"socket create, errno: %d", errno);
+				ESP_LOGE(TAG,"Socket create, errno: %d", errno);
 				xSemaphoreGive(sDisconnect);
 				continue;
 			}
@@ -1335,33 +1358,37 @@ void clientTask(void *pvParams) {
 			dest.sin_family = AF_INET;
 			dest.sin_port = htons(clientPort);
 			dest.sin_addr.s_addr = inet_addr(inet_ntoa(*(struct in_addr*)(serverInfo->h_addr_list[0])));
-			ESP_LOGI(TAG,"ip: %x   ADDR:%s\n", dest.sin_addr.s_addr, inet_ntoa(*(struct in_addr*)(serverInfo-> h_addr_list[0])));
+			ESP_LOGI(TAG,"IP: %x   ADDR:%s\n", dest.sin_addr.s_addr, inet_ntoa(*(struct in_addr*)(serverInfo-> h_addr_list[0])));
 			bytes_read = 0;
 			/*---Connect to server---*/
+			ssl = NULL;
 			if(connect(sockfd, (struct sockaddr*)&dest, sizeof(dest)) >= 0)
 			{
+				test_https();
 				if (https)
 				{
-					ssl = NULL;
+					spiRamFifoDestroy();
+					setSPIRAMSIZE(128); // need heap for ssl connect
+					spiRamFifoInit();
+					vTaskDelay(1);
+//					wolfSSL_getLogState()?wolfSSL_Debugging_ON():wolfSSL_Debugging_OFF();
 					/* Create a WOLFSSL object */
 					if ((ssl = wolfSSL_new(ctx)) == NULL) {
-						ESP_LOGE(TAG,"Failed to create WOLFSSL object");
-						goto clearAll;
+						ESP_LOGE(TAG,"Failed to create WOLFSSL ssl object");
+						goto NotConnected;
 					}
 					wolfSSL_set_using_nonblock(ssl, 1);    
 					/* Attach wolfSSL to the socket */
 					wolfSSL_set_fd(ssl, sockfd);
-					
-					
+				
 					/* Connect to wolfSSL on the server side */
 					if (wolfSSL_connect(ssl) != SSL_SUCCESS) {
-						ESP_LOGE(TAG,"Failed to connect to wolfSSL");
 						int err=wolfSSL_get_error(ssl, 0);
-						ESP_LOGE(TAG,"wolfSSL_connect err: %d",err);
-						goto clearAll;
+						ESP_LOGE(TAG,"WolfSSL_connect error: %d",err);
+						goto NotConnected;
 					}				
 				}
-					
+
 //				printf("WebClient Socket connected\n");
 				memset(bufrec,0, RECEIVE+20);
 
@@ -1388,7 +1415,7 @@ void clientTask(void *pvParams) {
 				if (https)
 				{
 					if (wolfSSL_write(ssl, bufrec, strlen((char*)bufrec)) != strlen((char*)bufrec)) {
-						ESP_LOGE(TAG,"ERROR: failed to write\n");
+						ESP_LOGE(TAG,"wolfSSL_write");
 						goto clearAll;
 					}
 				}
@@ -1396,11 +1423,11 @@ void clientTask(void *pvParams) {
 					send(sockfd, (char*)bufrec, strlen((char*)bufrec), 0);
 
 				if (setsockopt (sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0)
-					ESP_LOGE(TAG,"Client socket: %d  setsockopt: %d  errno:%d ",sockfd, bytes_read,errno);
+					ESP_LOGE(TAG,"Socket: %d  setsockopt: %d  errno:%d ",sockfd, bytes_read,errno);
 //////
 				cnterror = 0;			
 				wsMonitor();
-				
+				ramSinit();
 				do
 				{
 					if (https)
@@ -1412,7 +1439,7 @@ void clientTask(void *pvParams) {
 							char buffer[80];
 							err = wolfSSL_get_error(ssl, 0);
 							wolfSSL_ERR_error_string(err, buffer);
-							ESP_LOGE(TAG,"wolfSSL_read error: %d  read: %s errno:%d ",err, buffer,errno);
+							ESP_LOGE(TAG,"wolfSSL_read: %d, read: %s, errno:%d ",err, buffer,errno);
 
 							if (wolfSSL_want_read(ssl) == 1) bytes_read = 0;
 						}						
@@ -1422,7 +1449,7 @@ void clientTask(void *pvParams) {
 						bytes_read = recvfrom(sockfd, bufrec,RECEIVE, 0, NULL, NULL);						
 						if ( bytes_read < 0 )
 						{
-							ESP_LOGE(TAG,"Client socket: %d  read: %d  errno:%d ",sockfd, bytes_read,errno);
+							ESP_LOGE(TAG,"Socket: %d, read: %d, errno:%d ",sockfd, bytes_read,errno);
 							if (errno == 11) bytes_read = 0;
 						}
 					}
@@ -1449,16 +1476,16 @@ void clientTask(void *pvParams) {
 				while (( bytes_read > 0 )||(playing && (bytes_read == 0)));
 			} else
 			{
-				ESP_LOGE(TAG,"Client socket: %d  connect errno:%d ",sockfd,errno);
-				clientSaveOneHeader("Invalid address",15,METANAME);
+				NotConnected:
+				ESP_LOGE(TAG,"Socket: %d  connect errno:%d ",sockfd,errno);
+				clientSaveOneHeader("Connection error",16,METANAME);
 				wsHeaders();
+				shutdown(sockfd,SHUT_RDWR); // stop the socket
 				vTaskDelay(1);
 				clientDisconnect("Invalid");
 				if (https){
-					if (ssl) wolfSSL_free(ssl);     /* Free the wolfSSL object                  */
-//					wolfSSL_CTX_free(ctx); /* Free the wolfSSL context object          */
-//					wolfSSL_Cleanup();     /* Cleanup the wolfSSL environment          */
-					ESP_LOGE(TAG,"SSL Cleanup Client socket: %d",sockfd);
+					if (ssl) wolfSSL_free(ssl);     /* Free the wolfSSL object */
+					ESP_LOGI(TAG,"SSL Cleanup Socket: %d",sockfd);
 				}
 				close(sockfd);
 				continue;
@@ -1482,7 +1509,7 @@ void clientTask(void *pvParams) {
 							while (spiRamFifoFill()) vTaskDelay(200);
 							vTaskDelay(100);
 							playing=0;
-							clientDisconnect("data not played");
+							clientDisconnect("Data not played");
 						}
 					}
 						//
@@ -1517,8 +1544,8 @@ void clientTask(void *pvParams) {
 			shutdown(sockfd,SHUT_RDWR); // stop the socket
 			vTaskDelay(10);
 			if (https){
-				if (ssl) wolfSSL_free(ssl);     /* Free the wolfSSL object                  */
-				ESP_LOGE(TAG,"SSL Cleanup 1 Client socket: %d",sockfd);
+				if (ssl) wolfSSL_free(ssl);    // Free the wolfSSL object 
+				ESP_LOGI(TAG,"SSL Cleanup 1 Socket: %d",sockfd);
 			}
 			close(sockfd);
 			if (cstatus == C_PLAYLIST)

@@ -318,6 +318,60 @@ static const ucg_pgm_uint8_t ucg_st7789_power_down_seq[] = {
 	UCG_END(),					/* end of sequence */
 };
 
+ucg_int_t ucg_dev_ic_st7789_13(ucg_t *ucg, ucg_int_t msg, void *data)
+{
+  switch(msg)
+  {
+    case UCG_MSG_DEV_POWER_UP:
+      /* setup com interface and provide information on the clock speed */
+      /* of the serial and parallel interface. Values are nanoseconds. */
+	  ucg->display_offset.x = 53;
+      ucg->display_offset.y = 40;
+      return ucg_com_PowerUp(ucg, 100, 66);
+    case UCG_MSG_DEV_POWER_DOWN:
+      ucg_com_SendCmdSeq(ucg, ucg_st7789_power_down_seq);
+      return 1;
+    case UCG_MSG_GET_DIMENSION:
+      ((ucg_wh_t *)data)->w = 135;
+      ((ucg_wh_t *)data)->h = 240;
+      return 1;
+    case UCG_MSG_DRAW_PIXEL:
+      if ( ucg_clip_is_pixel_visible(ucg) !=0 )
+      {
+	uint8_t c[3];
+	ucg_com_SendCmdSeq(ucg, ucg_st7789_set_pos_seq);	
+	c[0] = ucg->arg.pixel.rgb.color[0];
+	c[1] = ucg->arg.pixel.rgb.color[1];
+	c[2] = ucg->arg.pixel.rgb.color[2];
+	ucg_com_SendRepeat3Bytes(ucg, 1, c);
+	ucg_com_SetCSLineStatus(ucg, 1);		/* disable chip */
+      }
+      return 1;
+    case UCG_MSG_DRAW_L90FX:
+      //ucg_handle_l90fx(ucg, ucg_dev_ic_st7789_18);
+      ucg_handle_st7789_l90fx(ucg);
+      return 1;
+#ifdef UCG_MSG_DRAW_L90TC
+    case UCG_MSG_DRAW_L90TC:
+      //ucg_handle_l90tc(ucg, ucg_dev_ic_st7789_18);
+      ucg_handle_st7789_l90tc(ucg);
+      return 1;	
+#endif /* UCG_MSG_DRAW_L90TC */
+#ifdef UCG_MSG_DRAW_L90BF
+     case UCG_MSG_DRAW_L90BF:
+      ucg_handle_l90bf(ucg, ucg_dev_ic_st7789_18);
+      return 1;
+#endif /* UCG_MSG_DRAW_L90BF */
+      
+    /* msg UCG_MSG_DRAW_L90SE is handled by ucg_dev_default_cb */
+    /*
+    case UCG_MSG_DRAW_L90SE:
+      return ucg->ext_cb(ucg, msg, data);
+    */
+  }
+  return ucg_dev_default_cb(ucg, msg, data);  
+}
+
 ucg_int_t ucg_dev_ic_st7789_18(ucg_t *ucg, ucg_int_t msg, void *data)
 {
   switch(msg)
