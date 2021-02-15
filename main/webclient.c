@@ -1207,7 +1207,7 @@ ESP_LOGD(TAG,"mtlen len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,c
 //					if (spiRamFifoFree() < metad) ESP_LOGV(TAG,"metaout2 wait metad: %d, bufferfree: %d",metad,spiRamFifoFree());
 //					while(spiRamFifoFree()<metad)	 // wait some room
 //						vTaskDelay(20);
-					if (audio_stream_consumer((char*)inpdata, metad, (void*)player_config)<0)
+					if (audio_stream_consumer((char*)inpdata, metad, (void*)player_config)== -1)
 					{
 						playing=1;
 						clientSaveOneHeader("Cannot decode",13,METANAME);
@@ -1234,7 +1234,7 @@ ESP_LOGD(TAG,"mt2 len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,cle
 //					if (spiRamFifoFree() < rest) ESP_LOGV(TAG,"metaout3 wait rest: %d, bufferfree: %d",rest,spiRamFifoFree());
 //					while(spiRamFifoFree()<rest)	 // wait some room
 //						vTaskDelay(20);//
-					if (audio_stream_consumer((char*)inpdata, rest, (void*)player_config)<0)
+					if (audio_stream_consumer((char*)inpdata, rest, (void*)player_config)== -1)
 					{
 						playing=1;
 						clientSaveOneHeader("Cannot decode",13,METANAME);
@@ -1255,7 +1255,7 @@ ESP_LOGD(TAG,"mt2 len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,cle
 //				if (spiRamFifoFree() < len) ESP_LOGV(TAG,"metaout1 wait len: %d, bufferfree: %d",len,spiRamFifoFree());
 //				while(spiRamFifoFree()<len)	 // wait some room
 //						vTaskDelay(20);
-				if (audio_stream_consumer((char*)(pdata+rest), len, (void*)player_config)<0)
+				if (audio_stream_consumer((char*)(pdata+rest), len, (void*)player_config)== -1)
 				{
 					playing=1;
 					clientSaveOneHeader("Cannot decode",13,METANAME);
