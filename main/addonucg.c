@@ -384,15 +384,15 @@ void ucEraseSlashes(char * str) {
 //-Max
 
 // non linear cyrillic conversion
-struct _utf8To1251_t
+struct _utf8ToAscii_t
 {
   uint16_t utf8;
-  uint8_t c1251;
+  uint8_t ascii;
 
 };
-typedef struct _utf8To1251_t utf8To1251_t;
+typedef struct _utf8ToAscii_t utf8ToAscii_t;
 #define UTF8TO1251	30
-const utf8To1251_t utf8To1251[UTF8TO1251] = {
+const utf8ToAscii_t utf8To1251[UTF8TO1251] = {
 	{0x401,0x45/*0xa8*/},{0x402,0x80},{0x403,0x81},{0x404,0x45/*0xaa*/},{0x405,0xbd},{0x406,0x49/*0xb2*/},{0x407,0x49/*0xaf*/},{0x408,0xa3},
 	{0x409,0x8a},{0x40a,0x8c},{0x40b,0x8e},{0x40c,0x8d},{0x40e,0xa1},{0x40f,0x8f},{0x452,0x90},{0x451,0x65/*0xb8*/},
 	{0x453,0x83},{0x454,0xE5/*0xba*/},{0x455,0xbe},{0x456,0x69/*0xb3*/},{0x457,0x69/*0xbf*/},{0x458,0x6a/*0xbc*/},{0x459,0x9a},{0x45a,0x9c},
@@ -409,11 +409,10 @@ uint8_t to1251(uint16_t utf8)
 	{
 		if (utf8 == utf8To1251[i].utf8)
 		{
-//			printf("to1251: utf8: %x, ret: %x\n",utf8,utf8To1251[i].c1251);
-			return utf8To1251[i].c1251;
+//			printf("to1251: utf8: %x, ret: %x\n",utf8,utf8To1251[i].ascii);
+			return utf8To1251[i].ascii;
 		}
-	}
-	
+	}	
 //	printf("to1251: utf8: %x, ret: %x\n",utf8,(utf8 - 0x350)& 0xff);
 	return ((utf8 - 0x350)& 0xff );
 }
@@ -436,10 +435,58 @@ uint8_t to1253(uint16_t utf8)
 	return ((utf8 - 0x300)& 0xff );
 }
 
+#define UTF8TO8859	62
+const utf8ToAscii_t utf8To8859[UTF8TO8859] = {
+	{0x100,0x41},{0x102,0x41},{0x104,0x41}/*C484*/, /*A*/
+	{0x101,0x61},{0x103,0x61},{0x105,0x61}/*C484*/, /*a*/
+	{0x106,0x43}/*c486*/,{0x108,0x43}/*c488*/,{0x1a,0x43}/*c48a*/,{0x10c,0x43}/*c48c*/, /*C*/
+	{0x107,0x63}/*c487 c*/,{0x109,0x63}/*89 c*/,{0x10b,0x63}/*8b c*/,{0x10d,0x63}/*8d c*/, /*c*/
+	{0x10E,0x44},{0x110,0x44}/*C490*/, /*D*/
+	{0x10F,0x44},{0x111,0x44}/*C491*/, /*d*/
+	{0x11a,0x45}/*c49A*/, /*E*/
+	{0x11b,0x65}/*c49B*/, /*e*/
+	{0x11c,0x47}/*c49C*/,{0x11e,0x47}/*c49e*/,{0x120,0x47}/*c4a0*/,{0x122,0x47}/*c4a2*/, /*G*/
+	{0x11d,0x67}/*c49D*/,{0x11f,0x67}/*c49f*/,{0x121,0x67}/*c4a1*/,{0x123,0x67}/*c4a3*/, /*g*/
+	{0x124,0x48},{0x126,0x48}/*C4a6*/, /*H*/
+	{0x125,0x68},{0x127,0x68}/*C4a7*/, /*h*/
+	{0x130,0x49},{0x132,0x49}/*C4b0*/, /*I*/
+	{0x131,0x69},{0x133,0x69}/*C4b1*/, /*i*/
+	{0x147,0x4e}/*c587*/, /*N*/
+	{0x148,0x6e}/*c588*/, /*n*/
+	{0x158,0x52}/*c598*/, /*R*/
+	{0x159,0x72}/*c599*/, /*r*/
+	{0x160,0x53}/*c5a0*/, /*S*/
+	{0x161,0x73}/*c5a1*/, /*s*/
+	{0x168,0x55},{0x16A,0x55},{0x16C,0x55},{0x16E,0x55},{0x170,0x55},{0x172,0x55}/*c5AF*/, /*U*/
+	{0x169,0x75},{0x16B,0x75},{0x16D,0x75},{0x16F,0x75},{0x171,0x75},{0x173,0x75}/*c5AF*/, /*u*/
+	{0x17e,0x7a}/*C5BE*/, /*z*/
+	{0x179,0x5a},{0x17b,0x5a},{0x17d,0x5a}/*C5BD*/, /*Z*/
+	{0x491,0xb4},
+	{0,0}
+	};
+
+
+// Latin
+uint8_t to8859(uint16_t utf8)
+{
+	int i;
+	if (utf8 > 0x1ff) return 0x1f;
+	for (i = 0; i<UTF8TO8859;i++)
+	{
+		if (utf8 == utf8To8859[i].utf8)
+		{
+			return utf8To8859[i].ascii;
+		}
+	}	
+	return ((utf8 )& 0xff );
+	
+}
+
 ////////////////////////////////////////
 uint16_t UtoC(uint8_t high,uint8_t low)
 {
-	uint16_t res = (( high<<6)  |( low & 0x3F )) & 0x7FF;
+	uint16_t res = (( (high&0x01f )<<6)  |( low & 0x3F )) & 0x7FF;
+	ESP_LOGV(TAG,"UtoC: HL: %02x%02x,  res:0x%04x",high,low,res);
 	return(res);
 }
 
@@ -447,17 +494,17 @@ void removeUtf8(char *characters)
 {
   int Rindex = 0;
   uint16_t utf8;
-//  ESP_LOGV(TAG,"removeUtf8 in : %s",characters);
+  ESP_LOGV(TAG,"removeUtf8 in : %s",characters);
   ucEraseSlashes(characters) ; 
   while (characters[Rindex])
   {
-    if ((characters[Rindex] >= 0xc2)&&(characters[Rindex] <=0xc3)) // only 0 to FF ascii char
+    if ((characters[Rindex] >= 0xc2)&&(characters[Rindex] <=0xc5)) // only 0 to FF ascii char
     {
 		utf8 = UtoC(characters[Rindex],characters[Rindex+1]) ; // the utf8
-		characters[Rindex+1] =  (uint8_t)utf8 &0xff;
-		if (utf8>= 0x100) characters[Rindex+1] = 0x1f; //Erase to non-printable symbol
+		characters[Rindex+1] =  to8859(utf8)  ;//  (uint8_t)utf8 &0xff;
+//		if (utf8>= 0x100) characters[Rindex+1] = 0x1f; //Erase to non-printable symbol
 		int sind = Rindex+1;
-		while (characters[sind]) { characters[sind-1] = characters[sind];sind++;}
+		while (characters[sind]) { characters[sind-1] = characters[sind];sind++;} // pad left
 		characters[sind-1] = 0; 
     }
     else if ((characters[Rindex] >= 0xd0)&&(characters[Rindex] <= 0xd3)) // only 0 to FF ascii char
@@ -621,7 +668,7 @@ void draw(int i)
           ucg_SetColori(&ucg,0,0,0); 
  //         ucg_DrawBox(&ucg,0,y*i+z,x,y-ucg_GetFontDescent(&ucg)); 
 //          ucg_DrawBox(&ucg,0,y*i+z,x,y-1); 
-          ucg_DrawBox(&ucg,0,y*i+z,x,y); 
+          ucg_DrawBox(&ucg,0,y*i+z-3,x,y); 
           setColor(i);
           if (lline[i] != NULL) ucg_DrawString(&ucg,0,y*i+z,0,lline[i]+iline[i]);                
    }      

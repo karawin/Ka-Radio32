@@ -1303,7 +1303,7 @@ void clientTask(void *pvParams) {
 	portBASE_TYPE uxHighWaterMark;
 	struct timeval timeout;
     timeout.tv_usec = 0;
-	timeout.tv_sec = 3;
+	timeout.tv_sec = 5;
 	int sockfd;
 	int bytes_read;
 	uint8_t cnterror;

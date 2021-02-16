@@ -1,7 +1,7 @@
 key,type,encoding,value
 
 label_space,namespace,,
-L_LABEL,data,string,tdisplay.csv
+L_LABEL,data,string,ttgotdisplay.csv
 L_COMMENT,data,string,This is the tdisplay configuration.
 
 gpio_space,namespace,,
@@ -43,7 +43,7 @@ P_ADC_KBD,data,u8,255
 P_BACKLIGHT,data,u8,4
 
 option_space,namespace,,
-O_LCD_TYPE,data,u8,199
+O_LCD_TYPE,data,u8,204
 O_LCD_ROTA,data,u8,0
 O_LCD_OUT,data,u32,0
 O_DDMM_FLAG,data,u8,0
