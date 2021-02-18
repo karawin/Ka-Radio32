@@ -31,8 +31,8 @@
 extern player_t* player_config;
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 //2000 1440 1460 1436
-#define RECEIVE 2048
-//#define RECEIVE 3000
+//#define RECEIVE 1440 2144
+#define RECEIVE 1440
 enum clientStatus cstatus;
 //static uint32_t metacount = 0;
 //static uint16_t metasize = 0;
@@ -268,7 +268,7 @@ bool clientParsePlaylist(char* s)
 	
   str = strstr(s,"http://");
   if (str ==NULL) str = strstr(s,"HTTP://");
-  if ((str != NULL))   {s= str+7; j = 7; strcpy (url,"http://"); }
+  if (str != NULL)   {s= str+7; j = 7; strcpy (url,"http://"); }
   else
   {
 	str = strstr(s,"https://");
@@ -1344,7 +1344,7 @@ void clientTask(void *pvParams) {
 		xSemaphoreGive(sConnected);
 		if(xSemaphoreTake(sConnect, portMAX_DELAY)) 
 		{		
-			VS1053_HighPower();
+			if (get_audio_output_mode() == VS1053)  VS1053_HighPower();
 			xSemaphoreTake(sDisconnect, 0);
 			sockfd = socket(AF_INET, SOCK_STREAM, 0);
 			ESP_LOGD(TAG,"Socket: %d", sockfd);
@@ -1468,10 +1468,10 @@ void clientTask(void *pvParams) {
 						vTaskDelay(20);
 						if ((errno == 128)||(cnterror > 20 )) break;
 					}
-					vTaskDelay(1);
+					vTaskDelay(2); // >1 mandatory
 					// if a stop is asked
 					if(xSemaphoreTake(sDisconnect, 0))
-						{ clearHeaders(); break;	}
+					{ clearHeaders(); break;}
 				}
 				while (( bytes_read > 0 )||(playing && (bytes_read == 0)));
 			} else
@@ -1535,7 +1535,7 @@ void clientTask(void *pvParams) {
 				if (get_audio_output_mode() == VS1053) VS1053_flush_cancel();
 				playing = 0;
 				vTaskDelay(1);	// stop without click
-				VS1053_LowPower();
+				if (get_audio_output_mode() == VS1053) VS1053_LowPower();
 				setVolumei(getVolume());
 				strcpy(userAgent,g_device->ua);
 			}

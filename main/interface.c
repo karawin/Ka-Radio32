@@ -824,7 +824,9 @@ void clientWake(char *s)
 	if(t == 0)
 	{
 		// no argument, no action
-		kprintf("#Wake in %lld s##\n",getWake());
+		uint64_t temps = getWake();
+		if (temps == 0) kprintf("No wake in progress\n");
+		else kprintf("#Wake in %lld m  %lld s##\n",temps/60,temps%60);
 		return;
 	}
 	char *t_end  = strstr(t, parquoteslash)-2;
@@ -845,7 +847,7 @@ void clientWake(char *s)
 		else startWake(atoi(label));
 		free(label);
     }	
-	kprintf("#Wake in %lld s##\n",getWake());
+	clientWake((char*)"");
 }
 void clientSleep(char *s)
 {
@@ -853,7 +855,10 @@ void clientSleep(char *s)
 	if(t == 0)
 	{
 		// no argument, no action
-		kprintf("#Sleep in %lld s##\n",getSleep());
+		uint64_t temps = getSleep();
+		if (temps == 0) kprintf("No sleep in progress\n");
+		else 
+		kprintf("#Sleep in %lld m  %lld s##\n",temps/60,temps%60);
 		return;
 	}
 	char *t_end  = strstr(t, parquoteslash)-2;
@@ -874,7 +879,7 @@ void clientSleep(char *s)
 		else startSleep(atoi(label));
 		free(label);
     }
-	kprintf("#Sleep in %lld s##\n",getSleep());	
+	clientSleep((char*)"");
 }
 
 // option for loading or not the pacth of the vs1053

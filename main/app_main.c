@@ -196,7 +196,8 @@ uint64_t getSleep()
 	uint64_t tot=0;
 	timer_get_alarm_value(TIMERGROUP, sleepTimer,&tot);
 	timer_get_counter_value(TIMERGROUP, sleepTimer,&ret);
-	return ((tot-ret)/5000000);
+	ESP_LOGD(TAG,"getSleep: ret: %lld, tot: %lld, return %lld",ret,tot,tot-ret);
+	return ((tot)-ret)/5000000;
 }
 uint64_t getWake()
 {
@@ -204,25 +205,29 @@ uint64_t getWake()
 	uint64_t tot=0;
 	timer_get_alarm_value(TIMERGROUP, wakeTimer,&tot);
 	timer_get_counter_value(TIMERGROUP, wakeTimer,&ret);
-	return ((tot-ret)/5000000);
+	ESP_LOGD(TAG,"getWake: ret: %lld, tot: %lld  return %lld",ret,(tot),tot-ret);
+	return ((tot)-ret)/5000000;
 }
 
 void tsocket(const char* lab, uint32_t cnt)
 {
-		char* title = malloc(strlen(lab)+10);
+		char* title = malloc(strlen(lab)+50);
 		sprintf(title,"{\"%s\":\"%d\"}",lab,cnt*60); 
 		websocketbroadcast(title, strlen(title));
 		free(title);	
 }
 
 void stopSleep(){
-	ESP_LOGD(TAG,"stopDelayDelay\n");
+	ESP_LOGD(TAG,"stopSleep");
 	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, sleepTimer));
+	ESP_ERROR_CHECK(timer_set_alarm_value(TIMERGROUP, sleepTimer, 0x00000000ULL));
+	ESP_ERROR_CHECK(timer_set_counter_value(TIMERGROUP, sleepTimer, 0x00000000ULL));
+
 	tsocket("lsleep",0);
 }
 void startSleep(uint32_t delay)
 {
-	ESP_LOGD(TAG,"Delay:%d\n",delay);
+	ESP_LOGD(TAG,"startSleep: %d min.",delay );
 	if (delay == 0) return;
 	stopSleep();
 	ESP_ERROR_CHECK(timer_set_counter_value(TIMERGROUP, sleepTimer, 0x00000000ULL));
@@ -234,17 +239,18 @@ void startSleep(uint32_t delay)
 }
 
 void stopWake(){
-	ESP_LOGD(TAG,"stopDelayWake\n");
+	ESP_LOGD(TAG,"stopWake");
 	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, wakeTimer));
+	ESP_ERROR_CHECK(timer_set_counter_value(TIMERGROUP, wakeTimer, 0x00000000ULL));
+	ESP_ERROR_CHECK(timer_set_alarm_value(TIMERGROUP, wakeTimer, 0x00000000ULL));
 	tsocket("lwake",0);
 }
 void startWake(uint32_t delay)
 {
-	ESP_LOGD(TAG,"Wake Delay:%d\n",delay);
+	ESP_LOGD(TAG,"startWake: %d min.",delay);
 	if (delay == 0) return;
 	stopWake();
 	ESP_ERROR_CHECK(timer_set_counter_value(TIMERGROUP, wakeTimer, 0x00000000ULL));
-	//TIMER_INTERVAL0_SEC * TIMER_SCALE - TIMER_FINE_ADJ
 	ESP_ERROR_CHECK(timer_set_alarm_value(TIMERGROUP, wakeTimer,TIMERVALUE(delay*60)));
 	ESP_ERROR_CHECK(timer_enable_intr(TIMERGROUP, wakeTimer));
 	ESP_ERROR_CHECK(timer_set_alarm(TIMERGROUP, wakeTimer,TIMER_ALARM_EN));
@@ -806,7 +812,6 @@ void uartInterfaceTask(void *pvParameters) {
 			//switchCommand() ;  // hardware panel of command
 		}
 		checkCommand(t, tmp);
-		
 		uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
 		ESP_LOGD("uartInterfaceTask",striWATERMARK,uxHighWaterMark,xPortGetFreeHeapSize( ));
 				
@@ -1091,7 +1096,7 @@ void app_main()
 	xTaskCreatePinnedToCore(uartInterfaceTask, "uartInterfaceTask", 2500, NULL, PRIO_UART, &pxCreatedTask,CPU_UART); 
 	ESP_LOGI(TAG, "%s task: %x","uartInterfaceTask",(unsigned int)pxCreatedTask);
 	vTaskDelay(1);
-	xTaskCreatePinnedToCore(clientTask, "clientTask", 3700, NULL, PRIO_CLIENT, &pxCreatedTask,CPU_CLIENT); 
+	xTaskCreatePinnedToCore(clientTask, "clientTask", 3800, NULL, PRIO_CLIENT, &pxCreatedTask,CPU_CLIENT); 
 	ESP_LOGI(TAG, "%s task: %x","clientTask",(unsigned int)pxCreatedTask);	
 	vTaskDelay(1);
     xTaskCreatePinnedToCore(serversTask, "serversTask", 3100, NULL, PRIO_SERVER, &pxCreatedTask,CPU_SERVER); 

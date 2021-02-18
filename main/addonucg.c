@@ -435,7 +435,7 @@ uint8_t to1253(uint16_t utf8)
 	return ((utf8 - 0x300)& 0xff );
 }
 
-#define UTF8TO8859	62
+#define UTF8TO8859	63
 const utf8ToAscii_t utf8To8859[UTF8TO8859] = {
 	{0x100,0x41},{0x102,0x41},{0x104,0x41}/*C484*/, /*A*/
 	{0x101,0x61},{0x103,0x61},{0x105,0x61}/*C484*/, /*a*/
@@ -457,11 +457,12 @@ const utf8ToAscii_t utf8To8859[UTF8TO8859] = {
 	{0x159,0x72}/*c599*/, /*r*/
 	{0x160,0x53}/*c5a0*/, /*S*/
 	{0x161,0x73}/*c5a1*/, /*s*/
+	{0x166,0x54}/*c5a6*/, /*T*/
+	{0x167,0x74}/*c5a7*/, /*t*/
 	{0x168,0x55},{0x16A,0x55},{0x16C,0x55},{0x16E,0x55},{0x170,0x55},{0x172,0x55}/*c5AF*/, /*U*/
 	{0x169,0x75},{0x16B,0x75},{0x16D,0x75},{0x16F,0x75},{0x171,0x75},{0x173,0x75}/*c5AF*/, /*u*/
-	{0x17e,0x7a}/*C5BE*/, /*z*/
 	{0x179,0x5a},{0x17b,0x5a},{0x17d,0x5a}/*C5BD*/, /*Z*/
-	{0x491,0xb4},
+	{0x17a,0x7a},{0x17c,0x7a},{0x17e,0x7a}/*C5BE*/, /*z*/
 	{0,0}
 	};
 
@@ -501,7 +502,10 @@ void removeUtf8(char *characters)
     if ((characters[Rindex] >= 0xc2)&&(characters[Rindex] <=0xc5)) // only 0 to FF ascii char
     {
 		utf8 = UtoC(characters[Rindex],characters[Rindex+1]) ; // the utf8
-		characters[Rindex+1] =  to8859(utf8)  ;//  (uint8_t)utf8 &0xff;
+		if (utf8>=0x100)
+			characters[Rindex+1] =  to8859(utf8)  ;//  (uint8_t)utf8 &0xff;
+		else
+			characters[Rindex+1] = (uint8_t)utf8 &0xff;
 //		if (utf8>= 0x100) characters[Rindex+1] = 0x1f; //Erase to non-printable symbol
 		int sind = Rindex+1;
 		while (characters[sind]) { characters[sind-1] = characters[sind];sind++;} // pad left

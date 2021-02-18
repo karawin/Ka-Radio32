@@ -43,7 +43,7 @@
 #define TIMER_DIVIDER1MS TIMER_BASE_CLK/10000 //10000Hz 
 #define TIMER_DIVIDER1mS 8 //10000000Hz 10MHz
 
-#define TIMERVALUE(x) (x*5000000 )
+#define TIMERVALUE(x) (x*5000000ULL )
 #define TIMERVALUE1MS(x) (x*10) 
 #define TIMERVALUE1mS(x) (x*10000 )
 #define TIMERGROUP TIMER_GROUP_0 
@@ -60,35 +60,10 @@
 #define TIMER_1MS	2
 #define TIMER_1mS	3
 
-/* // Tasks priority
-#define PRIO_MAD 		7
-#define PRIO_VS1053 	4
-#define PRIO_RMT		7
-#define PRIO_UART		2
-#define PRIO_CLIENT		4
-#define PRIO_SERVER		3
-#define PRIO_ADDON		5
-#define PRIO_LCD		6
-#define PRIO_SUBSERV	3
-#define PRIO_TIMER		1
-#define PRIO_OTA		10
-
-// CPU for task
-#define CPU_MAD			0  // internal decoder and vs1053
-#define CPU_RMT			0
-#define CPU_UART		1
-#define CPU_CLIENT		1
-#define CPU_SERVER		0
-#define CPU_ADDON		1
-#define CPU_LCD			1
-#define CPU_SUBSERV		0
-#define CPU_TIMER		1
- */
-
 
 // Tasks priority
-#define PRIO_MAD 		9
-#define PRIO_VS1053 	9
+#define PRIO_MAD 		7
+#define PRIO_VS1053 	6
 #define PRIO_RMT		5
 #define PRIO_UART		2
 #define PRIO_CLIENT		8
@@ -109,6 +84,7 @@
 #define CPU_LCD			0
 #define CPU_SUBSERV		0
 #define CPU_TIMER		0
+
 
 #define TEMPO_SAVE_VOL	10000
 

@@ -46,7 +46,7 @@ void fdkaac_decoder_task(void *pvParameters)
     buffer_t *pcm_buf = buf_create(OUTPUT_BUFFER_SIZE);
 
     /* allocate bitstream buffer */
-    buffer_t *in_buf = buf_create(INPUT_BUFFER_SIZE*24);
+    buffer_t *in_buf = buf_create(INPUT_BUFFER_SIZE*48);
     fill_read_buffer(in_buf);
 
     HANDLE_AACDECODER handle = NULL;
@@ -55,37 +55,6 @@ void fdkaac_decoder_task(void *pvParameters)
     /* select bitstream format */
     if (player->media_stream->content_type == AUDIO_MP4)
 		{
-/*
-        demux_res_t demux_res;
-        stream_t input_stream;
-        memset(&demux_res, 0, sizeof(demux_res));
-
-        stream_create(&input_stream, in_buf);
-        fill_read_buffer(in_buf);
-
-        if (!qtmovie_read(&input_stream, &demux_res)) {
-            ESP_LOGE(TAG, "qtmovie_read failed");
-            goto cleanup;
-        } else {
-            ESP_LOGI(TAG, "qtmovie_read success");
-        }
-
-        //create decoder instance 
-        handle = aacDecoder_Open(TT_MP4_RAW,1); // num layers 
-        if (handle == NULL) {
-            ESP_LOGE(TAG, "malloc failed %d", __LINE__);
-            goto cleanup;
-        }
-
-        // If out-of-band config data (AudioSpecificConfig(ASC) or StreamMuxConfig(SMC)) is available
-//        uint8_t ascData[1] = {demux_res.codecdata};
-//        const uint32_t ascDataLen[1] = {demux_res.codecdata_len};
-        err = aacDecoder_ConfigRaw(handle,(UCHAR **) &demux_res.codecdata, &demux_res.codecdata_len);
-        if (err != AAC_DEC_OK) {
-            ESP_LOGE(TAG, "aacDecoder_ConfigRaw error %d", err);
-            goto cleanup;
-        }
-		*/
 		goto cleanup;
     } else {
         /* create decoder instance */
@@ -111,10 +80,12 @@ void fdkaac_decoder_task(void *pvParameters)
     while (!player->media_stream->eof) {
 
         /* re-fill buffer if necessary */
-        if (buf_data_unread(in_buf) == 0) {
+       if (buf_data_unread(in_buf) == 0) {
             fill_read_buffer(in_buf);
-			vTaskDelay(3);
-        }
+//			vTaskDelay(1);
+       if(player->decoder_command == CMD_STOP) {
+                goto abort;
+        }        }
 		
 //		watchgog reset 
 		TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
@@ -122,20 +93,22 @@ void fdkaac_decoder_task(void *pvParameters)
 		TIMERG0.wdt_wprotect=0;
 
 
-        if(player->decoder_command == CMD_STOP) {
+ /*       if(player->decoder_command == CMD_STOP) {
                 goto abort;
         }
-		
+*/		
         // bytes_avail will be updated and indicate "how much data is left"
         size_t bytes_avail = buf_data_unread(in_buf);
         aacDecoder_Fill(handle, &in_buf->read_pos, &bytes_avail, &bytes_avail);
 
         uint32_t bytes_taken = buf_data_unread(in_buf) - bytes_avail;
-        buf_seek_rel(in_buf, bytes_taken);
-
+//        buf_seek_rel(in_buf, bytes_taken);
+        in_buf->read_pos += bytes_taken;
+        in_buf->bytes_consumed += bytes_taken;
 
         err = aacDecoder_DecodeFrame(handle, (short int *) pcm_buf->base,
                 pcm_buf->len, flags);
+
 
         // need more bytes, lets refill
         if(err == AAC_DEC_TRANSPORT_SYNC_ERROR || err == AAC_DEC_NOT_ENOUGH_BITS) {
@@ -166,14 +139,12 @@ void fdkaac_decoder_task(void *pvParameters)
             pcm_format.num_channels = mStreamInfo->numChannels;
             pcm_format.sample_rate = mStreamInfo->sampleRate;
         }
-//		vTaskDelay(1);
-//		taskYIELD ();	
+	
         render_samples((char *) pcm_buf->base, pcm_size, &pcm_format);
 
         // ESP_LOGI(TAG, "fdk_aac_decoder stack: %d\n", uxTaskGetStackHighWaterMark(NULL));
         // ESP_LOGI(TAG, "%u free heap %u", __LINE__, esp_get_free_heap_size());
 
-        // about 32K free heap at this point
     }
 	goto cleanup;
 	// exit on internal error
@@ -189,7 +160,7 @@ void fdkaac_decoder_task(void *pvParameters)
     ESP_LOGI(TAG, "aac decoder finished  %x    %x",(int)in_buf,(int)pcm_buf);
     aacDecoder_Close(handle);
     spiRamFifoReset();
-    buf_destroy(in_buf);
+    //buf_destroy(in_buf);
     buf_destroy(pcm_buf);
 	//esp_task_wdt_delete(NULL);
 

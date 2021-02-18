@@ -155,7 +155,7 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 	uint8_t* outBuf8;
 	uint32_t* outBuf32;
 	uint64_t* outBuf64;
-	
+	if (buf_len == 0) return; // decoder error
     // handle changed sample rate
     if(renderer_instance->sample_rate != buf_desc->sample_rate)
     {
@@ -340,15 +340,6 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 		}
 //		if (bytes_written != bytes_left) ESP_LOGV(TAG, "written: %d, len: %d",bytes_written,bytes_left);
 
-/*    size_t bytes_left = buf_len*(2/buf_desc->num_channels);
-    size_t bytes_written = 0;
-    while(bytes_left > 0 && renderer_status != STOPPED) {
-        res = i2s_write(renderer_instance->i2s_num, (const char*) outBuf8, bytes_left,& bytes_written, max_wait);
-		if (res != ESP_OK) {
-				ESP_LOGE(TAG, "i2s_write error %d",res);
-		}
-		if (bytes_written != buf_len*(2/buf_desc->num_channels))ESP_LOGV(TAG, "written: %d, len: %d",bytes_written,bytes_left);
-*/
 
         bytes_left -= bytes_written;
         buf += (bytes_written  );

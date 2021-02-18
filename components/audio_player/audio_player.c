@@ -72,7 +72,7 @@ static int start_decoder_task(player_t *player)
 		
             task_func = fdkaac_decoder_task;
             task_name = (char*)"fdkaac_decoder_task";
-            stack_depth = 7000; //6144; 
+            stack_depth = 6900; //6144; 
             break;
 			
 /*
@@ -144,7 +144,7 @@ int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read,
 		t = 0;
 //		uint32_t trigger = (bigSram())? (70*1024):(20*1024);
 //		bool buffer_ok = (bytes_in_buf > trigger);
-		bool buffer_ok = (fill_level > bigSram()?20:50); // in %
+		bool buffer_ok = (fill_level > (bigSram()?10:70)); // in %
 		if (buffer_ok)
 		{
 		// buffer is filled, start decoder
@@ -155,6 +155,7 @@ int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read,
 				clientDisconnect("decoder failed"); 
 				return -1;
 			}
+			ESP_LOGI(TAG, "Buffer fill %u%%, %d // %d bytes", fill_level, bytes_in_buf,spiRamFifoLen());
 		}
 	}
 
