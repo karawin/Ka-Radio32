@@ -1422,6 +1422,7 @@ void clientTask(void *pvParams) {
 				else
 					send(sockfd, (char*)bufrec, strlen((char*)bufrec), 0);
 
+				ESP_LOGD(TAG,"\nSent: %s\n",bufrec);
 				if (setsockopt (sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0)
 					ESP_LOGE(TAG,"Socket: %d  setsockopt: %d  errno:%d ",sockfd, bytes_read,errno);
 //////
@@ -1453,7 +1454,7 @@ void clientTask(void *pvParams) {
 							if (errno == 11) bytes_read = 0;
 						}
 					}
-//if (bytes_read < 1000 )
+//if (bytes_read < 100 ) ESP_LOGD(TAG,"\nReceived: %s\n",bufrec);
 //	printf("Rec:%d\n%s\n",bytes_read,bufrec);
 //	printf(" %d ",bytes_read);	fflush(stdout);
 					if ( bytes_read > 0 )

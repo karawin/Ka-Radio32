@@ -1108,20 +1108,25 @@ function downloadStations()
 				xhr.send(tosend);
 				} catch (e){console.log("error "+e+" "+tosend);}
 //			}
-			indmax = 2;
+			indmax = 4;
 			for(line = 3; line < lines.length; line+=indmax){				
 //				console.log(lines[line]);
 				try {
 				tosend =  "nb=" + indmax;
-				for (i = 0 ; i< indmax;i++)
+				for (i = 0 ; (i< indmax)&&((line+i) <maxStation);i++)
 				{
+					if (lines[line+i] != "")
 					arr = JSON.parse(lines[line+i]);
 					fillInfo(line+i,arr);
 				}
-				xhr.open("POST","setStation",false);
-				xhr.setRequestHeader(content,ctype);
-				xhr.send(tosend);
+				if (i>0)
+				{
+					xhr.open("POST","setStation",false);
+					xhr.setRequestHeader(content,ctype);
+					xhr.send(tosend);
+				}
 				} catch (e){console.log("error "+e+" "+tosend);}
+				
 			}
 			loadStationsList(maxStation);		
 
