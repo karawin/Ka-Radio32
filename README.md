@@ -20,6 +20,9 @@ Found it at
 https://play.google.com/store/apps/details?id=com.serasidis.karadio.rc
 
 Thanks Vassilis.
+### The facebook group
+https://www.facebook.com/groups/162949914181385  
+Just register and talk to other users.  
 ## Added features from KaRadio
 Work with i2s, internal DAC or a vs1053.  
 Output mode set in Setting panel on web page of KaraDio32 :
