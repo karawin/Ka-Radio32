@@ -22,9 +22,9 @@ P_ENC1_BTN,data,u8,5
 P_BTN0_A,data,u8,255
 P_BTN0_B,data,u8,255
 P_BTN0_C,data,u8,255
-P_BTN1_A,data,u8,255
-P_BTN1_B,data,u8,255
-P_BTN1_C,data,u8,255
+P_BTN1_A,data,u8,12
+P_BTN1_B,data,u8,35
+P_BTN1_C,data,u8,0
 P_I2C_SCL,data,u8,16
 P_I2C_SDA,data,u8,5
 P_I2C_RST,data,u8,23
@@ -47,6 +47,8 @@ O_LCD_TYPE,data,u8,204
 O_LCD_ROTA,data,u8,0
 O_LCD_OUT,data,u32,0
 O_DDMM_FLAG,data,u8,0
+O_BTN0,data,u8,0
+O_BTN1,data,u8,0
 
 custom_ir_space,namespace,,
 K_UP,data,string,
