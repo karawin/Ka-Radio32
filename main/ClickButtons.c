@@ -18,6 +18,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include <driver/i2c.h>
+#include "gpio.h"
 // ----------------------------------------------------------------------------
 
 #define TAG "ClickButton"
@@ -51,17 +52,17 @@ Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C, bool Active)
 	gpio_conf.pull_down_en = (enc->pinsActive == LOW) ?GPIO_PULLDOWN_DISABLE : GPIO_PULLDOWN_ENABLE;
 	gpio_conf.intr_type = GPIO_INTR_DISABLE;	
 
-  if (enc->pinBTN[0] > 0) 
+  if (enc->pinBTN[0] != (int8_t) GPIO_NONE)
   {
 	gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<enc->pinBTN[0]));
 	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
   }
-  if (enc->pinBTN[1] > 0) 
+  if (enc->pinBTN[1] != (int8_t) GPIO_NONE)
   {
 	gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<enc->pinBTN[1]));
 	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
   }
-  if (enc->pinBTN[2] > 0) 
+  if (enc->pinBTN[2] != (int8_t) GPIO_NONE)
   {
 	gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<enc->pinBTN[2]));
 	ESP_ERROR_CHECK(gpio_config(&gpio_conf));
@@ -106,7 +107,7 @@ IRAM_ATTR void serviceBtn(Button_t *enc)
   for(uint8_t i = 0; i < 3; i++) 
   {
 //	if (currentMillis < enc->lastButtonCheck[i]) enc->lastButtonCheck[i] = 0;        // Handle case when millis() wraps back around to zero
-	if (enc->pinBTN[i] > 0 )        // check enc->button only, if a pin has been provided
+	if (enc->pinBTN[i] != (int8_t) GPIO_NONE )        // check enc->button only, if a pin has been provided
 //		&& ((currentMillis - enc->lastButtonCheck[i]) >= ENC_BUTTONINTERVAL))            // checking enc->button is sufficient every 10-30ms
 	{ 
 //		enc->lastButtonCheck[i] = currentMillis;
@@ -205,7 +206,7 @@ bool getPinStates(Button_t *enc,uint8_t index) {
   }
   return pinState;
 */  
-  if (enc->pinBTN[index] == 0) return false;
+  if (enc->pinBTN[index] == (int8_t) GPIO_NONE) return false;
   return (enc->expGpio?((rexp >> (enc->pinBTN[index]-1) & 1)):digitalRead(enc->pinBTN[index]));
 }
 

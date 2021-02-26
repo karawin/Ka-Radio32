@@ -459,7 +459,7 @@ void gpio_get_active_buttons(bool *abtn0, bool *abtn1)
 		return;
 	}		 
 	err = nvs_get_u8(hardware_handle, "O_BTN0",(uint8_t *) abtn0);	 
-	err = nvs_get_u8(hardware_handle, "O_BTN1",(uint8_t *) abtn0);	
+	err = nvs_get_u8(hardware_handle, "O_BTN1",(uint8_t *) abtn1);
 	if (err != ESP_OK) ESP_LOGD(TAG,"g_get_active_buttons err 0x%x",err);
 	
 	close_partition(hardware_handle,hardware);			
