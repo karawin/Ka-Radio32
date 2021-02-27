@@ -112,10 +112,10 @@ P_ENC1_A			pin A clk
 P_ENC1_B			pin B Data  
 P_ENC1_BTN			pin SW  
 - **BUTTONS PANEL 0 & 1** of three buttons (switch to gnd):  
-P_BTN0_A		click:start/stop, double click:toggle, help: station  
+P_BTN0_A		click:start/stop, double click:toggle, held: station  
 P_BTN0_B		click: +  
 P_BTN0_C		click: -  
-P_BTN1_A		start/stop, toggle, volume  
+P_BTN1_A		click:start/stop, double click:toggle,  held: volume  
 P_BTN1_B		+  
 P_BTN1_C		-  
 - **JOYSTICK 0 & 1**  
@@ -202,10 +202,10 @@ Each set has functions equivalent to Encoder0 and Encoder1:
 click on button A: Start/Stop playing  
 click on button B and C: volume down and up for set 0 (P_BTN0), Station down and up for set 1 (P_BTN1)  
 held on button A: click on button B and C: volume down and up for set 1 (P_BTN1), Station down and up for set 0 (P_BTN0)  
-A button may be active with a level of 0 volt (0) (default) or +3.3volt (1)  
+A button may be active with a level of 0 volt (0) (default) or +3.3volt (1) 
 
 If a set is not used, P_BTNx_A must be set to 255. In this case P_BTNx_B P_BTNx_C are disabled too.  
-If P_ENCx_B or P_ENCx_BTN are not used in a set, they can be set to 0.  
+  
 
 ### Joystick
 A joystick is a set of two buttons but both cannot be pushed at the same time.  

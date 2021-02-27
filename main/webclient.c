@@ -939,6 +939,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 			wsHeaders();
 			vTaskDelay(1);
 			cstatus = C_HEADER;
+			clientDisconnect("C_LIST"); 
 			return;
 		}
 	}
@@ -996,7 +997,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 							metad = header.members.single.metaint;
 						ESP_LOGD(TAG,"t1: 0x%x, cstatus: %d, icyfound: %d  metad:%d Metaint:%d\n", (int) t1,cstatus, icyfound,metad,  (header.members.single.metaint));
 						cstatus = C_DATA;	// a stream found
-
+						setVolumei(1);
 /////////////////////////////////////////////////////////////////////////////////////////////////
 						player_config->media_stream->eof = false;
 						audio_player_start();
@@ -1268,11 +1269,9 @@ ESP_LOGD(TAG,"mt2 len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,cle
 		if (!playing )
 		{
 			kprintf(CLIPLAY,0x0d,0x0a);
-			setVolumei(0);
 			playing=1;
-			vTaskDelay(20);
 			setVolumei(getVolume());
-
+			if (get_player_status()!= RUNNING) return; // not started. filling the buffer
 			if (!ledStatus){ 
 			if (getLedGpio() != GPIO_NONE) gpio_set_level(getLedGpio(), ledPolarity ? 0 : 1);	
 			}		
@@ -1529,7 +1528,7 @@ void clientTask(void *pvParams) {
 
 			if (playing)  // stop clean
 			{
-				setVolumei(0);
+				setVolumei(1);
 				if (get_player_status() != STOPPED)
 					audio_player_stop();
 				player_config->media_stream->eof = true;
