@@ -1037,7 +1037,7 @@ void initButtonDevices()
 		//1:start 2:select 3:up 4:down 5:left 6:right 7:a 8:b
 		isEsplay = true;
 		expButton0 = ClickexpButtonsInit(1,6,5,0);
-		expButton1 = ClickexpButtonsInit(0,3,4,0);
+		expButton1 = ClickexpButtonsInit((int8_t) GPIO_NONE,3,4,0);
 		expButton2 = ClickexpButtonsInit(2,7,8,0);
 	}
 }

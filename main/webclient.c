@@ -911,6 +911,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 	extern bool ledPolarity;
 	static int metad ;
 	static int rest ;
+	static uint16_t dloop;
 	static IRAM_ATTR  uint32_t chunked;
 	static IRAM_ATTR  uint32_t cchunk;
 	static char* metadata = NULL;
@@ -1266,17 +1267,17 @@ ESP_LOGD(TAG,"mt2 len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,cle
 			}
 		}
 // ---------------
-		if (!playing )
+
+		if ((!playing )  && (((++dloop) % 40)==0)) 
 		{
 			kprintf(CLIPLAY,0x0d,0x0a);
 			playing=1;
-			setVolumei(getVolume());
-			if (get_player_status()!= RUNNING) return; // not started. filling the buffer
 			if (!ledStatus){ 
 			if (getLedGpio() != GPIO_NONE) gpio_set_level(getLedGpio(), ledPolarity ? 0 : 1);	
-			}		
+			}				
+			setVolumei(getVolume());
 		}
-	}
+	} // switch
 }
 
 

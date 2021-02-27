@@ -26,11 +26,9 @@
 #include "app_main.h"
 #include "audio_player.h"
 #include "spiram_fifo.h"
-//#include "common_buffer.h"
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-//#include "freertos/event_groups.h"
-//#include "freertos\queue.h"
 
 extern void  LoadUserCodes(void);
 
@@ -663,8 +661,8 @@ void vsTask(void *pvParams) {
 		// stop requested, terminate immediately
         if(player->decoder_command == CMD_STOP) {
             break;
-        }				
-		//size = bufferRead(b, VSTASKBUF);
+        }	
+
 		unsigned fsize = spiRamFifoFill();
 		size = min(VSTASKBUF, fsize);
 /*		if (size > 	VSTASKBUF)
