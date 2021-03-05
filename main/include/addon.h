@@ -115,4 +115,8 @@ int getBatPercent();
 void* getEncoder(int num);
 struct tm* getDt();
 
+bool deepSleepConf(void);
+bool checkDeepSleepInput(void);
+void deepSleepStart(void);
+
 #endif

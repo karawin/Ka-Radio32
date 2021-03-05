@@ -62,6 +62,7 @@
 #define PIN_BTN1_B   GPIO_NONE		
 #define PIN_BTN1_C 	 GPIO_NONE		
 
+
 // Joystick (2 buttons emulation on ADC)
 //--------------------------------------
 #define PIN_JOY_0	GPIO_NONE
@@ -104,6 +105,10 @@
 //esplay
 #define PIN_AUDIO_SHDN	GPIO_NUM_4
 
+// Sleep Input. https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/sleep_modes.html 
+//-------------
+#define PIN_SLEEP   GPIO_NONE // 13 . Enter Deep Sleep if pin P_SLEEP is set to P_LEVEL_SLEEP. Only GPIOs which have RTC functionality can be used: 0,2,4,12-15,25-27,32-39. And note that GPIO12 is a bootstrap pin, ESP32 might not even start up if GPIO12 is grounded.
+#define LEVEL_SLEEP   1		  // Level of P_SLEEP to enter Deep Sleep.
 // I2C rda5807 (if lcd is spi)
 // (removed)
 //----------------------------
@@ -149,5 +154,6 @@ void option_set_lcd_stop(uint32_t enca);
 void option_set_lcd_out(uint32_t enca);
 void option_set_lcd_blv(int blv);
 uint8_t gpioToChannel(uint8_t gpio);
+void gpio_get_pinSleep(gpio_num_t *pin, bool *aLevel);
 
 #endif

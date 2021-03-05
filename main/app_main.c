@@ -908,6 +908,12 @@ void app_main()
 	
 	copyDeviceSettings(); // copy in the safe partion
 
+	// Configure Deep Sleep start and wakeup options
+	deepSleepConf(); // also called in addon.c
+	// Enter ESP32 Deep Sleep (but not powerdown uninitialized peripherals) when P_SLEEP GPIO is P_LEVEL_SLEEP
+	if (checkDeepSleepInput())
+		esp_deep_sleep_start();
+
 	// led mode
 	if (g_device->options & T_LED)
 		ledStatus = false; // play mode

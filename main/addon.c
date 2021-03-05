@@ -9,7 +9,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <sys/time.h>
-
+#include <time.h>
+#include "esp_sleep.h"
 #include "ClickEncoder.h"
 #include "ClickButtons.h"
 #include "ClickJoystick.h"
@@ -23,7 +24,6 @@
 #include "custom.h"
 #include "u8g2_esp32_hal.h"
 #include "ucg_esp32_hal.h"
-#include <time.h>
 #include "ntp.h"
 
 #include "eeprom.h"
@@ -112,6 +112,7 @@ Encoder_t* encoder0 = NULL;
 Encoder_t* encoder1 = NULL;
 Button_t* button0 = NULL;
 Button_t* button1 = NULL;
+
 Joystick_t* joystick1 = NULL;
 Joystick_t* joystick0 = NULL;
 
@@ -120,6 +121,10 @@ Button_t* expButton1 = NULL;
 Button_t* expButton2 = NULL;
 
 struct tm* getDt() { return dt;}
+
+// Deep Sleep Power Save Input. https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/sleep_modes.html 
+gpio_num_t deepSleep_io; /** Enter Deep Sleep if pin is set to level defined in P_LEVELPINSLEEP. */
+bool deepSleepLevel; /** Level to enter Deep Sleep / Wakeup if level is the opposite. */
 
 void setBlv(int val) {blv = val;}
 int getBlv() {return blv;}
@@ -1037,7 +1042,7 @@ void initButtonDevices()
 		//1:start 2:select 3:up 4:down 5:left 6:right 7:a 8:b
 		isEsplay = true;
 		expButton0 = ClickexpButtonsInit(1,6,5,0);
-		expButton1 = ClickexpButtonsInit(0,3,4,0);
+		expButton1 = ClickexpButtonsInit((int8_t) GPIO_NONE,3,4,0);
 		expButton2 = ClickexpButtonsInit(2,7,8,0);
 	}
 }
@@ -1276,6 +1281,9 @@ void task_addon(void *pvParams)
 		getTaskLcd(&pxTaskLcd); // give the handle to xpt
 	}
 	
+	// Configure Deep Sleep start and wakeup options
+	deepSleepConf(); // also called in app_main.c
+	
 	while (1)
 	{
 		adcLoop();  // compute the adc keyboard and battery
@@ -1330,6 +1338,10 @@ void task_addon(void *pvParams)
 			if (itAskStime&&(stateScreen != stime)) // time start the time display. Don't do that in interrupt.  
 				evtScreen(stime);			
 		}
+		// Enter ESP32 Deep Sleep and powerdown peripherals when P_SLEEP GPIO is P_LEVEL_SLEEP
+		if (checkDeepSleepInput())
+			deepSleepStart();
+
 		vTaskDelay(10);
 	}	
 	vTaskDelete( NULL ); 
@@ -1426,3 +1438,52 @@ void addonParse(const char *fmt, ...)
    free (line);
 }
 
+/** Configure Deep Sleep: source and wakeup options. */
+bool deepSleepConf(void)
+{
+	/** 1. get the pin number and trigger level from NVS configuration. */
+	gpio_get_pinSleep(&deepSleep_io, &deepSleepLevel);	
+	
+	if (GPIO_NONE != deepSleep_io) {
+		/** 2. Initialize GPIO. */
+		gpio_config_t gpio_conf;
+		gpio_conf.mode = GPIO_MODE_INPUT;
+		gpio_conf.pull_up_en =  GPIO_PULLUP_ENABLE;
+		gpio_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+		gpio_conf.intr_type = GPIO_INTR_DISABLE;
+		gpio_conf.pin_bit_mask = ((uint64_t)(((uint64_t)1)<<deepSleep_io));
+		ESP_ERROR_CHECK(gpio_config(&gpio_conf));
+
+		/** 3. Configure Deep Sleep External wakeup (ext0). */
+		/** Wake up (EXT0) when GPIO deepSleep_io pin level is opposite to deepSleepLevel. */
+		esp_sleep_enable_ext0_wakeup(deepSleep_io, !deepSleepLevel);
+	}
+	return true;
+}
+
+/** Check Deep Sleep GPIO input. */
+/** If deepSleep_io pin is set to deepSleepLevel, then trigger Deep Sleep Power Saving mode */
+bool checkDeepSleepInput(void) {
+	if (GPIO_NONE != deepSleep_io) {
+		if (deepSleepLevel == gpio_get_level(deepSleep_io))
+			return true; 
+		else
+			return false;
+	}
+	else
+		return false;
+}
+
+/** Enter ESP32 Deep Sleep with the configured wakeup options, and powerdown peripherals, */
+/** when P_SLEEP GPIO is set to P_LEVEL_SLEEP. */
+/** https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/sleep_modes.html */
+void deepSleepStart(void)
+{
+	/** 1. Enter peripherals sleep */
+	sleepLcd();	// LCD
+/** note that PCM5102 also enters powerdown because pins P_I2S_LRCK and P_I2S_BCLK are low. */
+
+	/** 2. Enter ESP32 deep sleep with the configured wakeup options. */
+/*	YMMV: rtc_gpio_isolate(deepSleep_io); // disconnect GPIO from internal circuits in deep sleep, to minimize leakage current. */
+	esp_deep_sleep_start();
+}
