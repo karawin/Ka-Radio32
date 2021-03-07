@@ -683,9 +683,9 @@ void vsTask(void *pvParams) {
 		vTaskDelay(2);		
 	}	
 	
-	spiRamFifoReset();
     player->decoder_status = STOPPED;
     player->decoder_command = CMD_NONE;
+	spiRamFifoReset();
     ESP_LOGD(TAG, "Decoder vs1053 stopped.\n");
 	uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
 	ESP_LOGI(TAG,"watermark: %x  %d",uxHighWaterMark,uxHighWaterMark);	

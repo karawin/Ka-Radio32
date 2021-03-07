@@ -219,13 +219,13 @@ function dtime() {
 	if ((!isNaN(eltw.innerHTML))&&(eltw.innerHTML == 0)) eltw.innerHTML = "0";
 }
 // return the timezone (+/-x)
-function timezone() {
-    var offset = new Date().getTimezoneOffset();
+function timezone(offset) {
     var minutes = Math.abs(offset);
     var hours = Math.floor(minutes / 60);
+	minutes = Math.abs(offset%60);
     var prefix = offset < 0 ? "+" : "-";
-	document.getElementById('atzo').innerHTML = prefix+hours;	
-//    return prefix+hours;
+//	document.getElementById('atzo').innerHTML = prefix+hours+":"+minutes;	
+    return prefix+hours+":"+minutes;	
 }
 
 function labelSleep(label){
@@ -561,7 +561,12 @@ function wifi(valid) {
 			chkip(document.getElementById('gw2'));
 			document.getElementById('ua').value = arr["ua"];
 			document.getElementById('host').value = arr["host"];
-			document.getElementById('tzo').value = arr["tzo"];
+			if (Math.abs(arr["tzo"]) >= 60)
+			{
+				document.getElementById('tzo').value = timezone(-arr["tzo"]);
+			}
+			else
+				document.getElementById('tzo').value = arr["tzo"];
 			if (arr["dhcp"] == "1")
 				document.getElementById("dhcp").setAttribute("checked","");
 			else
@@ -1452,7 +1457,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			wifi(0) ;
 			hardware(0);
 			checkversion();
-			timezone();
+			document.getElementById('atzo').innerHTML = timezone(new Date().getTimezoneOffset()); 	
 			setMainHeight(curtab);	
 	});
 	window.addEventListener("keydown", function (event)

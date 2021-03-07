@@ -1508,7 +1508,7 @@ void clientTask(void *pvParams) {
 							setVolumei(getVolume());
 							kprintf(CLIPLAY,0x0d,0x0a);
 							while (spiRamFifoFill()) vTaskDelay(200);
-							vTaskDelay(100);
+//							vTaskDelay(100);
 							playing=0;
 							clientDisconnect("Data not played");
 						}
@@ -1529,15 +1529,12 @@ void clientTask(void *pvParams) {
 
 			if (playing)  // stop clean
 			{
-				setVolumei(1);
 				if (get_player_status() != STOPPED)
 					audio_player_stop();
 				player_config->media_stream->eof = true;
 				if (get_audio_output_mode() == VS1053) VS1053_flush_cancel();
 				playing = 0;
-				vTaskDelay(1);	// stop without click
 				if (get_audio_output_mode() == VS1053) VS1053_LowPower();
-				setVolumei(getVolume());
 				strcpy(userAgent,g_device->ua);
 			}
 			
