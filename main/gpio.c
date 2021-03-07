@@ -714,3 +714,27 @@ bool gpio_get_ir_key(nvs_handle handle,const char *key, uint32_t *out_value1 , u
 	
 	return ret;
 }
+
+/** Get the GPIO (P_SLEEP) for Deep Sleep power saving mode. */
+/*  Get the level (P_LEVEL_SLEEP) of pin (P_SLEEP) that triggers power saving. */
+void gpio_get_pinSleep(gpio_num_t *pin, bool *aLevel)
+{
+	esp_err_t err;
+	nvs_handle hardware_handle;
+
+	// init defaults from gpio.h
+	*pin = PIN_SLEEP;
+	*aLevel = LEVEL_SLEEP;
+	
+	if (open_partition(hardware, gpio_space, NVS_READONLY, &hardware_handle)!= ESP_OK) {
+		ESP_LOGD(TAG,"buttons");
+		return;
+	}	
+	
+	err = nvs_get_u8(hardware_handle, "P_SLEEP",(uint8_t *) pin);
+	err |= nvs_get_u8(hardware_handle, "P_LEVEL_SLEEP",(uint8_t *) aLevel);	
+		
+	if (err != ESP_OK) ESP_LOGD(TAG,"gpio_get_pinDeepSleep err 0x%x",err);
+
+	close_partition(hardware_handle,hardware);		
+}
