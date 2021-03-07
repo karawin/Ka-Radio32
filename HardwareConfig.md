@@ -146,6 +146,7 @@ P_TOUCH_CS		GPIO of the t_cs pin of the touch or 255 if no screen
   Other pins are t_clk, t_din, t_do respectively the spi clk, mosi, miso. T_irq is not used.  
 - **LED GPIO**  
 P_LED_GPIO		GPIO of the status led  
+- **DEEP_SLEEP**
 P_SLEEP GPIO 	GPIO to enter Deep sleep if set to P_LEVEL_SLEEP  
 P_LEVEL_SLEEP	logical level to be set on P_SLEEP GPIO to enter deep_sleep mode.  
 
@@ -292,9 +293,10 @@ If a sys. command changes the value in csv, the internal flashed bin of the csv 
 As long  the original bin is not flashed again, the internal value apply. 
 
 ### DEEP SLEEP
-Enter ESP32 Deep Sleep, and powerdown peripherals, when pin P_SLEEP GPIO is set to P_LEVEL_SLEEP.
-( https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/sleep_modes.html )
-Only GPIOs which have RTC functionality can be used: 0,2,4,12-15,25-27,32-39. And note that GPIO12 is a bootstrap pin, ESP32 might not even start up if GPIO12 is grounded.
+Enter ESP32 Deep Sleep, and powerdown peripherals, when pin P_SLEEP GPIO is set to P_LEVEL_SLEEP.  
+( https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/sleep_modes.html )  
+Only GPIOs which have RTC functionality can be used: 0,2,4,12-15,25-27,32-39. And note that GPIO12 is a bootstrap pin, ESP32 might not even start up if GPIO12 is grounded.  
+
 ---------------------
 3/ IR key definitions
 ---------------------
