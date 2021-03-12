@@ -535,7 +535,8 @@ static void start_wifi()
 			wifi_config_t wifi_config = {
 				.sta = {
 					.bssid_set = 0,
-				},
+					.scan_method = WIFI_ALL_CHANNEL_SCAN,
+					.sort_method = WIFI_CONNECT_AP_BY_SIGNAL,				},
 			};
 			strcpy((char*)wifi_config.sta.ssid,ssid);
 			strcpy((char*)wifi_config.sta.password,pass);
