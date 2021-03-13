@@ -19,11 +19,13 @@
 int8_t  applyTZ(struct tm *time) {
 
 	bool dst = false;
-	int8_t tzo = 0;
-	tzo = g_device->tzoffset;
+	int8_t tzo = g_device->tzoffseth;
+	if (g_device->tzoffsetm == 0xFF) g_device->tzoffsetm = 0; // if not initialized
+	int8_t tzom = g_device->tzoffsetm;
  
 	// apply base timezone offset
 //	time->tm_hour += 1; // e.g. central europe
+	time->tm_min += tzom;
 	time->tm_hour += tzo;
 
 	// call mktime to fix up (needed if applying offset has rolled the date back/forward a day)

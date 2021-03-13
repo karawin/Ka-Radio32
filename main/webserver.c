@@ -797,13 +797,17 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 	} else if(strcmp(name, "/wifi") == 0)
 	{
 		bool val = false;
+		bool val2 = false;
 		char tmpip[16],tmpmsk[16],tmpgw[16];
 		char tmpip2[16],tmpmsk2[16],tmpgw2[16],tmptzo[10];
 		changed = false;
 		if(data_size > 0) {
 			char valid[5];
 			if(getSParameterFromResponse(valid,5,"valid=", data, data_size))
+			{
 				if (strcmp(valid,"1")==0) val = true;
+				if (strcmp(valid,"2")==0) val2 = true;
+			}
 			char* aua = getParameterFromResponse("ua=", data, data_size);
 			pathParse(aua);
 			char* host = getParameterFromResponse("host=", data, data_size);
@@ -875,7 +879,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 
 			if ((g_device->ua!= NULL)&&(strlen(g_device->ua)==0))
 			{
-				if (aua==NULL) {aua= inmalloc(12); strcpy(aua,"Karadio/1.6");}
+				if (aua==NULL) {aua= inmalloc(12); strcpy(aua,"Karadio32/2.1");}
 			}
 			if (aua!=NULL)
 			{
@@ -904,7 +908,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			if (tzo==NULL)
 			{
 				tzo= inmalloc(10);
-				sprintf(tmptzo,"%d",g_device->tzoffset);
+				sprintf(tmptzo,"%d",g_device->tzoffseth);
 				strcpy(tzo,tmptzo);
 			}
 			else if (strlen(tzo) ==0)
@@ -915,9 +919,13 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 
 			if (strlen(tzo) >0)
 			{
-				if (strcmp(tzo,"undefined") != 0)
+				if ((strcmp(tzo,"undefined") != 0)&&(val2))
 				{
-					g_device->tzoffset= atoi(tzo);
+					int offtzo= 0;
+					int offtzoh= 0;
+					sscanf(tzo,"%d:%d",&offtzoh,&offtzo);
+					g_device->tzoffseth = offtzoh;
+					g_device->tzoffsetm = offtzo;
 					addonDt();
 					changed = true;
 				}
@@ -939,7 +947,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			strlen(g_device->ssid2) +
 			strlen(g_device->ua)+
 			strlen(g_device->hostname)+
-			sprintf(tmptzo,"%d",g_device->tzoffset)+
+			sprintf(tmptzo,"%+d:%d",g_device->tzoffseth,g_device->tzoffsetm)+
 			sprintf(tmpip,"%d.%d.%d.%d",g_device->ipAddr1[0], g_device->ipAddr1[1],g_device->ipAddr1[2], g_device->ipAddr1[3])+
 			sprintf(tmpmsk,"%d.%d.%d.%d",g_device->mask1[0], g_device->mask1[1],g_device->mask1[2], g_device->mask1[3])+
 			sprintf(tmpgw,"%d.%d.%d.%d",g_device->gate1[0], g_device->gate1[1],g_device->gate1[2], g_device->gate1[3])+

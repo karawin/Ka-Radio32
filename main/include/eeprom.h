@@ -43,7 +43,7 @@
 #define SSIDLEN		32
 #define PASSLEN		64
 #define HOSTLEN		24
-#define USERAGLEN	39
+#define USERAGLEN	38
 
 struct device_settings {
 	uint16_t cleared; 		// 0xAABB if initialized
@@ -73,7 +73,8 @@ struct device_settings {
 	uint8_t options;  // bit0:0 theme ligth blue, 1 Dark brown, bit1: 0 patch load  1 no patch, bit2: O blink led  1 led on On play, bit3:led polarity 0 normal 1 reverse, bit 4: log syst on telnet, 
 	// bit 3&4: log wolfssl  OFF(0)  ERROR&INFO(1) ENTER&LEAVE(2)  OTHER_LOG(3)
 	char ua[USERAGLEN]; // user agent
-	int8_t tzoffset; //timezone offset
+	int8_t tzoffsetm; //timezone offset (minutes)
+	int8_t tzoffseth; //timezone offset	(hour)
 	uint32_t sleepValue; 	
 	uint32_t wakeValue;	
 // esp32

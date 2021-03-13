@@ -1247,7 +1247,7 @@ void tzoffset(char* s)
 	char *t = strstr(s, parslashquote);
 	if(t == NULL)
 	{
-		kprintf("##SYS.TZO#: %d\n",g_device->tzoffset);
+		kprintf("##SYS.TZO#: %+d:%d\n",g_device->tzoffseth,g_device->tzoffsetm);
 		return;
 	}
 	char *t_end  = strstr(t, parquoteslash);
@@ -1256,8 +1256,7 @@ void tzoffset(char* s)
 		kprintf(stritCMDERROR);
 		return;
     }	
-	uint8_t value = atoi(t+2);
-	g_device->tzoffset = value;	
+	sscanf(t+2,"%d:%d",(int*)&(g_device->tzoffseth),(int*)&(g_device->tzoffsetm));
 	saveDeviceSettings(g_device);	
 	tzoffset((char*) "");
 	addonDt(); // for addon, force the dt fetch
