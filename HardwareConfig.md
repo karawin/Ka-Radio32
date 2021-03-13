@@ -295,6 +295,7 @@ As long  the original bin is not flashed again, the internal value apply.
 ### DEEP SLEEP
 Enter ESP32 Deep Sleep, and powerdown peripherals, when pin P_SLEEP GPIO is set to P_LEVEL_SLEEP.  
 ( https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/sleep_modes.html )  
+Wake up (EXT0) when P_SLEEP GPIO pin level is opposite to P_LEVEL_SLEEP.  
 Only GPIOs which have RTC functionality can be used: 0,2,4,12-15,25-27,32-39. And note that GPIO12 is a bootstrap pin, ESP32 might not even start up if GPIO12 is grounded.  
 
 ---------------------

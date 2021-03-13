@@ -167,7 +167,7 @@ sys.patch		: Display the vs1053 patch status
 sys.led("x")	: Change the led indication: 
 				  1 = Led is in Play mode (lighted when a station is playing), 0 = Led is in Blink mode (default)
 sys.led			: Display the led indication status
-sys.tzo("xx")	: Set the timezone offset of your country.
+sys.tzo("h:m")	: Set the timezone offset of your country.
 sys.tzo			: Display the timezone offset
 sys.date		: Send a ntp request and Display the current locale time
 				: Format ISO-8601 local time   https://www.w3.org/TR/NOTE-datetime
@@ -211,5 +211,6 @@ sys.henc0 or sys.henc1: Display the current step setting for the encoder. Normal
 sys.henc0("x") with x=0 Normal, x=1 Half
 sys.henc1("x") with x=0 Normal, x=1 Half
 sys.cali[brate]: start a touch screen calibration
+sys.ledpola and sys.ledpola("x"): display or set the polarity of the system led
 sys.conf: Display the labels of the csv file.
 ```
