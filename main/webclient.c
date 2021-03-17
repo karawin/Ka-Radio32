@@ -320,7 +320,7 @@ bool clientParsePlaylist(char* s)
 }
 
 //---------------------------------------
-// add escape char to special char of the string
+// add escape char to special char of the string  json constructor
 static char* stringify(char* str,int len)
 {
 #define MORE	20
@@ -349,7 +349,12 @@ static char* stringify(char* str,int len)
 					new[j++] =(str)[i] ;
 				}
 				else 
-				new[j++] =(str)[i] ;
+				if (str[i] == 0x09) {  // TAB
+					new[j++] = '\\';
+					new[j++] ='t' ;
+				}
+				else
+ 				new[j++] =(str)[i] ;
 
 				if ( j+MORE> nlen)
 				{
