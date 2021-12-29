@@ -87,7 +87,7 @@ See : [Hardware configuration partition](HardwareConfig.md)
 For a wrover cpu you need a csv file with psram in the name. Without it, the default configuration will fail.  
 
 ## Build your own
-To build your own release if you want to do some improvments, you must install the idf https://github.com/espressif/esp-idf and the toolchain. The esp-idf release is the 3.3  
+To build your own release if you want to do some improvments, you must install the idf https://github.com/espressif/esp-idf and the toolchain. The esp-idf release is the 3.3.5  
 
 To flash all build output, run 'make flash' or :
 
