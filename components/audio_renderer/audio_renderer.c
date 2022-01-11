@@ -103,7 +103,7 @@ static void init_i2s(renderer_config_t *config)
     }
 
 	if ((config->output_mode == I2S)||(config->output_mode == I2S_MERUS)
-			|| (config->output_mode == SPDIF))
+			|| (config->output_mode == SPDIF) || (config->output_mode == DAC_BUILT_IN))
 	{
 	/* don't use audio pll on buggy rev0 chips */
 	// don't do it for PDM
@@ -158,12 +158,12 @@ static void init_i2s(renderer_config_t *config)
 		return;
 	}	
 	ESP_LOGI(TAG,"i2s intr:%d", i2s_config.intr_alloc_flags);	
-    if((mode & I2S_MODE_DAC_BUILT_IN))// || (mode & I2S_MODE_PDM))
+/*    if((mode & I2S_MODE_DAC_BUILT_IN))// || (mode & I2S_MODE_PDM))
     {
         i2s_set_pin(config->i2s_num, NULL);
         i2s_set_dac_mode(I2S_DAC_CHANNEL_BOTH_EN);
     }
-    else {
+    else*/ {
 		if ((lrck!=255) && (bclk!=255) && (i2sdata!=255))
 			i2s_set_pin(config->i2s_num, &pin_config);
     }
