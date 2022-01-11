@@ -543,7 +543,7 @@ static void IRAM_ATTR render_spdif_samples(const void *buf, uint32_t buf_len, pc
 		renderer_stop();
 		return;
 	}
-
+//
 //-------------------------
 	/*ESP_LOGV(TAG, "I2S CHECK:  buf_desc->bit_depth %d, renderer_instance->bit_depth %d, buf_desc->buffer_format %d, PCM_INTERLEAVED %d, buf_desc->num_channels %d (2), renderer_instance->output_mode %d, DAC_BUILT_IN %d ",buf_desc->bit_depth,renderer_instance->bit_depth,buf_desc->buffer_format,PCM_INTERLEAVED,buf_desc->num_channels,renderer_instance->output_mode,DAC_BUILT_IN);
 	 */
