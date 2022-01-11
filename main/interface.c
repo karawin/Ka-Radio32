@@ -1255,8 +1255,12 @@ void tzoffset(char* s)
     {
 		kprintf(stritCMDERROR);
 		return;
-    }	
-	sscanf(t+2,"%d:%d",(int*)&(g_device->tzoffseth),(int*)&(g_device->tzoffsetm));
+    }
+	int tzoffseth=0;
+	int tzoffsetm=0;
+	sscanf(t+2,"%d:%d",&tzoffseth,&tzoffsetm);
+	g_device->tzoffseth = tzoffseth; // int to byte
+	g_device->tzoffsetm = tzoffsetm;
 	saveDeviceSettings(g_device);	
 	tzoffset((char*) "");
 	addonDt(); // for addon, force the dt fetch
