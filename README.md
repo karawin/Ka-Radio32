@@ -87,27 +87,8 @@ See : [Hardware configuration partition](HardwareConfig.md)
 For a wrover cpu you need a csv file with psram in the name. Without it, the default configuration will fail.  
 
 ## Build your own
-<<<<<<< HEAD
-To build your own release if you want to do some improvments, you must install the idf https://github.com/espressif/esp-idf and the toolchain. The esp-idf release is the 3.3.5
-### ESP-IDF Patch
-Since the 3.3.5 and upper releases there is a bug with CONFIG_SPIRAM_IGNORE_NOTFOUND 
-You need to patche the spiram.c line 128 to  
-```
-esp_spiram_size_t esp_spiram_get_chip_size()
-{
-    if (!spiram_inited) {
-#if CONFIG_SPIRAM_IGNORE_NOTFOUND
-         ESP_EARLY_LOGE(TAG, "SPI RAM not initialized");
-		 return ESP_SPIRAM_SIZE_INVALID;
-#endif		
-		 abort();
-    }
-```
-  
 =======
 To build your own release if you want to do some improvments, you must install the idf https://github.com/espressif/esp-idf and the toolchain. The esp-idf release is the 3.3.5  
-<<<<<<< HEAD:README.md.old
->>>>>>> origin/master
 
 =======
 ### ESP-IDF Patch
@@ -126,7 +107,7 @@ esp_spiram_size_t esp_spiram_get_chip_size()
 ```
 See https://github.com/espressif/esp-idf/issues/6063#issuecomment-1010899552  
   
->>>>>>> origin/master:README.md
+
 To flash all build output, run 'make flash' or :
 
 ```
