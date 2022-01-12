@@ -112,7 +112,7 @@ To build your own release if you want to do some improvments, you must install t
 =======
 ### ESP-IDF Patch
 Since the 3.3.5 and upper releases there is a bug with CONFIG_SPIRAM_IGNORE_NOTFOUND 
-You need to patche the spiram.c line 128 to  
+You need to patch the esp\esp-idf\components\esp32\spiram.c line 128 to  
 ```
 esp_spiram_size_t esp_spiram_get_chip_size()
 {
@@ -124,6 +124,7 @@ esp_spiram_size_t esp_spiram_get_chip_size()
 		 abort();
     }
 ```
+See https://github.com/espressif/esp-idf/issues/6063#issuecomment-1010899552  
   
 >>>>>>> origin/master:README.md
 To flash all build output, run 'make flash' or :
