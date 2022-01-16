@@ -87,10 +87,9 @@ See : [Hardware configuration partition](HardwareConfig.md)
 For a wrover cpu you need a csv file with psram in the name. Without it, the default configuration will fail.  
 
 ## Build your own
-=======
+=======  
 To build your own release if you want to do some improvments, you must install the idf https://github.com/espressif/esp-idf and the toolchain. The esp-idf release is the 3.3.5  
 
-=======
 ### ESP-IDF Patch
 Since the 3.3.5 and upper releases there is a bug with CONFIG_SPIRAM_IGNORE_NOTFOUND 
 You need to patch the esp\esp-idf\components\esp32\spiram.c line 128 to  

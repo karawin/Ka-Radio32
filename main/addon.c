@@ -1276,7 +1276,7 @@ void task_addon(void *pvParams)
 		event_lcd = xQueueCreate(20, sizeof(event_lcd_t));
 		ESP_LOGD(TAG,"event_lcd: %x",(int)event_lcd);	
 
-		xTaskCreatePinnedToCore (task_lcd, "task_lcd", 2200, NULL, PRIO_LCD, &pxTaskLcd,CPU_LCD); 
+		xTaskCreatePinnedToCore (task_lcd, "task_lcd", 2300, NULL, PRIO_LCD, &pxTaskLcd,CPU_LCD); 
 		ESP_LOGI(TAG, "%s task: %x","task_lcd",(unsigned int)pxTaskLcd);
 		getTaskLcd(&pxTaskLcd); // give the handle to xpt
 	}

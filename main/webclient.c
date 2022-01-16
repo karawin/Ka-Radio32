@@ -746,6 +746,11 @@ bool clientParseHeader(char* s)
 
 		if(contentType == KMIME_UNKNOWN) {
 			ESP_LOGD(TAG, "unknown contentType: %s", t);
+			clientSaveOneHeader("unknown contentType",19,METANAME);
+			wsHeaders(); // update all server
+			vTaskDelay(10);
+			clientDisconnect("unknown contentType");
+			cstatus = C_HEADER;		
 		}
 		ESP_LOGD(TAG, "contentType: %d", contentType);
 		player_config->media_stream->content_type = contentType;
@@ -782,7 +787,7 @@ bool clientParseHeader(char* s)
 	}
 	if (ret == true)
 	{
-		wsHeaders();
+		wsHeaders(); // update all server
 	}
 	xSemaphoreGive(sHeader);
 	return ret;
