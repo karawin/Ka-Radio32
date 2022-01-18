@@ -491,6 +491,8 @@ uint16_t UtoC(uint8_t high,uint8_t low)
 	return(res);
 }
 
+
+
 void removeUtf8(char *characters)
 {
   int Rindex = 0;
@@ -783,7 +785,7 @@ void drawStationUcg(uint8_t mTscreen,char* snum,char* ddot)
 //        ddot = strstr(sline,":");
         if (ddot != NULL)
         {
-
+		  Unicode_decoding(ddot);
 		  removeUtf8(ddot);
 		  setfont(middle);
           ucg_DrawString(&ucg,(x/2)-(ucg_GetStrWidth(&ucg,snum)/2),yy/3,0,snum);
@@ -975,7 +977,8 @@ void metaUcg(char* ici)
      cleartitleUcg(TITLE11);
      cleartitleUcg(TITLE2);
      cleartitleUcg(TITLE21);
-     strcpy(title,ici+7);    
+     strcpy(title,ici+7);  
+	 Unicode_decoding(title);	 
 	 removeUtf8(title);
      separatorUcg(title); 	
 }
@@ -992,6 +995,7 @@ void icy4Ucg(char* ici)
 	 }
 	 
 	 strcpy(genre,ici+7);
+	 Unicode_decoding(genre);
      removeUtf8(genre); 
      lline[GENRE] = genre;
 	 markDrawResetUcg(GENRE);
@@ -1002,6 +1006,7 @@ void icy0Ucg(char* ici)
       clearAllUcg();
       if (strlen(ici+7) == 0) strcpy (station,nameset);
       else strcpy(station,ici+7);
+	  Unicode_decoding(station);
 	  removeUtf8(station);
       separatorUcg(station);	
 }
@@ -1030,6 +1035,7 @@ void namesetUcg(char* ici)
     }
     strcpy(nameset,nameset+strlen(nameNum));
 	charset = Latin;
+	Unicode_decoding(nameset);
 	removeUtf8(nameset);
     lline[STATIONNAME] = nameset;
 	markDrawResetUcg(STATIONNAME);

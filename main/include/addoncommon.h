@@ -1,7 +1,10 @@
 
 #ifndef ADDONCOMMON_H
 #define ADDONCOMMON_H
-#include "stdint.h"
+#include <stdint.h>
+#include <stddef.h>
+#include <string.h>
+#include <stdio.h>
 #define BUFLEN  256
 #define LINES	9
 
@@ -26,4 +29,5 @@ extern   uint8_t  mline[LINES] ; // mark to display
 extern   char nameNum[5] ; // the number of the current station
 extern   char genre[BUFLEN/2]; // the local name of the station
 
+extern void Unicode_decoding(char *string);
 #endif

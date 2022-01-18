@@ -383,6 +383,7 @@ void drawStationU8g2(uint8_t mTscreen,char* snum,char* ddot)
 	if (ddot != NULL)
 	{
 		setfont8(middle);
+		Unicode_decoding(ddot);
 		u8g2_DrawUTF8(&u8g2,(x/2)-(u8g2_GetUTF8Width(&u8g2,snum)/2),yy/3-2, snum);
 		len = (x/2)-(u8g2_GetUTF8Width(&u8g2,ddot)/2);
 		if (len <0) len = 0;
@@ -456,7 +457,8 @@ void separatorU8g2(char* from)
 void metaU8g2(char* ici)
 {
      cleartitleU8g2(3); 
-     strcpy(title,ici+7);    
+     strcpy(title,ici+7);
+	 Unicode_decoding(title);	 	 
      separatorU8g2(title); 	
 }
 
@@ -480,6 +482,7 @@ void icy0U8g2(char* ici)
       clearAllU8g2();
       if (strlen(ici+7) == 0) strcpy (station,nameset);
       else strcpy(station,ici+7);
+	  Unicode_decoding(station);
       separatorU8g2(station);	
 }
 
@@ -503,6 +506,7 @@ void namesetU8g2(char* ici)
 	   setFuturNum(atoi(nameNum));     
     }
     strcpy(nameset,nameset+strlen(nameNum));
+	Unicode_decoding(nameset);
     lline[STATIONNAME] = nameset;
 }
 
