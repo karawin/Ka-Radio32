@@ -613,7 +613,7 @@ void draw(int i)
         case STATIONNAME:
 		setfont(text);
         ucg_SetColori(&ucg,255,255,255);  
-        ucg_DrawBox(&ucg,0,0,x,y-1/*-ucg_GetFontDescent(&ucg)*/);  
+        ucg_DrawBox(&ucg,0,0,x,y/*-ucg_GetFontDescent(&ucg)*/);  
         ucg_SetColori(&ucg,0,0,0);  
 		if (lline[i] != NULL)
 		{
@@ -672,9 +672,10 @@ void draw(int i)
         break;
         default:
           ucg_SetColori(&ucg,0,0,0); 
- //         ucg_DrawBox(&ucg,0,y*i+z,x,y-ucg_GetFontDescent(&ucg)); 
-//          ucg_DrawBox(&ucg,0,y*i+z,x,y-1); 
-          ucg_DrawBox(&ucg,0,y*i+z-3,x,y); 
+		  if (yy <= 80)
+			ucg_DrawBox(&ucg,0,y*i+z,x,y+1); 
+		 else
+			ucg_DrawBox(&ucg,0,y*i+z-1,x,y+1); 
           setColor(i);
           if (lline[i] != NULL) ucg_DrawString(&ucg,0,y*i+z,0,lline[i]+iline[i]);                
    }      
@@ -785,7 +786,6 @@ void drawStationUcg(uint8_t mTscreen,char* snum,char* ddot)
 //        ddot = strstr(sline,":");
         if (ddot != NULL)
         {
-		  Unicode_decoding(ddot);
 		  removeUtf8(ddot);
 		  setfont(middle);
           ucg_DrawString(&ucg,(x/2)-(ucg_GetStrWidth(&ucg,snum)/2),yy/3,0,snum);
@@ -977,8 +977,7 @@ void metaUcg(char* ici)
      cleartitleUcg(TITLE11);
      cleartitleUcg(TITLE2);
      cleartitleUcg(TITLE21);
-     strcpy(title,ici+7);  
-	 Unicode_decoding(title);	 
+     strcpy(title,ici+7);  	 
 	 removeUtf8(title);
      separatorUcg(title); 	
 }
@@ -995,7 +994,6 @@ void icy4Ucg(char* ici)
 	 }
 	 
 	 strcpy(genre,ici+7);
-	 Unicode_decoding(genre);
      removeUtf8(genre); 
      lline[GENRE] = genre;
 	 markDrawResetUcg(GENRE);
@@ -1006,7 +1004,6 @@ void icy0Ucg(char* ici)
       clearAllUcg();
       if (strlen(ici+7) == 0) strcpy (station,nameset);
       else strcpy(station,ici+7);
-	  Unicode_decoding(station);
 	  removeUtf8(station);
       separatorUcg(station);	
 }
@@ -1035,7 +1032,6 @@ void namesetUcg(char* ici)
     }
     strcpy(nameset,nameset+strlen(nameNum));
 	charset = Latin;
-	Unicode_decoding(nameset);
 	removeUtf8(nameset);
     lline[STATIONNAME] = nameset;
 	markDrawResetUcg(STATIONNAME);

@@ -53,13 +53,6 @@ static int start_decoder_task(player_t *player)
             stack_depth = 8448;
             break;
 
- /*       case AUDIO_MP4:
-            task_func = libfaac_decoder_task;
-            task_name = (char*)"libfaac_decoder_task";
-            stack_depth = 55000;
-            break;
-*/
-
 		case AUDIO_AAC:
         case OCTET_STREAM: // probably .aac
 			if (!bigSram())
@@ -74,7 +67,14 @@ static int start_decoder_task(player_t *player)
             task_name = (char*)"fdkaac_decoder_task";
             stack_depth = 6900; //6144; 
             break;
-			
+	
+ /*       case AUDIO_MP4:
+            task_func = libfaac_decoder_task;
+            task_name = (char*)"libfaac_decoder_task";
+            stack_depth = 55000;
+            break;
+*/
+		
 /*
 		case AUDIO_AAC:
         case OCTET_STREAM: // probably .aac
@@ -116,13 +116,11 @@ static int start_decoder_task(player_t *player)
 static int t;
 
 /* Writes bytes into the FIFO queue, starts decoder task if necessary. */
-int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read,
-        void *user_data)
+int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read)
 {
-//	ESP_LOGW(TAG,"audio_stream_consumer rec len: %d",bytes_read);
-    player_t *player = user_data;
+
     // don't bother consuming bytes if stopped
-    if(player->command == CMD_STOP) {
+    if(player_instance->command == CMD_STOP) {
 		clientSilentDisconnect();
         return -2;
     }
@@ -131,39 +129,34 @@ int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read,
         spiRamFifoWrite(recv_buf, bytes_read);
     }
 
-
-	int bytes_in_buf = spiRamFifoFill();
-	uint8_t fill_level = (bytes_in_buf * 100) / spiRamFifoLen();
-
-	// seems 4k is enough to prevent initial buffer underflow
-//	uint8_t min_fill_lvl = player->buffer_pref == BUF_PREF_FAST ? 40 : 90;
-//	bool buffer_ok = fill_level > min_fill_lvl;
-
-	if (player->decoder_status != RUNNING ) 
+	if (player_instance->decoder_status != RUNNING ) 
 	{
-		t = 0;
-//		uint32_t trigger = (bigSram())? (70*1024):(20*1024);
-//		bool buffer_ok = (bytes_in_buf > trigger);
-		bool buffer_ok = (fill_level > (bigSram()?10:70)); // in %
+//		t = 0;
+		int bytes_in_buf = spiRamFifoFill();
+		uint8_t fill_level = (bytes_in_buf * 100) / spiRamFifoLen();
+
+		bool buffer_ok = (fill_level > (bigSram()?15:80)); // in %
 		if (buffer_ok)
 		{
+			t = 0;
 		// buffer is filled, start decoder
-//			ESP_LOGV(TAG,"trigger: %d",trigger);
-			if (start_decoder_task(player) != 0) {
+			if (start_decoder_task(player_instance) != 0) {
 				ESP_LOGE(TAG, "failed to start decoder task");
 				audio_player_stop();
 				clientDisconnect("decoder failed"); 
 				return -1;
 			}
-			ESP_LOGI(TAG, "Buffer fill %u%%, %d // %d bytes", fill_level, bytes_in_buf,spiRamFifoLen());
 		}
 	}
 
-	t = (t+1) & 255;
 	if (t == 0) {
+		int bytes_in_buf = spiRamFifoFill();
+		uint8_t fill_level = (bytes_in_buf * 100) / spiRamFifoLen();
+		
 		ESP_LOGI(TAG, "Buffer fill %u%%, %d // %d bytes", fill_level, bytes_in_buf,spiRamFifoLen());
 	}
-
+	t = (t+1) & 255;
+	
     return 0;
 }
 
@@ -173,12 +166,13 @@ void audio_player_init(player_t *player)
     player_status = INITIALIZED;
 }
 
+/*
 void audio_player_destroy()
 {
     if (get_audio_output_mode() != VS1053) renderer_destroy();
     player_status = UNINITIALIZED;
 }
-
+*/
 void audio_player_start()
 {
 		if (get_audio_output_mode() != VS1053) renderer_start();

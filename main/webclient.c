@@ -232,6 +232,76 @@ struct icyHeader* clientGetHeader()
 	return &header;
 }
 
+
+//------------------------------------------------------------------------------//
+void Unicode_decoding(char *string){ //
+union { //
+	struct { //
+		unsigned char t_LOW; //
+		unsigned char t_HIG; //
+		}; //
+	uint16_t T_t; //
+}T_t; //
+uint16_t ss = 0;
+uint16_t sss = 0;
+size_t len = 0;
+uint8_t l = 0;
+char * string_rec ;
+
+if (strstr(string,"&#") != NULL)
+{
+string_rec  = calloc(strlen(string)+1, sizeof(uint8_t));
+  while (strstr(string,"&#") != NULL){
+    len = strcspn(string, "&#");
+    if(len == 0){l=1;}
+    else{    
+        for(uint16_t s=sss;s<len;s++){
+           string_rec[ss++] = string[s];
+           sss++;
+        } 
+    }
+    string[len++] = ' ';
+    string[len++] = ' ';
+
+    uint8_t p_s[4];
+    for(uint8_t a=0;a<4;a++){
+       p_s[a] = string[len++];
+    }
+    
+    T_t.T_t = atol((const char *)p_s);    
+    T_t.t_HIG = T_t.t_HIG << 2;
+    T_t.t_HIG = (T_t.t_HIG & 0x3F) ^ (  T_t.t_LOW & 0xC0 );
+    T_t.t_LOW = (T_t.t_LOW & 0x3F) ^ 0x80;
+    T_t.t_HIG = (T_t.t_HIG & 0x1F) ^ 0xC0;
+    
+    string_rec[ss++] = T_t.t_HIG;
+    string_rec[ss++] = T_t.t_LOW;
+    sss = sss + 7;
+//    if(len>=  sizeof(string)){break;}
+    if(len>=  strlen(string))
+	{break;}
+  }
+
+//  if(len < sizeof(string)){
+  if(len < strlen(string)){
+    l = 1;
+  }
+
+  if(l){
+//    len =  sizeof(string);
+    len =  strlen(string);
+    for(uint16_t s=sss;s<len;s++){
+        string_rec[ss++] = string[s];
+        sss++;
+    }
+  }
+  strcpy(string,string_rec);
+  free(string_rec);
+}
+}
+//------------------------------------------------------------------------------
+
+
 // extract the url from a playlist m3u pls etc....
 bool clientParsePlaylist(char* s)
 {
@@ -493,6 +563,7 @@ static void clientSaveMetadata(char* s,int len)
 		strcpy(header.members.mArr[METADATA], t);
 //		dump((uint8_t*)(header.members.mArr[METADATA]),strlen(header.members.mArr[METADATA]));
 		header.members.mArr[METADATA] = stringify(header.members.mArr[METADATA],len);
+		Unicode_decoding(header.members.mArr[METADATA]);
 		clientPrintMeta();
 		while ((header.members.mArr[METADATA][strlen(header.members.mArr[METADATA])-1] == ' ')||
 			(header.members.mArr[METADATA][strlen(header.members.mArr[METADATA])-1] == '\r')||
@@ -713,7 +784,8 @@ bool clientSaveOneHeader(const char* t, uint16_t len, uint8_t header_num)
 	for(i = 0; i<len+1; i++) tt[i] = 0;
 	strncpy(tt, t, len);
 	header.members.mArr[header_num] = stringify(tt,len); //tt is freed here
-	vTaskDelay(2);
+	Unicode_decoding(header.members.mArr[header_num]);
+	vTaskDelay(1);
 	clientPrintOneHeader(header_num);
 	ESP_LOGV(TAG,"Header after num:%d addr:0x%x  cont:\"%s\"",header_num,(int)header.members.mArr[header_num],header.members.mArr[header_num]);
 	return true;
@@ -1219,7 +1291,7 @@ ESP_LOGD(TAG,"mtlen len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,c
 //					if (spiRamFifoFree() < metad) ESP_LOGV(TAG,"metaout2 wait metad: %d, bufferfree: %d",metad,spiRamFifoFree());
 //					while(spiRamFifoFree()<metad)	 // wait some room
 //						vTaskDelay(20);
-					if (audio_stream_consumer((char*)inpdata, metad, (void*)player_config)== -1)
+					if (audio_stream_consumer((char*)inpdata, metad)== -1)
 					{
 						playing=1;
 						clientSaveOneHeader("Cannot decode",13,METANAME);
@@ -1246,7 +1318,7 @@ ESP_LOGD(TAG,"mt2 len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,cle
 //					if (spiRamFifoFree() < rest) ESP_LOGV(TAG,"metaout3 wait rest: %d, bufferfree: %d",rest,spiRamFifoFree());
 //					while(spiRamFifoFree()<rest)	 // wait some room
 //						vTaskDelay(20);//
-					if (audio_stream_consumer((char*)inpdata, rest, (void*)player_config)== -1)
+					if (audio_stream_consumer((char*)inpdata, rest)== -1)
 					{
 						playing=1;
 						clientSaveOneHeader("Cannot decode",13,METANAME);
@@ -1267,7 +1339,7 @@ ESP_LOGD(TAG,"mt2 len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,cle
 //				if (spiRamFifoFree() < len) ESP_LOGV(TAG,"metaout1 wait len: %d, bufferfree: %d",len,spiRamFifoFree());
 //				while(spiRamFifoFree()<len)	 // wait some room
 //						vTaskDelay(20);
-				if (audio_stream_consumer((char*)(pdata+rest), len, (void*)player_config)== -1)
+				if (audio_stream_consumer((char*)(pdata+rest), len)== -1)
 				{
 					playing=1;
 					clientSaveOneHeader("Cannot decode",13,METANAME);
@@ -1368,7 +1440,7 @@ void clientTask(void *pvParams) {
 			dest.sin_family = AF_INET;
 			dest.sin_port = htons(clientPort);
 			dest.sin_addr.s_addr = inet_addr(inet_ntoa(*(struct in_addr*)(serverInfo->h_addr_list[0])));
-			ESP_LOGI(TAG,"IP: %x   ADDR:%s\n", dest.sin_addr.s_addr, inet_ntoa(*(struct in_addr*)(serverInfo-> h_addr_list[0])));
+			ESP_LOGI(TAG,"IP: %x   ADDR:%s", dest.sin_addr.s_addr, inet_ntoa(*(struct in_addr*)(serverInfo-> h_addr_list[0])));
 			bytes_read = 0;
 			/*---Connect to server---*/
 			ssl = NULL;
@@ -1474,10 +1546,9 @@ void clientTask(void *pvParams) {
 					}
 					else
 					{
-						ESP_LOGW(TAG,"No data in recv. Errno = %d",errno);
-						cnterror++;
-						vTaskDelay(20);
-						if ((errno == 128)||(cnterror > 20 )) break;
+						ESP_LOGW(TAG,"No data in recv. Errno = %d, error count: %d",errno,++cnterror);
+						vTaskDelay(10);
+						if ((errno == 128)||(cnterror >= 10 )) break;
 					}
 					vTaskDelay(2); // >1 mandatory
 					// if a stop is asked
@@ -1507,6 +1578,7 @@ void clientTask(void *pvParams) {
 					if ((playing)&&(once == 0))  // try restart
 					{
 						clientDisconnect("try restart");
+						vTaskDelay(1);
 						clientConnect();
 						playing=1; // force
 					}

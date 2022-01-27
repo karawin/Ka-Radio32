@@ -394,11 +394,13 @@ float FDKatof(const char *nptr);
  *
  * \return  1 if platform is little endian, non-1 if platform is big endian.
  */
+
 #ifdef __cplusplus
 inline
 #else
 static
 #endif
+
 int IS_LITTLE_ENDIAN(void) {
   int __dummy = 1;
   return ( *( (UCHAR*)(&(__dummy) ) ) );
@@ -410,11 +412,12 @@ int IS_LITTLE_ENDIAN(void) {
  * \param val  Value to be converted. It may be in both big or little endian.
  * \return     Value in little endian format.
  */
+ /*
 #define TO_LITTLE_ENDIAN(val) \
   ( (IS_LITTLE_ENDIAN()) ? \
      (val) \
    : ( (((val) & 0xff) << 24) || (((val) & 0xff00)<< 8) || (((val) & 0xff0000)>>8) || (((val) & 0xff000000) >> 24) ) )
-
+*/
 
 /*!
  * \fn     FDKFILE *FDKfopen(const char *filename, const char *mode);

@@ -152,7 +152,7 @@ static void serveFile(char* name, int conn)
 		return;
 	}
 
-	ESP_LOGE(TAG,"File not found : %s",name);
+	ESP_LOGV(TAG,"File not found : %s",name);
 	if(write(conn, buf, strlen(buf)) == -1) {
 		respKo(conn);
 		ESP_LOGE(TAG,"semfile fails 0 errno:%d",errno);
@@ -1036,6 +1036,12 @@ static bool httpServerHandleConnection(int conn, char* buf, uint16_t buflen) {
 					wsVol(param);
 				}
 				infree(param);
+// volume+ command
+				param = strstr(c,"volume+") ;
+				if (param != NULL) {setRelVolume(5);}
+// volume- command
+				param = strstr(c,"volume-") ;
+				if (param != NULL) {setRelVolume(-5);}
 // play command
 				param = getParameterFromResponse("play=", c, strlen(c)) ;
 				if (param != NULL) {playStation(param);infree(param);}

@@ -770,7 +770,6 @@ void timerTask(void* p) {
 			rexp = i2c_keypad_read(); // read the expansion
 	}
 //	printf("t0 end\n");
-	
 	vTaskDelete( NULL ); // stop the task (never reached)
 }
 
@@ -779,6 +778,7 @@ void uartInterfaceTask(void *pvParameters) {
 	int d;
 	uint8_t c;
 	int t ;
+	esp_err_t err;
 //	struct device_settings *device;
 	uint32_t uspeed;
 	int uxHighWaterMark;
@@ -792,8 +792,12 @@ void uartInterfaceTask(void *pvParameters) {
         .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,    //UART_HW_FLOWCTRL_CTS_RTS,
         .rx_flow_ctrl_thresh = 0,
     };	
-	uart_param_config(UART_NUM_0, &uart_config0);	
-	uart_driver_install(UART_NUM_0, 1024 , 0, 0, NULL, 0);
+	err = uart_param_config(UART_NUM_0, &uart_config0);	
+	ESP_LOGE("uartInterfaceTask","uart_param_config err: %d",err);
+	
+	err = uart_driver_install(UART_NUM_0, 1024 , 0, 0, NULL, 0);
+	ESP_LOGE("uartInterfaceTask","uart_driver_install err: %d",err);
+	if (err != ESP_OK) vTaskDelete(NULL);
 	
 	for(t = 0; t<sizeof(tmp); t++) tmp[t] = 0;
 	t = 0;
@@ -970,7 +974,7 @@ void app_main()
 		conf.master.clk_speed = I2C_MASTER_FREQ_HZ;
 		esp_err_t res = i2c_param_config(I2C_MASTER_NUM, &conf);
 		ESP_LOGD(TAG,"I2C setup : %d\n",res);
-		res = i2c_driver_install(I2C_MASTER_NUM, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0);
+		res = i2c_driver_install(I2C_MASTER_NUM, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, ESP_INTR_FLAG_LEVEL1);
 		if (res != 0) ESP_LOGD(TAG,"I2C already installed. No problem");
 		else ESP_LOGD(TAG,"I2C installed: %d",res);
 
@@ -1049,6 +1053,8 @@ void app_main()
 	xTaskCreatePinnedToCore(timerTask, "timerTask",2100, NULL, PRIO_TIMER, &pxCreatedTask,CPU_TIMER); 
 	ESP_LOGI(TAG, "%s task: %x","t0",(unsigned int)pxCreatedTask);		
 	
+	xTaskCreatePinnedToCore(uartInterfaceTask, "uartInterfaceTask", 2500, NULL, PRIO_UART, &pxCreatedTask,CPU_UART); 
+	ESP_LOGI(TAG, "%s task: %x","uartInterfaceTask",(unsigned int)pxCreatedTask);
 	
 //-----------------------------
 // start the network
@@ -1100,8 +1106,8 @@ void app_main()
     ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
 
 	//start tasks of KaRadio32
-	xTaskCreatePinnedToCore(uartInterfaceTask, "uartInterfaceTask", 2500, NULL, PRIO_UART, &pxCreatedTask,CPU_UART); 
-	ESP_LOGI(TAG, "%s task: %x","uartInterfaceTask",(unsigned int)pxCreatedTask);
+//	xTaskCreatePinnedToCore(uartInterfaceTask, "uartInterfaceTask", 2500, NULL, PRIO_UART, &pxCreatedTask,CPU_UART); 
+//	ESP_LOGI(TAG, "%s task: %x","uartInterfaceTask",(unsigned int)pxCreatedTask);
 	vTaskDelay(1);
 	xTaskCreatePinnedToCore(clientTask, "clientTask", 3800, NULL, PRIO_CLIENT, &pxCreatedTask,CPU_CLIENT); 
 	ESP_LOGI(TAG, "%s task: %x","clientTask",(unsigned int)pxCreatedTask);	

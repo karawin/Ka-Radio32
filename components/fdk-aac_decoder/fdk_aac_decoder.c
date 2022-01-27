@@ -22,10 +22,12 @@
 #include "aacdecoder_lib.h"
 #include "audio_player.h"
 #include "spiram_fifo.h"
+#include "gpio.h"
 //#include "m4a.h"
 
 
 #define TAG "fdkaac_decoder"
+
 
 
 /* small, its just a transfer bucket for the internal decoder buffer */
@@ -40,13 +42,23 @@ void fdkaac_decoder_task(void *pvParameters)
 {
     // ESP_LOGI(TAG, "(line %u) free heap: %u", __LINE__, esp_get_free_heap_size());
     player_t *player = pvParameters;
+	renderer_config_t *renderer_instance;
+	renderer_instance = renderer_get();
     AAC_DECODER_ERROR err;
+	init_i2s();
+	//ESP_LOGD(TAG, "init I2S mode %d, port %d, %d bit, %d Hz", renderer_instance->output_mode, renderer_instance->i2s_num, renderer_instance->bit_depth, renderer_instance->sample_rate);
+    // buffer might contain noise
+    i2s_zero_dma_buffer(renderer_instance->i2s_num);
+    i2s_start(renderer_instance->i2s_num);
 
     /* allocate sample buffer */
     buffer_t *pcm_buf = buf_create(OUTPUT_BUFFER_SIZE);
-
+	
     /* allocate bitstream buffer */
-    buffer_t *in_buf = buf_create(INPUT_BUFFER_SIZE*48);
+//    buffer_t *in_buf = buf_create(INPUT_BUFFER_SIZE*48);
+	buffer_t *in_buf  = NULL;
+    in_buf = buf_create(INPUT_BUFFER_SIZE*24);
+
     fill_read_buffer(in_buf);
 
     HANDLE_AACDECODER handle = NULL;
@@ -54,17 +66,13 @@ void fdkaac_decoder_task(void *pvParameters)
 
     /* select bitstream format */
     if (player->media_stream->content_type == AUDIO_MP4)
-		{
+	{
 		goto cleanup;
     } else {
         /* create decoder instance */
-        handle = aacDecoder_Open(TT_MP4_ADTS, /* num layers */1);
-        if (handle == NULL) {
-            ESP_LOGE(TAG, "malloc failed %d", __LINE__);
-            goto cleanup;
-        }
+		handle = aacDecoder_Open(TT_MP4_ADTS, /* num layers */1);
     }
-
+	
     /* configure instance */
     aacDecoder_SetParam(handle, AAC_PCM_OUTPUT_INTERLEAVED, 1);
     aacDecoder_SetParam(handle, AAC_PCM_MIN_OUTPUT_CHANNELS, 2);
@@ -82,10 +90,11 @@ void fdkaac_decoder_task(void *pvParameters)
         /* re-fill buffer if necessary */
        if (buf_data_unread(in_buf) == 0) {
             fill_read_buffer(in_buf);
-//			vTaskDelay(1);
-       if(player->decoder_command == CMD_STOP) {
-                goto abort;
-        }        }
+			vTaskDelay(1);
+			if(player->decoder_command == CMD_STOP) {
+                break;
+			}        
+		}
 		
 //		watchgog reset 
 		TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
@@ -93,23 +102,27 @@ void fdkaac_decoder_task(void *pvParameters)
 		TIMERG0.wdt_wprotect=0;
 
 
- /*       if(player->decoder_command == CMD_STOP) {
-                goto abort;
-        }
-*/		
         // bytes_avail will be updated and indicate "how much data is left"
         size_t bytes_avail = buf_data_unread(in_buf);
+		
         aacDecoder_Fill(handle, &in_buf->read_pos, &bytes_avail, &bytes_avail);
 
         uint32_t bytes_taken = buf_data_unread(in_buf) - bytes_avail;
 //        buf_seek_rel(in_buf, bytes_taken);
         in_buf->read_pos += bytes_taken;
         in_buf->bytes_consumed += bytes_taken;
+		
+		if (bytes_taken == 0) {  // blank output
+//		if (!first_frame) {  // blank output  speed test
+			memset(pcm_buf->base,0,OUTPUT_BUFFER_SIZE);
+			pcm_buf->len = OUTPUT_BUFFER_SIZE;
+			err = AAC_DEC_OK;
+        }
+		else
+			err = aacDecoder_DecodeFrame(handle, (short int *) pcm_buf->base,
+					pcm_buf->len, flags);
 
-        err = aacDecoder_DecodeFrame(handle, (short int *) pcm_buf->base,
-                pcm_buf->len, flags);
-
-
+//		if (err != AAC_DEC_OK) continue;
         // need more bytes, lets refill
         if(err == AAC_DEC_TRANSPORT_SYNC_ERROR || err == AAC_DEC_NOT_ENOUGH_BITS) {
             continue;
@@ -117,9 +130,6 @@ void fdkaac_decoder_task(void *pvParameters)
 
         if ((err != AAC_DEC_OK) && (err != AAC_DEC_INVALID_CODE_BOOK)){
             ESP_LOGI(TAG, "decode error 0x%08x", err);
-			//buf_clear(in_buf);
-			//buf_clear(pcm_buf);
-			//goto abort;
             continue;
         }
 
@@ -129,10 +139,10 @@ void fdkaac_decoder_task(void *pvParameters)
 
             CStreamInfo* mStreamInfo = aacDecoder_GetStreamInfo(handle);
 
-            pcm_size = mStreamInfo->frameSize * sizeof(int16_t)
+            pcm_size = mStreamInfo->frameSize * sizeof(short) //sizeof(int16_t)
                     * mStreamInfo->numChannels;
 
-            ESP_LOGV(TAG, "pcm_size %d, channels: %d, sample rate: %d, object type: %d, bitrate: %d", pcm_size, mStreamInfo->numChannels,
+            ESP_LOGI(TAG, "pcm_size %d, channels: %d, sample rate: %d, object type: %d, bitrate: %d", pcm_size, mStreamInfo->numChannels,
                     mStreamInfo->sampleRate, mStreamInfo->aot, mStreamInfo->bitRate);
 
             pcm_format.bit_depth = I2S_BITS_PER_SAMPLE_16BIT;
@@ -141,28 +151,27 @@ void fdkaac_decoder_task(void *pvParameters)
         }
 	
         render_samples((char *) pcm_buf->base, pcm_size, &pcm_format);
-
         // ESP_LOGI(TAG, "fdk_aac_decoder stack: %d\n", uxTaskGetStackHighWaterMark(NULL));
         // ESP_LOGI(TAG, "%u free heap %u", __LINE__, esp_get_free_heap_size());
 
     }
-	goto cleanup;
+//	goto cleanup;
 	// exit on internal error
-    abort:
 	player->command = CMD_STOP;
 
     cleanup:
-	ESP_LOGI(TAG, "fdk_aac_decoder stack: %d\n", uxTaskGetStackHighWaterMark(NULL));
+	ESP_LOGD(TAG, "aac_decoder stack: %d\n", uxTaskGetStackHighWaterMark(NULL));
 	//renderer_zero_dma_buffer();
     player->decoder_status = STOPPED;
     player->decoder_command = CMD_NONE;
-    ESP_LOGD(TAG, "Decoder stopped.\n");
-    ESP_LOGI(TAG, "aac decoder finished  %x    %x",(int)in_buf,(int)pcm_buf);
+    ESP_LOGI(TAG, "aac decoder finished");
     aacDecoder_Close(handle);
     spiRamFifoReset();
-    //buf_destroy(in_buf);
+    buf_destroy(in_buf);
     buf_destroy(pcm_buf);
+	renderer_zero_dma_buffer();
+	i2s_stop(renderer_instance->i2s_num);
+    i2s_driver_uninstall(renderer_instance->i2s_num);	
 	//esp_task_wdt_delete(NULL);
-
     vTaskDelete(NULL);
 }

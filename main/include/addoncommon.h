@@ -28,6 +28,4 @@ extern   uint8_t  mline[LINES] ; // mark to display
 
 extern   char nameNum[5] ; // the number of the current station
 extern   char genre[BUFLEN/2]; // the local name of the station
-
-extern void Unicode_decoding(char *string);
 #endif

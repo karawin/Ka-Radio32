@@ -116,7 +116,7 @@ uint8_t u8g2_esp32_spi_byte_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int,  void
  */
 uint8_t u8g2_esp32_i2c_byte_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
 //	ESP_LOGD(TAG, "i2c_cb: Received a msg: %d, arg_int: %d, arg_ptr: %p", msg, arg_int, arg_ptr);
-
+	esp_err_t err = ESP_OK;
 	
 	switch(msg) {
 		case U8X8_MSG_BYTE_SET_DC: {
@@ -146,7 +146,8 @@ uint8_t u8g2_esp32_i2c_byte_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void 
 		    ESP_ERROR_CHECK(i2c_param_config(I2C_MASTER_NUM, &conf));
 			ESP_LOGI(TAG, "i2c_driver_install %d", I2C_MASTER_NUM);
 //		    ESP_ERROR_CHECK(i2c_driver_install(I2C_MASTER_NUM, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0));
-			i2c_driver_install(I2C_MASTER_NUM, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0);
+			err = i2c_driver_install(I2C_MASTER_NUM, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0);
+			if (err != ESP_OK ) ESP_LOGE(TAG, "i2c_driver_install error %x", err);
 			break;
 		}
 

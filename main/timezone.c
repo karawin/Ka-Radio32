@@ -20,7 +20,7 @@ int8_t  applyTZ(struct tm *time) {
 
 	bool dst = false;
 	int8_t tzo = g_device->tzoffseth;
-	if (g_device->tzoffsetm == 0xFF) g_device->tzoffsetm = 0; // if not initialized
+	if ((unsigned char)g_device->tzoffsetm == 0xFF) g_device->tzoffsetm = 0; // if not initialized
 	int8_t tzom = g_device->tzoffsetm;
  
 	// apply base timezone offset

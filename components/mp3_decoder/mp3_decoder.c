@@ -118,6 +118,9 @@ void mp3_decoder_task(void *pvParameters)
     struct mad_frame *frame;
     struct mad_synth *synth;
 
+	renderer_config_t *renderer_instance;
+	renderer_instance = renderer_get();
+
     //Allocate structs needed for mp3 decoding
     stream = malloc(sizeof(struct mad_stream));
     frame = malloc(sizeof(struct mad_frame));
@@ -132,6 +135,12 @@ void mp3_decoder_task(void *pvParameters)
     buf_underrun_cnt = 0;
 
     ESP_LOGD(TAG, "Decoder start.");
+
+	init_i2s();
+	//ESP_LOGD(TAG, "init I2S mode %d, port %d, %d bit, %d Hz", renderer_instance->output_mode, renderer_instance->i2s_num, renderer_instance->bit_depth, renderer_instance->sample_rate);
+    // buffer might contain noise
+    i2s_zero_dma_buffer(renderer_instance->i2s_num);
+    i2s_start(renderer_instance->i2s_num);
 
     //Initialize mp3 parts
     mad_stream_init(stream);
@@ -176,6 +185,8 @@ void mp3_decoder_task(void *pvParameters)
 	// exit on normal exit
 	cleanup:
     // avoid noise
+	i2s_stop(renderer_instance->i2s_num);
+	i2s_zero_dma_buffer(renderer_instance->i2s_num);
     renderer_zero_dma_buffer();
 
     if (synth != NULL) free(synth);
@@ -185,6 +196,9 @@ void mp3_decoder_task(void *pvParameters)
 
     // clear semaphore for reader task
     spiRamFifoReset();
+	renderer_zero_dma_buffer();
+	i2s_stop(renderer_instance->i2s_num);
+	i2s_driver_uninstall(renderer_instance->i2s_num);	
     player->decoder_status = STOPPED;
     player->decoder_command = CMD_NONE;
     ESP_LOGD(TAG, "Decoder stopped.\n");

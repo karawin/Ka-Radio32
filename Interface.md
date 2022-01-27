@@ -21,6 +21,8 @@ If a command return some informations, it must be the last of the list or alone.
 - prev			: play the previous station
 - play=xxx		: with xxx from 0 to 254  play the station xxx
 - volume=xxx		: with xxx from 0 to 254  change the volume to xxx
+- volume+		: increment the volume by 5
+- volume-		: decrement the volume by -5
 - uart			: uart baudrate at 115200 not saved on next reset
 - instant="http://your url" : instant play a site  
 Example: http://192.168.1.253/?instant=http://api.voicerss.org/?f=32khz_16bit_stereo&key=29334415954d491b85535df4eb4dd821&hl=en-us&src=hello?the-sun-is-yellow?and-i-like-it"  
