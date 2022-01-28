@@ -71,105 +71,6 @@ DRAM_ATTR static const uint16_t SPDIF_BMCLOOKUP[256] = {
 	0x32aa, 0xb2aa, 0xd2aa, 0x52aa, 0xcaaa, 0x4aaa, 0x2aaa, 0xaaaa
 };
 
-void init_i2s(/*renderer_config_t *config*/)
-{
-	renderer_config_t *config;
-	config = renderer_get();
-    i2s_mode_t mode = I2S_MODE_MASTER | I2S_MODE_TX;
-    i2s_comm_format_t comm_fmt = I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_MSB;
-	i2s_bits_per_sample_t bit_depth = config->bit_depth;
-	int sample_rate = config->sample_rate;
-    int use_apll = 0;
-	esp_chip_info_t out_info;
-	esp_chip_info(&out_info);
-
-    if(config->output_mode == DAC_BUILT_IN)
-    {
-        mode = mode | I2S_MODE_DAC_BUILT_IN;
-        comm_fmt = I2S_COMM_FORMAT_I2S_MSB;
-    }
-    else if(config->output_mode == PDM)
-    {
-        mode = mode | I2S_MODE_PDM;
-		comm_fmt = I2S_COMM_FORMAT_PCM | I2S_COMM_FORMAT_PCM_SHORT;
-    }
-    else if(config->output_mode == SPDIF)
-    {
-		bit_depth = I2S_BITS_PER_SAMPLE_32BIT;
-		sample_rate = config->sample_rate * 2;
-    }
-
-	if ((config->output_mode == I2S)||(config->output_mode == I2S_MERUS)
-			|| (config->output_mode == SPDIF) || (config->output_mode == DAC_BUILT_IN))
-	{
-	/* don't use audio pll on buggy rev0 chips */
-	// don't do it for PDM
-		if(out_info.revision > 0) {
-			use_apll = 1;
-			ESP_LOGW(TAG, "chip revision %d, enabling APLL", out_info.revision);
-		} else
-			ESP_LOGW(TAG, "chip revision %d, cannot enable APLL", out_info.revision);
-	}
-    /*
-     * Allocate just enough to decode AAC+, which has huge frame sizes.
-     *
-     * Memory consumption formula:
-     * (bits_per_sample / 8) * num_chan * dma_buf_count * dma_buf_len
-     *
-     * 16 bit: 32 * 256 = 8192 bytes
-     * 32 bit: 32 * 256 = 16384 bytes
-     */
-    i2s_config_t i2s_config = {
-            .mode = mode,          // Only TX
-            .sample_rate = sample_rate,
-            .bits_per_sample = bit_depth,
-            .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,   // 2-channels
-            .communication_format = comm_fmt,
-            .dma_buf_count = 8,                            // number of buffers, 128 max.  16
-//            .dma_buf_len = bigSram()?256:128,                          // size of each buffer 128
-            .dma_buf_len = 512,      // size of each buffer 128
-            .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,        // lowest level 1
-//            .intr_alloc_flags = 0 ,        // default
-			.use_apll = use_apll					
-    };
-
-	gpio_num_t lrck;
-	gpio_num_t bclk;
-	gpio_num_t i2sdata;
-	gpio_get_i2s(&lrck ,&bclk ,&i2sdata );
-
-	i2s_pin_config_t pin_config = {
-				.bck_io_num = bclk,
-				.ws_io_num = lrck,
-				.data_out_num = i2sdata,
-				.data_in_num = I2S_PIN_NO_CHANGE
-	};
-	
-    if (i2s_driver_install(config->i2s_num, &i2s_config, 0, NULL) != ESP_OK)
-	{
-		i2s_config.intr_alloc_flags = ESP_INTR_FLAG_LEVEL1;
-		if (i2s_driver_install(config->i2s_num, &i2s_config, 0, NULL) != ESP_OK)
-			i2s_config.intr_alloc_flags = ESP_INTR_FLAG_LEVEL2;
-			if (i2s_driver_install(config->i2s_num, &i2s_config, 0, NULL) != ESP_OK)
-			i2s_config.intr_alloc_flags = ESP_INTR_FLAG_LEVEL3;
-			if (i2s_driver_install(config->i2s_num, &i2s_config, 0, NULL) != ESP_OK)
-				ESP_LOGE(TAG,"i2s Error");
-		return;
-	}	
-//	ESP_LOGI(TAG,"i2s intr:%d", i2s_config.intr_alloc_flags);	
-/*    if((mode & I2S_MODE_DAC_BUILT_IN))// || (mode & I2S_MODE_PDM))
-    {
-        i2s_set_pin(config->i2s_num, NULL);
-        i2s_set_dac_mode(I2S_DAC_CHANNEL_BOTH_EN);
-    }
-    else*/ {
-		if ((lrck!=255) && (bclk!=255) && (i2sdata!=255))
-			i2s_set_pin(config->i2s_num, &pin_config);
-    }
-
-    i2s_stop(config->i2s_num);
-}
-
 //KaraDio32
 void renderer_volume(uint32_t vol)
 {
@@ -607,19 +508,6 @@ void renderer_init(renderer_config_t *config)
 
     renderer_status = INITIALIZED;
 
-//    ESP_LOGD(TAG, "init I2S mode %d, port %d, %d bit, %d Hz", config->output_mode, config->i2s_num, config->bit_depth, config->sample_rate);
-//	if (get_audio_output_mode() != VS1053)
-//		init_i2s(renderer_instance);
-
-    if(config->output_mode == I2S_MERUS) {
-        if (init_ma120(0x50))			// setup ma120x0p and initial volume
-			config->output_mode = I2S;	// error, back to I2S
-    }
-    else if(config->output_mode == SPDIF)
-    {
-		renderer_instance->sample_rate = 0;
-		set_sample_rate(44100);
-    }
 }
 
 
@@ -650,3 +538,115 @@ void renderer_destroy()
     renderer_status = UNINITIALIZED;
 //    i2s_driver_uninstall(renderer_instance->i2s_num);
 }
+
+
+void init_i2s(/*renderer_config_t *config*/)
+{
+	renderer_config_t *config;
+	config = renderer_get();
+    i2s_mode_t mode = I2S_MODE_MASTER | I2S_MODE_TX;
+    i2s_comm_format_t comm_fmt = I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_MSB;
+	i2s_bits_per_sample_t bit_depth = config->bit_depth;
+	int sample_rate = config->sample_rate;
+    int use_apll = 0;
+	esp_chip_info_t out_info;
+	esp_chip_info(&out_info);
+
+    if(config->output_mode == DAC_BUILT_IN)
+    {
+        mode = mode | I2S_MODE_DAC_BUILT_IN;
+        comm_fmt = I2S_COMM_FORMAT_I2S_MSB;
+    }
+    else if(config->output_mode == PDM)
+    {
+        mode = mode | I2S_MODE_PDM;
+		comm_fmt = I2S_COMM_FORMAT_PCM | I2S_COMM_FORMAT_PCM_SHORT;
+    }
+    else if(config->output_mode == SPDIF)
+    {
+		bit_depth = I2S_BITS_PER_SAMPLE_32BIT;
+		sample_rate = config->sample_rate * 2;
+    }
+
+	if ((config->output_mode == I2S)||(config->output_mode == I2S_MERUS)
+			|| (config->output_mode == SPDIF) || (config->output_mode == DAC_BUILT_IN))
+	{
+	/* don't use audio pll on buggy rev0 chips */
+	// don't do it for PDM
+		if(out_info.revision > 0) {
+			use_apll = 1;
+			ESP_LOGW(TAG, "chip revision %d, enabling APLL", out_info.revision);
+		} else
+			ESP_LOGW(TAG, "chip revision %d, cannot enable APLL", out_info.revision);
+	}
+    /*
+     * Allocate just enough to decode AAC+, which has huge frame sizes.
+     *
+     * Memory consumption formula:
+     * (bits_per_sample / 8) * num_chan * dma_buf_count * dma_buf_len
+     *
+     * 16 bit: 32 * 256 = 8192 bytes
+     * 32 bit: 32 * 256 = 16384 bytes
+     */
+    i2s_config_t i2s_config = {
+            .mode = mode,          // Only TX
+            .sample_rate = sample_rate,
+            .bits_per_sample = bit_depth,
+            .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,   // 2-channels
+            .communication_format = comm_fmt,
+            .dma_buf_count = 8,                            // number of buffers, 128 max.  16
+//            .dma_buf_len = bigSram()?256:128,                          // size of each buffer 128
+            .dma_buf_len = 512,      // size of each buffer 128
+            .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,        // lowest level 1
+//            .intr_alloc_flags = 0 ,        // default
+			.use_apll = use_apll					
+    };
+
+	gpio_num_t lrck;
+	gpio_num_t bclk;
+	gpio_num_t i2sdata;
+	gpio_get_i2s(&lrck ,&bclk ,&i2sdata );
+
+	i2s_pin_config_t pin_config = {
+				.bck_io_num = bclk,
+				.ws_io_num = lrck,
+				.data_out_num = i2sdata,
+				.data_in_num = I2S_PIN_NO_CHANGE
+	};
+	
+    if (i2s_driver_install(config->i2s_num, &i2s_config, 0, NULL) != ESP_OK)
+	{
+		i2s_config.intr_alloc_flags = ESP_INTR_FLAG_LEVEL1;
+		if (i2s_driver_install(config->i2s_num, &i2s_config, 0, NULL) != ESP_OK)
+			i2s_config.intr_alloc_flags = ESP_INTR_FLAG_LEVEL2;
+			if (i2s_driver_install(config->i2s_num, &i2s_config, 0, NULL) != ESP_OK)
+			i2s_config.intr_alloc_flags = ESP_INTR_FLAG_LEVEL3;
+			if (i2s_driver_install(config->i2s_num, &i2s_config, 0, NULL) != ESP_OK)
+				ESP_LOGE(TAG,"i2s Error");
+		return;
+	}	
+//	ESP_LOGI(TAG,"i2s intr:%d", i2s_config.intr_alloc_flags);	
+/*    if((mode & I2S_MODE_DAC_BUILT_IN))// || (mode & I2S_MODE_PDM))
+    {
+        i2s_set_pin(config->i2s_num, NULL);
+        i2s_set_dac_mode(I2S_DAC_CHANNEL_BOTH_EN);
+    }
+    else*/ {
+		if ((lrck!=255) && (bclk!=255) && (i2sdata!=255))
+			i2s_set_pin(config->i2s_num, &pin_config);
+    }
+
+	
+    if(config->output_mode == I2S_MERUS) {
+        if (init_ma120(0x50))			// setup ma120x0p and initial volume
+			config->output_mode = I2S;	// error, back to I2S
+    }
+    else if(config->output_mode == SPDIF)
+    {
+		config->sample_rate = 0;
+		set_sample_rate(44100);
+    }
+
+    i2s_stop(config->i2s_num);
+}
+

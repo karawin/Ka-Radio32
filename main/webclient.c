@@ -1506,7 +1506,7 @@ void clientTask(void *pvParams) {
 
 				ESP_LOGD(TAG,"\nSent: %s\n",bufrec);
 				if (setsockopt (sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0)
-					ESP_LOGE(TAG,"Socket: %d  setsockopt: %d  errno:%d ",sockfd, bytes_read,errno);
+					ESP_LOGE(TAG,"Socket: %d  setsockopt: %d  errno:%d ",sockfd, SO_RCVTIMEO,errno);
 //////
 				cnterror = 0;			
 				wsMonitor();

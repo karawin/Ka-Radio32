@@ -46,6 +46,8 @@ void fdkaac_decoder_task(void *pvParameters)
 	renderer_instance = renderer_get();
     AAC_DECODER_ERROR err;
 	init_i2s();
+	
+	
 	//ESP_LOGD(TAG, "init I2S mode %d, port %d, %d bit, %d Hz", renderer_instance->output_mode, renderer_instance->i2s_num, renderer_instance->bit_depth, renderer_instance->sample_rate);
     // buffer might contain noise
     i2s_zero_dma_buffer(renderer_instance->i2s_num);

@@ -974,7 +974,7 @@ void app_main()
 		conf.master.clk_speed = I2C_MASTER_FREQ_HZ;
 		esp_err_t res = i2c_param_config(I2C_MASTER_NUM, &conf);
 		ESP_LOGD(TAG,"I2C setup : %d\n",res);
-		res = i2c_driver_install(I2C_MASTER_NUM, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, ESP_INTR_FLAG_LEVEL1);
+		res = i2c_driver_install(I2C_MASTER_NUM, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0);
 		if (res != 0) ESP_LOGD(TAG,"I2C already installed. No problem");
 		else ESP_LOGD(TAG,"I2C installed: %d",res);
 
