@@ -339,6 +339,8 @@ Where N equals to CStreamInfo::frameSize .
 \endverbatim
 
 */
+#undef __xtensa__
+#define __xtensa__
 
 #ifndef AACDECODER_LIB_H
 #define AACDECODER_LIB_H

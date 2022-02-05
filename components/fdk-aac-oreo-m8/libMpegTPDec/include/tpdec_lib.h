@@ -95,7 +95,7 @@ amm-info@iis.fraunhofer.de
 
 #include "FDK_bitstream.h"
 
-#define TRANSPORTDEC_INBUF_SIZE  ( 8192 )   /*!< Size is in bytes.
+#define TRANSPORTDEC_INBUF_SIZE  ( 2048 )   /* 8192 !< Size is in bytes.
                                                  Set the transport input buffer size carefully and
                                                  assure that it fulfills the requirements of the
                                                  supported transport format(s).                    */

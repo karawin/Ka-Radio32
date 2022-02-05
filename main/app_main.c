@@ -50,7 +50,7 @@ Copyright (C) 2017  KaraWin
 
 #include "app_main.h"
 
-#include "spiram_fifo.h"
+//#include "spiram_fifo.h"
 #include "audio_renderer.h"
 //#include "bt_speaker.h"
 #include "bt_config.h"
@@ -793,11 +793,14 @@ void uartInterfaceTask(void *pvParameters) {
         .rx_flow_ctrl_thresh = 0,
     };	
 	err = uart_param_config(UART_NUM_0, &uart_config0);	
-	ESP_LOGE("uartInterfaceTask","uart_param_config err: %d",err);
+	if (err!=ESP_OK) ESP_LOGE("uartInterfaceTask","uart_param_config err: %d",err);
 	
 	err = uart_driver_install(UART_NUM_0, 1024 , 0, 0, NULL, 0);
-	ESP_LOGE("uartInterfaceTask","uart_driver_install err: %d",err);
-	if (err != ESP_OK) vTaskDelete(NULL);
+	if (err!=ESP_OK)
+	{
+		ESP_LOGE("uartInterfaceTask","uart_driver_install err: %d",err);
+		vTaskDelete(NULL);
+	}
 	
 	for(t = 0; t<sizeof(tmp); t++) tmp[t] = 0;
 	t = 0;
@@ -1007,12 +1010,6 @@ void app_main()
 	audio_output_mode = g_device->audio_output_mode;
 	ESP_LOGI(TAG, "audio_output_mode %d\nOne of I2S=0, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053, SPDIF",audio_output_mode);
 
-	//Initialize the SPI RAM chip communications and see if it actually retains some bytes. If it
-    //doesn't, warn user.
-	
-//	ramInit();
-	
-
 	//uart speed
 	uspeed = g_device->uartspeed;	
 	uspeed = checkUart(uspeed);	
@@ -1073,14 +1070,14 @@ void app_main()
     if (err) 
         ESP_LOGE(TAG,"mDNS Init failed: %d", err);
 	else
-		ESP_LOGE(TAG,"mDNS Init ok"); 
+		ESP_LOGI(TAG,"mDNS Init ok"); 
 	
 	//set hostname and instance name
 	if ((strlen(g_device->hostname) == 0)||(strlen(g_device->hostname) > HOSTLEN)) 
 	{	
 		strcpy(g_device->hostname,"karadio32");
 	} 	
-	ESP_LOGE(TAG,"mDNS Hostname: %s",g_device->hostname ); 
+	ESP_LOGI(TAG,"mDNS Hostname: %s",g_device->hostname ); 
 	err = mdns_hostname_set(g_device->hostname);	
 	if (err) 
         ESP_LOGE(TAG,"Hostname Init failed: %d", err);	
@@ -1106,8 +1103,6 @@ void app_main()
     ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
 
 	//start tasks of KaRadio32
-//	xTaskCreatePinnedToCore(uartInterfaceTask, "uartInterfaceTask", 2500, NULL, PRIO_UART, &pxCreatedTask,CPU_UART); 
-//	ESP_LOGI(TAG, "%s task: %x","uartInterfaceTask",(unsigned int)pxCreatedTask);
 	vTaskDelay(1);
 	xTaskCreatePinnedToCore(clientTask, "clientTask", 3800, NULL, PRIO_CLIENT, &pxCreatedTask,CPU_CLIENT); 
 	ESP_LOGI(TAG, "%s task: %x","clientTask",(unsigned int)pxCreatedTask);	
@@ -1118,12 +1113,6 @@ void app_main()
 	xTaskCreatePinnedToCore (task_addon, "task_addon", 2200, NULL, PRIO_ADDON, &pxCreatedTask,CPU_ADDON);  
 	ESP_LOGI(TAG, "%s task: %x","task_addon",(unsigned int)pxCreatedTask);	
 
-/*	if (RDA5807M_detection())
-	{
-		xTaskCreatePinnedToCore(rda5807Task, "rda5807Task", 2500, NULL, 3, &pxCreatedTask,1);  //
-		ESP_LOGI(TAG, "%s task: %x","rda5807Task",(unsigned int)pxCreatedTask);
-	}
-*/	
 	vTaskDelay(60);// wait tasks init
 	ESP_LOGI(TAG," Init Done");
 	

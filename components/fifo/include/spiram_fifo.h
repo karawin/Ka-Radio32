@@ -1,7 +1,8 @@
 #ifndef _SPIRAM_FIFO_H_
 #define _SPIRAM_FIFO_H_
 
-int  spiRamFifoInit();
+#define SPIRAMSIZE (30*1024) //for a 23LC1024 chip
+void*  spiRamFifoInit();
 void  spiRamFifoRead(char *buff, unsigned len);
 void  spiRamFifoWrite(const char *buff, unsigned len);
 unsigned  spiRamFifoFill();

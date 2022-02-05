@@ -127,16 +127,19 @@ void mp3_decoder_task(void *pvParameters)
     synth = malloc(sizeof(struct mad_synth));
     buffer_t *buf = buf_create(MAX_FRAME_SIZE);
 
-    if (stream==NULL) { ESP_LOGE(TAG,"malloc(stream) failed"); goto abort; }
-    if (synth==NULL) { ESP_LOGE(TAG,"malloc(synth) failed"); goto abort; }
-    if (frame==NULL) { ESP_LOGE(TAG,"malloc(frame) failed"); goto abort; }
-    if (buf==NULL) { ESP_LOGE(TAG,"buf_create() failed"); goto abort; }
+    if (stream==NULL) { ESP_LOGE(TAG,"malloc(stream) failed"); goto abort1; }
+    if (synth==NULL) { ESP_LOGE(TAG,"malloc(synth) failed"); goto abort1; }
+    if (frame==NULL) { ESP_LOGE(TAG,"malloc(frame) failed"); goto abort1; }
+    if (buf==NULL) { ESP_LOGE(TAG,"buf_create() failed"); goto abort1; }
 
     buf_underrun_cnt = 0;
 
     ESP_LOGD(TAG, "Decoder start.");
 
-	init_i2s();
+	if (!init_i2s()) 
+	{
+		goto abort0;
+	}
 	
 	
 	//ESP_LOGD(TAG, "init I2S mode %d, port %d, %d bit, %d Hz", renderer_instance->output_mode, renderer_instance->i2s_num, renderer_instance->bit_depth, renderer_instance->sample_rate);
@@ -204,9 +207,14 @@ void mp3_decoder_task(void *pvParameters)
     player->decoder_status = STOPPED;
     player->decoder_command = CMD_NONE;
     ESP_LOGD(TAG, "Decoder stopped.\n");
-
-    ESP_LOGD(TAG, "MAD decoder stack: %d\n", uxTaskGetStackHighWaterMark(NULL));
+//    ESP_LOGD(TAG, "MAD decoder stack: %d\n", uxTaskGetStackHighWaterMark(NULL));
     vTaskDelete(NULL);
+	return;
+	
+	
+abort1:
+abort0:
+	esp_restart();
 }
 
 /* Called by the NXP modifications of libmad. Sets the needed output sample rate. */

@@ -72,7 +72,7 @@
 /* #define FREERTOS */
 
 /* Uncomment next line if using FreeRTOS+ TCP */
-/* #define FREERTOS_TCP */
+/* #define FREERTOS_TCP*/
 
 /* Uncomment next line if using FreeRTOS Windows Simulator */
 /* #define FREERTOS_WINSIM */

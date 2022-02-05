@@ -239,6 +239,7 @@ void websocketparsedata(int socket, char* buf, int len)
 	wsMessageHeader_t header;
 	uint8_t * payload = (uint8_t *)buf;
 	uint8_t headerLen = 2;
+	header.maskKey = 0;
 	if (!iswebsocket(socket)) return;
 	while(headerLen > recbytes) recbytes += read(socket , buf+recbytes, MAXDATA-recbytes);
 	header.fin = ((*payload >> 7) & 0x01);

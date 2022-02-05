@@ -62,29 +62,29 @@
 
 
 // Tasks priority
-#define PRIO_MAD 		(configMAX_PRIORITIES - 8)
+#define PRIO_MAD 		20
 #define PRIO_VS1053 	(configMAX_PRIORITIES - 8)
 #define PRIO_RMT		5
 #define PRIO_UART		2
-#define PRIO_CLIENT		(configMAX_PRIORITIES - 8)
-#define PRIO_SERVER		(configMAX_PRIORITIES - 10)
-#define PRIO_ADDON		6
-#define PRIO_LCD		6
-#define PRIO_SUBSERV	7
-#define PRIO_TIMER		10
-#define PRIO_OTA		8
+#define PRIO_CLIENT		10
+#define PRIO_SERVER		6
+#define PRIO_ADDON		4
+#define PRIO_LCD		7
+#define PRIO_SUBSERV	5
+#define PRIO_TIMER		3
+#define PRIO_OTA		5
 
 // CPU for task
 #define CPU_MAD			1  // internal decoder and vs1053
 #define CPU_RMT			0
-#define CPU_UART		0 
+#define CPU_UART		0
 #define CPU_CLIENT		0
 #define CPU_SERVER		0
 #define CPU_ADDON		0
 #define CPU_LCD			0
 #define CPU_SUBSERV		0
 #define CPU_TIMER		0
-
+#define CPU_OTA			0
 
 #define TEMPO_SAVE_VOL	10000
 

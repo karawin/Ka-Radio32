@@ -113,45 +113,41 @@ static void render_i2s_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_de
     {
         ESP_LOGD(TAG, "changing sample rate from %d to %d", renderer_instance->sample_rate, buf_desc->sample_rate);
         uint32_t rate = buf_desc->sample_rate * renderer_instance->sample_rate_modifier;
-       res =  i2s_set_sample_rates(renderer_instance->i2s_num, rate);
+        res =  i2s_set_sample_rates(renderer_instance->i2s_num, rate);
 
-		if (res != ESP_OK) {
+	    if (res != ESP_OK) {
 			ESP_LOGE(TAG, "i2s_set_clk error %d",res);
 		}
-        renderer_instance->sample_rate = buf_desc->sample_rate;
+        else renderer_instance->sample_rate = buf_desc->sample_rate;
     }
 
     uint8_t buf_bytes_per_sample = (buf_desc->bit_depth / 8);
     uint32_t num_samples = buf_len / buf_bytes_per_sample / buf_desc->num_channels;
 //KaraDio32 Volume control
-	register uint32_t mult = renderer_instance->volume;
+	uint32_t mult = renderer_instance->volume;
 	
 	if ((mult!= 0x10000)) // && (renderer_instance->output_mode != DAC_BUILT_IN) && (renderer_instance->output_mode != PDM))// need volume?
 	{	
+		uint32_t pmax= num_samples*buf_desc->num_channels;
 		if (buf_bytes_per_sample ==2)
 		{
 			int16_t *psample;
-			uint32_t pmax;
 			psample = (int16_t*)buf;
-			pmax = num_samples*buf_desc->num_channels;
 			for (int32_t i = 0; i < pmax; i++) 
 			{
-				int32_t temp = (int32_t)psample[i] * mult;
-				psample[i] = (temp>>16) & 0xFFFF;	
+				psample[i] = (((int32_t)psample[i] * mult)>>16) & 0xFFFF;	
 			}
 		} else
 		{
 			int32_t *psample;
-			uint32_t pmax;
 			psample = (int32_t*)buf;
-			pmax = num_samples*buf_desc->num_channels;
 			for (int32_t i = 0; i < pmax; i++) 
 			{
-				int64_t temp = psample[i] * mult;
-				psample[i] = (temp>>16) & 0xFFFFFFFF;	
+				psample[i] = ((int64_t)(psample[i] * mult)>>16) & 0xFFFFFFFF;	
 			}
 		}			
 	}
+
 //-------------------------
 //ESP_LOGD(TAG, "I2S CHECK:  buf_desc->bit_depth %d, renderer_instance->bit_depth %d, buf_desc->buffer_format %d, PCM_INTERLEAVED %d, buf_desc->num_channels %d (2), renderer_instance->output_mode %d, DAC_BUILT_IN %d ",buf_desc->bit_depth,renderer_instance->bit_depth,buf_desc->buffer_format,PCM_INTERLEAVED,buf_desc->num_channels,renderer_instance->output_mode,DAC_BUILT_IN);
 
@@ -163,20 +159,23 @@ static void render_i2s_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_de
 			&& renderer_instance->output_mode != PDM
 			)
 	{
-
-        // don't block, rather retry
+	  if (renderer_status == RUNNING)
+	  {
+        // don't block, rather retry portMAX_DELAY
         size_t bytes_left = buf_len;
         size_t bytes_written = 0;
-        while((bytes_left > 0) && (renderer_status == RUNNING)) {
-            res = i2s_write(renderer_instance->i2s_num, buf, bytes_left,& bytes_written, 20);
+        while((bytes_left > 0) ) {//&& (renderer_status == RUNNING)) {
+            res = i2s_write(renderer_instance->i2s_num, buf, bytes_left,& bytes_written,3);
 			if (res != ESP_OK) {
 				ESP_LOGE(TAG, "i2s_write error %d",res);
 			}
             bytes_left -= bytes_written;
             buf += bytes_written;
+			if (bytes_left != 0) printf("%d/%d\n",bytes_written,buf_len);
+			//vTaskDelay(1);
         }
-
-        return;
+	  }
+      return;
     }
 
     // support only 16 bit buffers for now
@@ -209,16 +208,13 @@ static void render_i2s_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_de
 	if (renderer_instance->bit_depth == I2S_BITS_PER_SAMPLE_32BIT) outBufBytes <<= 1;
 	
 	outBuf8 = malloc(outBufBytes);
-	
-//	outBuf8 = malloc(buf_len*(2/buf_desc->num_channels));
-//
+
 	if (outBuf8 == NULL) 
 	{
 		ESP_LOGE(TAG, "malloc outBuf8 failed len:%d ",buf_len);
 		renderer_stop();
 		return;
 	}
-//	outBuf16 =(uint16_t*)outBuf8;
 	outBuf32 =(uint32_t*)outBuf8;
 	outBuf64 = (uint64_t*)outBuf8;
 
@@ -243,12 +239,6 @@ static void render_i2s_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_de
 			outBuf32[i] = sample;
         }
 		
-/*		else if (renderer_instance->output_mode == PDM)
-		{
-            const char samp16[2] = {ptr_l[0], ptr_l[1]};
-		    outBuf16[i] = *((uint16_t*)samp16);		
-		
-		} */
         else {
 
             switch (renderer_instance->bit_depth)
@@ -257,7 +247,7 @@ static void render_i2s_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_de
                     ; // workaround
                     /* low - high / low - high */
                     const char samp32[4] = {ptr_l[0], ptr_l[1], ptr_r[0], ptr_r[1]};
-					outBuf32[i] = *((uint32_t*)samp32);					
+					outBuf32[i] = (uint32_t)(*((uint32_t*)samp32));					
                     break;
 
                 case I2S_BITS_PER_SAMPLE_32BIT:
@@ -281,25 +271,14 @@ static void render_i2s_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_de
 	size_t bytes_written = 0;
 		
 //	TickType_t max_wait = buf_desc->sample_rate / num_samples / 2;
-    TickType_t max_wait = 20 / portTICK_PERIOD_MS; // portMAX_DELAY = bad idea
+//    TickType_t max_wait =portMAX_DELAY/2;// portTICK_PERIOD_MS; // portMAX_DELAY = bad idea
 //	ESP_LOGI(TAG, "I2S write from %x for %d bytes", (uint32_t)outBuf8, bytes_left);
 	uint8_t* iobuf = outBuf8;
 	while(bytes_left > 0 && renderer_status != STOPPED) {
-		res = i2s_write(renderer_instance->i2s_num, (const char*) iobuf, bytes_left,& bytes_written, max_wait);
+		res = i2s_write(renderer_instance->i2s_num, (const char*) iobuf, bytes_left,& bytes_written, 4);
 		if (res != ESP_OK) {
 			ESP_LOGE(TAG, "i2s_write error %d",res);
 		}
-//		if (bytes_written != bytes_left) ESP_LOGV(TAG, "written: %d, len: %d",bytes_written,bytes_left);
-
-/*    size_t bytes_left = buf_len*(2/buf_desc->num_channels);
-    size_t bytes_written = 0;
-    while(bytes_left > 0 && renderer_status != STOPPED) {
-        res = i2s_write(renderer_instance->i2s_num, (const char*) outBuf8, bytes_left,& bytes_written, max_wait);
-		if (res != ESP_OK) {
-				ESP_LOGE(TAG, "i2s_write error %d",res);
-		}
-		if (bytes_written != buf_len*(2/buf_desc->num_channels))ESP_LOGV(TAG, "written: %d, len: %d",bytes_written,bytes_left);
-*/
 
         bytes_left -= bytes_written;
         iobuf += (bytes_written  );
@@ -412,7 +391,7 @@ static void IRAM_ATTR write_i2s(const void *buffer, size_t bytes_cnt)
 	size_t bytes_written = 0;
 	while((bytes_left > 0) && (renderer_status != STOPPED))
 	{
-		esp_err_t res = i2s_write(renderer_instance->i2s_num, buf, bytes_cnt, &bytes_written, 40 / portTICK_PERIOD_MS);
+		esp_err_t res = i2s_write(renderer_instance->i2s_num, buf, bytes_cnt, &bytes_written, 4);
 		if ( res != ESP_OK)
 		{
 			ESP_LOGE(TAG, "i2s_write error %d", res);
@@ -431,9 +410,10 @@ static void IRAM_ATTR write_i2s(const void *buffer, size_t bytes_cnt)
 */
 static void IRAM_ATTR render_spdif_samples(const void *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 {
-	//    ESP_LOGI(TAG, "buf_desc: bit_depth %d format %d num_chan %d sample_rate %d", buf_desc->bit_depth, buf_desc->buffer_format, buf_desc->num_channels, buf_desc->sample_rate);
+	//ESP_LOGI(TAG, "buf_desc: bit_depth %d format %d num_chan %d sample_rate %d", buf_desc->bit_depth, buf_desc->buffer_format, buf_desc->num_channels, buf_desc->sample_rate);
 	//    ESP_LOGV(TAG, "renderer_instance: bit_depth %d, output_mode %d", renderer_instance->bit_depth, renderer_instance->output_mode);
-	//	  ESP_LOGI(TAG, "render_samples len: %d",buf_len);
+	
+	
 	int16_t *pcm_buffer = (int16_t*)buf;
 
 	// support only 16 bit buffers for now
@@ -452,6 +432,9 @@ static void IRAM_ATTR render_spdif_samples(const void *buf, uint32_t buf_len, pc
 	// aac max: #define OUTPUT_BUFFER_SIZE  (2048 * sizeof(SHORT) * 2)
 	//	mp3max:  short int short_sample_buff[2][32];
 	size_t bytes_cnt = num_samples * sizeof(uint32_t) * 4;
+	
+//	ESP_LOGI(TAG, "render_spdif_samples len: %d, bytes_cnt: %d",buf_len,bytes_cnt);
+	
 	uint32_t *spdif_buffer = malloc(bytes_cnt);
 	if (spdif_buffer == NULL)
 	{
@@ -476,7 +459,7 @@ static void IRAM_ATTR render_spdif_samples(const void *buf, uint32_t buf_len, pc
 	free (spdif_buffer);
 }
 
-void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
+void IRAM_ATTR render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 {
     if(renderer_status != RUNNING)
         return;
@@ -487,7 +470,7 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 		render_i2s_samples(buf, buf_len, buf_desc);
 }
 
-void renderer_zero_dma_buffer()
+void  IRAM_ATTR renderer_zero_dma_buffer()
 {
     i2s_zero_dma_buffer(renderer_instance->i2s_num);
 }
@@ -540,7 +523,7 @@ void renderer_destroy()
 }
 
 
-void init_i2s(/*renderer_config_t *config*/)
+bool  init_i2s(/*renderer_config_t *config*/)
 {
 	renderer_config_t *config;
 	config = renderer_get();
@@ -575,9 +558,9 @@ void init_i2s(/*renderer_config_t *config*/)
 	// don't do it for PDM
 		if(out_info.revision > 0) {
 			use_apll = 1;
-			ESP_LOGW(TAG, "chip revision %d, enabling APLL", out_info.revision);
+			ESP_LOGI(TAG, "chip revision %d, enabling APLL", out_info.revision);
 		} else
-			ESP_LOGW(TAG, "chip revision %d, cannot enable APLL", out_info.revision);
+			ESP_LOGI(TAG, "chip revision %d, cannot enable APLL", out_info.revision);
 	}
     /*
      * Allocate just enough to decode AAC+, which has huge frame sizes.
@@ -588,17 +571,19 @@ void init_i2s(/*renderer_config_t *config*/)
      * 16 bit: 32 * 256 = 8192 bytes
      * 32 bit: 32 * 256 = 16384 bytes
      */
+	int bc = bigSram()?10:8;
     i2s_config_t i2s_config = {
             .mode = mode,          // Only TX
             .sample_rate = sample_rate,
             .bits_per_sample = bit_depth,
             .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,   // 2-channels
             .communication_format = comm_fmt,
-            .dma_buf_count = 8,                            // number of buffers, 128 max.  16
+            .dma_buf_count = bc,                            // number of buffers, 128 max.  16
 //            .dma_buf_len = bigSram()?256:128,                          // size of each buffer 128
             .dma_buf_len = 512,      // size of each buffer 128
-            .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,        // lowest level 1
+           .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,        // lowest level 1
 //            .intr_alloc_flags = 0 ,        // default
+			.tx_desc_auto_clear = true,
 			.use_apll = use_apll					
     };
 
@@ -614,6 +599,7 @@ void init_i2s(/*renderer_config_t *config*/)
 				.data_in_num = I2S_PIN_NO_CHANGE
 	};
 	
+
     if (i2s_driver_install(config->i2s_num, &i2s_config, 0, NULL) != ESP_OK)
 	{
 		i2s_config.intr_alloc_flags = ESP_INTR_FLAG_LEVEL1;
@@ -622,16 +608,18 @@ void init_i2s(/*renderer_config_t *config*/)
 			if (i2s_driver_install(config->i2s_num, &i2s_config, 0, NULL) != ESP_OK)
 			i2s_config.intr_alloc_flags = ESP_INTR_FLAG_LEVEL3;
 			if (i2s_driver_install(config->i2s_num, &i2s_config, 0, NULL) != ESP_OK)
-				ESP_LOGE(TAG,"i2s Error");
-		return;
+			{	
+				ESP_LOGE(TAG,"i2s driver Error");
+				return false;
+			}
 	}	
 //	ESP_LOGI(TAG,"i2s intr:%d", i2s_config.intr_alloc_flags);	
-/*    if((mode & I2S_MODE_DAC_BUILT_IN))// || (mode & I2S_MODE_PDM))
+    if(config->output_mode == DAC_BUILT_IN)// || (mode & I2S_MODE_PDM))
     {
         i2s_set_pin(config->i2s_num, NULL);
         i2s_set_dac_mode(I2S_DAC_CHANNEL_BOTH_EN);
     }
-    else*/ {
+    else {
 		if ((lrck!=255) && (bclk!=255) && (i2sdata!=255))
 			i2s_set_pin(config->i2s_num, &pin_config);
     }
@@ -648,5 +636,6 @@ void init_i2s(/*renderer_config_t *config*/)
     }
 
     i2s_stop(config->i2s_num);
+	return true;
 }
 

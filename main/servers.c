@@ -57,7 +57,7 @@ void serversTask(void* pvParams) {
 //	telnetinit();
 //	websocketinit();
 	uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-	ESP_LOGI(TAG,"watermark: 0x%x  %d",uxHighWaterMark,uxHighWaterMark);
+	ESP_LOGD(TAG,"watermark: 0x%x  %d",uxHighWaterMark,uxHighWaterMark);
 	while(1)
 	{
 /////////////////////		
@@ -73,7 +73,7 @@ void serversTask(void* pvParams) {
 			vTaskDelay(5);	
             break;
         }
-		ESP_LOGI(TAG,"telnetServer_sock socket: %d, errno: %d", telnetServer_sock, errno);
+		ESP_LOGD(TAG,"telnetServer_sock socket: %d, errno: %d", telnetServer_sock, errno);
         if (-1 == bind(telnetServer_sock, (struct sockaddr *)(&tenetserver_addr), sizeof(struct sockaddr))) {
 			ESP_LOGE(TAG,strsTELNET,strbind, errno);
 			close(telnetServer_sock);
@@ -105,7 +105,7 @@ void serversTask(void* pvParams) {
 			vTaskDelay(5);	
 			break;
 		}
-		ESP_LOGI(TAG,"Webserver socket: %d, errno: %d", server_sock, errno);
+		ESP_LOGD(TAG,"Webserver socket: %d, errno: %d", server_sock, errno);
 		if (-1 == bind(server_sock, (struct sockaddr *)(&server_addr), sizeof(struct sockaddr))) {
 			ESP_LOGE(TAG,strsWSOCK, strbind,errno);
 			close(server_sock);
@@ -229,7 +229,7 @@ void serversTask(void* pvParams) {
 			if (FD_ISSET(telnetServer_sock, &readfds)) 
 			{
 				FD_CLR(telnetServer_sock , &readfds); 
-				ESP_LOGV(TAG,"telnetServer_sock accept. Socket: %d",telnetServer_sock);	 				
+				ESP_LOGD(TAG,"telnetServer_sock accept. Socket: %d",telnetServer_sock);	 				
 				if ((telnetClient_sock = accept(telnetServer_sock, (struct sockaddr *) &tenetclient_addr, &telnetSin_size)) < 0) 
 				{
 					ESP_LOGE(TAG,strsTELNET,"accept",errno);

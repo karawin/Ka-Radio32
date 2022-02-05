@@ -92,47 +92,6 @@ void incfree(void *p,const char* from)
 }
 
 
-//compute the size of the audio buffer for http
-void ramInit()
-{
-	if (bigSram())
-	{
-		if (getSPIRAMSIZE() == BIGRAM*1024) return; // no need
-		setSPIRAMSIZE(BIGRAM*1024);		// more free heap
-	}
-	else
-	{
-		if (get_audio_output_mode() == VS1053)
-		{
-			if (getSPIRAMSIZE() == SMALLRAM*1024) return; // no need
-			setSPIRAMSIZE(SMALLRAM*1024);		// more free heap
-		}		
-		else
-		{
-			if (getSPIRAMSIZE() == DEFAULTRAM*1024) return; // no need
-			setSPIRAMSIZE(DEFAULTRAM*1024);		// more free heap	
-		}
-	}
-	
-	spiRamFifoDestroy();
-	ESP_LOGI(TAG, "Set Song buffer to %dk",getSPIRAMSIZE()/1024);
-	vTaskDelay(1);
-	if (!spiRamFifoInit())
-	{
-		vTaskDelay(100);
-		ESP_LOGE(TAG, "SPIRAM fail for %dK",getSPIRAMSIZE()/1024);
-		setSPIRAMSIZE(getSPIRAMSIZE() - 10240);
-		ESP_LOGI(TAG, "Set Song buffer to %dk",getSPIRAMSIZE()/1024);
-		if (!spiRamFifoInit())
-		{
-			ESP_LOGE(TAG, "SPIRAM fail for %dK",getSPIRAMSIZE()/1024);
-			ESP_LOGE(TAG, "REBOOT");
-			esp_restart();
-		}
-	}
-}
-
-
 // is it a https one?
 void test_https()
 {
@@ -157,7 +116,7 @@ void ramSinit()
 			if (getSPIRAMSIZE() == HTTPSRAM*1024) return; // no need
 			setSPIRAMSIZE(HTTPSRAM*1024);
 		}	
-		ESP_LOGI(TAG, "Set Song buffer to %dk",getSPIRAMSIZE()/1024);
+/*		ESP_LOGI(TAG, "Set Song buffer to %dk",getSPIRAMSIZE()/1024);
 
 		spiRamFifoDestroy();
 		vTaskDelay(1);
@@ -176,9 +135,46 @@ void ramSinit()
 					esp_restart();
 				}
 			}
+		} */
+	}
+	else //ramInit();
+	//compute the size of the audio buffer for http
+	{
+		if (bigSram())
+		{
+			if (getSPIRAMSIZE() == BIGRAM*1024) return; // no need
+			setSPIRAMSIZE(BIGRAM*1024);		// more free heap
+		}
+		else
+		{
+			if (get_audio_output_mode() == VS1053)
+			{
+				if (getSPIRAMSIZE() == SMALLRAM*1024) return; // no need
+				setSPIRAMSIZE(SMALLRAM*1024);		// more free heap
+			}		
+			else
+			{
+				if (getSPIRAMSIZE() == DEFAULTRAM*1024) return; // no need
+				setSPIRAMSIZE(DEFAULTRAM*1024);		// more free heap	
+			}
 		}
 	}
-	else ramInit();	
+	spiRamFifoDestroy();
+	ESP_LOGI(TAG, "Set Song buffer to %dk",getSPIRAMSIZE()/1024);
+	vTaskDelay(1);
+	if (!spiRamFifoInit())
+	{
+		vTaskDelay(100);
+		ESP_LOGE(TAG, "SPIRAM fail for %dK",getSPIRAMSIZE()/1024);
+		setSPIRAMSIZE(getSPIRAMSIZE() - 10240);
+		ESP_LOGI(TAG, "Set Song buffer to %dk",getSPIRAMSIZE()/1024);
+		if (!spiRamFifoInit())
+		{
+			ESP_LOGE(TAG, "SPIRAM fail for %dK",getSPIRAMSIZE()/1024);
+			ESP_LOGE(TAG, "REBOOT");
+			esp_restart();
+		}
+	}
 }
 
 
@@ -815,6 +811,8 @@ bool clientParseHeader(char* s)
 		if (strstr(t, "audio/mp4")) contentType = KAUDIO_MP4;
 		if (strstr(t, "audio/x-m4a")) contentType = KAUDIO_MP4;
 		if (strstr(t, "audio/mpeg")) contentType = KAUDIO_MPEG;
+		if (strstr(t, "application/ogg")) contentType = KAUDIO_OGG;
+		if (strstr(t, "audio/ogg")) contentType = KAUDIO_OGG;
 
 		if(contentType == KMIME_UNKNOWN) {
 			ESP_LOGD(TAG, "unknown contentType: %s", t);
@@ -1098,6 +1096,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 									len += wolfSSL_read(ssl, pdata+len, RECEIVE+8-len);
 								else
 									len += recv(sockfd, pdata+len, RECEIVE+8-len, 0); 
+								if (len <0) {clientDisconnect("chunk2");break;}							
 							}
 							chunked = (uint32_t) strtol(t1, NULL, 16) +2;
 							if (strchr((t1),0x0A) != NULL)
@@ -1121,7 +1120,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 						bread = wolfSSL_read(ssl, pdata+len, RECEIVE-len);
 					else
 						bread = recvfrom(sockfd, pdata+len, RECEIVE-len, 0, NULL, NULL);					
-					
+					if (bread <0) {clientDisconnect("header11");break;}
 					if (bread >0) len += bread;
 				}
 			} while (t1 == NULL);
@@ -1163,7 +1162,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 								bread = wolfSSL_read(ssl, pdata+len, 9);
 							else
 								bread = recvfrom(sockfd, pdata+len, 9, 0, NULL, NULL);
-
+							if (bread <0) {clientDisconnect("chunk1");break;}
 							if (bread >0) clen = bread;
 							else clen = 0;
 							lc+=clen;len+=clen;
@@ -1385,7 +1384,7 @@ void clientTask(void *pvParams) {
 	portBASE_TYPE uxHighWaterMark;
 	struct timeval timeout;
     timeout.tv_usec = 0;
-	timeout.tv_sec = 5;
+	timeout.tv_sec = 6;
 	int sockfd;
 	int bytes_read;
 	uint8_t cnterror;
@@ -1507,6 +1506,13 @@ void clientTask(void *pvParams) {
 				ESP_LOGD(TAG,"\nSent: %s\n",bufrec);
 				if (setsockopt (sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0)
 					ESP_LOGE(TAG,"Socket: %d  setsockopt: %d  errno:%d ",sockfd, SO_RCVTIMEO,errno);
+
+/// Wi-Fi QoS
+				const int ip_precedence_vi = 4;
+				const int ip_precedence_offset = 5;
+				int priority = (ip_precedence_vi << ip_precedence_offset);
+				if (setsockopt(sockfd, IPPROTO_IP, IP_TOS, &priority, sizeof(priority))< 0)
+					ESP_LOGE(TAG,"Socket: %d  setsockopt: %d  errno:%d ",sockfd, IP_TOS,errno);
 //////
 				cnterror = 0;			
 				wsMonitor();
@@ -1515,16 +1521,21 @@ void clientTask(void *pvParams) {
 				{
 					if (https)
 					{
-						bytes_read = wolfSSL_read(ssl, bufrec, RECEIVE);
-						if ( bytes_read < 0 )
-						{   					    
-							int err;
-							char buffer[80];
-							err = wolfSSL_get_error(ssl, 0);
-							wolfSSL_ERR_error_string(err, buffer);
-							ESP_LOGE(TAG,"wolfSSL_read: %d, read: %s, errno:%d ",err, buffer,errno);
-
-							if (wolfSSL_want_read(ssl) == 1) bytes_read = 0;
+//						int incr = 0;
+//						bytes_read = 0;
+//						while (( bytes_read <= 0 )&& (incr++ <2))
+						{	
+							bytes_read = wolfSSL_read(ssl, bufrec, RECEIVE);							
+							if ( bytes_read < 0 )
+							{   					    
+								int err;
+								char buffer[80];
+								err = wolfSSL_get_error(ssl, 0);
+								wolfSSL_ERR_error_string(err, buffer);
+								ESP_LOGW(TAG,"wolfSSL_read: %d, read: %s",err, buffer);
+								if (wolfSSL_want_read(ssl) == 1) bytes_read = 0;
+								vTaskDelay(10);
+							}	
 						}						
 					}	
 					else
@@ -1621,17 +1632,19 @@ void clientTask(void *pvParams) {
 			}
 			
 			clearAll:
-			shutdown(sockfd,SHUT_RDWR); // stop the socket
-			vTaskDelay(10);
+			spiRamFifoReset();
 			if (https){
 				if (ssl) wolfSSL_free(ssl);    // Free the wolfSSL object 
 				ESP_LOGI(TAG,"SSL Cleanup 1 Socket: %d",sockfd);
 			}
+			shutdown(sockfd,SHUT_RDWR); // stop the socket
+			vTaskDelay(10);
 			close(sockfd);
 			if (cstatus == C_PLAYLIST)
 			{
 			  clientConnect();
 			}
+			vTaskDelay(2);
 			uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
 			ESP_LOGI(TAG,"watermark : %x  %d",uxHighWaterMark,uxHighWaterMark);
 		}

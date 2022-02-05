@@ -4,7 +4,7 @@
  *  Created on: 27.04.2017
  *      Author: michaelboeckling
  */
-
+ 
 #ifndef _INCLUDE_COMMON_BUFFER_H_
 #define _INCLUDE_COMMON_BUFFER_H_
 

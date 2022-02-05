@@ -87,6 +87,8 @@ amm-info@iis.fraunhofer.de
    Description: fixed point abs definitions
 
 ******************************************************************************/
+#undef __xtensa__
+#define __xtensa__
 
 #if !defined(__ABS_H__)
 #define __ABS_H__

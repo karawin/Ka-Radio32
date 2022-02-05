@@ -220,6 +220,7 @@ static void ota_task(void *pvParameter)
     bool resp_body_start = false, flag = true;
     /*deal with all receive packet*/
     while (flag) {
+		vTaskDelay(1);
         memset(text, 0, BUFFSIZE);
         memset(ota_write_data, 0, BUFFSIZE);
         int buff_len = recv(sockfd, text, BUFFSIZE, 0);
@@ -323,7 +324,7 @@ void update_firmware(char* fname)
 	{
 		taskState = true;
 		xTaskHandle pxCreatedTask;
-		xTaskCreate(ota_task, "ota_task", 8192, fname, PRIO_OTA, &pxCreatedTask);
+		xTaskCreatePinnedToCore(ota_task, "ota_task", 8192, fname, PRIO_OTA, &pxCreatedTask,CPU_OTA);
 		ESP_LOGI(TAG, "ota_task: %x",(unsigned int)pxCreatedTask);
 	} else
 	{

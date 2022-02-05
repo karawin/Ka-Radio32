@@ -110,7 +110,7 @@ static void serveFile(char* name, int conn)
 	}
 	struct servFile* f = findFile(name);
 	ESP_LOGV(TAG,"find %s at %x",name,(int)f);
-	ESP_LOGV(TAG,"Heap size: %d",xPortGetFreeHeapSize( ));
+	//ESP_LOGV(TAG,"Heap size: %d",xPortGetFreeHeapSize( ));
 	gpart = PART;
 	if(f != NULL)
 	{
@@ -124,7 +124,7 @@ static void serveFile(char* name, int conn)
 		if (xSemaphoreTake(semfile,portMAX_DELAY ))
 		{
 
-			ESP_LOGV(TAG,"serveFile socket:%d,  %s. Length: %d  sliced in %d",conn,name,length,gpart);
+			//ESP_LOGV(TAG,"serveFile socket:%d,  %s. Length: %d  sliced in %d",conn,name,length,gpart);
 			sprintf(buf, "HTTP/1.1 200 OK\r\nContent-Type: %s\r\nContent-Encoding: gzip\r\nContent-Length: %d\r\nConnection: keep-alive\r\n\r\n", (f!=NULL ? f->type : "text/plain"), length);
 			ESP_LOGV(TAG,"serveFile send %d bytes\n%s",strlen(buf),buf);
 			vTaskDelay(1); // why i need it? Don't know.

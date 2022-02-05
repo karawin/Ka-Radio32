@@ -57,6 +57,6 @@ void renderer_destroy();
 void renderer_zero_dma_buffer();
 renderer_config_t *renderer_get();
 
-void init_i2s();
+bool init_i2s();
 
 #endif /* INCLUDE_AUDIO_RENDERER_H_ */

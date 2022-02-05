@@ -67,30 +67,7 @@ static int start_decoder_task(player_t *player)
             task_name = (char*)"fdkaac_decoder_task";
             stack_depth = 6900; //6144; 
             break;
-	
- /*       case AUDIO_MP4:
-            task_func = libfaac_decoder_task;
-            task_name = (char*)"libfaac_decoder_task";
-            stack_depth = 55000;
-            break;
-*/
-		
-/*
-		case AUDIO_AAC:
-        case OCTET_STREAM: // probably .aac
-            task_func = helixaac_decoder_task;
-            task_name = (char*)"helixaac_decoder_task";
-            stack_depth = 6144; //6144; //6144
-            break;
-*/
-/*				
-        case AUDIO_AAC:
-        case OCTET_STREAM: // probably .aac
-            task_func = libfaac_decoder_task;
-            task_name = "libfaac_decoder_task";
-            stack_depth = 55000;
-            break;
-*/
+
         default:
             ESP_LOGW(TAG, "unknown mime type: %d", player->media_stream->content_type);
 			spiRamFifoReset();
@@ -124,10 +101,8 @@ int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read)
 		clientSilentDisconnect();
         return -2;
     }
-
-    if (bytes_read > 0) {
-        spiRamFifoWrite(recv_buf, bytes_read);
-    }
+	if (bytes_read >0)
+		spiRamFifoWrite(recv_buf, bytes_read);
 
 	if (player_instance->decoder_status != RUNNING ) 
 	{
@@ -135,8 +110,8 @@ int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read)
 		int bytes_in_buf = spiRamFifoFill();
 		uint8_t fill_level = (bytes_in_buf * 100) / spiRamFifoLen();
 
-		bool buffer_ok = (fill_level > (bigSram()?15:80)); // in %
-		if (buffer_ok)
+		//bool buffer_ok = (fill_level > (bigSram()?15:80)); // in %
+		if ((fill_level > (bigSram()?15:80)))
 		{
 			t = 0;
 		// buffer is filled, start decoder
@@ -184,6 +159,7 @@ void audio_player_start()
 
 void audio_player_stop()
 { 
+//		spiRamFifoReset();
 		player_instance->decoder_command = CMD_STOP;
 		player_instance->command = CMD_STOP;
 		player_instance->media_stream->eof = true;
