@@ -527,6 +527,18 @@ bool  init_i2s(/*renderer_config_t *config*/)
 {
 	renderer_config_t *config;
 	config = renderer_get();
+	
+    config->bit_depth = I2S_BITS_PER_SAMPLE_16BIT;
+    config->i2s_num = I2S_NUM_0;
+    config->sample_rate = 44100;
+    config->sample_rate_modifier = 1.0;
+    config->output_mode = get_audio_output_mode();	
+	
+    if(config->output_mode == I2S_MERUS) {
+        config->bit_depth = I2S_BITS_PER_SAMPLE_32BIT;
+    }
+
+	
     i2s_mode_t mode = I2S_MODE_MASTER | I2S_MODE_TX;
     i2s_comm_format_t comm_fmt = I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_MSB;
 	i2s_bits_per_sample_t bit_depth = config->bit_depth;
@@ -537,6 +549,7 @@ bool  init_i2s(/*renderer_config_t *config*/)
 
     if(config->output_mode == DAC_BUILT_IN)
     {
+		config->bit_depth = I2S_BITS_PER_SAMPLE_16BIT;
         mode = mode | I2S_MODE_DAC_BUILT_IN;
         comm_fmt = I2S_COMM_FORMAT_I2S_MSB;
     }
@@ -552,7 +565,7 @@ bool  init_i2s(/*renderer_config_t *config*/)
     }
 
 	if ((config->output_mode == I2S)||(config->output_mode == I2S_MERUS)
-			|| (config->output_mode == SPDIF) || (config->output_mode == DAC_BUILT_IN))
+			|| (config->output_mode == SPDIF) )//|| (config->output_mode == DAC_BUILT_IN))
 	{
 	/* don't use audio pll on buggy rev0 chips */
 	// don't do it for PDM
@@ -581,8 +594,8 @@ bool  init_i2s(/*renderer_config_t *config*/)
             .dma_buf_count = bc,                            // number of buffers, 128 max.  16
 //            .dma_buf_len = bigSram()?256:128,                          // size of each buffer 128
             .dma_buf_len = 512,      // size of each buffer 128
-           .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,        // lowest level 1
-//            .intr_alloc_flags = 0 ,        // default
+//           .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,        // lowest level 1
+            .intr_alloc_flags = 0 ,        // default
 			.tx_desc_auto_clear = true,
 			.use_apll = use_apll					
     };
@@ -598,7 +611,7 @@ bool  init_i2s(/*renderer_config_t *config*/)
 				.data_out_num = i2sdata,
 				.data_in_num = I2S_PIN_NO_CHANGE
 	};
-	
+	ESP_LOGD(TAG, "mode:%d, sample_rate:%d, bit_depth:%d, comm:%d,  data:%d",mode,sample_rate,bit_depth,comm_fmt,i2sdata);
 
     if (i2s_driver_install(config->i2s_num, &i2s_config, 0, NULL) != ESP_OK)
 	{
@@ -617,7 +630,7 @@ bool  init_i2s(/*renderer_config_t *config*/)
     if(config->output_mode == DAC_BUILT_IN)// || (mode & I2S_MODE_PDM))
     {
         i2s_set_pin(config->i2s_num, NULL);
-        i2s_set_dac_mode(I2S_DAC_CHANNEL_BOTH_EN);
+//        i2s_set_dac_mode(I2S_DAC_CHANNEL_BOTH_EN);
     }
     else {
 		if ((lrck!=255) && (bclk!=255) && (i2sdata!=255))

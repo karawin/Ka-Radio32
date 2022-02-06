@@ -312,12 +312,6 @@ static renderer_config_t *create_renderer_config()
 {
     renderer_config_t *renderer_config = calloc(1, sizeof(renderer_config_t));
 
-    renderer_config->bit_depth = I2S_BITS_PER_SAMPLE_16BIT;
-    renderer_config->i2s_num = I2S_NUM_0;
-    renderer_config->sample_rate = 44100;
-    renderer_config->sample_rate_modifier = 1.0;
-    renderer_config->output_mode = audio_output_mode;
-
     if(renderer_config->output_mode == I2S_MERUS) {
         renderer_config->bit_depth = I2S_BITS_PER_SAMPLE_32BIT;
     }
