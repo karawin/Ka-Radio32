@@ -12,9 +12,9 @@ A csv file is interpreted by an utility to generate a bin file that must be flas
 ---------------
 Toolchain Setup
 --------------------
-The quick setup is to download the Windows all-in-one toolchain & MSYS2 zip file from dl.espressif.com:
+The quick setup is to download the Windows all-in-one toolchain & MSYS2 zip file from dl.espressif.com. See  
 
-https://dl.espressif.com/.../esp32_win32_msys2...
+https://docs.espressif.com/projects/esp-idf/en/release-v3.3/get-started/windows-setup-scratch.html#configure-windows-toolchain-from-scratch
 
 - Unzip the zip file to C:\ (or some other location, but this guide assumes C:\) and it will create an msys32 directory with a pre-prepared environment.
 - Open a MSYS2 MINGW32 terminal window by running C:\msys32\mingw32.exe. Create a directory named "esp" that is a default location to develop ESP32 applications. To do so, run the following shell command: mkdir -p ~/esp
