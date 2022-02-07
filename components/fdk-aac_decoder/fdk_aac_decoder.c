@@ -135,7 +135,6 @@ void fdkaac_decoder_task(void *pvParameters)
         }
 		else 
 		{	
-			
 			err = aacDecoder_DecodeFrame(handle, (short int *) pcm_buf->base,
 					pcm_buf->len, flags);
 			

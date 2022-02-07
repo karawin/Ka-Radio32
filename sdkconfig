@@ -853,34 +853,6 @@ CONFIG_LWIP_SNTP_UPDATE_DELAY=3600000
 CONFIG_LWIP_ESP_LWIP_ASSERT=y
 
 #
-# LWIP
-#
-
-#
-# DHCP server
-#
-
-#
-# TCP
-#
-
-#
-# UDP
-#
-
-#
-# ICMP
-#
-
-#
-# LWIP RAW API
-#
-
-#
-# SNTP
-#
-
-#
 # mbedTLS
 #
 CONFIG_MBEDTLS_INTERNAL_MEM_ALLOC=
