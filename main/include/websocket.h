@@ -15,7 +15,7 @@ Inspirated by:
 
 
 typedef  uint32_t u32;
-#include "crypto/sha1_i.h"
+//#include "crypto/sha1_i.h"
 
 
 #define NBCLIENT 5

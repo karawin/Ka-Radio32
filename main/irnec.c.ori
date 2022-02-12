@@ -56,7 +56,7 @@ static const char* NEC_TAG = "NEC";
  /*
  * @brief Check whether duration is around target_us
  */
-/*inline*/ bool nec_check_in_range(int duration_ticks, int target_us, int margin_us)
+inline bool nec_check_in_range(int duration_ticks, int target_us, int margin_us)
 {
 //	ESP_LOGD(NEC_TAG,"NEC_ITEM_DURATION(%d)= %d",duration_ticks,NEC_ITEM_DURATION(duration_ticks));
     if(( NEC_ITEM_DURATION(duration_ticks) < (target_us + margin_us))

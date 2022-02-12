@@ -502,7 +502,9 @@ void namesetU8g2(char* ici)
        nameNum[ici - nameset+1] = 0; 
 	   setFuturNum(atoi(nameNum));     
     }
-    strcpy(nameset,nameset+strlen(nameNum));
+	char nameseti[BUFLEN];
+	strcpy(nameseti,nameset+strlen(nameNum));
+    strcpy(nameset,nameseti);
     lline[STATIONNAME] = nameset;
 }
 

@@ -36,6 +36,7 @@ Copyright (C) 2017  KaraWin
 #include "esp_event_loop.h"
 #include "esp_log.h"
 #include "esp_ota_ops.h"
+#include "esp_sleep.h"
 //#include "esp_heap_trace.h"
 #include "nvs_flash.h"
 #include "driver/i2s.h"
@@ -608,19 +609,19 @@ void start_network(){
 
 		default: // other: AP mode
 			IP4_ADDR(&ipAddr, 192,168,4,1);
-			IPADDR2_COPY(&gate,&ipAddr);
+			IP4_ADDR(&gate, 192, 168, 4, 1);
 			IP4_ADDR(&mask,255,255,255,0);
 	}	
 	
-	IPADDR2_COPY(&info.ip,&ipAddr);
-	IPADDR2_COPY(&info.gw,&gate);
-	IPADDR2_COPY(&info.netmask,&mask);	
+	ip4_addr_copy(info.ip, ipAddr);
+	ip4_addr_copy(info.gw, gate);
+	ip4_addr_copy(info.netmask, mask);
 	
 	ESP_ERROR_CHECK(esp_wifi_get_mode(&mode));		
 	if (mode == WIFI_MODE_AP)
 	{
 			xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT,false, true, 3000);
-			IPADDR2_COPY(&info.ip,&ipAddr);
+			ip4_addr_copy(info.ip, ipAddr);
 			tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_AP, &info);
 			strcpy(localIp , ip4addr_ntoa(&info.ip));
 			printf("IP: %s\n\n",ip4addr_ntoa(&info.ip));	
@@ -675,16 +676,17 @@ void start_network(){
 			tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &info);
 			switch (g_device->current_ap)
 			{
-			case STA1: //ssid1 used			
-				IPADDR2_COPY(&g_device->ipAddr1, &info.ip);
-				IPADDR2_COPY(&g_device->mask1, &info.netmask);
-				IPADDR2_COPY(&g_device->gate1, &info.gw);	
-			break;
-			case STA2: //ssid2 used			
-				IPADDR2_COPY(&g_device->ipAddr2, &info.ip);
-				IPADDR2_COPY(&g_device->mask2, &info.netmask);
-				IPADDR2_COPY(&g_device->gate2, &info.gw);	
-			break;
+			case STA1: //ssid1 used
+				ip4addr_aton((const char *)&g_device->ipAddr1,(ip4_addr_t *)&info.ip);
+				ip4addr_aton((const char *)&g_device->gate1,(ip4_addr_t *)&info.gw);
+				ip4addr_aton((const char *)&g_device->mask1,(ip4_addr_t *)&info.netmask);
+				break;
+
+			case STA2: //ssid2 used
+				ip4addr_aton((const char *)&g_device->ipAddr2,(ip4_addr_t *)&info.ip);
+				ip4addr_aton((const char *)&g_device->gate2,(ip4_addr_t *)&info.gw);
+				ip4addr_aton((const char *)&g_device->mask2,(ip4_addr_t *)&info.netmask);
+				break;
 			}
 		}
 		saveDeviceSettings(g_device);	

@@ -2,12 +2,13 @@
 <html>
    <body>
    <BR/> 
-<h1>Donate:</h1>
-  If you like Karadio and want to contribute to the development (software and hardware),<BR/> please donate, the amount is up to you.<br/> Even one euro or $, I am so happy to know how many users appreciate this project.<BR/>
+<h1>Donate with paypal:</h1>
+<h3>
+  If you like Karadio and want to contribute to the development (software and hardware),<BR/> please donate, the amount is up to you.<br/> Even one € or $, I am so happy to know how many users appreciate this project.<BR/>
   Jean-Pierre COCATRIX<BR/>
   <A HREF="mailto:jp@karawin.fr">jp@karawin.fr</A><BR/>
   KaraWin & KaRadio<BR/>
-  Thanks.<BR/><BR/>
+  Thanks.<BR/><BR/></h3>
  <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
 <input type="hidden" name="cmd" value="_s-xclick">
 <input type="hidden" name="hosted_button_id" value="HVGLA5NYAXYFG">
@@ -16,7 +17,7 @@
 </form>
  <BR/>
   
-<h1>Links</h1>
+<h1>Links to KaRadio repositories and forums</h1>
 <a href="https://github.com/karawin/Ka-Radio" target="_blank"><font color="#14A692">The Github page of KaRadio</font></a> <BR/>
 <a href="https://github.com/karawin/Ka-Radio32" target="_blank"><font color="#14A692">The Github page of KaRadio32</font></a> <BR/>
 <a href="https://github.com/karawin/Karadio-addons" target="_blank"><font color="#14A692">The Github page of KaRadio AddOn (lcd, ir encoder etc...)</font></a> <BR/>
@@ -26,13 +27,13 @@
   <BR/>
   <BR/>
   
-<h1>KaRadio Remote Control</h1> 
+<h1>KaRadio Remote Control on Android</h1> 
 <a href="https://play.google.com/store/apps/details?id=com.serasidis.karadio.rc" target="_blank"><font color="#14A692">KaRadio Remote Control by Vassilis Serasidis on google Play.</font></a> <BR/>
 <p>It is an easy and fast WiFi remote control for your KaRadio or KaRadio32 hardware.<BR/>
 With this android app you can select the WebRadio station you want to play, set the volume and get the station information such as Station name, Genre, Bit rate, Meta data and more. </p>
 <BR/>
 <h1>Playlists:</h1><BR/>
-My playlist: <a href="http://karadio.karawin.fr/playlist/WebStations.txt" download> WebStations.txt</a> updated on 2019/12/12<BR/>
+My playlist: <a href="http://karadio.karawin.fr/playlist/WebStations.txt" download> WebStations.txt</a> updated on 2021/03/03<BR/>
 An italian playlist: <a href="http://karadio.karawin.fr/playlist/WebStations_Italy.txt" download> WebStations_Italy.txt</a><BR/>
 A list of Swiss radio station: <a href="http://karadio.karawin.fr/playlist/WebStationssuisse.txt" download> WebStationssuisse.txt</a><BR/>
 A list from Sergey Sergeevich): <a href="http://karadio.karawin.fr/playlist/My_WebStations(1).txt" download> My_WebStations(1).txt</a> <BR/>
@@ -51,13 +52,19 @@ A list of Hungarian radios from Csaba Dudas: <a href="http://karadio.karawin.fr/
 A list of Lithuania radios from Virginijus Jenkus: <a href="http://karadio.karawin.fr/playlist/Lithuania1.txt" download> Here is a Playlist of Lithuania radios</a><BR/>
 A list of Lithuania radios from sigissoft: <a href="http://karadio.karawin.fr/playlist/Lithuania2.txt" download> Here is a Playlist of Lithuania radios</a><BR/>
 A list from В.Нурмухаметов: <a href="http://karadio.karawin.fr/playlist/Vladnur.txt" download> Here is a Playlist from В.Нурмухаметов</a><BR/>
+A list from Tomáš Pintér. Slovak and Czech radio stations. Various other radio stations are also included: <a href="http://karadio.karawin.fr/playlist/SK&CZ_+_various_WebStations_[20210113].txt" download> Here is a Playlist from Tomáš Pintér</a><BR/>
+A list from Oleg Kruglov: <a href="http://karadio.karawin.fr/playlist/WebStations_Oleg.txt" download> Download here</a><BR/>
+A list from Adil Neymatov: <a href="http://karadio.karawin.fr/playlist/Web_Radio_1.txt" download> Download here</a><BR/>
+A list from Roman Marchuk (space wanderer): radio station Radio Record 128kbp<a href="http://karadio.karawin.fr/playlist/WebStations_record.txt" download> Download here</a><BR/>
+A list from Andrey A. Smirnov: SmirnovStations.txt<a href="http://karadio.karawin.fr/playlist/SmirnovStations.txt" download> Download here</a><BR/>
+A list from Alexandru Dexter: DexterStations.txt<a href="http://karadio.karawin.fr/playlist/DexterStations.txt" download> Download here</a><BR/>
+A list from Mykhailo Sarabyn: WebStations_Ukraine.txt<a href="http://karadio.karawin.fr/playlist/WebStations_Ukraine.txt" download> Download here</a><BR/>
+A list from Stefanidesz János from Hungary: WebStationsjands.txt<a href="http://karadio.karawin.fr/playlist/WebStationsjands.txt" download> Download here</a><BR/><BR/><A HREF="mailto:jp@karawin.fr">Please Send me your playlist to add it here.</A> <br/> <br/><BR/><BR/>
 
-<BR/>
-
-
-<A HREF="mailto:jp@karawin.fr">Please Send me your playlist to add it here.</A> <br/> <br/><BR/>
 <h1>Your prototypes:</h1><BR/>
 <a href="http://karadio.karawin.fr/yours/"  target="_blank"><font color="#14A692">Click here to see your prototypes</font></a><BR/>
+
+
 <BR/>
     </body>
 </html>

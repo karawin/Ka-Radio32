@@ -15,6 +15,7 @@
 #include "interface.h"
 #include "webserver.h"
 #include "cencode_inc.h"
+#include "libsha1.h"
 //#include <stddef.h> /* for size_t */
 
 #define TAG	"websocket"
@@ -47,11 +48,11 @@ void  websocketacceptKey(char* clientKey,char* Output) {
     uint8_t sha1HashBin[20] = { 0 };
     strcat(clientKey ,"258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
 	
-    struct SHA1Context ctx;
+    SHA1_CTX ctx;
 	
-    SHA1Init(&ctx);
-    SHA1Update(&ctx, clientKey, strlen(clientKey));
-    SHA1Final(&sha1HashBin[0], &ctx);
+    SHA1IInit(&ctx);
+    SHA1IUpdate(&ctx, (const unsigned char*)clientKey, strlen(clientKey));
+    SHA1IFinal(&sha1HashBin[0], &ctx);
     base64_encode_local(sha1HashBin, 20,Output);
 }
 

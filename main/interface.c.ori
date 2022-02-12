@@ -154,7 +154,7 @@ static gpio_num_t led_gpio = GPIO_NONE;
 static IRAM_ATTR uint32_t lcd_out = 0xFFFFFFFF;
 static IRAM_ATTR uint32_t lcd_stop = 0xFFFFFFFF;
 
-static esp_log_level_t s_log_default_level = ESP_LOG_NONE;
+static esp_log_level_t s_log_default_level = CONFIG_LOG_BOOTLOADER_LEVEL;
 extern void wsVol(char* vol);
 extern void playStation(char* id);
 void clientVol(char *s);

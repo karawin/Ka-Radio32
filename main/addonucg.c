@@ -1030,7 +1030,9 @@ void namesetUcg(char* ici)
        nameNum[ici - nameset+1] = 0; 
 	   setFuturNum(atoi(nameNum));     
     }
-    strcpy(nameset,nameset+strlen(nameNum));
+	char nameseti[BUFLEN];
+	strcpy(nameseti,nameset+strlen(nameNum));
+    strcpy(nameset,nameseti);
 	charset = Latin;
 	removeUtf8(nameset);
     lline[STATIONNAME] = nameset;
