@@ -556,7 +556,7 @@ bool  init_i2s(/*renderer_config_t *config*/)
     {
 		config->bit_depth = I2S_BITS_PER_SAMPLE_16BIT;
         mode = mode | I2S_MODE_DAC_BUILT_IN;
- //       comm_fmt = I2S_COMM_FORMAT_I2S_MSB;
+        comm_fmt = I2S_COMM_FORMAT_I2S_MSB;
     }
     else if(config->output_mode == PDM)
     {
