@@ -21,6 +21,11 @@
 #include "app_main.h"
 #include "MerusAudio.h"
 
+//#include "freertos/FreeRTOS.h"
+
+//#include "common_component.h"
+
+
 #include "audio_player.h"
 #include "audio_renderer.h"
 
@@ -166,12 +171,12 @@ static void render_i2s_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_de
         size_t bytes_written = 0;
         while((bytes_left > 0) ) {//&& (renderer_status == RUNNING)) {
             res = i2s_write(renderer_instance->i2s_num, buf, bytes_left,& bytes_written,3);
-			if (res != ESP_OK) {
+/*			if (res != ESP_OK) {
 				ESP_LOGE(TAG, "i2s_write error %d",res);
-			}
+			} */
             bytes_left -= bytes_written;
             buf += bytes_written;
-			if (bytes_left != 0) printf("%d/%d\n",bytes_written,buf_len);
+//			if (bytes_left != 0) printf("%d/%d\n",bytes_written,buf_len);
 			//vTaskDelay(1);
         }
 	  }
@@ -286,7 +291,7 @@ static void render_i2s_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_de
 	free (outBuf8);
 }
 
-static bool IRAM_ATTR set_sample_rate(int hz)
+static bool set_sample_rate(int hz)
 {
 //  if (!i2sOn) return false;
   if (hz < 32000) return false;
@@ -310,7 +315,7 @@ static bool IRAM_ATTR set_sample_rate(int hz)
 }
 
 
-static inline void IRAM_ATTR change_volume16(int16_t *buffer, size_t num_samples)
+static inline void change_volume16(int16_t *buffer, size_t num_samples)
 {
 	volatile uint32_t mult = renderer_instance->volume;
 
@@ -324,7 +329,7 @@ static inline void IRAM_ATTR change_volume16(int16_t *buffer, size_t num_samples
 	}
 }
 
-static void IRAM_ATTR encode_spdif(uint32_t *spdif_buffer, int16_t *buffer, size_t num_samples, pcm_format_t *buf_desc)
+static void encode_spdif(uint32_t *spdif_buffer, int16_t *buffer, size_t num_samples, pcm_format_t *buf_desc)
 {
 		// pointer to left / right sample positio
 	int16_t *ptr_l = buffer;
@@ -435,7 +440,7 @@ static void IRAM_ATTR render_spdif_samples(const void *buf, uint32_t buf_len, pc
 	
 //	ESP_LOGI(TAG, "render_spdif_samples len: %d, bytes_cnt: %d",buf_len,bytes_cnt);
 	
-	uint32_t *spdif_buffer = malloc(bytes_cnt);
+	uint32_t *spdif_buffer = heap_caps_malloc(bytes_cnt, MALLOC_CAP_DMA);
 	if (spdif_buffer == NULL)
 	{
 		ESP_LOGE(TAG, "malloc buf failed len:%d ",buf_len);
@@ -470,7 +475,7 @@ void IRAM_ATTR render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_des
 		render_i2s_samples(buf, buf_len, buf_desc);
 }
 
-void  IRAM_ATTR renderer_zero_dma_buffer()
+void  renderer_zero_dma_buffer()
 {
     i2s_zero_dma_buffer(renderer_instance->i2s_num);
 }
@@ -540,7 +545,7 @@ bool  init_i2s(/*renderer_config_t *config*/)
 
 	
     i2s_mode_t mode = I2S_MODE_MASTER | I2S_MODE_TX;
-    i2s_comm_format_t comm_fmt = I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_MSB;
+    i2s_comm_format_t comm_fmt = I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_MSB ;
 	i2s_bits_per_sample_t bit_depth = config->bit_depth;
 	int sample_rate = config->sample_rate;
     int use_apll = 0;
@@ -551,7 +556,7 @@ bool  init_i2s(/*renderer_config_t *config*/)
     {
 		config->bit_depth = I2S_BITS_PER_SAMPLE_16BIT;
         mode = mode | I2S_MODE_DAC_BUILT_IN;
-        comm_fmt = I2S_COMM_FORMAT_I2S_MSB;
+ //       comm_fmt = I2S_COMM_FORMAT_I2S_MSB;
     }
     else if(config->output_mode == PDM)
     {
@@ -571,9 +576,9 @@ bool  init_i2s(/*renderer_config_t *config*/)
 	// don't do it for PDM
 		if(out_info.revision > 0) {
 			use_apll = 1;
-			ESP_LOGI(TAG, "chip revision %d, enabling APLL", out_info.revision);
+			ESP_LOGD(TAG, "chip rev. %d, enabling APLL", out_info.revision);
 		} else
-			ESP_LOGI(TAG, "chip revision %d, cannot enable APLL", out_info.revision);
+			ESP_LOGD(TAG, "chip rev. %d, cannot enable APLL", out_info.revision);
 	}
     /*
      * Allocate just enough to decode AAC+, which has huge frame sizes.
@@ -584,7 +589,8 @@ bool  init_i2s(/*renderer_config_t *config*/)
      * 16 bit: 32 * 256 = 8192 bytes
      * 32 bit: 32 * 256 = 16384 bytes
      */
-	int bc = bigSram()?10:8;
+	int bc = bigSram()?16:8;
+	int bl = bigSram()?256:128;
     i2s_config_t i2s_config = {
             .mode = mode,          // Only TX
             .sample_rate = sample_rate,
@@ -592,9 +598,9 @@ bool  init_i2s(/*renderer_config_t *config*/)
             .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,   // 2-channels
             .communication_format = comm_fmt,
             .dma_buf_count = bc,                            // number of buffers, 128 max.  16
-//            .dma_buf_len = bigSram()?256:128,                          // size of each buffer 128
-            .dma_buf_len = 512,      // size of each buffer 128
-//           .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,        // lowest level 1
+            .dma_buf_len = bl,                          // size of each buffer 128
+//            .dma_buf_len = 128,      // size of each buffer 128
+//           .intr_alloc_flags = ESP_INTR_FLAG_LEVEL3, 
             .intr_alloc_flags = 0 ,        // default
 			.tx_desc_auto_clear = true,
 			.use_apll = use_apll					
@@ -651,4 +657,3 @@ bool  init_i2s(/*renderer_config_t *config*/)
     i2s_stop(config->i2s_num);
 	return true;
 }
-

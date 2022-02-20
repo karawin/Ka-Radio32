@@ -21,7 +21,7 @@
 
 
 
-//const char strtMALLOC1[] = {"Telnet %s malloc fails\n"};
+//const char strtMALLOC1[] = {"Telnet %s kmalloc fails\n"};
 #define strtSOCKET	"Telnet Socket fails %s errno: %d"
 const char strtWELCOME[]  ={"Karadio telnet\n> "};
 
@@ -60,7 +60,7 @@ void telnetinit(void)
 	memset(brec,0,sizeof(brec));
 	irec = 0;
 	iiac = 0;
-	obrec = malloc(2);
+	obrec = kmalloc(2);
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -119,7 +119,7 @@ void vTelnetWrite(uint32_t lenb,const char *fmt, va_list ap)
 	char *buf = NULL;
 	int i;
 	
-	buf = (char *)malloc(lenb+1);
+	buf = (char *)kmalloc(lenb+1);
 	if (buf == NULL) return;
 	buf[0] = 0;
 	vsprintf(buf,fmt, ap);	
@@ -140,7 +140,7 @@ void telnetWrite(uint32_t lenb,const char *fmt, ...)
 	int i ;
 	char *buf = NULL;
 	int rlen;
-	buf = (char *)malloc(lenb+1);
+	buf = (char *)kmalloc(lenb+1);
 	if (buf == NULL) return;
 	buf[0] = 0;
 	strcpy(buf,"ok\n");
@@ -198,12 +198,12 @@ int telnetRead(int tsocket)
 	char *buf ;
 	int32_t recbytes ;
 	int i;	
-	buf = (char *)malloc(MAXDATAT);	
+	buf = (char *)kmalloc(MAXDATAT);	
 	recbytes = 0;
     if (buf == NULL)
 	{
 		vTaskDelay(100); // wait a while and retry
-		buf = (char *)malloc(MAXDATAT);	
+		buf = (char *)kmalloc(MAXDATAT);	
 	}	
 	if (buf != NULL)
 	{

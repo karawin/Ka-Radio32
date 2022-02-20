@@ -21,10 +21,7 @@
 #include "common_buffer.h"
 #include "aacdecoder_lib.h"
 #include "audio_player.h"
-//#include "spiram_fifo.h"
-#include "gpio.h"
-//#include "m4a.h"
-
+#include "app_main.h"
 
 #define TAG "fdkaac_decoder"
 
@@ -56,14 +53,15 @@ void fdkaac_decoder_task(void *pvParameters)
     i2s_start(renderer_instance->i2s_num);
 
     /* allocate sample buffer */
-    buffer_t *pcm_buf = buf_create(OUTPUT_BUFFER_SIZE);
+    buffer_t *pcm_buf = buf_create_dma(OUTPUT_BUFFER_SIZE);
 	if (pcm_buf==NULL) { ESP_LOGE(TAG,"malloc(pcm_buf) failed"); goto abort1; }
     /* allocate bitstream buffer */
 //    buffer_t *in_buf = buf_create(INPUT_BUFFER_SIZE*48);
 	buffer_t *in_buf  = NULL;
-    in_buf = buf_create(INPUT_BUFFER_SIZE* 48 );
+	int bf = bigSram()?12:6;
+    in_buf = buf_create_dma(INPUT_BUFFER_SIZE* bf );
 	if (in_buf==NULL) { 
-		ESP_LOGE(TAG,"malloc(in_buf) failed"); 
+		ESP_LOGE(TAG,"buf_create in_buf failed"); 
 		buf_destroy( pcm_buf); 
 		goto abort1; 
 	}
@@ -80,6 +78,11 @@ void fdkaac_decoder_task(void *pvParameters)
     } else {
         /* create decoder instance */
 		handle = aacDecoder_Open(TT_MP4_ADTS, /* num layers */1);
+		if (handle == 0) 
+		{
+			ESP_LOGE(TAG,"aac invalid handle"); 
+			goto abort1; 
+		}
     }
 	
     /* configure instance */

@@ -71,7 +71,7 @@
 #define PRIO_ADDON		4
 #define PRIO_LCD		7
 #define PRIO_SUBSERV	5
-#define PRIO_TIMER		3
+#define PRIO_TIMER		8
 #define PRIO_OTA		5
 
 // CPU for task
@@ -100,6 +100,10 @@ output_mode_t get_audio_output_mode() ;
 uint8_t getIvol();
 void setIvol( uint8_t vol);
 bool bigSram();
+
+void* kmalloc(size_t memorySize);
+void* kcalloc(size_t elementCount, size_t elementSize);
+
 
 void sleepCallback(void *pArg);
 void wakeCallback(void *pArg);

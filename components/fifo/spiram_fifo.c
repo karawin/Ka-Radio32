@@ -24,6 +24,11 @@
 //#include "esp_heap_trace.h"
 #include "esp_heap_caps.h"
 //#include "playerconfig.h"
+
+extern void* kmalloc(size_t memorySize);
+extern void* kcalloc(size_t elementCount, size_t elementSize);
+
+
 #define FAKE_SPI_BUFF
 
 //#define SPIREADSIZE 1024
@@ -64,7 +69,7 @@ unsigned getSPIRAMSIZE()
 
 //Initialize the FIFO
 void* spiRamFifoInit() {
-	fakespiram = malloc(SPIRAMSIZE);
+	fakespiram = kmalloc(SPIRAMSIZE);
 	fifoRpos=0;
 	fifoWpos=0;
 	fifoFill=0;

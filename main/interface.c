@@ -44,7 +44,7 @@ const char stritWIFISTATUS[]  = {"#WIFI.STATUS#\nIP: %d.%d.%d.%d\nMask: %d.%d.%d
 const char stritWIFISTATION[]  = {"#WIFI.STATION#\nSSID: %s\nPASSWORD: %s\n##WIFI.STATION#\n"};
 const char stritPATCH[]  = {"#WIFI.PATCH#: VS1053 Patch will be %s after power Off and On#\n"};
 const char stritCMDERROR[]  = {"##CMD_ERROR#\n"};
-const char stritHELP0[]  = {"\
+static const char stritHELP0[]  = {"\
 Commands:\n\
 ---------\n\
 //////////////////\n\
@@ -65,7 +65,7 @@ wifi.status: give the current IP GW and mask\n\
 wifi.rssi: print the rssi (power of the reception\n\
 wifi.auto[(\"x\")]  show the autoconnection  state or set it to x. x=0: reboot on wifi disconnect or 1: try reconnection.\n\n\
 "};
-const char stritHELP1[]  = {"\
+static const char stritHELP1[]  = {"\
 //////////////////\n\
   Station Client commands\n\
 //////////////////\n\
@@ -85,7 +85,7 @@ cli.vol: display the current volume. respond with ##CLI.VOL# xxx\n\
 cli.vol-: Decrement the volume by 10 \n\
 cli.vol+: Increment the volume by 10 \n\
 "};
-const char stritHELP2[]  = {"\
+static const char stritHELP2[]  = {"\
 Every vol command from uart or web or browser respond with ##CLI.VOL#: xxx\n\
 cli.wake(\"x\"):  x in minutes. Start or stop the wake function. A value 0 stop the wake timer\n\
 cli.sleep(\"x\"):  x in minutes. Start or stop the sleep function. A value 0 stop the sleep timer\n\
@@ -100,7 +100,7 @@ sys.uart(\"x\"): Change the baudrate of the uart on the next reset.\n\
 sys.i2s: Display the current I2S speed\n\
 "};
 
-const char stritHELP3[]  = {"\
+static const char stritHELP3[]  = {"\
 sys.i2s(\"x\"): Change and record the I2S clock speed of the vs1053 GPIO5 MCLK of the i2s interface to external dac.\n\
 : 0=48kHz, 1=96kHz, 2=192kHz, other equal 0\n\
 sys.erase: erase all recorded configuration and stations.\n\
@@ -116,7 +116,7 @@ sys.version: Display the Release and Revision numbers\n\
 sys.tzo and sys.tzo(\"x:y\"): Display and Set the timezone offset of your country.\n\
 "};
 
-const char stritHELP4[]  = {"\
+static const char stritHELP4[]  = {"\
 sys.date: Send a ntp request and Display the current locale time\n\
 sys.dlog: Display the current log level\n\
 sys.logx: Set log level to x with x=n for none, v for verbose, d for debug, i for info, w for warning, e for error\n\
@@ -128,7 +128,7 @@ sys.lcdblv and sys.lcdblv(\"x\"): Value in percent of the backlight.\n\
 sys.lcd and sys.lcd(\"x\"): Display and Change the lcd type to x on next reset\n\
 "};
 
-const char stritHELP5[]  = {"\
+static const char stritHELP5[]  = {"\
 sys.ledgpio and sys.ledgpio(\"x\"): Display and Change the default Led GPIO (4) to x\n\
 sys.ddmm and sys.ddmm(\"x\"):  Display and Change  the date format. 0:MMDD, 1:DDMM\n\
 sys.host and sys.host(\"your hostname\"): display and change the hostname for mDNS\n\
@@ -273,7 +273,7 @@ wifi_scan_config_t config = {
 	config.scan_time.passive = 500;
 	esp_wifi_scan_start(&config, true);
 	esp_wifi_scan_get_ap_num(&number);
-	records = malloc(sizeof(wifi_ap_record_t) * number);
+	records = kmalloc(sizeof(wifi_ap_record_t) * number);
 	if (records == NULL) return;
 	esp_wifi_scan_get_ap_records(&number, records); // get the records
 	kprintf(hscan1,number);
@@ -438,15 +438,14 @@ void clientParseUrl(char* s)
 	}
 	t_end -= 2;
 
-    char *url = (char*) malloc((t_end-t+1)*sizeof(char));
+    char *url = (char*) kmalloc((t_end-t+1)*sizeof(char));
     if(url != NULL)
     {
         uint8_t tmp;
         for(tmp=0; tmp<(t_end-t+1); tmp++) url[tmp] = 0;
         strncpy(url, t+2, (t_end-t));
         clientSetURL(url);
-//		char* title = malloc(88);
-		char* title = malloc(strlen(url)+13);
+		char* title = kmalloc(strlen(url)+13);
 		sprintf(title,"{\"iurl\":\"%s\"}",url); 
 		websocketbroadcast(title, strlen(title));
 		free(title);		
@@ -466,7 +465,7 @@ void clientParsePath(char* s)
 	}
 	t_end -= 2;
 	
-    char *path = (char*) malloc((t_end-t+1)*sizeof(char));
+    char *path = (char*) kmalloc((t_end-t+1)*sizeof(char));
     if(path != NULL)
     {
         uint8_t tmp;
@@ -474,8 +473,7 @@ void clientParsePath(char* s)
         strncpy(path, t+2, (t_end-t));
 //kprintf("cli.path: %s\n",path);
         clientSetPath(path);
-//		char* title = malloc(130);
-		char* title = malloc(strlen(path)+14);
+		char* title = kmalloc(strlen(path)+14);
 		sprintf(title,"{\"ipath\":\"%s\"}",path); 
 		websocketbroadcast(title, strlen(title));
 		free(title);		
@@ -495,7 +493,7 @@ void clientParsePort(char *s)
 	}
 	t_end -= 2;
 
-    char *port = (char*) malloc((t_end-t+1)*sizeof(char));
+    char *port = (char*) kmalloc((t_end-t+1)*sizeof(char));
     if(port != NULL)
     {
         uint8_t tmp;
@@ -503,7 +501,7 @@ void clientParsePort(char *s)
         strncpy(port, t+2, (t_end-t));
         uint16_t porti = atoi(port);
         clientSetPort(porti);
-		char* title = malloc(24);
+		char* title = kmalloc(24);
 		sprintf(title,"{\"iport\":\"%d\"}",porti); 
 		websocketbroadcast(title, strlen(title));
 		free(title);		
@@ -524,7 +522,7 @@ void clientPlay(char *s)
 	}
 	t_end -= 2;
 
-	char *id = (char*) malloc((t_end-t+1)*sizeof(char));
+	char *id = (char*) kmalloc((t_end-t+1)*sizeof(char));
     if(id != NULL)
     {
         uint8_t tmp;
@@ -640,7 +638,7 @@ char* tmp;
 char* tmpend ;
 char url[200];
 
-	si = malloc(sizeof(struct shoutcast_info));	
+	si = kmalloc(sizeof(struct shoutcast_info));	
 	if (si == NULL) { kprintf("##CLI.EDIT#: ERROR MEM#") ; return;}
 	memset(si->domain, 0, sizeof(si->domain));
     memset(si->file, 0, sizeof(si->file));
@@ -704,7 +702,7 @@ char* webInfo()
 {
 	struct shoutcast_info* si;
 	si = getStation(currentStation);
-	char* resp = malloc(1024);
+	char* resp = kmalloc(1024);
 	if (si != NULL)
 	{
 		if (resp != NULL)
@@ -720,7 +718,7 @@ char* webList(int id)
 {
 	struct shoutcast_info* si;
 	si = getStation(id);
-	char* resp = malloc(1024);
+	char* resp = kmalloc(1024);
 	if (si != NULL)
 	{
 		if (resp != NULL)
@@ -803,7 +801,7 @@ void clientVol(char *s)
 		kprintf(stritCMDERROR);
 		return;
     }
-   char *vol = (char*) malloc((t_end-t+1)*sizeof(char));
+   char *vol = (char*) kmalloc((t_end-t+1)*sizeof(char));
     if (vol != NULL)
     {
         uint8_t tmp;
@@ -836,7 +834,7 @@ void clientWake(char *s)
 		kprintf(stritCMDERROR);
 		return;
     }
-   char *label = (char*) malloc((t_end-t+1)*sizeof(char));
+   char *label = (char*) kmalloc((t_end-t+1)*sizeof(char));
     if (label != NULL)
     {
         uint8_t tmp;
@@ -868,7 +866,7 @@ void clientSleep(char *s)
 		kprintf(stritCMDERROR);
 		return;
     }
-   char *label = (char*) malloc((t_end-t+1)*sizeof(char));
+   char *label = (char*) kmalloc((t_end-t+1)*sizeof(char));
     if (label != NULL)
     {
         uint8_t tmp;
@@ -936,19 +934,8 @@ void sysledgpio(char* s)
 
 void setLedGpio(uint8_t val) { led_gpio = val;g_device->led_gpio = val;}
 
-uint8_t getLedGpio()
+IRAM_ATTR uint8_t getLedGpio()
 {
-/*	if (led_gpio == GPIO_NONE)
-	{
-		gpio_get_ledgpio(&led_gpio);
-		if (led_gpio != g_device->led_gpio) 
-		{
-			g_device->led_gpio = led_gpio;
-			saveDeviceSettings(g_device);
-		} 
-	} 
-	
-	*/
 	return led_gpio;	
 }
 
@@ -1269,8 +1256,7 @@ void tzoffset(char* s)
 // print the heapsize
 void heapSize()
 {
-	int hps = xPortGetFreeHeapSize( );
-	kprintf("%sHEAP: %d #\n",msgsys,hps);
+	kprintf("%sHEAP: %d, Internal: %d #\n",msgsys,xPortGetFreeHeapSize(),heap_caps_get_free_size(MALLOC_CAP_INTERNAL  | MALLOC_CAP_8BIT) );
 }
 
 // set hostname in mDNS
@@ -1452,7 +1438,7 @@ void dbgSSL(char* s)
 
 void checkCommand(int size, char* s)
 {
-	char *tmp = (char*)malloc((size+1)*sizeof(char));
+	char *tmp = (char*)kmalloc((size+1)*sizeof(char));
 	int i;
 	for(i=0;i<size;i++) tmp[i] = s[i];
 	tmp[size] = 0;

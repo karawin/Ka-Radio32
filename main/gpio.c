@@ -8,11 +8,9 @@
 #define TAG "GPIO"
 #include "driver/gpio.h"
 #include "gpio.h"
-#include "nvs_flash.h"
 #include "esp_log.h"
 #include "app_main.h"
 #include "eeprom.h"
-
 
 static xSemaphoreHandle muxnvs= NULL;
 const char hardware[] = {"hardware"};
@@ -73,7 +71,7 @@ void gpio_get_label(char** label)
 	nvs_get_str(hardware_handle, "L_LABEL", NULL, &required_size);
 	if (required_size >1)
 	{
-		*label = malloc(required_size);
+		*label = kmalloc(required_size);
 		nvs_get_str(hardware_handle, "L_LABEL", *label, &required_size);	
 		ESP_LOGV(TAG,"Label: \"%s\"\n Required size: %d",*label,required_size);
 	}	
@@ -93,7 +91,7 @@ void gpio_get_comment(char** label)
 	nvs_get_str(hardware_handle, "L_COMMENT", NULL, &required_size);
 	if (required_size >1)
 	{
-		*label = malloc(required_size);
+		*label = kmalloc(required_size);
 		nvs_get_str(hardware_handle, "L_COMMENT", *label, &required_size);	
 		ESP_LOGV(TAG,"Label: \"%s\"\n Required size: %d",*label,required_size);
 	}	
@@ -615,11 +613,11 @@ void gpio_get_adc(adc1_channel_t  *channel, adc1_channel_t *chanbatt)
 	}	
 	
 	err = nvs_get_u8(hardware_handle, "P_ADC_KBD",(uint8_t *) channel);
-	if (err != ESP_OK)ESP_LOGW(TAG,"g_get_adc err 0x%x",err);
+	if (err != ESP_OK)ESP_LOGW(TAG,"g_get_adc kbd err 0x%x",err);
 	else *channel = gpioToChannel(*channel);
 
 	err = nvs_get_u8(hardware_handle, "P_ADC_BAT",(uint8_t *) chanbatt);
-	if (err != ESP_OK)ESP_LOGW(TAG,"g_get_adc err 0x%x",err);
+	if (err != ESP_OK)ESP_LOGW(TAG,"g_get_adc bat err 0x%x",err);
 	else *chanbatt = gpioToChannel(*chanbatt);
 
 	close_partition(hardware_handle,hardware);		
@@ -703,7 +701,7 @@ bool gpio_get_ir_key(nvs_handle handle,const char *key, uint32_t *out_value1 , u
 	nvs_get_str(handle, key, NULL, &required_size);
 	if (required_size >1)
 	{
-		char* string = malloc(required_size);
+		char* string = kmalloc(required_size);
 		nvs_get_str(handle, key, string, &required_size);	
 		sscanf(string,"%x %x",out_value1,out_value2);
 //		ESP_LOGV(TAG,"String \"%s\"\n Required size: %d",string,required_size);

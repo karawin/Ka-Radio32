@@ -12,7 +12,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
-#include <u8g2.h>
+#include "u8g2.h"
 #include "ucg.h"
 
 
@@ -100,6 +100,7 @@ void task_addon(void *pvParams);
 void task_lcd(void *pvParams);
 void lcd_init(uint8_t Type);
 void (*serviceAddon)();
+void ServiceAddon(void);
 void addonParse(const char *fmt, ...);
 void lcd_welcome(const char* ip,const char*state);
 void setFuturNum(int16_t new);

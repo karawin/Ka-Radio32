@@ -30,7 +30,7 @@
 
 Joystick_t* ClickJoystickInit(int8_t A)
 {
-	Joystick_t* enc = malloc(sizeof(Joystick_t));
+	Joystick_t* enc = kmalloc(sizeof(Joystick_t));
 	if (enc == NULL) return enc;
 	enc->channel = gpioToChannel(A); 
 	ESP_LOGD(TAG,"Joystick Channel: %i",enc->channel);

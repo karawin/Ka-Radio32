@@ -118,6 +118,8 @@ void saveDeviceSettingsVolume(struct device_settings *settings);
 struct device_settings* getDeviceSettings();
 struct device_settings* getDeviceSettingsSilent();
 
+extern void* kmalloc(size_t memorySize);
+extern void* kcalloc(size_t elementCount, size_t elementSize);
 
 // Protect: html page is password protected.
 void setProtect(bool);

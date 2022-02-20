@@ -15,6 +15,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_log.h"
+#include "esp_heap_caps.h"
 #include "spiram_fifo.h"
 #include "byteswap.h"
 
@@ -24,11 +25,34 @@
 buffer_t *buf_create(size_t len)
 {
     buffer_t* buf = calloc(1, sizeof(buffer_t));
-
+	if(buf == NULL) {
+        ESP_LOGE(TAG, "couldn't malloc buffer size %d",  sizeof(buffer_t));
+        return NULL;
+    }
     buf->len = len;
-    buf->base = calloc(len, sizeof(uint8_t));
+    buf->base = calloc(len,sizeof(uint8_t));
     if(buf->base == NULL) {
-        ESP_LOGE(TAG, "couldn't allocate buffer of size %d", len);
+        ESP_LOGE(TAG, "couldn't calloc base size %d", len);
+        return NULL;
+    }
+    buf->read_pos = buf->base;
+    buf->fill_pos = buf->base;
+    buf->bytes_consumed = 0;
+
+    return buf;
+}
+/* creates a buffer struct and its storage on the heap */
+buffer_t *buf_create_dma(size_t len)
+{
+    buffer_t* buf = heap_caps_calloc(1,sizeof(buffer_t), MALLOC_CAP_DEFAULT);
+	if(buf == NULL) {
+        ESP_LOGE(TAG, "couldn't calloc buffer size %d",  sizeof(buffer_t));
+        return NULL;
+    }
+    buf->len = len;
+    buf->base = heap_caps_calloc(len,sizeof(uint8_t), MALLOC_CAP_DMA);
+    if(buf->base == NULL) {
+        ESP_LOGE(TAG, "couldn't calloc base size %d", len);
         return NULL;
     }
     buf->read_pos = buf->base;

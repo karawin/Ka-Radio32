@@ -13,7 +13,7 @@
 
 #define UCG_ESP32_HAL_UNDEFINED (-1)
 #define ONEBYTEMAX 4
-#define ONEBYTEMAXM1 3
+#define ONEBYTEMAXM1 ONEBYTEMAX-1
 typedef struct {
 #ifdef KaRadio32	
 	uint8_t spi_no;
@@ -32,7 +32,8 @@ typedef struct {
 //cumul one byte entries
 typedef struct {
 	uint16_t nb;
-	uint8_t data[ONEBYTEMAX];
+//	uint8_t data[ONEBYTEMAX];
+	uint8_t *data;
 } ucg_esp32_oneByte;
 
 

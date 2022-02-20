@@ -31,7 +31,7 @@ uint8_t rexp; // expansion ports for esplay
 
 Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C, bool Active)
 {
-	Button_t* enc = malloc(sizeof(Button_t));
+	Button_t* enc = kmalloc(sizeof(Button_t));
 	enc->pinBTN[0] = A; 
 	enc->pinBTN[1] = B;
 	enc->pinBTN[2] = C;
@@ -74,7 +74,7 @@ Button_t* ClickButtonsInit(int8_t A, int8_t B, int8_t C, bool Active)
 //Buttons on a gpio expander
 Button_t* ClickexpButtonsInit(int8_t A, int8_t B, int8_t C, bool Active)
 {
-	Button_t* enc = malloc(sizeof(Button_t));
+	Button_t* enc = kmalloc(sizeof(Button_t));
 	enc->pinBTN[0] = A; 
 	enc->pinBTN[1] = B;
 	enc->pinBTN[2] = C;
@@ -180,7 +180,7 @@ Button getButtons(Button_t *enc,uint8_t index)
 #define NACK_VAL 0x1                /*!< I2C nack value */
 #define I2C_ADDR 0x40				// esplay i2c address
 
-uint8_t i2c_keypad_read()
+IRAM_ATTR  uint8_t i2c_keypad_read()
 {
 uint8_t val;
 

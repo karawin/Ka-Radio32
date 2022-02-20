@@ -27,7 +27,7 @@
 static spi_device_handle_t handle; // SPI handle of the spi lcd interface.
 //static spi_device_handle_t t_handle; // SPI handle of the spi touch interface.XPT2046_Touchscreen ts = XPT2046_Touchscreen();
 
-DRAM_ATTR static ucg_esp32_hal_t ucg_esp32_hal; // HAL state data.
+static ucg_esp32_hal_t ucg_esp32_hal; // HAL state data.
 static ucg_esp32_oneByte oneByte;
 static spi_transaction_t trans_desc;
 /* to init call
@@ -57,33 +57,22 @@ ucg_SetFontMode(&ucg, UCG_FONT_MODE_TRANSPARENT);
 void ucg_esp32_hal_init(ucg_esp32_hal_t ucg_esp32_hal_param) {
 	ucg_esp32_hal = ucg_esp32_hal_param;
 	oneByte.nb = 0;
-	
+	oneByte.data = heap_caps_malloc(ONEBYTEMAX, MALLOC_CAP_DMA);
 } // ucg_esp32_hal_init
 
 void sendOneByte()
 {
-	int nb = oneByte.nb;
-	oneByte.nb = 0;	
+//	int nb = oneByte.nb;
+//	oneByte.nb = 0;	
 		
-	if (nb != 0)
+	if (oneByte.nb != 0)
 	{
-//		printf("O");
-//		spi_transaction_t trans_desc;
 		memset(&trans_desc,0,sizeof(spi_transaction_t));
 		
-		trans_desc.flags     =  SPI_TRANS_USE_TXDATA;
-		trans_desc.length    = 8*nb;  // Number of bits NOT number of bytes.
-		trans_desc.tx_data[0] = oneByte.data[0];// data;
-		trans_desc.tx_data[1] = oneByte.data[1];// data;
-		trans_desc.tx_data[2] = oneByte.data[2];// data;
-		trans_desc.tx_data[3] = oneByte.data[3];//			
-		ESP_ERROR_CHECK(spi_device_transmit(handle, &trans_desc));	
-		
-//		printf("NB: %d\n",nb);
-/*		trans_desc.length    = 8*nb ; // Number of bits NOT number of bytes.
+		trans_desc.length    = 8*oneByte.nb ; // Number of bits NOT number of bytes.
 		trans_desc.tx_buffer = oneByte.data;
 		ESP_ERROR_CHECK(spi_device_transmit(handle, &trans_desc));							
-*/		
+		oneByte.nb = 0;	
 	}
 }
 
@@ -93,7 +82,7 @@ void sendOneByte()
 void addOneByte(uint8_t bt)
 {
 	oneByte.data[oneByte.nb++] = bt;
-	if (oneByte.nb > ONEBYTEMAXM1) sendOneByte(); //security, but ucglib send a max of 4 bytes alone.
+	if (oneByte.nb > ONEBYTEMAXM1) {sendOneByte();} //security, but ucglib send a max of 4 bytes alone.
 }
 
 
@@ -216,12 +205,18 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 		sendOneByte();
       break;
     case UCG_COM_MSG_SEND_BYTE: {
-//		printf("B");
+//		printf("%c",arg);
 		addOneByte(arg);
       /* "data" is not used */
       /* "arg" contains one byte, which should be sent to the display */
       /* The current status of the CD line is available */
-      /* in bit 0 of u8g->com_status */		 
+      /* in bit 0 of u8g->com_status */
+/*		memset(&trans_desc,0,sizeof(spi_transaction_t));	  
+		trans_desc.flags     =  SPI_TRANS_USE_TXDATA;
+		trans_desc.length    = 8;  // Number of bits NOT number of bytes.
+		trans_desc.tx_data[0] = arg;// data;	
+		ESP_ERROR_CHECK(spi_device_transmit(handle, &trans_desc));	
+*/	  
 	  }
       break;
     case UCG_COM_MSG_REPEAT_1_BYTE: 
@@ -248,6 +243,7 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 		ESP_ERROR_CHECK(spi_device_transmit(handle, &trans_desc));				
 		heap_caps_free(txb);	
 	}
+	
       break;
     case UCG_COM_MSG_REPEAT_2_BYTES: 
 	if (arg ==0) break;
@@ -260,8 +256,7 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
       /* repeat sending the two bytes "arg" times */
       /* The current status of the CD line is available */
       /* in bit 0 of u8g->com_status */
-	  uint16_t i = arg;
-	  
+	  uint16_t i = arg;	  
 //	  spi_transaction_t trans_desc;
 	  memset(&trans_desc,0,sizeof(spi_transaction_t));
 		uint8_t* txbf;
@@ -273,7 +268,7 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 		trans_desc.length    = 16*arg ; // Number of bits NOT number of bytes.
 		trans_desc.tx_buffer = txb;
 		ESP_ERROR_CHECK(spi_device_transmit(handle, &trans_desc));				
-		heap_caps_free(txb);	
+		heap_caps_free(txb);		
 	}
     break;
     case UCG_COM_MSG_REPEAT_3_BYTES: 
@@ -288,7 +283,8 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
       /* repeat sending the three bytes "arg" times */
       /* The current status of the CD line is available */
       /* in bit 0 of u8g->com_status */
-	  uint16_t i = arg;	  
+		uint16_t i = arg;	  
+
 //	  spi_transaction_t trans_desc;
 	  memset(&trans_desc,0,sizeof(spi_transaction_t));
 		uint8_t* txbf;
@@ -301,11 +297,10 @@ int16_t ucg_com_hal(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *data)
 		trans_desc.tx_buffer = txb;
 		ESP_ERROR_CHECK(spi_device_transmit(handle, &trans_desc));				
 		heap_caps_free(txb);	
-
 	}
     break;
     case UCG_COM_MSG_SEND_STR: {
-//		printf("S");
+//		printf("%s",data);
 		sendOneByte();
       /* "data" is an array with "arg" bytes */
       /* send "arg" bytes to the display */

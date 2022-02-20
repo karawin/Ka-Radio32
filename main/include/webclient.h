@@ -17,12 +17,12 @@
 
 // audio buffer size in k
 // default to 30
-#define DEFAULTRAM	40
+#define DEFAULTRAM	45
 // for https
 #define HTTPSRAM	25
-#define HTTPSVSRAM	40
+#define HTTPSVSRAM	50
 // for vs1053 output on woover
-#define SMALLRAM 	50
+#define SMALLRAM 	60
 // for wrover
 #define BIGRAM		400
 

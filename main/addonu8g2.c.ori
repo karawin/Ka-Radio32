@@ -287,7 +287,7 @@ void drawFrameU8g2(uint8_t mTscreen)
 		u8g2_SetFontRefHeightText(&u8g2); 
 		{
 			u8g2_DrawHLine(&u8g2,0,((yy==32)?3:4*y) - (y/2)-1,x);
-			u8g2_DrawBox(&u8g2,0,0,x-1,y+1);
+			u8g2_DrawBox(&u8g2,0,0,x-1,y);
 		}
 		for (int i = 0;i < LINES;i++)
 		{
@@ -502,9 +502,7 @@ void namesetU8g2(char* ici)
        nameNum[ici - nameset+1] = 0; 
 	   setFuturNum(atoi(nameNum));     
     }
-	char nameseti[BUFLEN];
-	strcpy(nameseti,nameset+strlen(nameNum));
-    strcpy(nameset,nameseti);
+    strcpy(nameset,nameset+strlen(nameNum));
     lline[STATIONNAME] = nameset;
 }
 

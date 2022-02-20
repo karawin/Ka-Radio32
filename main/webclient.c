@@ -48,14 +48,14 @@ static bool https = false;
 static const char* icyHeaders[] = { "icy-name:", "icy-notice1:", "icy-notice2:",  "icy-url:", "icy-genre:", "icy-br:","icy-description:","ice-audio-info:", "icy-metaint:" };
 contentType_t contentType;
 
-static char notfound[]={"Not Found"};
-static char nodata[]={"No Data"};
+static const char notfound[]={"Not Found"};
+static const char nodata[]={"No Data"};
 static char parEmpty[] = {" "};
-const char CLIPLAY[]  = {"##CLI.PLAYING#%c%c"};
-const char CLISTOP[]  = {"##CLI.STOPPED# from %s\n"};
+static char CLIPLAY[]  = {"##CLI.PLAYING#%c%c"};
+static char CLISTOP[]  = {"##CLI.STOPPED# from %s\n"};
 
 #define strcMALLOC  	"Client: incmalloc fails for %d"
-#define strcMALLOC1  	"%s malloc fails"
+#define strcMALLOC1  	"%s kmalloc fails"
 
 #define URLMAX	256
 #define PATHMAX	512
@@ -71,17 +71,17 @@ static uint16_t clientPort = 80;
     WOLFSSL_CTX *ctx ;
     WOLFSSL *ssl ;
 
-static struct hostent *serverInfo = NULL;
+static const struct hostent *serverInfo = NULL;
 static char* pseudoUtf8(char* str,int *len);
 
 void *incmalloc(size_t n)
 {
 	void* ret;
-//printf ("Client malloc of %d %d,  Heap size: %d\n",n,((n / 32) + 1) * 32,xPortGetFreeHeapSize( ));
-	ret = malloc(n);
+//printf ("Client kmalloc of %d %d,  Heap size: %d\n",n,((n / 32) + 1) * 32,xPortGetFreeHeapSize( ));
+	ret = kmalloc(n);
 	if (ret == NULL) ESP_LOGV(TAG,strcMALLOC,n);
 //	if (n <4) printf("Client: incmalloc size:%d\n",n);
-	ESP_LOGV(TAG,"Client malloc after of %d bytes ret:%x  Heap size: %d",n,(int)ret,xPortGetFreeHeapSize( ));
+	ESP_LOGV(TAG,"Client kmalloc after of %d bytes ret:%x  Heap size: %d",n,(int)ret,xPortGetFreeHeapSize( ));
 	return ret;
 }
 void incfree(void *p,const char* from)
@@ -116,26 +116,6 @@ void ramSinit()
 			if (getSPIRAMSIZE() == HTTPSRAM*1024) return; // no need
 			setSPIRAMSIZE(HTTPSRAM*1024);
 		}	
-/*		ESP_LOGI(TAG, "Set Song buffer to %dk",getSPIRAMSIZE()/1024);
-
-		spiRamFifoDestroy();
-		vTaskDelay(1);
-		if (!spiRamFifoInit()) 
-		{	
-			vTaskDelay(200);
-			if (!spiRamFifoInit()) 
-			{
-				setSPIRAMSIZE(getSPIRAMSIZE() - 10240);
-				ESP_LOGI(TAG, "SPIRAM retry for %dK",getSPIRAMSIZE()/1024);
-				vTaskDelay(200);				
-				if (!spiRamFifoInit()) 
-				{
-					ESP_LOGE(TAG, "SPIRAM fail for %dK",getSPIRAMSIZE()/1024);
-					ESP_LOGE(TAG, "REBOOT");
-					esp_restart();
-				}
-			}
-		} */
 	}
 	else //ramInit();
 	//compute the size of the audio buffer for http
@@ -161,7 +141,6 @@ void ramSinit()
 	}
 	spiRamFifoDestroy();
 	ESP_LOGI(TAG, "Set Song buffer to %dk",getSPIRAMSIZE()/1024);
-	vTaskDelay(1);
 	if (!spiRamFifoInit())
 	{
 		vTaskDelay(100);
@@ -171,6 +150,7 @@ void ramSinit()
 		if (!spiRamFifoInit())
 		{
 			ESP_LOGE(TAG, "SPIRAM fail for %dK",getSPIRAMSIZE()/1024);
+			ESP_LOGE(TAG,"%sHEAPd0: %d #\n","##SYS.",xPortGetFreeHeapSize( ));	
 			ESP_LOGE(TAG, "REBOOT");
 			esp_restart();
 		}
@@ -246,7 +226,7 @@ char * string_rec ;
 
 if (strstr(string,"&#") != NULL)
 {
-string_rec  = calloc(strlen(string)+1, sizeof(uint8_t));
+string_rec  = kcalloc(strlen(string)+1, sizeof(uint8_t));
   while (strstr(string,"&#") != NULL){
     len = strcspn(string, "&#");
     if(len == 0){l=1;}
@@ -653,7 +633,7 @@ void wsMonitor()
 	char *answer;
 	uint16_t len;
 	len = strlen(clientURL)+strlen(clientPath)+30;
-	answer= malloc(len);
+	answer= kmalloc(len);
 	if (answer)
 	{
 		memset(answer,0,len);

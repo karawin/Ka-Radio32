@@ -17,7 +17,7 @@
 
 
 #define RELEASE "2.2"
-#define REVISION "1"
+#define REVISION "2"
 
 uint32_t checkUart(uint32_t speed);
 extern unsigned short adcdiv;	
@@ -53,6 +53,8 @@ void setHostname(char* s);
 		telnetWrite(printf(fmt, ##__VA_ARGS__),fmt, ##__VA_ARGS__); \
 		addonParse(fmt, ##__VA_ARGS__);\
 	} while (0)
+
+
 
 void lkprintf(const char *format, va_list ap);
 	

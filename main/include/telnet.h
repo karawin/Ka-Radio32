@@ -37,4 +37,6 @@ int telnetRead(int tsocket);
 // the telnet server task
 void telnetTask(void* pvParams) ;
 
+extern void* kmalloc(size_t memorySize);
+extern void* kcalloc(size_t elementCount, size_t elementSize);
 #endif

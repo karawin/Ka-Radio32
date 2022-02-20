@@ -38,7 +38,7 @@ const char tryagain[] = {"try again"};
 
 const char lowmemory[]  = { "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/plain\r\nContent-Length: 11\r\n\r\nlow memory\n"};
 const char strsMALLOC[]  = {"WebServer inmalloc fails for %d\n"};
-const char strsMALLOC1[]  = {"WebServer %s malloc fails\n"};
+const char strsMALLOC1[]  = {"WebServer %s kmalloc fails\n"};
 const char strsSOCKET[]  = {"WebServer Socket fails %s errno: %d\n"};
 const char strsID[]  = {"getstation, no id or Wrong id %d\n"};
 const char strsR13[]  = {"HTTP/1.1 200 OK\r\nContent-Type:application/json\r\nContent-Length:13\r\n\r\n{\"%s\":\"%c\"}"};
@@ -54,9 +54,9 @@ static int8_t clientOvol = 0;
 static void *inmalloc(size_t n)
 {
 	void* ret;
-//	ESP_LOGV(TAG, "server Malloc of %d %d,  Heap size: %d",n,((n / 32) + 1) * 32,xPortGetFreeHeapSize( ));
-	ret = malloc(n);
-	ESP_LOGV(TAG,"server Malloc of %x : %d bytes Heap size: %d",(int)ret,n,xPortGetFreeHeapSize( ));
+//	ESP_LOGV(TAG, "server kmalloc of %d %d,  Heap size: %d",n,((n / 32) + 1) * 32,xPortGetFreeHeapSize( ));
+	ret = kmalloc(n);
+	ESP_LOGV(TAG,"server kmalloc of %x : %d bytes Heap size: %d",(int)ret,n,xPortGetFreeHeapSize( ));
 //	if (n <4) printf("Server: incmalloc size:%d\n",n);
 	return ret;
 }
@@ -83,7 +83,7 @@ static struct servFile* findFile(char* name)
 
 static void respOk(int conn,const char* message)
 {
-	char rempty[] = {""};
+	const char rempty[] = {""};
 	if (message == NULL) message = rempty;
 	char fresp[strlen(strsROK)+strlen(message)+15]; // = inmalloc(strlen(strsROK)+strlen(message)+15);
 	sprintf(fresp,strsROK,"text/plain",strlen(message),message);
@@ -194,7 +194,7 @@ static char* getParameter(const char* sep,const char* param, char* data, uint16_
 			if (p_end==p) return NULL;
 			char* t = inmalloc(p_end-p + 1);
 			if (t == NULL) { printf("getParameterF fails\n"); return NULL;}
-			ESP_LOGV(TAG,"getParameter malloc of %d  for %s",p_end-p + 1,param);
+			ESP_LOGV(TAG,"getParameter kmalloc of %d  for %s",p_end-p + 1,param);
 			int i;
 			for(i=0; i<(p_end-p + 1); i++) t[i] = 0;
 			strncpy(t, p, p_end-p);
@@ -557,7 +557,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 					buf = inmalloc(json_length + 75);
 					if (buf == NULL)
 					{
-						ESP_LOGE(TAG," %s malloc fails","getStation");
+						ESP_LOGE(TAG," %s kmalloc fails","getStation");
 						respKo(conn);
 						//return;
 					}
@@ -599,7 +599,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			struct shoutcast_info *nsi ;
 
 			if (si == NULL) {
-				ESP_LOGE(TAG," %s malloc fails","setStation");
+				ESP_LOGE(TAG," %s kmalloc fails","setStation");
 				respKo(conn);
 				return;
 			}
@@ -730,7 +730,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 		char *buf = inmalloc( json_length + 75);
 		if (buf == NULL)
 		{
-			ESP_LOGE(TAG," %s malloc fails","post icy");
+			ESP_LOGE(TAG," %s kmalloc fails","post icy");
 			infree(buf);
 			respKo(conn);
 			return;
@@ -961,7 +961,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			char *buf = inmalloc( json_length + 95+39+10);
 			if (buf == NULL)
 			{
-				ESP_LOGE(TAG," %s malloc fails","post wifi");
+				ESP_LOGE(TAG," %s kmalloc fails","post wifi");
 				respKo(conn);
 				//return;
 			}
@@ -1071,7 +1071,7 @@ static bool httpServerHandleConnection(int conn, char* buf, uint16_t buflen) {
 // version command
 				param = strstr(c,"version") ;
 				if (param != NULL) {
-					char vr[30];// = malloc(30);
+					char vr[30];// = kmalloc(30);
 					sprintf(vr,"Release: %s, Revision: %s\n",RELEASE,REVISION);
 					printf("Version:%s\n",vr);
 					respOk(conn,vr);

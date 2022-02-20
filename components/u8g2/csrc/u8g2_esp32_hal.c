@@ -89,11 +89,6 @@ uint8_t u8g2_esp32_spi_byte_cb(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int,  void
 		case U8X8_MSG_BYTE_SEND: {
 			spi_transaction_t trans_desc;
 			memset(&trans_desc,0,sizeof(spi_transaction_t));
-/*			trans_desc.addr      = 0;
-			trans_desc.cmd   	 = 0;
-			trans_desc.flags     = 0;
-			trans_desc.rx_buffer = NULL;
-			trans_desc.rxlength  = 0; */
 			trans_desc.length    = 8 * arg_int; // Number of bits NOT number of bytes.
 			trans_desc.tx_buffer = arg_ptr;
 			//ESP_LOGI(TAG, "... Transmitting %d bytes.", arg_int);

@@ -58,7 +58,7 @@ bool getpinsActive(Encoder_t *enc) {return enc->pinsActive;}
 Encoder_t* ClickEncoderInit(int8_t A, int8_t B, int8_t BTN, bool initHalfStep)
 {
 	
-	Encoder_t* enc = malloc(sizeof(Encoder_t));
+	Encoder_t* enc = kmalloc(sizeof(Encoder_t));
 	enc->pinA = A; enc->pinB = B;
 	if (BTN == -1) enc->pinBTN = 0;
 		else enc->pinBTN = BTN;

@@ -49,7 +49,7 @@ void partitions_init(void)
 
 bool eeSetData(int address, void* buffer, int size) { // address, size in BYTES !!!!
 uint8_t* inbuf = buffer;
-uint32_t* eebuf= malloc(PARTITIONLEN);
+uint32_t* eebuf= kmalloc(PARTITIONLEN);
 uint16_t i = 0;
 if (eebuf != NULL)
 {
@@ -80,7 +80,7 @@ if (eebuf != NULL)
 	free (eebuf);
 } else 
 {
-	ESP_LOGE(TAG,"Warning %s malloc low memory","eebuf");
+	ESP_LOGE(TAG,"Warning %s kmalloc low memory","eebuf");
 	return false;
 }
 return true;
@@ -88,14 +88,14 @@ return true;
 
 
 void eeEraseAll() { // clear (0) stations and device
-uint8_t* buffer= malloc(PARTITIONLEN);
+uint8_t* buffer= kmalloc(PARTITIONLEN);
 int i = 0;
 //	printf("erase All\n");
 	while (buffer == NULL) 
 	{
 		if (++i > 4) break;
 		vTaskDelay(100); 
-		buffer= malloc(PARTITIONLEN); // last chance
+		buffer= kmalloc(PARTITIONLEN); // last chance
 	}	
 	if (buffer != NULL)
 	{
@@ -118,20 +118,20 @@ int i = 0;
 
 void eeErasesettings(void){
 	int i = 0;
-	uint8_t* buffer= malloc(PARTITIONLEN);
+	uint8_t* buffer= kmalloc(PARTITIONLEN);
 	for(i=0; i<PARTITIONLEN; i++) buffer[i] = 0;
 	ESP_ERROR_CHECK(esp_partition_write(DEVICE,0,buffer,PARTITIONLEN));	 //clear device	
 	free(buffer);
 }
 
 void eeEraseStations() {
-	uint8_t* buffer = malloc(PARTITIONLEN);
+	uint8_t* buffer = kmalloc(PARTITIONLEN);
 	int i=0;
 	while (buffer == NULL) 
 	{
 		if (++i > 10) break;
 		vTaskDelay(10); 
-		buffer= malloc(PARTITIONLEN); // last chance
+		buffer= kmalloc(PARTITIONLEN); // last chance
 	}
 	if (buffer != NULL) 
 	{
@@ -144,7 +144,7 @@ void eeEraseStations() {
 			vTaskDelay(1); // avoid watchdog
 		}
 		free(buffer);
-	} else ESP_LOGE(TAG,"Warning %s malloc low memory","eeEraseStations");
+	} else ESP_LOGE(TAG,"Warning %s kmalloc low memory","eeEraseStations");
 }
 
 void saveStation(struct shoutcast_info *station, uint16_t position) {
@@ -174,7 +174,7 @@ void saveMultiStation(struct shoutcast_info *station, uint16_t position, uint8_t
 
 struct shoutcast_info* getStation(uint8_t position) {
 	if (position > NBSTATIONS-1) {kprintf("getStation fails pos=%d\n",position); return NULL;}
-	uint8_t* buffer = malloc(256);
+	uint8_t* buffer = kmalloc(256);
 	uint8_t i = 0;
 	
 	while (buffer == NULL) 
@@ -182,7 +182,7 @@ struct shoutcast_info* getStation(uint8_t position) {
 //		ESP_LOGE(TAG,"getStation fails pos=%d",256);
 		if (++i > 2) break;
 		vTaskDelay(400); 
-		buffer= malloc(256); // last chance
+		buffer= kmalloc(256); // last chance
 	}	
 	ESP_ERROR_CHECK(esp_partition_read(STATIONS, (position)*256, buffer, 256));
 	//eeGetData((position+1)*256, buffer, 256);
@@ -192,7 +192,7 @@ struct shoutcast_info* getStation(uint8_t position) {
 
 void copyDeviceSettings()
 {
-	uint8_t* buffer= malloc(PARTITIONLEN);
+	uint8_t* buffer= kmalloc(PARTITIONLEN);
 	if(buffer) {	
 		ESP_ERROR_CHECK(esp_partition_read(DEVICE, 0, buffer, sizeof(struct device_settings)));
 		ESP_ERROR_CHECK(esp_partition_erase_range(DEVICE1,0,DEVICE1->size));
@@ -203,7 +203,7 @@ void copyDeviceSettings()
 
 void restoreDeviceSettings()
 {
-	uint8_t* buffer= malloc(PARTITIONLEN);
+	uint8_t* buffer= kmalloc(PARTITIONLEN);
 	if(buffer) {	
 		ESP_ERROR_CHECK(esp_partition_read(DEVICE1, 0, buffer, sizeof(struct device_settings)));
 		ESP_ERROR_CHECK(esp_partition_erase_range(DEVICE,0,DEVICE->size));
@@ -235,7 +235,7 @@ void saveDeviceSettingsVolume(struct device_settings *settings) {
 
 struct device_settings* getDeviceSettingsSilent() {
 	uint16_t size = sizeof(struct device_settings);
-	uint8_t* buffer = malloc(size);
+	uint8_t* buffer = kmalloc(size);
 	if(buffer) {	
 		ESP_ERROR_CHECK(esp_partition_read(DEVICE, 0, buffer, size));
 		return (struct device_settings*)buffer;
