@@ -1045,6 +1045,7 @@ void app_main()
 
 	// Version infos
 	ESP_LOGI(TAG, "Release %s, Revision %s",RELEASE,REVISION);
+	ESP_LOGI(TAG, " Date %s, Time: %s", __DATE__,__TIME__ );
 	ESP_LOGI(TAG, "SDK %s",esp_get_idf_version());
 	ESP_LOGI(TAG, "Heap size: %d",xPortGetFreeHeapSize());
 
