@@ -17,8 +17,8 @@
 #include "app_main.h"
 #include "eeprom.h"
 //4400
-#define stack  	5500 
-#define TAG	"servers"
+#define stack  	5400 
+#define TAG	"Servers"
 
 #define  strsTELNET  "Servers Telnet Socket fails %s errno: %d"
 #define  strsWSOCK  "WebServer Socket fails %s errno: %d"
@@ -209,16 +209,15 @@ void serversTask(void* pvParams) {
 								PRIO_SUBSERV, 
 								NULL, CPU_SUBSERV ) != pdPASS) 
 							{								
-								vTaskDelay(200);
-								ESP_LOGE(TAG,"Server low mem. Retrying...");
-							}	
-							vTaskDelay(1);							
+								vTaskDelay(300);
+								ESP_LOGW(TAG,"low mem. Retrying...");
+							}							
 							break; // while 1
 						}
 						else  // xSemaphoreTake fails
 						{
 							vTaskDelay(300); 
-							ESP_LOGE(TAG,"Server busy. Retrying...");
+							ESP_LOGE(TAG,"busy. Retrying...");
 						}
 					}
 				}					

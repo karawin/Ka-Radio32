@@ -29,7 +29,7 @@
 #include "audio_player.h"
 #include "audio_renderer.h"
 
-#define TAG "renderer"
+#define TAG "Renderer"
 
 
 static renderer_config_t *renderer_instance = NULL;
@@ -77,7 +77,7 @@ DRAM_ATTR static const uint16_t SPDIF_BMCLOOKUP[256] = {
 };
 
 //KaraDio32
-void renderer_volume(uint32_t vol)
+void IRAM_ATTR renderer_volume(uint32_t vol)
 {
 	// log volume (magic)
 	if (vol == 1) return;  // volume 0
@@ -103,7 +103,7 @@ void renderer_volume(uint32_t vol)
  *
  * ESP32 is little-endian.
  */
-static void render_i2s_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
+static void IRAM_ATTR render_i2s_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 {
 //    ESP_LOGV(TAG, "buf_desc: bit_depth %d format %d num_chan %d sample_rate %d", buf_desc->bit_depth, buf_desc->buffer_format, buf_desc->num_channels, buf_desc->sample_rate);
 //    ESP_LOGV(TAG, "renderer_instance: bit_depth %d, output_mode %d", renderer_instance->bit_depth, renderer_instance->output_mode);
@@ -187,7 +187,8 @@ static void render_i2s_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_de
     if(buf_desc->bit_depth != I2S_BITS_PER_SAMPLE_16BIT) {
         ESP_LOGD(TAG, "unsupported decoder bit depth: %d", buf_desc->bit_depth);
 		renderer_stop();
-        return;
+		audio_player_stop();    
+		return;
     }
 
     // pointer to left / right sample position
@@ -218,6 +219,7 @@ static void render_i2s_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_de
 	{
 		ESP_LOGE(TAG, "malloc outBuf8 failed len:%d ",buf_len);
 		renderer_stop();
+		audio_player_stop(); 
 		return;
 	}
 	outBuf32 =(uint32_t*)outBuf8;
@@ -329,7 +331,7 @@ static inline void change_volume16(int16_t *buffer, size_t num_samples)
 	}
 }
 
-static void encode_spdif(uint32_t *spdif_buffer, int16_t *buffer, size_t num_samples, pcm_format_t *buf_desc)
+static void  encode_spdif(uint32_t *spdif_buffer, int16_t *buffer, size_t num_samples, pcm_format_t *buf_desc)
 {
 		// pointer to left / right sample positio
 	int16_t *ptr_l = buffer;
@@ -413,7 +415,7 @@ static void IRAM_ATTR write_i2s(const void *buffer, size_t bytes_cnt)
  * Original source at:
 *      https://github.com/earlephilhower/ESP8266Audio/blob/master/src/AudioOutputSPDIF.cpp
 */
-static void IRAM_ATTR render_spdif_samples(const void *buf, uint32_t buf_len, pcm_format_t *buf_desc)
+static void  render_spdif_samples(const void *buf, uint32_t buf_len, pcm_format_t *buf_desc)
 {
 	//ESP_LOGI(TAG, "buf_desc: bit_depth %d format %d num_chan %d sample_rate %d", buf_desc->bit_depth, buf_desc->buffer_format, buf_desc->num_channels, buf_desc->sample_rate);
 	//    ESP_LOGV(TAG, "renderer_instance: bit_depth %d, output_mode %d", renderer_instance->bit_depth, renderer_instance->output_mode);
@@ -425,6 +427,7 @@ static void IRAM_ATTR render_spdif_samples(const void *buf, uint32_t buf_len, pc
 	if(buf_desc->bit_depth != I2S_BITS_PER_SAMPLE_16BIT) {
 		ESP_LOGE(TAG, "unsupported decoder bit depth: %d", buf_desc->bit_depth);
 		renderer_stop();
+		audio_player_stop(); 
 		return;
 	}
 //
@@ -440,11 +443,12 @@ static void IRAM_ATTR render_spdif_samples(const void *buf, uint32_t buf_len, pc
 	
 //	ESP_LOGI(TAG, "render_spdif_samples len: %d, bytes_cnt: %d",buf_len,bytes_cnt);
 	
-	uint32_t *spdif_buffer = heap_caps_malloc(bytes_cnt, MALLOC_CAP_DMA);
+	uint32_t *spdif_buffer = heap_caps_malloc(bytes_cnt, MALLOC_CAP_DEFAULT);
 	if (spdif_buffer == NULL)
 	{
-		ESP_LOGE(TAG, "malloc buf failed len:%d ",buf_len);
+		ESP_LOGE(TAG, "spdif buf failed len:%d ",buf_len);
 		renderer_stop();
+		audio_player_stop(); 
 		return;
 	}
 
@@ -589,7 +593,7 @@ bool  init_i2s(/*renderer_config_t *config*/)
      * 16 bit: 32 * 256 = 8192 bytes
      * 32 bit: 32 * 256 = 16384 bytes
      */
-	int bc = bigSram()?16:8;
+	int bc = bigSram()?12:8;
 	int bl = bigSram()?256:128;
     i2s_config_t i2s_config = {
             .mode = mode,          // Only TX
@@ -621,7 +625,7 @@ bool  init_i2s(/*renderer_config_t *config*/)
 
     if (i2s_driver_install(config->i2s_num, &i2s_config, 0, NULL) != ESP_OK)
 	{
-		i2s_config.intr_alloc_flags = ESP_INTR_FLAG_LEVEL1;
+		i2s_config.intr_alloc_flags = 0; //ESP_INTR_FLAG_LEVEL1;
 		if (i2s_driver_install(config->i2s_num, &i2s_config, 0, NULL) != ESP_OK)
 			i2s_config.intr_alloc_flags = ESP_INTR_FLAG_LEVEL2;
 			if (i2s_driver_install(config->i2s_num, &i2s_config, 0, NULL) != ESP_OK)
@@ -633,7 +637,7 @@ bool  init_i2s(/*renderer_config_t *config*/)
 			}
 	}	
 //	ESP_LOGI(TAG,"i2s intr:%d", i2s_config.intr_alloc_flags);	
-    if(config->output_mode == DAC_BUILT_IN)// || (mode & I2S_MODE_PDM))
+    if(config->output_mode == DAC_BUILT_IN)
     {
         i2s_set_pin(config->i2s_num, NULL);
 //        i2s_set_dac_mode(I2S_DAC_CHANNEL_BOTH_EN);
