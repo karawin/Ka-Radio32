@@ -1,5 +1,9 @@
 ## STATE
-Release 2.2 R1 Stable
+Release 2.2 R2 Stable  
+ESP-IDF v3.3  
+
+See also the version for ESP-IDF v4.4 at    
+   https://github.com/karawin/KaRadio32_4
 
 Works on any esp32 board.  
 See the boards directory for a list of pre-configured boards.  
@@ -60,7 +64,6 @@ Output mode set in Setting panel on web page of KaraDio32 :
 - Remote IR support integrated. Nec protocol only.
 - Two configurable access points .
 - OTA (Over The Air) update of the software.
-- Uses a 40 kB (I2S), 50 kB (vs1053) or 420 Kb (wrover) queue to provide smooth playback.
 - many more configurable parameters. See [Interfaces document](Interface.md )  
 
 
@@ -73,8 +76,8 @@ Output mode set in Setting panel on web page of KaraDio32 :
 ### Buffering audio
 |   CPU        |  vs1053b      |  other |  
 | -------      | -------       | ------ |  
-| Wroom http   | 50k           | 40k    |  
-| Wroom https  | 40k           | 25k    |  
+| Wroom http   | 60k           | 45k    |  
+| Wroom https  | 50k           | 25k    |  
 | Wrover http  | 400k          | 400k   |  
 | Wrover https | 400k          | 400k   |  
 
