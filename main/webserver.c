@@ -879,7 +879,7 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 
 			if ((g_device->ua!= NULL)&&(strlen(g_device->ua)==0))
 			{
-				if (aua==NULL) {aua= inmalloc(12); strcpy(aua,"Karadio32/2.1");}
+				if (aua==NULL) {aua= inmalloc(12); strcpy(aua,"Karadio32/2.2");}
 			}
 			if (aua!=NULL)
 			{

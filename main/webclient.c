@@ -1,7 +1,7 @@
 /*
  * Copyright 2016 karawin (http://www.karawin.fr)
 */
-#define TAG "webclient"
+#define TAG "Webclient"
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 
 #include "webclient.h"
@@ -1086,11 +1086,18 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 						{
 							while (len -(t1-pdata)<8) {
 								vTaskDelay(1);
+								int ilen;
 								if (https)
-									len += wolfSSL_read(ssl, pdata+len, RECEIVE+8-len);
+								{
+									ilen = wolfSSL_read(ssl, pdata+len, RECEIVE+8-len);
+									if (ilen >0) len += ilen;
+								}
 								else
-									len += recv(sockfd, pdata+len, RECEIVE+8-len, 0); 
-								if (len <0) {clientDisconnect("chunk2");break;}							
+								{
+									ilen = recv(sockfd, pdata+len, RECEIVE+8-len, 0); 
+									if (ilen >0) len += ilen; 
+								}
+								if (ilen <0) {clientDisconnect("chunk2");break;}							
 							}
 							chunked = (uint32_t) strtol(t1, NULL, 16) +2;
 							if (strchr((t1),0x0A) != NULL)
@@ -1122,87 +1129,100 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 	break;
 	default:
 // -----------
-
+//ESP_LOGD(TAG,"LenIn: %d",len);
 // Chunk computing
 		lc = len; // lc rest after chunk
 //	 printf("CDATAIN: chunked: %d, cchunk: %d, len: %d\n",chunked,cchunk,len);
 		if((chunked != 0)&&((cchunk ==0)||(len >= cchunk-1)))  //if in chunked mode and chunk received or complete in data
 		{
+			if ((len ==1)&&(cchunk==1))
+			{
+				 len -=1;
+				 cchunk = 0;
+//				 ESP_LOGD(TAG,"Len00: %d  cchunk: %d",len,cchunk);
+			} else
+			{
 //	 printf("CDATA1: chunked: %d, cchunk: %d, len: %d\n",chunked,cchunk,len);
-			if (len == cchunk) // if a complete chunk in pdata, remove crlf
-			{
-				len -= 2;
-				cchunk = 0;
+				if (len == cchunk) // if a complete chunk in pdata, remove crlf
+				{
+					len -= 2;
+					cchunk = 0;
+//					ESP_LOGD(TAG,"Len0: %d  cchunk: %d",len,cchunk);
 //	printf("lenoe:%d, chunked:%d  cchunk:%d, lc:%d, metad:%d\n",len,chunked,cchunk, lc,metad );
-			} else  // an incomplete chunk in progress
-			{
-				if (len == cchunk-1) // missing lf: remove cr only, wait lf in next data
+				} else  // an incomplete chunk in progress
 				{
-					len -= 1;
-					cchunk = 1;
-//	printf("leno1:%d, chunked:%d  cchunk:%d, lc:%d, metad:%d\n",len,chunked,cchunk, lc,metad );
-				}
-				else		// a part of end of chunk 	and beginnining of a new one
-				{
-					inpdata = pdata;
-
-					while (lc != 0)
+					if (len == cchunk-1) // missing lf: remove cr only, wait lf in next data
 					{
-						while (lc < cchunk+9)
+						len -= 1;
+						cchunk = 1;
+//						ESP_LOGD(TAG,"Len1: %d ",len);
+//	printf("leno1:%d, chunked:%d  cchunk:%d, lc:%d, metad:%d\n",len,chunked,cchunk, lc,metad );
+					}
+					else		// a part of end of chunk 	and beginnining of a new one
+					{
+						inpdata = pdata;
+
+						while (lc != 0)
 						{
-							vTaskDelay(1);
+							while (lc < cchunk+9)
+							{
+								vTaskDelay(1);
 							
-							if (https)
-								bread = wolfSSL_read(ssl, pdata+len, 9);
-							else
-								bread = recvfrom(sockfd, pdata+len, 9, 0, NULL, NULL);
-							if (bread <0) {clientDisconnect("chunk1");break;}
-							if (bread >0) clen = bread;
-							else clen = 0;
-							lc+=clen;len+=clen;
-							//ESP_LOGV(TAG,"more:%d, lc:%d\n",clen,lc);
-						} //security to be sure to receive the new length
+								if (https)
+									bread = wolfSSL_read(ssl, pdata+len, 9);
+								else
+									bread = recvfrom(sockfd, pdata+len, 9, 0, NULL, NULL);
+								if (bread <0) {clientDisconnect("chunk1");break;}
+								if (bread >0) clen = bread;
+								else clen = 0;
+								lc+=clen;len+=clen;
+								//ESP_LOGV(TAG,"more:%d, lc:%d\n",clen,lc);
+							} //security to be sure to receive the new length
 
 //	printf("leni0:%d, inpdata:%x, chunked:%d  cchunk:%d, lc:%d, \n",len,inpdata,chunked,cchunk, lc );
-						inpchr=strchr(inpdata+cchunk,0x0D) ;
-						if ((inpchr != NULL) &&(inpchr- (inpdata+cchunk) <16))
-							*inpchr = 0; // replace lf by a end of string
-						else {
-							clientDisconnect("chunk"); clientConnect();
-							lc = 0;
-							break;
-						}
-						chunked = (uint32_t) strtol(inpdata+cchunk, NULL, 16)+2;  // new chunk lenght including cr lf
-						clen = strlen(inpdata+cchunk)  +2;
-						lc = lc -cchunk  -clen; // rest after
+							inpchr=strchr(inpdata+cchunk,0x0D) ;
+							if ((inpchr != NULL) &&(inpchr- (inpdata+cchunk) <16))
+								*inpchr = 0; // replace lf by a end of string
+							else {
+								clientDisconnect("chunk"); clientConnect();
+								lc = 0;
+								break;
+							}
+							chunked = (uint32_t) strtol(inpdata+cchunk, NULL, 16)+2;  // new chunk lenght including cr lf
+							clen = strlen(inpdata+cchunk)  +2;
+							lc = lc -cchunk  -clen; // rest after
 //	printf("leni:%d, inpdata:%x, chunked:%d  cchunk:%d, lc:%d, clen:%d, str: %s\n",len,inpdata,chunked,cchunk, lc,clen,inpdata+cchunk );
 						// compact data without chunklen and crlf
-						if (cchunk >1){
-							memcpy (inpdata+cchunk-2,pdata+len-lc, lc);
+							if (cchunk >1){
+								memcpy (inpdata+cchunk-2,pdata+len-lc, lc);
 //	printf("lenm:%d, inpdata:%x, chunked:%d  cchunk:%d, lc:%d\n",len,inpdata,chunked,cchunk, lc);
-							len -= (clen +2);
-							inpdata +=   (cchunk -2);
+								len -= (clen +2);
+								inpdata +=   (cchunk -2);
+								//if (len <0) ESP_LOGD(TAG,"Len2: %d",len);
 //	printf("memcpy1 at %x from %x, lc:%d\n",inpdata+cchunk-2,pdata+len-lc,lc);
-						}
-						else{
-							memcpy (inpdata,inpdata+cchunk+clen, lc);
+							}
+							else{
+								memcpy (inpdata,inpdata+cchunk+clen, lc);
 //	printf("lenm:%d, inpdata:%x, chunked:%d  cchunk:%d, lc:%d\n",len,inpdata,chunked,cchunk, lc);
-							len -= (clen + cchunk);
+								len -= (clen + cchunk);
+								//if (len <0) ESP_LOGD(TAG,"Len3: %d",len);
 //	printf("memcpy2 at %x from %x, lc:%d, len:%d\n",inpdata,inpdata+cchunk+clen,lc,len);
-						}
+							}
 
-						if (chunked > lc)
-						{
-							cchunk = chunked - lc ;
-							if (cchunk ==1) len --;
-							if (cchunk ==0) len -=2;
-							lc = 0;
-						}
-						else
-						{
-							cchunk = chunked;
-						}
+							if (chunked > lc)
+							{
+								cchunk = chunked - lc ;
+								if (cchunk ==1) len --;
+								if (cchunk ==0) len -=2;
+								//if (len <0) ESP_LOGD(TAG,"Len4: %d",len);
+								lc = 0;
+							}
+							else
+							{
+								cchunk = chunked;
+							}
 //	printf("leniout:%d, inpdata:%x, chunked:%d  cchunk:%d, lc:%d, metad:%d  clen:%d \n",len,inpdata,chunked,cchunk, lc,metad,clen );
+						}
 					}
 				}
 			}
@@ -1214,7 +1234,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 		}
 
 // printf("CDATAOUT: chunked: %d, cchunk: %d, len: %d\n",chunked,cchunk,len);
-
+//		if (len <0) ESP_LOGD(TAG,"Len: %d",len);
 // meta data computing
 		if (rest <0)
 		{
@@ -1224,11 +1244,11 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 				*(pdata-rest) = 0; //truncated
 			else
 				*(pdata+len) = 0; //truncated
-			strcat(metadata,pdata);
-			if (len>-rest)
+			if (metadata != NULL) strcat(metadata,pdata);
+			if (len >= -rest)
 			{
 				ESP_LOGD(TAG,"Negaposi   len= %d, metad= %d  rest= %d   pdata= %x :\"%s\"",len,metad,rest,(int)pdata,pdata);
-				clientSaveMetadata(metadata,strlen(metadata));
+				if (metadata != NULL) clientSaveMetadata(metadata,strlen(metadata));
 				metad = header.members.single.metaint ;
 				pdata -= rest;
 				len += rest;
@@ -1240,7 +1260,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 				pdata += len;
 				rest += len;
 				len = 0;
-				ESP_LOGD(TAG,"Negatafter len= %d, metad= %d  rest= %d   pdata= %x :\"%s\"",len,metad,rest,(int)pdata,pdata);
+//				ESP_LOGD(TAG,"Negatafter len= %d, metad= %d  rest= %d   pdata= %x :\"%s\"",len,metad,rest,(int)pdata,pdata);
 			}
 //printf("Negative len out = %d, pdata: %x,metad= %d  rest= %d \n",len,pdata,metad,rest);
 
@@ -1255,7 +1275,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 			int jj = 0;
 			while ((clen > metad)&&(header.members.single.metaint != 0)) // in buffer
 			{
-//				ESP_LOGD(TAG,"metainb len:%d, clen:%d, metad:%d, l:%d, inpdata:%x, rest:%d\n",len,clen,metad, l,(int)inpdata,rest );
+//				ESP_LOGD(TAG,"metainb len:%d, clen:%d, metad:%d, l:%d, inpdata:%x, rest:%d",len,clen,metad, l,(int)inpdata,rest );
 				jj++;
 				l = inpdata[metad]*16;	//new meta length
 				rest = clen - metad  -l -1;
@@ -1267,7 +1287,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 				if (l !=0)
 				{
 ESP_LOGD(TAG,"clientReceiveCallback: pdata: %x, pdataend: %x, len: %d",(int)pdata,(int)pdata+len,len);
-ESP_LOGD(TAG,"mt len:%d, clen:%d, metad:%d ,&l:%x, l:%d, inpdata:%x, rest:%d, str: %s",len,clen,metad,(int)inpdata+metad, l,(int)inpdata,rest,inpdata+metad+1 );
+//ESP_LOGD(TAG,"mt len:%d, clen:%d, metad:%d ,&l:%x, l:%d, inpdata:%x, rest:%d, str: %s",len,clen,metad,(int)inpdata+metad, l,(int)inpdata,rest,inpdata+metad+1 );
 					if (rest <0)
 					{
 						*(inpdata+clen) = 0; //truncated
@@ -1277,7 +1297,7 @@ ESP_LOGD(TAG,"mtlen len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,c
 						metadata = incmalloc(l+1);
 						strcpy(metadata,inpdata+metad+1);
 					}
-					else clientSaveMetadata(inpdata+metad+1,l);
+					else clientSaveMetadata(inpdata+metad+1,l); // just in case....
 				}
 				if (metad >0)
 				{

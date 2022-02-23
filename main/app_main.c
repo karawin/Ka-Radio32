@@ -174,7 +174,7 @@ IRAM_ATTR void   msCallback(void *pArg) {
     evt.i1 = TIMERGROUP;
     evt.i2 = timer_idx;
 	xQueueSendFromISR(event_queue, &evt, NULL);
-	ServiceAddon();
+	if (serviceAddon != NULL) serviceAddon(); // for the encoders and buttons
 /*	if (divide)
 	{
 		ctimeMs++;	// for led
@@ -752,12 +752,13 @@ IRAM_ATTR void timerTask(void* p) {
 		{
 			switch (evt.type){
 					case TIMER_1MS:
-						if (serviceAddon != NULL) serviceAddon(); // for the encoders and buttons
+						//if (serviceAddon != NULL) serviceAddon(); // for the encoders and buttons
 						if (isEsplay) // esplay board only
 							rexp = i2c_keypad_read(); // read the expansion
 						if (divide)
 							ctimeMs++;	// for led	
 						divide = !divide;	
+						ServiceAddon();
 					break;				
 					case TIMER_SLEEP:
 						clientDisconnect("Timer"); // stop the player

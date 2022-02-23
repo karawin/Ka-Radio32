@@ -1111,7 +1111,7 @@ bail:
 }
 
 
-LINKSPEC_CPP AAC_DECODER_ERROR CAacDecoder_DecodeFrame(
+LINKSPEC_CPP  AAC_DECODER_ERROR CAacDecoder_DecodeFrame(
         HANDLE_AACDECODER self,
         const UINT flags,
         INT_PCM *pTimeData,
