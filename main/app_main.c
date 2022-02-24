@@ -1044,10 +1044,15 @@ void app_main()
 	}	
 	
 
+	
 	// Version infos
+	ESP_LOGI(TAG, "\n");
+	ESP_LOGI(TAG, "Project name: %s",esp_ota_get_app_description()->project_name);
+	ESP_LOGI(TAG, "Version: %s",esp_ota_get_app_description()->version);
 	ESP_LOGI(TAG, "Release %s, Revision %s",RELEASE,REVISION);
-	ESP_LOGI(TAG, " Date %s, Time: %s", __DATE__,__TIME__ );
-	ESP_LOGI(TAG, "SDK %s",esp_get_idf_version());
+	ESP_LOGI(TAG, "Date: %s,  Time: %s",esp_ota_get_app_description()->date,esp_ota_get_app_description()->time);
+	ESP_LOGI(TAG, "SDK %s\n",esp_get_idf_version());	
+//	ESP_LOGI(TAG, " Date %s, Time: %s\n", __DATE__,__TIME__ );
 	ESP_LOGI(TAG, "Heap size: %d",xPortGetFreeHeapSize());
 
 	// lcd init

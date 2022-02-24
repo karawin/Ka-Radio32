@@ -22,8 +22,8 @@
 #include "aacdecoder_lib.h"
 #include "audio_player.h"
 #include "app_main.h"
-
-#define TAG "fdkaac_decoder"
+#include "esp_idf_version.h"
+#define TAG "Fdkaac_decoder"
 
 
 
@@ -114,11 +114,15 @@ void fdkaac_decoder_task(void *pvParameters)
 		}
 
 //		watchgog reset 
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+		TIMERG0.wdtwprotect.wdt_wkey = TIMG_WDT_WKEY_VALUE;
+		TIMERG0.wdtfeed.wdt_feed = 1;
+		TIMERG0.wdtwprotect.wdt_wkey = 0;
+#else
 		TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
 		TIMERG0.wdt_feed=1;
 		TIMERG0.wdt_wprotect=0;
-
-
+#endif
         // bytes_avail will be updated and indicate "how much data is left"
 //        size_t bytes_avail = buf_data_unread(in_buf);
 		//printf("B%d\n",bytes_avail);

@@ -695,7 +695,11 @@ static void handlePOST(char* name, char* data, int data_size, int conn) {
 			}
 		}
 	} else if(strcmp(name, "/upgrade") == 0) {
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
+		update_firmware((char*)"KaRadio32_4");  // start the OTA
+#else
 		update_firmware((char*)"KaRadio32");  // start the OTA
+#endif	
 	} else if(strcmp(name, "/icy") == 0)
 	{
 		ESP_LOGV(TAG,"icy vol");
