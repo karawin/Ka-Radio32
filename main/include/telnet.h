@@ -10,6 +10,8 @@ Inspirated by:
 #ifndef __TELNET_H__
 #define __TELNET_H__
 // max size of the WS Message Header
+#include <stdbool.h>
+#include <stddef.h> 
 
 #define NBCLIENTT 5
 //#define MAXDATAT	 256

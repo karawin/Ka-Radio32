@@ -823,8 +823,8 @@ void clientWake(char *s)
 	{
 		// no argument, no action
 		uint64_t temps = getWake();
-		if (temps == 0) kprintf("No wake in progress\n");
-		else kprintf("#Wake in %lld m  %lld s##\n",temps/60,temps%60);
+		if (temps == 0ll) kprintf("No wake in progress\n");
+		else kprintf("#Wake in %lld m  %lld s##\n",temps/(60ll),temps%60ll);
 		return;
 	}
 	char *t_end  = strstr(t, parquoteslash)-2;
@@ -854,15 +854,14 @@ void clientSleep(char *s)
 	{
 		// no argument, no action
 		uint64_t temps = getSleep();
-		if (temps == 0) kprintf("No sleep in progress\n");
+		if (temps == 0ll) kprintf("No sleep in progress\n");
 		else 
-		kprintf("#Sleep in %lld m  %lld s##\n",temps/60,temps%60);
+		kprintf("#Sleep in %lld m  %lld s##\n",temps/(60ll),temps%60ll);
 		return;
 	}
 	char *t_end  = strstr(t, parquoteslash)-2;
     if(t_end <= (char*) 0)
     {
-
 		kprintf(stritCMDERROR);
 		return;
     }

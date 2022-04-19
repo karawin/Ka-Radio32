@@ -83,7 +83,11 @@ Copyright (C) 2017  KaraWin
 #include "vs1053.h"
 #include "ClickEncoder.h"
 #include "addon.h"
-
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+#include "driver/gptimer.h"
+#else
+#include "driver/timer.h"
+#endif
 //#include "rda5807Task.h"
 
 /* The event group allows multiple bits for each event*/
@@ -148,26 +152,45 @@ IRAM_ATTR void   microsCallback(void *pArg) {
 	TIMERG1.hw_timer[timer_idx].config.alarm_en = 1;
 }*/
 // 
-IRAM_ATTR bool bigSram() { return bigRam;}
+bool bigSram() { return bigRam;}
+void* kmalloc(size_t memorySize)
+{
+	if (bigRam) return heap_caps_malloc(memorySize, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+	else return heap_caps_malloc(memorySize, MALLOC_CAP_INTERNAL  | MALLOC_CAP_8BIT);
+		
+}
+void* kcalloc(size_t elementCount, size_t elementSize)
+{
+	if (bigRam) return heap_caps_calloc(elementCount,elementSize, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+	else return heap_caps_calloc(elementCount,elementSize, MALLOC_CAP_INTERNAL  | MALLOC_CAP_8BIT);
+		
+}
+
 //-----------------------------------
 // every 500µs
 IRAM_ATTR void   msCallback(void *pArg) {
 	int timer_idx = (int) pArg;
-
+	queue_event_t evt;	
 //	queue_event_t evt;	
 	TIMERG1.hw_timer[timer_idx].update = 1;
 	TIMERG1.int_clr_timers.t0 = 1; //isr ack
-	if (divide)
+	evt.type = TIMER_1MS;
+    evt.i1 = TIMERGROUP1MS;
+    evt.i2 = timer_idx;
+	xQueueSendFromISR(event_queue, &evt, NULL);
+	if (serviceAddon != NULL) serviceAddon(); // for the encoders and buttons
+/*	if (divide)
 	{
 		ctimeMs++;	// for led
 //		ctimeVol++; // to save volume
 	}	
 	divide = !divide;
-	if (serviceAddon != NULL) serviceAddon(); // for the encoders and buttons
+	*/
+//	if (serviceAddon != NULL) serviceAddon(); // for the encoders and buttons
 	TIMERG1.hw_timer[timer_idx].config.alarm_en = 1;
 }
 
-IRAM_ATTR void   sleepCallback(void *pArg) {
+void   sleepCallback(void *pArg) {
 	int timer_idx = (int) pArg;
 	queue_event_t evt;	
 	TIMERG0.int_clr_timers.t0 = 1; //isr ack
@@ -177,7 +200,7 @@ IRAM_ATTR void   sleepCallback(void *pArg) {
 	xQueueSendFromISR(event_queue, &evt, NULL);	
 	TIMERG0.hw_timer[timer_idx].config.alarm_en = 0;
 }
-IRAM_ATTR void   wakeCallback(void *pArg) {
+void   wakeCallback(void *pArg) {
 
 	int timer_idx = (int) pArg;
 	queue_event_t evt;	
@@ -212,7 +235,7 @@ uint64_t getWake()
 
 void tsocket(const char* lab, uint32_t cnt)
 {
-		char* title = malloc(strlen(lab)+50);
+		char* title = kmalloc(strlen(lab)+50);
 		sprintf(title,"{\"%s\":\"%d\"}",lab,cnt*60); 
 		websocketbroadcast(title, strlen(title));
 		free(title);	
@@ -270,6 +293,8 @@ timer_config_t config;
     config.intr_type = TIMER_INTR_LEVEL;
     config.counter_en = TIMER_PAUSE;
 	
+	event_queue = xQueueCreate(10, sizeof(queue_event_t));
+	
 	/*Configure timer sleep*/
     ESP_ERROR_CHECK(timer_init(TIMERGROUP, sleepTimer, &config));
 	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, sleepTimer));
@@ -311,7 +336,7 @@ timer_config_t config;
 // Renderer config creation
 static renderer_config_t *create_renderer_config()
 {
-    renderer_config_t *renderer_config = calloc(1, sizeof(renderer_config_t));
+    renderer_config_t *renderer_config = kcalloc(1, sizeof(renderer_config_t));
 
     if(renderer_config->output_mode == I2S_MERUS) {
         renderer_config->bit_depth = I2S_BITS_PER_SAMPLE_32BIT;
@@ -358,21 +383,19 @@ static void init_hardware()
 
 
 /* event handler for pre-defined wifi events */
-//static esp_err_t event_handler(void *ctx, system_event_t *event)
-static void wifi_event_handler(void *arg, esp_event_base_t event_base,
-							   int32_t event_id, void *event_data)
+static esp_err_t event_handler(void *ctx, system_event_t *event)
 {
-    //EventGroupHandle_t wifi_event = ctx;
-//	if (event_base == WIFI_EVENT)
-    switch (event_id)
+    EventGroupHandle_t wifi_event = ctx;
+
+    switch (event->event_id)
     {
-    case WIFI_EVENT_STA_START:
+    case SYSTEM_EVENT_STA_START:
 		FlashOn = FlashOff = 100;
         esp_wifi_connect();
         break;
 		
-	case WIFI_EVENT_STA_CONNECTED:
-		xEventGroupSetBits(wifi_event_group, CONNECTED_AP);
+	case SYSTEM_EVENT_STA_CONNECTED:
+		xEventGroupSetBits(wifi_event, CONNECTED_AP);
 		ESP_LOGI(TAG, "Wifi connected");		
 		if (wifiInitDone) 
 		{
@@ -382,17 +405,17 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base,
 			} // retry
 		else wifiInitDone = true;		break;
 
-    case IP_EVENT_STA_GOT_IP:
+    case SYSTEM_EVENT_STA_GOT_IP:
 		FlashOn = 5;FlashOff = 395;
-        xEventGroupSetBits(wifi_event_group, CONNECTED_BIT);
+        xEventGroupSetBits(wifi_event, CONNECTED_BIT);
         break;
 
-    case WIFI_EVENT_STA_DISCONNECTED:
+    case SYSTEM_EVENT_STA_DISCONNECTED:
         /* This is a workaround as ESP32 WiFi libs don't currently
            auto-reassociate. */
 		FlashOn = FlashOff = 100;
-		xEventGroupClearBits(wifi_event_group, CONNECTED_AP);
-        xEventGroupClearBits(wifi_event_group, CONNECTED_BIT);
+		xEventGroupClearBits(wifi_event, CONNECTED_AP);
+        xEventGroupClearBits(wifi_event, CONNECTED_BIT);
 		ESP_LOGE(TAG, "Wifi Disconnected.");
 		vTaskDelay(100);
         if (!getAutoWifi()&&(wifiInitDone)) 
@@ -419,20 +442,20 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base,
 		}
         break;
 
-	case WIFI_EVENT_AP_START:
+	case SYSTEM_EVENT_AP_START:
 		FlashOn = 5;FlashOff = 395;
-		xEventGroupSetBits(wifi_event_group, CONNECTED_AP);
-		xEventGroupSetBits(wifi_event_group, CONNECTED_BIT);
+		xEventGroupSetBits(wifi_event, CONNECTED_AP);
+		xEventGroupSetBits(wifi_event, CONNECTED_BIT);
 		wifiInitDone = true;
 		break;
 		
-	case WIFI_EVENT_AP_STADISCONNECTED:
+	case SYSTEM_EVENT_AP_STADISCONNECTED:
 		break;
 		
     default:
         break;
     }
-//    return ESP_OK;
+    return ESP_OK;
 }
 
 
@@ -468,21 +491,9 @@ static void start_wifi()
 	tcpip_adapter_init();
 	tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA); // Don't run a DHCP client	
     /* FreeRTOS event group to signal when we are connected & ready to make a request */
-//	wifi_event_group = xEventGroupCreate();	
-//    ESP_ERROR_CHECK( esp_event_loop_init(event_handler, wifi_event_group) );
-
-	wifi_event_group = xEventGroupCreate();
-	ESP_ERROR_CHECK(esp_event_loop_create_default());
-/*	ap = esp_netif_create_default_wifi_ap();
-	assert(ap);
-	sta = esp_netif_create_default_wifi_sta();
-	assert(sta);*/
-	ESP_ERROR_CHECK(esp_wifi_init(&cfg));
-	ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, NULL));
-	ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &wifi_event_handler, NULL));
-	ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
-	ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_NULL));
-		
+	wifi_event_group = xEventGroupCreate();	
+    ESP_ERROR_CHECK( esp_event_loop_init(event_handler, wifi_event_group) );
+	
 	if (g_device->current_ap == APMODE) 
 	{
 		if (strlen(g_device->ssid1) !=0)
@@ -578,7 +589,7 @@ static void start_wifi()
 		}
 
 		/* Wait for the callback to set the CONNECTED_BIT in the event group. */
-		if ( (xEventGroupWaitBits(wifi_event_group, CONNECTED_AP,false, true,2000) & CONNECTED_AP) ==0) 
+		if ( (xEventGroupWaitBits(wifi_event_group, CONNECTED_AP,false, true, 1500) & CONNECTED_AP) ==0) 
 		//timeout . Try the next AP
 		{
 			g_device->current_ap++;
@@ -634,8 +645,7 @@ void start_network(){
 	ESP_ERROR_CHECK(esp_wifi_get_mode(&mode));		
 	if (mode == WIFI_MODE_AP)
 	{
-			xEventGroupWaitBits(wifi_event_group, CONNECTED_AP,false, true, 3000);
-//			xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT,false, true, 3000);
+			xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT,false, true, 3000);
 			ip4_addr_copy(info.ip, ipAddr);
 			tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_AP, &info);
 			strcpy(localIp , ip4addr_ntoa(&info.ip));
@@ -715,18 +725,17 @@ void start_network(){
 
 
 //blinking led and timer isr
-void timerTask(void* p) {
+IRAM_ATTR void timerTask(void* p) {
 //	struct device_settings *device;	
 	uint32_t cCur;
 	bool stateLed = false;
 	bool isEsplay;
 	gpio_num_t gpioLed;
-//	int uxHighWaterMark;
-	
-	initTimers();
-	isEsplay = option_get_esplay();
+	queue_event_t evt;
 	gpio_get_ledgpio(&gpioLed);
 	setLedGpio(gpioLed);
+//	int uxHighWaterMark;
+	isEsplay = option_get_esplay();
 				
 	if (gpioLed != GPIO_NONE)
 	{
@@ -734,8 +743,10 @@ void timerTask(void* p) {
 		gpio_set_level(gpioLed, ledPolarity ? 1 : 0);
 	}	
 	cCur = FlashOff*10;
+		// queue for events of the sleep / wake and Ms timers
+	
+	initTimers();
 
-	queue_event_t evt;
 	
 	while(1) {
 		// read and treat the timer queue events
@@ -744,41 +755,45 @@ void timerTask(void* p) {
 		while (xQueueReceive(event_queue, &evt, 0))
 		{
 			switch (evt.type){
+					case TIMER_1MS:
+						//if (serviceAddon != NULL) serviceAddon(); // for the encoders and buttons
+						if (isEsplay) // esplay board only
+							rexp = i2c_keypad_read(); // read the expansion
+						if (divide)
+							ctimeMs++;	// for led	
+						divide = !divide;	
+						ServiceAddon();
+					break;				
 					case TIMER_SLEEP:
 						clientDisconnect("Timer"); // stop the player
 					break;
 					case TIMER_WAKE:
-					clientConnect(); // start the player	
+						clientConnect(); // start the player	
 					break;
 					default:
 					break;
 			}
-		}
-		if (ledStatus)
-		{
-			if (ctimeMs >= cCur)
-			{
-				gpioLed = getLedGpio();
+		}	
+					if ((ledStatus)&&(ctimeMs >= cCur))
+					{
+						gpioLed = getLedGpio();
+						if (stateLed)
+						{
+							if (gpioLed != GPIO_NONE) gpio_set_level(gpioLed,ledPolarity?1:0);	
+							stateLed = false;
+							cCur = FlashOff*10;
+						} else
+						{
+							if (gpioLed != GPIO_NONE) gpio_set_level(gpioLed,ledPolarity?0:1);	
+							stateLed = true;
+							cCur = FlashOn*10;										
+						}
+						ctimeMs = 0;			
+					} 							
 
-				if (stateLed)
-				{
-					if (gpioLed != GPIO_NONE) gpio_set_level(gpioLed,ledPolarity?1:0);	
-					stateLed = false;
-					cCur = FlashOff*10;
-				} else
-				{
-					if (gpioLed != GPIO_NONE) gpio_set_level(gpioLed,ledPolarity?0:1);	
-					stateLed = true;
-					cCur = FlashOn*10;										
-				}
-				ctimeMs = 0;
-			}			
-		} 
+
 		
-		vTaskDelay(10);	
-		
-		if (isEsplay) // esplay board only
-			rexp = i2c_keypad_read(); // read the expansion
+		vTaskDelay(1);	
 	}
 //	printf("t0 end\n");
 	vTaskDelete( NULL ); // stop the task (never reached)
@@ -879,7 +894,7 @@ void app_main()
 	esp_err_t err;
 
 	ESP_LOGI(TAG, "starting app_main()");
-    ESP_LOGI(TAG, "RAM left: %u", esp_get_free_heap_size());
+    ESP_LOGI(TAG, "RAM left: %u, Internal %u", esp_get_free_heap_size(), heap_caps_get_free_size(MALLOC_CAP_INTERNAL  | MALLOC_CAP_8BIT));
 
 	const esp_partition_t *running = esp_ota_get_running_partition();
 	ESP_LOGE(TAG, "Running partition type %d subtype %d (offset 0x%08x)",
@@ -1033,9 +1048,15 @@ void app_main()
 	}	
 	
 
+	
 	// Version infos
+	ESP_LOGI(TAG, "\n");
+	ESP_LOGI(TAG, "Project name: %s",esp_ota_get_app_description()->project_name);
+	ESP_LOGI(TAG, "Version: %s",esp_ota_get_app_description()->version);
 	ESP_LOGI(TAG, "Release %s, Revision %s",RELEASE,REVISION);
-	ESP_LOGI(TAG, "SDK %s",esp_get_idf_version());
+//	ESP_LOGI(TAG, "Date: %s,  Time: %s",esp_ota_get_app_description()->date,esp_ota_get_app_description()->time);
+	ESP_LOGI(TAG, "SDK %s\n",esp_get_idf_version());	
+	ESP_LOGI(TAG, "Date %s, Time: %s\n", __DATE__,__TIME__ );
 	ESP_LOGI(TAG, "Heap size: %d",xPortGetFreeHeapSize());
 
 	// lcd init
@@ -1054,9 +1075,7 @@ void app_main()
 	setIvol( g_device->vol);
 	ESP_LOGI(TAG, "Volume set to %d",g_device->vol);
 		
-	
-	// queue for events of the sleep / wake and Ms timers
-	event_queue = xQueueCreate(30, sizeof(queue_event_t));
+
 	// led blinks
 	xTaskCreatePinnedToCore(timerTask, "timerTask",2100, NULL, PRIO_TIMER, &pxCreatedTask,CPU_TIMER); 
 	ESP_LOGI(TAG, "%s task: %x","t0",(unsigned int)pxCreatedTask);		
@@ -1098,12 +1117,12 @@ void app_main()
 	ESP_ERROR_CHECK(mdns_service_add(NULL, "_telnet", "_tcp", 23, NULL, 0));	
 
     // init player config
-    player_config = (player_t*)calloc(1, sizeof(player_t));
+    player_config = (player_t*)kcalloc(1, sizeof(player_t));
     player_config->command = CMD_NONE;
     player_config->decoder_status = UNINITIALIZED;
     player_config->decoder_command = CMD_NONE;
     player_config->buffer_pref = BUF_PREF_SAFE;
-    player_config->media_stream = calloc(1, sizeof(media_stream_t));
+    player_config->media_stream = kcalloc(1, sizeof(media_stream_t));
 
 	audio_player_init(player_config);	  
 	renderer_init(create_renderer_config());
@@ -1111,7 +1130,7 @@ void app_main()
 	// LCD Display infos
     lcd_welcome(localIp,"STARTED");
 	vTaskDelay(10);
-    ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
+    ESP_LOGI(TAG, "RAM left %d, Internal %u", esp_get_free_heap_size(),heap_caps_get_free_size(MALLOC_CAP_INTERNAL  | MALLOC_CAP_8BIT));
 
 	//start tasks of KaRadio32
 	vTaskDelay(1);

@@ -9,7 +9,7 @@
 #include "nvs_flash.h"
 #include "driver/spi_master.h"
 #include "esp_adc_cal.h"
-#include "audio_renderer.h"
+#include "app_main.h"
 
 #define GPIO_NONE 255
 

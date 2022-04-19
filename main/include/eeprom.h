@@ -90,7 +90,7 @@ struct device_settings {
 	uint32_t tp_calx;
 	uint32_t tp_caly;
 
-} Device_Settings;
+};// Device_Settings;
 
 struct shoutcast_info {
 	char domain[73]; //url

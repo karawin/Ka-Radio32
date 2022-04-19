@@ -24,7 +24,6 @@
 #include "freertos/queue.h"
 
 #include "driver/rmt.h"
-#include "driver/periph_ctrl.h"
 #include "soc/rmt_reg.h"
 
 //IR

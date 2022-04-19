@@ -9,7 +9,6 @@
 #include "webserver.h"
 #include "serv-fs.h"
 #include "servers.h"
-#include "driver/timer.h"
 #include "driver/uart.h"
 #include "audio_renderer.h"
 #include "app_main.h"

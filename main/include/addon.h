@@ -99,7 +99,7 @@ extern ucg_t ucg;
 void task_addon(void *pvParams);
 void task_lcd(void *pvParams);
 void lcd_init(uint8_t Type);
-void (*serviceAddon)();
+//void (*serviceAddon)(void);
 void ServiceAddon(void);
 void addonParse(const char *fmt, ...);
 void lcd_welcome(const char* ip,const char*state);

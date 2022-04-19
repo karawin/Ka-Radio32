@@ -50,7 +50,7 @@ void fdkaac_decoder_task(void *pvParameters)
 	//ESP_LOGD(TAG, "init I2S mode %d, port %d, %d bit, %d Hz", renderer_instance->output_mode, renderer_instance->i2s_num, renderer_instance->bit_depth, renderer_instance->sample_rate);
     // buffer might contain noise
     i2s_zero_dma_buffer(renderer_instance->i2s_num);
-    i2s_start(renderer_instance->i2s_num);
+    //i2s_start(renderer_instance->i2s_num);
 
     /* allocate sample buffer */
     buffer_t *pcm_buf = buf_create_dma(OUTPUT_BUFFER_SIZE);

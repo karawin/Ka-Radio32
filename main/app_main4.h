@@ -33,9 +33,10 @@ Copyright (C) 2017  KaraWin
 #include "freertos/queue.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
-#include "esp_event_loop.h"
+#include "esp_event.h"
 #include "esp_log.h"
 #include "esp_ota_ops.h"
+#include "esp_sleep.h"
 //#include "esp_heap_trace.h"
 #include "nvs_flash.h"
 #include "driver/i2s.h"
@@ -54,7 +55,7 @@ Copyright (C) 2017  KaraWin
 #include "audio_renderer.h"
 //#include "bt_speaker.h"
 #include "bt_config.h"
-//#include "mdns_task.h"
+//#include "mdns_task.h"f
 #include "audio_player.h"
 #include <u8g2.h>
 #include "u8g2_esp32_hal.h"
@@ -82,7 +83,12 @@ Copyright (C) 2017  KaraWin
 #include "vs1053.h"
 #include "ClickEncoder.h"
 #include "addon.h"
-
+#include "esp_idf_version.h"							
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+#include "driver/gptimer.h"
+#else
+#include "driver/timer.h"
+#endif
 //#include "rda5807Task.h"
 
 /* The event group allows multiple bits for each event*/
@@ -122,53 +128,97 @@ static bool bigRam = false;
 //static uint32_t ctimeVol = 0;
 static uint32_t ctimeMs = 0;	
 static bool divide = false;
+
+esp_netif_t *ap;
+esp_netif_t *sta;
+
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+gptimer_handle_t mstimer = NULL;
+gptimer_handle_t sleeptimer = NULL;
+gptimer_handle_t waketimer = NULL;
+
+IRAM_ATTR void noInterrupt1Ms() {}
+// enable 1MS timer interrupt
+IRAM_ATTR void interrupt1Ms() {}
+#else
 // disable 1MS timer interrupt
 IRAM_ATTR void noInterrupt1Ms() {timer_disable_intr(TIMERGROUP1MS, msTimer);}
 // enable 1MS timer interrupt
 IRAM_ATTR void interrupt1Ms() {timer_enable_intr(TIMERGROUP1MS, msTimer);}
 //IRAM_ATTR void noInterrupts() {noInterrupt1Ms();}
 //IRAM_ATTR void interrupts() {interrupt1Ms();}
+#endif
 
-IRAM_ATTR char* getIp() {return (localIp);}
+char* getIp() {return (localIp);}
 IRAM_ATTR uint8_t getIvol() {return clientIvol;}
 IRAM_ATTR void setIvol( uint8_t vol) {clientIvol = vol;}; //ctimeVol = 0;}
 IRAM_ATTR output_mode_t get_audio_output_mode() { return audio_output_mode;}
 
-/*
-IRAM_ATTR void   microsCallback(void *pArg) {
-	int timer_idx = (int) pArg;
-	queue_event_t evt;	
-	TIMERG1.hw_timer[timer_idx].update = 1;
-	TIMERG1.int_clr_timers.t1 = 1; //isr ack
-		evt.type = TIMER_1mS;
-        evt.i1 = TIMERGROUP1mS;
-        evt.i2 = timer_idx;
-	xQueueSendFromISR(event_queue, &evt, NULL);	
-	TIMERG1.hw_timer[timer_idx].config.alarm_en = 1;
-}*/
 // 
-IRAM_ATTR bool bigSram() { return bigRam;}
+bool bigSram() { return bigRam;}
+void* kmalloc(size_t memorySize)
+{
+	if (bigRam) return heap_caps_malloc(memorySize, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+	else return heap_caps_malloc(memorySize, MALLOC_CAP_INTERNAL  | MALLOC_CAP_8BIT);
+		
+}
+void* kcalloc(size_t elementCount, size_t elementSize)
+{
+	if (bigRam) return heap_caps_calloc(elementCount,elementSize, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+	else return heap_caps_calloc(elementCount,elementSize, MALLOC_CAP_INTERNAL  | MALLOC_CAP_8BIT);
+		
+}
+
+
+
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+static bool msCallback(gptimer_handle_t timer, const gptimer_alarm_event_data_t *edata, void *user_ctx)
+{
+	BaseType_t high_task_awoken = pdFALSE;
+	xQueueHandle event_qu = (xQueueHandle)user_ctx;
+	queue_event_t evt;	
+	evt.type = TIMER_1MS;
+    evt.i1 = 0;
+    evt.i2 = 0;
+	xQueueSendFromISR(event_qu, &evt, NULL);	
+	if (serviceAddon != NULL) serviceAddon(); // for the encoders and buttons
+	return high_task_awoken == pdTRUE;
+}
+#else
 //-----------------------------------
 // every 500µs
 IRAM_ATTR void   msCallback(void *pArg) {
 	int timer_idx = (int) pArg;
-
+	queue_event_t evt;	
 //	queue_event_t evt;	
 	TIMERG1.hw_timer[timer_idx].update = 1;
-	TIMERG1.int_clr_timers.t0 = 1; //isr ack
-	if (divide)
-	{
-		ctimeMs++;	// for led
-//		ctimeVol++; // to save volume
-	}	
-	divide = !divide;
+	TIMERG1.int_clr_timers.t0 = 1; //isr ack		
+	evt.type = TIMER_1MS;
+    evt.i1 = TIMERGROUP1MS;
+    evt.i2 = timer_idx;
+	xQueueSendFromISR(event_queue, &evt, NULL);
 	if (serviceAddon != NULL) serviceAddon(); // for the encoders and buttons
 	TIMERG1.hw_timer[timer_idx].config.alarm_en = 1;
 }
+#endif	
 
-IRAM_ATTR void   sleepCallback(void *pArg) {
-	int timer_idx = (int) pArg;
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+static bool sleepCallback(gptimer_handle_t timer, const gptimer_alarm_event_data_t *edata, void *user_ctx)
+{
+	BaseType_t high_task_awoken = pdFALSE;
+	gptimer_stop(timer);	
+	xQueueHandle event_qu = (xQueueHandle)user_ctx;
 	queue_event_t evt;	
+	evt.type = TIMER_SLEEP;
+    evt.i1 = 0;
+    evt.i2 = 0;
+	xQueueSendFromISR(event_qu, &evt, NULL);	
+	return high_task_awoken == pdTRUE;
+}
+#else
+void   sleepCallback(void *pArg) {
+	int timer_idx = (int) pArg;
+	queue_event_t evt;		
 	TIMERG0.int_clr_timers.t0 = 1; //isr ack
 		evt.type = TIMER_SLEEP;
         evt.i1 = TIMERGROUP;
@@ -176,19 +226,41 @@ IRAM_ATTR void   sleepCallback(void *pArg) {
 	xQueueSendFromISR(event_queue, &evt, NULL);	
 	TIMERG0.hw_timer[timer_idx].config.alarm_en = 0;
 }
-IRAM_ATTR void   wakeCallback(void *pArg) {
-
+#endif	
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+static bool wakeCallback(gptimer_handle_t timer, const gptimer_alarm_event_data_t *edata, void *user_ctx)
+{
+	BaseType_t high_task_awoken = pdFALSE;
+	gptimer_stop(timer);	
+	xQueueHandle event_qu = (xQueueHandle)user_ctx;
+	queue_event_t evt;	
+	evt.type = TIMER_WAKE;
+    evt.i1 = 0;
+    evt.i2 = 0;
+	xQueueSendFromISR(event_qu, &evt, NULL);	
+	return high_task_awoken == pdTRUE;
+}
+#else
+void   wakeCallback(void *pArg) {
 	int timer_idx = (int) pArg;
 	queue_event_t evt;	
-	TIMERG0.int_clr_timers.t1 = 1;
+	TIMERG0.int_clr_timers.t1 = 1;	
         evt.i1 = TIMERGROUP;
         evt.i2 = timer_idx;
 		evt.type = TIMER_WAKE;
 	xQueueSendFromISR(event_queue, &evt, NULL);
-	TIMERG0.hw_timer[timer_idx].config.alarm_en = 0;
+	TIMERG0.hw_timer[timer_idx].config.alarm_en = 0;	
 }
-	
-
+#endif		
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+uint64_t getSleep()
+{
+	uint64_t ret=0;
+	ESP_ERROR_CHECK(gptimer_get_raw_count(sleeptimer,&ret));
+	ESP_LOGD(TAG,"getSleep: ret: %lld",ret);
+	return ret/10000ll;
+}
+#else
 //return the current timer value in sec
 uint64_t getSleep()
 {
@@ -199,6 +271,16 @@ uint64_t getSleep()
 	ESP_LOGD(TAG,"getSleep: ret: %lld, tot: %lld, return %lld",ret,tot,tot-ret);
 	return ((tot)-ret)/5000000;
 }
+#endif
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+uint64_t getWake()
+{
+	uint64_t ret=0;
+	ESP_ERROR_CHECK(gptimer_get_raw_count(waketimer,&ret));
+	ESP_LOGD(TAG,"getWake: ret: %lld",ret);
+	return ret/10000ll;
+}
+#else
 uint64_t getWake()
 {
 	uint64_t ret=0;
@@ -208,21 +290,64 @@ uint64_t getWake()
 	ESP_LOGD(TAG,"getWake: ret: %lld, tot: %lld  return %lld",ret,(tot),tot-ret);
 	return ((tot)-ret)/5000000;
 }
+#endif
 
 void tsocket(const char* lab, uint32_t cnt)
 {
-		char* title = malloc(strlen(lab)+50);
+		char* title = kmalloc(strlen(lab)+50);
 		sprintf(title,"{\"%s\":\"%d\"}",lab,cnt*60); 
 		websocketbroadcast(title, strlen(title));
 		free(title);	
 }
-
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+void stopSleep(){
+	ESP_LOGD(TAG,"stopSleep");
+    ESP_ERROR_CHECK(gptimer_stop(sleeptimer));
+	tsocket("lsleep",0);
+}
+gptimer_event_callbacks_t cbss = {
+		.on_alarm = sleepCallback, // register user callback
+};
+gptimer_alarm_config_t  alarm_config = {
+    .alarm_count = 0, 
+    .flags.auto_reload_on_alarm = false, // enable auto-reload
+};
+void startSleep(uint32_t delay){
+	ESP_LOGD(TAG,"startSleep: %d min.",delay );
+	ESP_ERROR_CHECK(gptimer_stop(sleeptimer));
+	vTaskDelay(1);
+	if (delay == 0) return;
+	ESP_ERROR_CHECK(gptimer_set_raw_count(sleeptimer,delay*600000));
+	ESP_ERROR_CHECK(gptimer_set_alarm_action(sleeptimer, &alarm_config));
+	ESP_ERROR_CHECK(gptimer_register_event_callbacks(sleeptimer, &cbss, event_queue));
+	ESP_ERROR_CHECK(gptimer_start(sleeptimer));
+	tsocket("lsleep",delay);
+}
+void stopWake(){
+	ESP_LOGD(TAG,"stopWake");
+	ESP_ERROR_CHECK(gptimer_stop(waketimer));
+	tsocket("lwake",0);	
+}
+gptimer_event_callbacks_t cbsw = {
+		.on_alarm = wakeCallback, // register user callback
+};
+void startWake(uint32_t delay){
+	ESP_LOGD(TAG,"startWake: %d min.",delay );
+	ESP_ERROR_CHECK(gptimer_stop(waketimer));
+	vTaskDelay(1);
+	if (delay == 0) return;
+	ESP_ERROR_CHECK(gptimer_set_raw_count(waketimer,delay*600000ll));
+	ESP_ERROR_CHECK(gptimer_set_alarm_action(waketimer, &alarm_config));
+	ESP_ERROR_CHECK(gptimer_register_event_callbacks(waketimer, &cbsw, event_queue));
+	ESP_ERROR_CHECK(gptimer_start(waketimer));
+	tsocket("lwake",delay);
+}
+#else
 void stopSleep(){
 	ESP_LOGD(TAG,"stopSleep");
 	ESP_ERROR_CHECK(timer_pause(TIMERGROUP, sleepTimer));
 	ESP_ERROR_CHECK(timer_set_alarm_value(TIMERGROUP, sleepTimer, 0x00000000ULL));
 	ESP_ERROR_CHECK(timer_set_counter_value(TIMERGROUP, sleepTimer, 0x00000000ULL));
-
 	tsocket("lsleep",0);
 }
 void startSleep(uint32_t delay)
@@ -257,11 +382,39 @@ void startWake(uint32_t delay)
 	ESP_ERROR_CHECK(timer_start(TIMERGROUP, wakeTimer));
 	tsocket("lwake",delay);	
 }
-
+#endif
 
 void initTimers()
 {
-timer_config_t config;
+	event_queue = xQueueCreate(10, sizeof(queue_event_t));	
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+gptimer_config_t timer_config = {
+    .clk_src = GPTIMER_CLK_SRC_APB,
+    .direction = GPTIMER_COUNT_DOWN,
+    .resolution_hz = 10 * 1000 , //  1 tick = 100µs
+};
+gptimer_alarm_config_t  alarm_config = {
+    .reload_count = 5, // counter will reload with 0 on alarm event
+    .alarm_count = 0, // period = 500µs 
+    .flags.auto_reload_on_alarm = true, // enable auto-reload
+};
+
+	/*Configure timer 1MS*/
+	//////////////////////
+	ESP_ERROR_CHECK(gptimer_new_timer(&timer_config, &mstimer));
+	ESP_ERROR_CHECK(gptimer_set_alarm_action(mstimer, &alarm_config));
+	gptimer_event_callbacks_t cbs = {
+		.on_alarm = msCallback, // register user callback
+	};
+	ESP_ERROR_CHECK(gptimer_register_event_callbacks(mstimer, &cbs, event_queue));
+	ESP_ERROR_CHECK(gptimer_start(mstimer));	
+	
+
+	ESP_ERROR_CHECK(gptimer_new_timer(&timer_config, &sleeptimer));	
+	ESP_ERROR_CHECK(gptimer_new_timer(&timer_config, &waketimer));	
+	
+#else	
+	timer_config_t config;
 	config.alarm_en = 1;
     config.auto_reload = TIMER_AUTORELOAD_DIS;
     config.counter_dir = TIMER_COUNT_UP;
@@ -289,19 +442,8 @@ timer_config_t config;
 	ESP_ERROR_CHECK(timer_enable_intr(TIMERGROUP1MS, msTimer));
 	ESP_ERROR_CHECK(timer_set_alarm(TIMERGROUP1MS, msTimer,TIMER_ALARM_EN));
 	ESP_ERROR_CHECK(timer_start(TIMERGROUP1MS, msTimer));
-	
-	/*Configure timer 1µS*/
-/*	config.auto_reload = TIMER_AUTORELOAD_EN;
-	config.divider = TIMER_DIVIDER1mS;
-	ESP_ERROR_CHECK(timer_init(TIMERGROUP1mS, microsTimer, &config));
-	ESP_ERROR_CHECK(timer_pause(TIMERGROUP1mS, microsTimer));
-	ESP_ERROR_CHECK(timer_isr_register(TIMERGROUP1mS, microsTimer, microsCallback, (void*) microsTimer, 0, NULL));
-*/	/* start 1µS timer*/
-/*	ESP_ERROR_CHECK(timer_set_counter_value(TIMERGROUP1mS, microsTimer, 0x00000000ULL));
-	ESP_ERROR_CHECK(timer_set_alarm_value(TIMERGROUP1mS, microsTimer,TIMERVALUE1mS(10))); // 10 ms timer
-	ESP_ERROR_CHECK(timer_enable_intr(TIMERGROUP1mS, microsTimer));
-	ESP_ERROR_CHECK(timer_set_alarm(TIMERGROUP1mS, microsTimer,TIMER_ALARM_EN));
-	ESP_ERROR_CHECK(timer_start(TIMERGROUP1mS, microsTimer));*/
+#endif	
+
 }
 
 //////////////////////////////////////////////////////////////////
@@ -310,7 +452,7 @@ timer_config_t config;
 // Renderer config creation
 static renderer_config_t *create_renderer_config()
 {
-    renderer_config_t *renderer_config = calloc(1, sizeof(renderer_config_t));
+    renderer_config_t *renderer_config = kcalloc(1, sizeof(renderer_config_t));
 
     if(renderer_config->output_mode == I2S_MERUS) {
         renderer_config->bit_depth = I2S_BITS_PER_SAMPLE_32BIT;
@@ -357,19 +499,21 @@ static void init_hardware()
 
 
 /* event handler for pre-defined wifi events */
-static esp_err_t event_handler(void *ctx, system_event_t *event)
+//static esp_err_t event_handler(void *ctx, system_event_t *event)
+static void wifi_event_handler(void *arg, esp_event_base_t event_base,
+							   int32_t event_id, void *event_data)
 {
-    EventGroupHandle_t wifi_event = ctx;
+//    EventGroupHandle_t wifi_event = ctx;
 
-    switch (event->event_id)
+    switch (event_id)
     {
-    case SYSTEM_EVENT_STA_START:
+    case WIFI_EVENT_STA_START:
 		FlashOn = FlashOff = 100;
         esp_wifi_connect();
         break;
 		
-	case SYSTEM_EVENT_STA_CONNECTED:
-		xEventGroupSetBits(wifi_event, CONNECTED_AP);
+	case WIFI_EVENT_STA_CONNECTED:
+		xEventGroupSetBits(wifi_event_group, CONNECTED_AP);
 		ESP_LOGI(TAG, "Wifi connected");		
 		if (wifiInitDone) 
 		{
@@ -379,17 +523,17 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
 			} // retry
 		else wifiInitDone = true;		break;
 
-    case SYSTEM_EVENT_STA_GOT_IP:
+    case IP_EVENT_STA_GOT_IP:
 		FlashOn = 5;FlashOff = 395;
-        xEventGroupSetBits(wifi_event, CONNECTED_BIT);
+        xEventGroupSetBits(wifi_event_group, CONNECTED_BIT);
         break;
 
-    case SYSTEM_EVENT_STA_DISCONNECTED:
+    case WIFI_EVENT_STA_DISCONNECTED:
         /* This is a workaround as ESP32 WiFi libs don't currently
            auto-reassociate. */
 		FlashOn = FlashOff = 100;
-		xEventGroupClearBits(wifi_event, CONNECTED_AP);
-        xEventGroupClearBits(wifi_event, CONNECTED_BIT);
+		xEventGroupClearBits(wifi_event_group, CONNECTED_AP);
+        xEventGroupClearBits(wifi_event_group, CONNECTED_BIT);
 		ESP_LOGE(TAG, "Wifi Disconnected.");
 		vTaskDelay(100);
         if (!getAutoWifi()&&(wifiInitDone)) 
@@ -416,20 +560,20 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
 		}
         break;
 
-	case SYSTEM_EVENT_AP_START:
+	case WIFI_EVENT_AP_START:
 		FlashOn = 5;FlashOff = 395;
-		xEventGroupSetBits(wifi_event, CONNECTED_AP);
-		xEventGroupSetBits(wifi_event, CONNECTED_BIT);
+		xEventGroupSetBits(wifi_event_group, CONNECTED_AP);
+		xEventGroupSetBits(wifi_event_group, CONNECTED_BIT);
 		wifiInitDone = true;
 		break;
 		
-	case SYSTEM_EVENT_AP_STADISCONNECTED:
+	case WIFI_EVENT_AP_STADISCONNECTED:
 		break;
 		
     default:
         break;
     }
-    return ESP_OK;
+ //   return ESP_OK;
 }
 
 
@@ -458,32 +602,49 @@ static void start_wifi()
 	char ssid[SSIDLEN]; 
 	char pass[PASSLEN];
 	
-	wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-    ESP_ERROR_CHECK( esp_wifi_init(&cfg) );
-//    ESP_ERROR_CHECK( esp_wifi_set_storage(WIFI_STORAGE_RAM) );
-	
-	tcpip_adapter_init();
-	tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA); // Don't run a DHCP client	
-    /* FreeRTOS event group to signal when we are connected & ready to make a request */
-	wifi_event_group = xEventGroupCreate();	
-    ESP_ERROR_CHECK( esp_event_loop_init(event_handler, wifi_event_group) );
+	static bool first_pass = false;
+	static bool initialized = false;
+	if (!initialized)
+	{
+		esp_netif_init();
+		wifi_event_group = xEventGroupCreate();	
+		ESP_ERROR_CHECK(esp_event_loop_create_default());
+		ap = esp_netif_create_default_wifi_ap();
+		assert(ap);
+		sta = esp_netif_create_default_wifi_sta();
+		assert(sta);
+													wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();																													
+		ESP_ERROR_CHECK(esp_wifi_init(&cfg));
+		ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, NULL));
+		ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &wifi_event_handler, NULL));
+		ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
+		ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_NULL));
+		initialized = true;
+	}
+	ESP_LOGI(TAG, "WiFi init done!");
 	
 	if (g_device->current_ap == APMODE) 
 	{
 		if (strlen(g_device->ssid1) !=0)
-		{g_device->current_ap = STA1;}
-		else 
-		{	if (strlen(g_device->ssid2) !=0)
-			{g_device->current_ap = STA2;}
-			else g_device->current_ap = APMODE;
+		{
+			g_device->current_ap = STA1;
+		} else
+		{ 
+			if (strlen(g_device->ssid2) !=0)
+				g_device->current_ap = STA2;
+			else 
+				g_device->current_ap = APMODE;
 		}	
 		saveDeviceSettings(g_device);
 	}
 	
 	while (1)
 	{
-		ESP_ERROR_CHECK( esp_wifi_stop() );
-		vTaskDelay(10);
+		if (first_pass)
+		{
+			ESP_ERROR_CHECK( esp_wifi_stop() );
+			vTaskDelay(5);
+		}
 		
 		switch (g_device->current_ap)
 		{
@@ -538,12 +699,16 @@ static void start_wifi()
 			unParse((char*)(wifi_config.sta.password));
 			if  (strlen(ssid)/*&&strlen(pass)*/)
 			{
-				esp_wifi_disconnect();
+				if (CONNECTED_BIT > 1)
+				{
+					esp_wifi_disconnect();
+				}
 				ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
-//				ESP_LOGI(TAG, "connecting %s, %d, %s, %d",ssid,strlen((char*)(wifi_config.sta.ssid)),pass,strlen((char*)(wifi_config.sta.password)));
+
 				ESP_LOGI(TAG, "connecting %s",ssid);
 				ESP_ERROR_CHECK( esp_wifi_start() );	
-			} else
+			} 
+			else
 			{
 				g_device->current_ap++;
 				g_device->current_ap %=3;
@@ -563,7 +728,7 @@ static void start_wifi()
 		}
 
 		/* Wait for the callback to set the CONNECTED_BIT in the event group. */
-		if ( (xEventGroupWaitBits(wifi_event_group, CONNECTED_AP,false, true, 1500) & CONNECTED_AP) ==0) 
+		if ( (xEventGroupWaitBits(wifi_event_group, CONNECTED_AP,false, true, 2000) & CONNECTED_AP) ==0) 
 		//timeout . Try the next AP
 		{
 			g_device->current_ap++;
@@ -577,19 +742,26 @@ static void start_wifi()
 			}
 			saveDeviceSettings(g_device);
 			ESP_LOGI(TAG,"device->current_ap: %d",g_device->current_ap);	
-		}	else break;	// 					
+		}
+		else break;	// 						
+		first_pass = true;
 	}					
 }
 
 void start_network(){
 //	struct device_settings *g_device;	
-	tcpip_adapter_ip_info_t info;
+	esp_netif_ip_info_t info;
 	wifi_mode_t mode;	
 	ip4_addr_t ipAddr;
 	ip4_addr_t mask;
 	ip4_addr_t gate;
 	uint8_t dhcpEn = 0;
 
+	IP4_ADDR(&ipAddr, 192, 168, 4, 1);
+	IP4_ADDR(&gate, 192, 168, 4, 1);
+	IP4_ADDR(&mask, 255, 255, 255, 0);
+
+	esp_netif_dhcpc_stop(sta); // Don't run a DHCP client								 
 	
 	switch (g_device->current_ap)
 	{
@@ -608,34 +780,39 @@ void start_network(){
 
 		default: // other: AP mode
 			IP4_ADDR(&ipAddr, 192,168,4,1);
-			IPADDR2_COPY(&gate,&ipAddr);
+			IP4_ADDR(&gate, 192, 168, 4, 1);
 			IP4_ADDR(&mask,255,255,255,0);
 	}	
 	
-	IPADDR2_COPY(&info.ip,&ipAddr);
-	IPADDR2_COPY(&info.gw,&gate);
-	IPADDR2_COPY(&info.netmask,&mask);	
+	ip4_addr_copy(info.ip, ipAddr);
+	ip4_addr_copy(info.gw, gate);
+	ip4_addr_copy(info.netmask, mask);
 	
 	ESP_ERROR_CHECK(esp_wifi_get_mode(&mode));		
 	if (mode == WIFI_MODE_AP)
 	{
-			xEventGroupWaitBits(wifi_event_group, CONNECTED_BIT,false, true, 3000);
-			IPADDR2_COPY(&info.ip,&ipAddr);
-			tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_AP, &info);
-			strcpy(localIp , ip4addr_ntoa(&info.ip));
-			printf("IP: %s\n\n",ip4addr_ntoa(&info.ip));	
+		xEventGroupWaitBits(wifi_event_group, CONNECTED_AP,false, true, 3000);
+		ip4_addr_copy(info.ip, ipAddr);
+
 	
+		esp_netif_set_ip_info(ap, &info);
+		esp_netif_ip_info_t ap_ip_info;
+		ap_ip_info.ip.addr = 0;
+		while (ap_ip_info.ip.addr == 0)
+		{
+			esp_netif_get_ip_info(ap, &ap_ip_info);
+		}
 	}
 	else // mode STA
 	{	
 		if (dhcpEn ) // check if ip is valid without dhcp
-			tcpip_adapter_dhcpc_start(TCPIP_ADAPTER_IF_STA); //  run a DHCP client
+			esp_netif_dhcpc_start(sta); //  run a DHCP client
 		else
 		{
-			ESP_ERROR_CHECK(tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_STA, &info));
+			ESP_ERROR_CHECK(esp_netif_set_ip_info(sta, &info));
 			dns_clear_servers(false);
 			IP_SET_TYPE(( ip_addr_t* )&info.gw, IPADDR_TYPE_V4); // mandatory
-			(( ip_addr_t* )&info.gw)->type = IPADDR_TYPE_V4;
+//			(( ip_addr_t* )&info.gw)->type = IPADDR_TYPE_V4;
 			dns_setserver(0,( ip_addr_t* ) &info.gw);
 			dns_setserver(1,( ip_addr_t* ) &info.gw);				// if static ip	check dns
 		}
@@ -654,42 +831,43 @@ void start_network(){
 		
 		vTaskDelay(1);	
 		// retrieve the current ip	
-		tcpip_adapter_ip_info_t ip_info;
-		ip_info.ip.addr =0;		
-		while (ip_info.ip.addr ==0)
+		esp_netif_ip_info_t sta_ip_info;
+		sta_ip_info.ip.addr = 0;
+		while (sta_ip_info.ip.addr ==0)
 		{
-			if (mode == WIFI_MODE_AP)
-				tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_AP, &ip_info);
-			else	
-				tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info);
-		}		
+			esp_netif_get_ip_info(sta, &sta_ip_info);
+		
+		}
+		
 		ip_addr_t *ipdns0 = (ip_addr_t *)dns_getserver(0);
 //		ip_addr_t ipdns1 = dns_getserver(1);
-		printf("\nDNS: %s  \n",ip4addr_ntoa(( struct ip4_addr* ) ipdns0));
-		strcpy(localIp , ip4addr_ntoa(&ip_info.ip));
-		printf("IP: %s\n\n",ip4addr_ntoa(&ip_info.ip));
+		ESP_LOGW(TAG, "DNS: %s  \n", ip4addr_ntoa((struct ip4_addr *)&ipdns0));
 
 		
 		if (dhcpEn) // if dhcp enabled update fields
 		{  
-			tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &info);
+			esp_netif_get_ip_info(sta, &info);
 			switch (g_device->current_ap)
 			{
-			case STA1: //ssid1 used			
-				IPADDR2_COPY(&g_device->ipAddr1, &info.ip);
-				IPADDR2_COPY(&g_device->mask1, &info.netmask);
-				IPADDR2_COPY(&g_device->gate1, &info.gw);	
-			break;
-			case STA2: //ssid2 used			
-				IPADDR2_COPY(&g_device->ipAddr2, &info.ip);
-				IPADDR2_COPY(&g_device->mask2, &info.netmask);
-				IPADDR2_COPY(&g_device->gate2, &info.gw);	
-			break;
+			case STA1: //ssid1 used
+				ip4addr_aton((const char *)&g_device->ipAddr1,(ip4_addr_t *)&info.ip);
+				ip4addr_aton((const char *)&g_device->gate1,(ip4_addr_t *)&info.gw);
+				ip4addr_aton((const char *)&g_device->mask1,(ip4_addr_t *)&info.netmask);
+				break;
+
+			case STA2: //ssid2 used
+				ip4addr_aton((const char *)&g_device->ipAddr2,(ip4_addr_t *)&info.ip);
+				ip4addr_aton((const char *)&g_device->gate2,(ip4_addr_t *)&info.gw);
+				ip4addr_aton((const char *)&g_device->mask2,(ip4_addr_t *)&info.netmask);
+				break;
 			}
 		}
 		saveDeviceSettings(g_device);	
-		tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, "karadio32");	
+		esp_netif_set_hostname(sta, "karadio32");
 	}
+	ip4_addr_copy(ipAddr, info.ip);
+	strcpy(localIp, ip4addr_ntoa(&ipAddr));
+	ESP_LOGW(TAG, "IP: %s\n\n", localIp);									  
 	
 	lcd_welcome(localIp,"IP found");
 	vTaskDelay(10);
@@ -698,18 +876,17 @@ void start_network(){
 
 
 //blinking led and timer isr
-void timerTask(void* p) {
+IRAM_ATTR void timerTask(void* p) {
 //	struct device_settings *device;	
 	uint32_t cCur;
 	bool stateLed = false;
 	bool isEsplay;
 	gpio_num_t gpioLed;
-//	int uxHighWaterMark;
-	
-	initTimers();
-	isEsplay = option_get_esplay();
+	queue_event_t evt;
 	gpio_get_ledgpio(&gpioLed);
 	setLedGpio(gpioLed);
+//	int uxHighWaterMark;
+	isEsplay = option_get_esplay();
 				
 	if (gpioLed != GPIO_NONE)
 	{
@@ -717,8 +894,10 @@ void timerTask(void* p) {
 		gpio_set_level(gpioLed, ledPolarity ? 1 : 0);
 	}	
 	cCur = FlashOff*10;
+		// queue for events of the sleep / wake and Ms timers
+	
+	initTimers();
 
-	queue_event_t evt;
 	
 	while(1) {
 		// read and treat the timer queue events
@@ -726,42 +905,45 @@ void timerTask(void* p) {
 //		if (nb >29) printf(" %d\n",nb);
 		while (xQueueReceive(event_queue, &evt, 0))
 		{
+			if (evt.type != TIMER_1MS) printf("evt.type: %d\n",evt.type);
 			switch (evt.type){
+					case TIMER_1MS:
+						//if (serviceAddon != NULL) serviceAddon(); // for the encoders and buttons
+						if (isEsplay) // esplay board only
+							rexp = i2c_keypad_read(); // read the expansion
+						if (divide)
+							ctimeMs++;	// for led	
+						divide = !divide;	
+						ServiceAddon();
+					break;				
 					case TIMER_SLEEP:
 						clientDisconnect("Timer"); // stop the player
 					break;
 					case TIMER_WAKE:
-					clientConnect(); // start the player	
+						clientConnect(); // start the player	
 					break;
 					default:
 					break;
 			}
-		}
-		if (ledStatus)
-		{
-			if (ctimeMs >= cCur)
-			{
-				gpioLed = getLedGpio();
-
-				if (stateLed)
-				{
-					if (gpioLed != GPIO_NONE) gpio_set_level(gpioLed,ledPolarity?1:0);	
-					stateLed = false;
-					cCur = FlashOff*10;
-				} else
-				{
-					if (gpioLed != GPIO_NONE) gpio_set_level(gpioLed,ledPolarity?0:1);	
-					stateLed = true;
-					cCur = FlashOn*10;										
-				}
-				ctimeMs = 0;
-			}			
-		} 
+		}	
+					if ((ledStatus)&&(ctimeMs >= cCur))
+					{
+						gpioLed = getLedGpio();
+						if (stateLed)
+						{
+							if (gpioLed != GPIO_NONE) gpio_set_level(gpioLed,ledPolarity?1:0);	
+							stateLed = false;
+							cCur = FlashOff*10;
+						} else
+						{
+							if (gpioLed != GPIO_NONE) gpio_set_level(gpioLed,ledPolarity?0:1);	
+							stateLed = true;
+							cCur = FlashOn*10;										
+						}
+						ctimeMs = 0;			
+					} 
 		
-		vTaskDelay(10);	
-		
-		if (isEsplay) // esplay board only
-			rexp = i2c_keypad_read(); // read the expansion
+		vTaskDelay(1);	
 	}
 //	printf("t0 end\n");
 	vTaskDelete( NULL ); // stop the task (never reached)
@@ -862,7 +1044,7 @@ void app_main()
 	esp_err_t err;
 
 	ESP_LOGI(TAG, "starting app_main()");
-    ESP_LOGI(TAG, "RAM left: %u", esp_get_free_heap_size());
+    ESP_LOGE(TAG, "RAM left: %u", esp_get_free_heap_size());
 
 	const esp_partition_t *running = esp_ota_get_running_partition();
 	ESP_LOGE(TAG, "Running partition type %d subtype %d (offset 0x%08x)",
@@ -1017,8 +1199,14 @@ void app_main()
 	
 
 	// Version infos
+	ESP_LOGI(TAG, "\n");
+	ESP_LOGI(TAG, "Project name: %s",esp_ota_get_app_description()->project_name);
+	ESP_LOGI(TAG, "Version: %s",esp_ota_get_app_description()->version);
 	ESP_LOGI(TAG, "Release %s, Revision %s",RELEASE,REVISION);
-	ESP_LOGI(TAG, "SDK %s",esp_get_idf_version());
+//	ESP_LOGI(TAG, "Date: %s,  Time: %s",esp_ota_get_app_description()->date,esp_ota_get_app_description()->time);
+	ESP_LOGI(TAG, "SDK %s",esp_get_idf_version());	
+	ESP_LOGI(TAG, " Date %s, Time: %s\n", __DATE__,__TIME__ );
+	ESP_LOGI(TAG, "Heap size: %d",xPortGetFreeHeapSize());
 	ESP_LOGI(TAG, "Heap size: %d",xPortGetFreeHeapSize());
 
 	// lcd init
@@ -1036,11 +1224,7 @@ void app_main()
 	// volume
 	setIvol( g_device->vol);
 	ESP_LOGI(TAG, "Volume set to %d",g_device->vol);
-		
-	
-	// queue for events of the sleep / wake and Ms timers
-	event_queue = xQueueCreate(30, sizeof(queue_event_t));
-	// led blinks
+
 	xTaskCreatePinnedToCore(timerTask, "timerTask",2100, NULL, PRIO_TIMER, &pxCreatedTask,CPU_TIMER); 
 	ESP_LOGI(TAG, "%s task: %x","t0",(unsigned int)pxCreatedTask);		
 	
@@ -1051,14 +1235,18 @@ void app_main()
 // start the network
 //-----------------------------
     /* init wifi & network*/
+	ESP_LOGE(TAG, "RAM left bw: %u", esp_get_free_heap_size());
     start_wifi();
+	ESP_LOGE(TAG, "RAM left aw: %u", esp_get_free_heap_size());
 	start_network();
+	ESP_LOGE(TAG, "RAM left an: %u", esp_get_free_heap_size());
 	
 //-----------------------------------------------------
 //init softwares
 //-----------------------------------------------------
 
 	clientInit();	
+	ESP_LOGE(TAG, "RAM left ac: %u", esp_get_free_heap_size());
 	//initialize mDNS service
     err = mdns_init();
     if (err) 
@@ -1081,12 +1269,12 @@ void app_main()
 	ESP_ERROR_CHECK(mdns_service_add(NULL, "_telnet", "_tcp", 23, NULL, 0));	
 
     // init player config
-    player_config = (player_t*)calloc(1, sizeof(player_t));
+    player_config = (player_t*)kcalloc(1, sizeof(player_t));
     player_config->command = CMD_NONE;
     player_config->decoder_status = UNINITIALIZED;
     player_config->decoder_command = CMD_NONE;
     player_config->buffer_pref = BUF_PREF_SAFE;
-    player_config->media_stream = calloc(1, sizeof(media_stream_t));
+    player_config->media_stream = kcalloc(1, sizeof(media_stream_t));
 
 	audio_player_init(player_config);	  
 	renderer_init(create_renderer_config());
@@ -1098,7 +1286,7 @@ void app_main()
 
 	//start tasks of KaRadio32
 	vTaskDelay(1);
-	xTaskCreatePinnedToCore(clientTask, "clientTask", 3800, NULL, PRIO_CLIENT, &pxCreatedTask,CPU_CLIENT); 
+	xTaskCreatePinnedToCore(clientTask, "clientTask", 3700, NULL, PRIO_CLIENT, &pxCreatedTask,CPU_CLIENT); 
 	ESP_LOGI(TAG, "%s task: %x","clientTask",(unsigned int)pxCreatedTask);	
 	vTaskDelay(1);
     xTaskCreatePinnedToCore(serversTask, "serversTask", 3100, NULL, PRIO_SERVER, &pxCreatedTask,CPU_SERVER); 
@@ -1114,6 +1302,7 @@ void app_main()
 	kprintf("READY. Type help for a list of commands\n");
 	// error log on telnet
 	esp_log_set_vprintf( (vprintf_like_t)lkprintf);
+	ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
 	//autostart		
 	autoPlay();
 // All done.

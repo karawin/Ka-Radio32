@@ -68,7 +68,7 @@ static char clientPath[PATHMAX] = {0,0};
 static uint16_t clientPort = 80;
 
 /* declare wolfSSL objects */
-    WOLFSSL_CTX *ctx ;
+    WOLFSSL_CTX *wctx ;
     WOLFSSL *ssl ;
 
 static const struct hostent *serverInfo = NULL;
@@ -805,6 +805,7 @@ bool clientParseHeader(char* s)
 		if (strstr(t, "audio/mp4")) contentType = KAUDIO_MP4;
 		if (strstr(t, "audio/x-m4a")) contentType = KAUDIO_MP4;
 		if (strstr(t, "audio/mpeg")) contentType = KAUDIO_MPEG;
+		if (strstr(t, "audio/mp3")) contentType = KAUDIO_MPEG;
 		if (strstr(t, "application/ogg")) contentType = KAUDIO_OGG;
 		if (strstr(t, "audio/ogg")) contentType = KAUDIO_OGG;
 
@@ -1379,7 +1380,7 @@ ESP_LOGD(TAG,"mt2 len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,cle
 
 uint8_t bufrec[RECEIVE+20];
     /* declare wolfSSL objects */
-    WOLFSSL_CTX *ctx;
+    WOLFSSL_CTX *wctx;
     WOLFSSL *ssl;
 
 void wolfSSL_log_function(const int logLevel, const char *const logMessage){
@@ -1418,17 +1419,17 @@ void clientTask(void *pvParams) {
 	if (wolfSSL_Init() != WOLFSSL_SUCCESS) {
 		ESP_LOGE(TAG,"Failed to init WOLFSSL");}
 	/* Create and initialize WOLFSSL_CTX */
-	if ((ctx = wolfSSL_CTX_new(wolfSSLv23_client_method())) == NULL) {
+	if ((wctx = wolfSSL_CTX_new(wolfSSLv23_client_method())) == NULL) {
 		ESP_LOGE(TAG,"Failed to create WOLFSSL_CTX");
 	}
     wolfSSL_SetLoggingCb(wolfSSL_log_function);	
 	/* Load client certificates into WOLFSSL_CTX */
-	if ((ret = wolfSSL_CTX_load_verify_buffer(ctx, client_cert_der_1024,
+	if ((ret = wolfSSL_CTX_load_verify_buffer(wctx, client_cert_der_1024,
 		sizeof_client_cert_der_1024, WOLFSSL_FILETYPE_ASN1)) != SSL_SUCCESS) {
 		ESP_LOGE(TAG,"Failed to load %d, please check the file.",ret);
 	}
 	/* not peer check */
-	wolfSSL_CTX_set_verify(ctx, WOLFSSL_VERIFY_NONE, 0);
+	wolfSSL_CTX_set_verify(wctx, WOLFSSL_VERIFY_NONE, 0);
 //----------------------------------------------------------------------
 					
 //	portBASE_TYPE uxHighWaterMark;
@@ -1468,7 +1469,7 @@ void clientTask(void *pvParams) {
 					vTaskDelay(1);
 //					wolfSSL_getLogState()?wolfSSL_Debugging_ON():wolfSSL_Debugging_OFF();
 					/* Create a WOLFSSL object */
-					if ((ssl = wolfSSL_new(ctx)) == NULL) {
+					if ((ssl = wolfSSL_new(wctx)) == NULL) {
 						ESP_LOGE(TAG,"Failed to create WOLFSSL ssl object");
 						goto NotConnected;
 					}

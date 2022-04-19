@@ -36,8 +36,10 @@
 
 #ifndef MAIN_INCLUDE_APP_MAIN_H_
 #define MAIN_INCLUDE_APP_MAIN_H_
-#include "audio_renderer.h"
-#include "driver/timer.h"
+//#include "audio_renderer.h"
+
+
+
 
 #define TIMER_DIVIDER 16 	//5000000Hz 5MHz
 #define TIMER_DIVIDER1MS TIMER_BASE_CLK/10000 //10000Hz 
@@ -53,6 +55,7 @@
 #define microsTimer	TIMER_1
 #define sleepTimer  TIMER_0
 #define wakeTimer TIMER_1
+
 
 // event for timers and encoder
 #define TIMER_SLEEP   0   
@@ -88,6 +91,10 @@
 
 #define TEMPO_SAVE_VOL	10000
 
+typedef enum {
+    I2S, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053, SPDIF, BTOOTH
+} output_mode_t;
+
 
 typedef struct {
     int type;               /*!< event type */
@@ -105,8 +112,8 @@ void* kmalloc(size_t memorySize);
 void* kcalloc(size_t elementCount, size_t elementSize);
 
 
-void sleepCallback(void *pArg);
-void wakeCallback(void *pArg);
+//void sleepCallback(void *pArg);
+//void wakeCallback(void *pArg);
 uint64_t getSleep();
 uint64_t getWake();
 void startSleep(uint32_t delay);
@@ -120,6 +127,6 @@ void interrupt1Ms();
 #define interrupts interrupt1Ms
 
 char* getIp();
-
+void (*serviceAddon)(void);
 
 #endif /* MAIN_INCLUDE_APP_MAIN_H_ */

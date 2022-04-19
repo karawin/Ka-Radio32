@@ -11,10 +11,8 @@
 #include "freertos/FreeRTOS.h"
 #include "driver/i2s.h"
 #include "common_component.h"
+#include "app_main.h"
 
-typedef enum {
-    I2S, I2S_MERUS, DAC_BUILT_IN, PDM, VS1053, SPDIF, BTOOTH
-} output_mode_t;
 
 
 typedef struct

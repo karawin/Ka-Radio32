@@ -276,6 +276,7 @@ char Version[20];
 // call this every 1 millisecond via timer ISR
 //
 void (*serviceAddon)() = NULL;
+
 IRAM_ATTR  void ServiceAddon(void)
 {
 	timer1s++;
