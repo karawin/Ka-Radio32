@@ -18,7 +18,7 @@
 
 // lcd_type
 // min 128x64
-#define LCD_COLOR		128	//0x80
+#define LCD_COLOR		128 //0x80
 #define LCD_SPI			64 //0x40
 #define LCD_I2C			0
 #define LCD_NONE		255
@@ -35,10 +35,8 @@
 #define LCD_I2C_ST7567		7 //64x32
 
 //Monochrome I2C
-#define LCD_I2C_1602_27		50 //16x2 0x27
-#define LCD_I2C_1602_3F		51 //16x2 0x3F
-#define LCD_I2C_2004_27		52 //20x4 0x27
-#define LCD_I2C_2004_3F		53 //20x4 0x3F
+#define LCD_I2C_1602		8 //16x2
+#define LCD_I2C_2004		9 //20x4
 
 //SPI
 #define LCD_SPI_SSD1306 		64 //128X32 (LCD_SPI =0x40)

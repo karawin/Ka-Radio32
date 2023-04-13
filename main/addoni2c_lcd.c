@@ -244,22 +244,12 @@ void initI2c_lcd(uint8_t *lcd_type)
 	//This is switch between different types of I2C LCD with different i2c addresses
 	switch (*lcd_type)
 	{
-		case LCD_I2C_1602_27:
+		case LCD_I2C_1602:
 			#define LCD_NUM_ROWS               2
 			#define LCD_NUM_COLUMNS            32
 			#define LCD_NUM_VISIBLE_COLUMNS    16
 			break;
-		case LCD_I2C_1602_3F:
-			#define LCD_NUM_ROWS               2
-			#define LCD_NUM_COLUMNS            32
-			#define LCD_NUM_VISIBLE_COLUMNS    16
-			break;
-		case LCD_I2C_2004_27:
-			#define LCD_NUM_ROWS               4
-			#define LCD_NUM_COLUMNS            40
-			#define LCD_NUM_VISIBLE_COLUMNS    20
-			break;
-		case LCD_I2C_2004_3F:
+		case LCD_I2C_2004:
 			#define LCD_NUM_ROWS               4
 			#define LCD_NUM_COLUMNS            40
 			#define LCD_NUM_VISIBLE_COLUMNS    20
@@ -312,7 +302,7 @@ void initI2c_lcd(uint8_t *lcd_type)
 		}
 
 		//////////////////////////////////
-	    // Set up the SMBus
+		// Set up the SMBus
 		smbus_info_t * smbus_info = smbus_malloc();
 		ESP_ERROR_CHECK(smbus_init(smbus_info, i2c_num, address));
 		ESP_ERROR_CHECK(smbus_set_timeout(smbus_info, 1000 / portTICK_RATE_MS));
