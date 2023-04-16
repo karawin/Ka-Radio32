@@ -19,7 +19,6 @@
 
 #define TAG "addoni2c_lcd"
 
-#define I2C_MASTER_NUM           I2C_NUM_0
 #define I2C_MASTER_TX_BUF_LEN    0                     // disabled
 #define I2C_MASTER_RX_BUF_LEN    0                     // disabled
 #define I2C_MASTER_FREQ_HZ       100000
@@ -276,30 +275,7 @@ void initI2c_lcd(uint8_t *lcd_type)
 							I2C_MASTER_RX_BUF_LEN,
 							I2C_MASTER_TX_BUF_LEN, 0);
 		i2c_port_t i2c_num = I2C_NUM_0;
-
-		// Finding I2C LCD address, either 0x27 or 0x3F
-		int i;
-		esp_err_t espRc;
-		printf("     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f\n");
-		printf("00:         ");
-		for (i=3; i< 0x78; i++) {
-			i2c_cmd_handle_t cmd = i2c_cmd_link_create();
-			i2c_master_start(cmd);
-			i2c_master_write_byte(cmd, (i << 1) | I2C_MASTER_WRITE, 1 /* expect ack */);
-			i2c_master_stop(cmd);
-
-			espRc = i2c_master_cmd_begin(I2C_NUM_0, cmd, 10/portTICK_PERIOD_MS);
-			if (i%16 == 0) {
-				uint8_t address = scanf("%2x:", &i);
-			}
-			if (espRc == 0) {
-				uint8_t address = scanf("%2x", &i);
-			} else {
-				sprintf(espRc,"I2C address not found!");
-			}
-			//ESP_LOGD(tag, "i=%d, rc=%d (0x%x)", i, espRc, espRc);
-			i2c_cmd_link_delete(cmd);
-		}
+		uint8_t address = LCD_I2C_ADDRESS;
 
 		//////////////////////////////////
 		// Set up the SMBus

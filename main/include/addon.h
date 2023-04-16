@@ -22,6 +22,7 @@
 #define LCD_SPI			64 //0x40
 #define LCD_I2C			0
 #define LCD_NONE		255
+#define LCD_I2C_ADDRESS 0x27 // or 0x3F
 
 // Black&White
 //I2C
