@@ -1,8 +1,9 @@
 /******************************************************************************
  * 
- *Copyright 2018 karawin (http://www.karawin.fr)
+ * Copyright 2018 karawin (http://www.karawin.fr)
  *
- *******************************************************************************/
+ ******************************************************************************/
+
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 #include <stddef.h>
 #include <string.h>
@@ -235,23 +236,39 @@ static uint8_t _wait_for_user(void)
 void initI2c_lcd(uint8_t *lcd_type)
 {
 
-	gpio_num_t scl;
-	gpio_num_t sda;
-
 	if (*lcd_type == LCD_NONE) return;
 
-	//This is switch between different types of I2C LCD with different i2c addresses
+	// Set up I2C
+	i2c_config_t conf;
+	conf.mode = I2C_MODE_MASTER;
+	conf.sda_io_num = PIN_I2C_SDA;
+	conf.sda_pullup_en = GPIO_PULLUP_DISABLE;  // GY-2561 provides 10kΩ pullups
+	conf.scl_io_num = PIN_I2C_SCL;
+	conf.scl_pullup_en = GPIO_PULLUP_DISABLE;  // GY-2561 provides 10kΩ pullups
+	i2c_param_config(I2C_NUM_0, &conf);
+	i2c_driver_install(I2C_NUM_0, conf.mode,
+						I2C_MASTER_RX_BUF_LEN,
+						I2C_MASTER_TX_BUF_LEN, 0);
+	i2c_port_t i2c_num = I2C_NUM_0;
+
+	// Set up SMBus
+	smbus_info_t * smbus_info = smbus_malloc();
+	ESP_ERROR_CHECK(smbus_init(smbus_info, i2c_num, LCD_I2C_ADDRESS));
+	ESP_ERROR_CHECK(smbus_set_timeout(smbus_info, 1000 / portTICK_RATE_MS));
+
+	// Set up the I2C LCD with backlight off
+	i2c_lcd_info_t * lcd_info = i2c_lcd_malloc();
+
+	//This is switch between different types of I2C LCD
 	switch (*lcd_type)
 	{
 		case LCD_I2C_1602:
-			#define LCD_NUM_ROWS               2
-			#define LCD_NUM_COLUMNS            32
-			#define LCD_NUM_VISIBLE_COLUMNS    16
+			ESP_ERROR_CHECK(i2c_lcd_init(lcd_info, smbus_info, true, 2, 32, 16));
+			ESP_ERROR_CHECK(i2c_lcd_reset(lcd_info));
 			break;
 		case LCD_I2C_2004:
-			#define LCD_NUM_ROWS               4
-			#define LCD_NUM_COLUMNS            40
-			#define LCD_NUM_VISIBLE_COLUMNS    20
+			ESP_ERROR_CHECK(i2c_lcd_init(lcd_info, smbus_info, true, 4, 40, 20));
+			ESP_ERROR_CHECK(i2c_lcd_reset(lcd_info));
 			break;
 		default:
 			ESP_LOGE(TAG, "UNKNOWN LCD lcd_type %d. Fall back to type \"LCD_NONE\"", *lcd_type);
@@ -261,34 +278,6 @@ void initI2c_lcd(uint8_t *lcd_type)
 	if (*lcd_type != LCD_NONE)
 	{
 		ESP_LOGD(TAG, "lcd init type: %d", *lcd_type);
-
-		// Set up I2C
-		int i2c_master_port = I2C_NUM_0;
-		i2c_config_t conf;
-		conf.mode = I2C_MODE_MASTER;
-		conf.sda_io_num = sda;
-		conf.sda_pullup_en = GPIO_PULLUP_DISABLE;  // GY-2561 provides 10kΩ pullups
-		conf.scl_io_num = scl;
-		conf.scl_pullup_en = GPIO_PULLUP_DISABLE;  // GY-2561 provides 10kΩ pullups
-		i2c_param_config(i2c_master_port, &conf);
-		i2c_driver_install(i2c_master_port, conf.mode,
-							I2C_MASTER_RX_BUF_LEN,
-							I2C_MASTER_TX_BUF_LEN, 0);
-		i2c_port_t i2c_num = I2C_NUM_0;
-		uint8_t address = LCD_I2C_ADDRESS;
-
-		//////////////////////////////////
-		// Set up the SMBus
-		smbus_info_t * smbus_info = smbus_malloc();
-		ESP_ERROR_CHECK(smbus_init(smbus_info, i2c_num, address));
-		ESP_ERROR_CHECK(smbus_set_timeout(smbus_info, 1000 / portTICK_RATE_MS));
-
-		// Set up the I2C LCD with backlight off
-		i2c_lcd_info_t * lcd_info = i2c_lcd_malloc();
-		ESP_ERROR_CHECK(i2c_lcd_init(lcd_info, smbus_info, true,
-		                                 LCD_NUM_ROWS, LCD_NUM_COLUMNS, LCD_NUM_VISIBLE_COLUMNS));
-
-		ESP_ERROR_CHECK(i2c_lcd_reset(lcd_info));
 
 		// turn off backlight
 		ESP_LOGI(TAG, "backlight off");
@@ -307,3 +296,4 @@ void initI2c_lcd(uint8_t *lcd_type)
 		vTaskDelay(100);
 	}
 }
+
