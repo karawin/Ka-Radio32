@@ -113,13 +113,13 @@ See https://github.com/espressif/esp-idf/issues/6063#issuecomment-1010899552
 To flash all build output, run 'make flash' or :
 
 ```
-python /home/yourhome/esp/esp-idf/components/esptool_py/esptool/esptool.py \
-   --chip esp32 --port com5 --baud 460800 --before default_reset \
+esptool \
+   --chip esp32 --port /dev/ttyUSB0 --baud 921600 --before default_reset \
    --after hard_reset write_flash -u --flash_mode dio \
    --flash_freq 40m --flash_size detect \
-   0x1000 /home/yourhome/esp/Ka-Radio32/build/bootloader/bootloader.bin \
-   0x10000 /home/yourhome/esp/Ka-Radio32/build/KaRadio32.bin \
-   0x8000 /home/yourhome/esp/Ka-Radio32/build/partitions.bin
+   0x1000 $HOME/esp/Ka-Radio32/build/bootloader/bootloader.bin \
+   0x10000 $HOME/esp/Ka-Radio32/build/KaRadio32.bin \
+   0x8000 $HOME/esp/Ka-Radio32/build/partitions.bin
 ```
 ## GPIO Definition 
 The default configuration is given below. It includes an encoder, an IR remote and a LCD or OLED.  
