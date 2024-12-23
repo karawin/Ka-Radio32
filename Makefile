@@ -4,7 +4,7 @@
 #
 
 PROJECT_NAME := KaRadio32
-PROJECT_VER = "2.3.0.0"
+PROJECT_VER = "2.4.0.0"
 
 COMPONENT_ADD_INCLUDEDIRS := components/include
 
