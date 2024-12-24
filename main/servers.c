@@ -209,7 +209,7 @@ void serversTask(void* pvParams) {
 								PRIO_SUBSERV, 
 								NULL, CPU_SUBSERV ) != pdPASS) 
 							{								
-								vTaskDelay(300);
+								vTaskDelay(600);
 								ESP_LOGW(TAG,"low mem. Retrying...");
 							}							
 							break; // while 1

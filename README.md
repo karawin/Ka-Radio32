@@ -1,6 +1,6 @@
 ## STATE
-Release 2.3 R0 Stable  
-ESP-IDF v3.3  
+Release 2.4 R0 Stable  
+ESP-IDF v3.3.6  
 
 See also the version for ESP-IDF v4.4 at    
    https://github.com/karawin/KaRadio32_4
