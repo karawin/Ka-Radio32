@@ -1081,6 +1081,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 
 
 						t2 = strstr(pdata, "Transfer-Encoding: chunked"); // chunked stream?
+						if (t2 == NULL) t2 = strstr(pdata, "transfer-encoding: chunked"); // chunked stream?
 						chunked = 0;
 						t1+= 4;
 						if ( t2 != NULL)

@@ -2,11 +2,23 @@
 <!DOCTYPE html>
 <html>
 <body>
-    <p><span class="label label-success">Release <span id="firmware_last">2.2  Rev 1</span> - Built on 2022/02/05
+    <p><span class="label label-success">Release <span id="firmware_last">2.4  Rev 0</span> - Built on 2024/12/24
 	</span>
 	</p>	
     New:
 	<ul id="ordered">
+		<li> 2.4 R0: 
+		<ul id="ordered">
+		<li>Real time optimizations</li>
+		</ul></li>	
+		<li> 2.3 R0: 
+		<ul id="ordered">
+		<li>RAM optimization</li>
+		<li>Audio buffer size incremented.</li>
+		<li>Bugs correction: HTML chunks processing and Meta computing</li>
+		<li>Stack crash on http instant command removed</li>
+		<li>AAC Decoding improved</li>
+		</ul></li>	
 		<li> 2.2 R1: 
 		<ul id="ordered">
 		<li>Introducing WIFI QoS  Ip precedence AC_VI</li>
