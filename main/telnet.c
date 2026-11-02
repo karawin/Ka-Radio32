@@ -15,7 +15,6 @@
 #include "lwip/opt.h"
 #include "esp_system.h"
 #include "lwip/sockets.h"
-#include "cencode_inc.h"
 #include "telnet.h"
 #include "interface.h"
 
@@ -23,7 +22,7 @@
 
 //const char strtMALLOC1[] = {"Telnet %s kmalloc fails\n"};
 #define strtSOCKET	"Telnet Socket fails %s errno: %d"
-const char strtWELCOME[]  ={"Karadio telnet\n> "};
+const char strtWELCOME[] = {"Karadio telnet\n> "};
 
 
 int telnetclients[NBCLIENTT];

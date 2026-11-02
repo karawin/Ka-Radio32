@@ -6,17 +6,19 @@
 	minimal implementaion for short data messages
 */
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
+
+//#include <stddef.h> /* for size_t */
 #include <string.h>
 #include "esp_system.h"
 #include "lwip/api.h"
 #include "lwip/sockets.h"
-#include "cencode_inc.h"
+
+#include "mbedtls/base64.h"
+#include "mbedtls/sha1.h"
+
 #include "websocket.h"
 #include "interface.h"
 #include "webserver.h"
-#include "cencode_inc.h"
-#include "libsha1.h"
-//#include <stddef.h> /* for size_t */
 
 #define TAG	"websocket"
 
@@ -28,32 +30,43 @@ client_t webserverclients[NBCLIENT];
 //set of socket descriptors
 fd_set readfds;
 
-void base64_encode_local(uint8_t * data, size_t length, char* output) {
-//    size_t size = ((length * 1.6f) + 1);
-    if(output) {
-        base64_encodestate _state;
-        base64_init_encodestate(&_state);
-        int len = base64_encode_block((const char *) data, length, output, &_state);
-        len = base64_encode_blockend((output + len), &_state);
+void base64_encode_local(uint8_t *data, size_t length, char *output) {
+    size_t olen = 0;
+
+    if (data && output) {
+        if (mbedtls_base64_encode(
+                (unsigned char *)output, 29, &olen,
+                data, length) == 0) {
+            output[olen] = '\0';
+        }
     }
 }
-
 
 /**
  * generate the key for Sec-WebSocket-Accept
  * @param clientKey char*
  * @param Output char*
  */
-void  websocketacceptKey(char* clientKey,char* Output) {
-    uint8_t sha1HashBin[20] = { 0 };
-    strcat(clientKey ,"258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
-	
-    SHA1_CTX ctx;
-	
-    SHA1IInit(&ctx);
-    SHA1IUpdate(&ctx, (const unsigned char*)clientKey, strlen(clientKey));
-    SHA1IFinal(&sha1HashBin[0], &ctx);
-    base64_encode_local(sha1HashBin, 20,Output);
+void websocketacceptKey(char *clientKey, char *Output) {
+    static const char magic[] =
+        "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+
+    uint8_t sha1HashBin[20];
+    char key[128];
+
+    if (!clientKey || !Output)
+        return;
+
+    if (strlen(clientKey) + sizeof(magic) > sizeof(key))
+        return;
+
+	strcpy(key, clientKey);
+	strcat(key, magic);
+
+	mbedtls_sha1((const unsigned char *)key,
+				strlen(key), sha1HashBin);
+
+	base64_encode_local(sha1HashBin, sizeof(sha1HashBin), Output);
 }
 
 void wsclientDisconnect(int socket, uint16_t code, char * reason, size_t reasonLen) {
