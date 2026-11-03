@@ -50,7 +50,7 @@ Commands:\n\
 //////////////////\n\
   Debug commands   \n\
 //////////////////\n\
-dbg.ssl(\"x\"): Display or Tune the log level of the wolfssl component. 0: error to 3 full log.\n\
+dbg.ssl(\"x\"): Display or set Mbed TLS debug level (0: off, 3: full).\n\
 dbg.fifo: Display the audio buffer level.\n\n\
 //////////////////\n\
  Wifi related commands\n\
@@ -1412,26 +1412,24 @@ void sys_conf()
 
 void dbgSSL(char* s)
 {
-	extern bool logTel;
-    char *t = strstr(s, parslashquote);
+	char *t = strstr(s, parslashquote);
 	if(t == NULL)
 	{
-		kprintf("##dbg.ssl is %d#\n",(g_device->options&T_WOLFSSL)>>S_WOLFSSL);
+		kprintf("##dbg.ssl is %d#\n",(g_device->options&T_TLSLOG)>>S_TLSLOG);
 		return;
 	}
-	char *t_end  = strstr(t, parquoteslash);
-    if(t_end == NULL)
+	char *t_end = strstr(t+2, parquoteslash);
+	if(t_end != t+3 || t[2] < '0' || t[2] > '3')
     {
 		kprintf(stritCMDERROR);
 		return;
-    }	
-	uint8_t value = atoi(t+2);
-	if (value>3) value = 3;
-	g_device->options &= NT_WOLFSSL; //clear
-	g_device->options |= (value<<S_WOLFSSL)& T_WOLFSSL;
-
+	}
+	uint8_t value = t[2] - '0';
+	g_device->options &= NT_TLSLOG;
+	g_device->options |= (value<<S_TLSLOG)&T_TLSLOG;
+	tlsDebugSetLevel(value);
 	dbgSSL((char*)"");
-	saveDeviceSettings(g_device);	
+	saveDeviceSettings(g_device);
 }
 
 
