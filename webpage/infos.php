@@ -33,8 +33,8 @@
 With this android app you can select the WebRadio station you want to play, set the volume and get the station information such as Station name, Genre, Bit rate, Meta data and more. </p>
 <BR/>
 <h1>Playlists:</h1><BR/>
-My playlist: <a href="http://karadio.karawin.fr/playlist/WebStations.txt" download> WebStations.txt</a> updated on 2021/03/03<BR/>
-An italian playlist: <a href="http://karadio.karawin.fr/playlist/WebStations_Italy.txt" download> WebStations_Italy.txt</a><BR/>
+My playlist: <a href="http://karadio.karawin.fr/playlist/WebStations.txt" download> WebStations.txt</a> updated on 2026/03/09<BR/>
+An italian playlist: <a href="http://karadio.karawin.fr/playlist/WebStations_Italy1.txt" download> WebStations_Italy1.txt</a>updated on 2023/12/05<BR/>
 A list of Swiss radio station: <a href="http://karadio.karawin.fr/playlist/WebStationssuisse.txt" download> WebStationssuisse.txt</a><BR/>
 A list from Sergey Sergeevich): <a href="http://karadio.karawin.fr/playlist/My_WebStations(1).txt" download> My_WebStations(1).txt</a> <BR/>
 A list from arlaor (Arturo): <a href="http://karadio.karawin.fr/playlist/WebStationsX.txt" download> WebStationsX.txt</a> <BR/>
@@ -50,7 +50,7 @@ A list from Stego: <a href="http://karadio.karawin.fr/playlist/WebStations_Belgi
 A list of greek stations from Kosmas: <a href="http://karadio.karawin.fr/playlist/WebStationsGreek.txt" download> Here is a Playlist of Greek stations</a><BR/>
 A list of Hungarian radios from Csaba Dudas: <a href="http://karadio.karawin.fr/playlist/WebStations Hungary Csaba Dudas.txt" download> Here is a Playlist of Hungarian radios</a><BR/>
 A list of Lithuania radios from Virginijus Jenkus: <a href="http://karadio.karawin.fr/playlist/Lithuania1.txt" download> Here is a Playlist of Lithuania radios</a><BR/>
-A list of Lithuania radios from sigissoft: <a href="http://karadio.karawin.fr/playlist/Lithuania2.txt" download> Here is a Playlist of Lithuania radios</a><BR/>
+Updated 24Dec22: A list of Lithuania radios from sigissoft: <a href="http://karadio.karawin.fr/playlist/Lithuania2.txt" download> Here is a Playlist of Lithuania radios</a><BR/>
 A list from В.Нурмухаметов: <a href="http://karadio.karawin.fr/playlist/Vladnur.txt" download> Here is a Playlist from В.Нурмухаметов</a><BR/>
 A list from Tomáš Pintér. Slovak and Czech radio stations. Various other radio stations are also included: <a href="http://karadio.karawin.fr/playlist/SK&CZ_+_various_WebStations_[20210113].txt" download> Here is a Playlist from Tomáš Pintér</a><BR/>
 A list from Oleg Kruglov: <a href="http://karadio.karawin.fr/playlist/WebStations_Oleg.txt" download> Download here</a><BR/>
@@ -59,8 +59,11 @@ A list from Roman Marchuk (space wanderer): radio station Radio Record 128kbp<a 
 A list from Andrey A. Smirnov: SmirnovStations.txt<a href="http://karadio.karawin.fr/playlist/SmirnovStations.txt" download> Download here</a><BR/>
 A list from Alexandru Dexter: DexterStations.txt<a href="http://karadio.karawin.fr/playlist/DexterStations.txt" download> Download here</a><BR/>
 A list from Mykhailo Sarabyn: WebStations_Ukraine.txt<a href="http://karadio.karawin.fr/playlist/WebStations_Ukraine.txt" download> Download here</a><BR/>
-A list from Stefanidesz János from Hungary: WebStationsjands.txt<a href="http://karadio.karawin.fr/playlist/WebStationsjands.txt" download> Download here</a><BR/><BR/><A HREF="mailto:jp@karawin.fr">Please Send me your playlist to add it here.</A> <br/> <br/><BR/><BR/>
-
+A list from Stefanidesz János from Hungary: WebStationsjands.txt<a href="http://karadio.karawin.fr/playlist/WebStationsjands.txt" download> Download here</a><BR/>
+A list from Stefanidesz János from Hungary: Hungary_and_Italo_WebStations.txt<a href="http://karadio.karawin.fr/playlist/Hungary_and_Italo_WebStations.txt" download> Download here</a><BR/>
+A list from İsmail Caner Naz from Türkiye (Republic of Turkey): canernazWebStations.txt<a href="http://karadio.karawin.fr/playlist/canernazWebStations.txt" download> Download here</a><BR/>
+A list from Paulo Sousa : Portuguese station list<a href="http://karadio.karawin.fr/playlist/Portuguese Station List.txt" download> Download here</a><BR/>
+<BR/><A HREF="mailto:jp@karawin.fr">Please Send me your playlist to add it here.</A> <br/> <br/><BR/><BR/>
 <h1>Your prototypes:</h1><BR/>
 <a href="http://karadio.karawin.fr/yours/"  target="_blank"><font color="#14A692">Click here to see your prototypes</font></a><BR/>
 

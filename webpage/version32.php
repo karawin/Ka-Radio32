@@ -2,11 +2,16 @@
 <!DOCTYPE html>
 <html>
 <body>
-    <p><span class="label label-success">Release <span id="firmware_last">2.4  Rev 0</span> - Built on 2024/12/24
+    <p><span class="label label-success">Release <span id="firmware_last">2.4  Rev 1</span> - Built on 2026/03/08
 	</span>
 	</p>	
     New:
 	<ul id="ordered">
+		<li> 2.4 R1: 
+		<ul id="ordered">
+		<li>Some chunked transferts were wrongly detected like this one http://streaming.nrjaudio.fm:80/oug7girb92oc?origine=KaRadio</li>
+		<li>No more problem.</li>
+		</ul></li>	
 		<li> 2.4 R0: 
 		<ul id="ordered">
 		<li>Real time optimizations</li>
