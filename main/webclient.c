@@ -13,11 +13,12 @@
 #include "esp_wifi.h"
 #include "freertos/semphr.h"
 
-/* wolfSSL */
-#include "wolfssl/wolfcrypt/settings.h"
-#include "user_settings.h"
-#include "wolfssl/ssl.h"
-#include "wolfssl/certs_test.h"
+#include "mbedtls/ssl.h"
+#include "mbedtls/entropy.h"
+#include "mbedtls/ctr_drbg.h"
+#include "mbedtls/error.h"
+#include "mbedtls/debug.h"
+#include <errno.h>
 
 
 #include "vs1053.h"
@@ -67,9 +68,167 @@ static char clientURL[URLMAX]= {0,0};
 static char clientPath[PATHMAX] = {0,0};
 static uint16_t clientPort = 80;
 
-/* declare wolfSSL objects */
-    WOLFSSL_CTX *wctx ;
-    WOLFSSL *ssl ;
+typedef struct {
+	mbedtls_ssl_context ssl;
+	mbedtls_ssl_config config;
+	mbedtls_entropy_context entropy;
+	mbedtls_ctr_drbg_context drbg;
+	int socket;
+} tls_client_t;
+
+/* Only the webclient task owns this connection; its header parser also reads it. */
+static tls_client_t *tls_client;
+
+static void tlsLogError(const char *operation, int error)
+{
+	char message[96];
+	mbedtls_strerror(error, message, sizeof(message));
+	ESP_LOGE(TAG, "%s failed: -0x%04x (%s)", operation, -error, message);
+}
+
+#if defined(MBEDTLS_DEBUG_C)
+static void tlsDebugCallback(void *context, int level, const char *file,
+                             int line, const char *message)
+{
+	(void)context;
+	(void)file;
+	(void)line;
+	kprintf("MBEDTLS:%d %s", level, message);
+}
+#endif
+
+void tlsDebugSetLevel(uint8_t level)
+{
+#if defined(MBEDTLS_DEBUG_C)
+	static const uint8_t thresholds[4] = {0, 1, 3, 4};
+	if (level <= 3)
+		mbedtls_debug_set_threshold(thresholds[level]);
+#else
+	(void)level;
+#endif
+}
+
+static int tlsSocketSend(void *context, const unsigned char *buffer, size_t length)
+{
+	int socket = *(int *)context;
+	int result = send(socket, buffer, length, 0);
+	if (result >= 0) return result;
+	if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR)
+		return MBEDTLS_ERR_SSL_WANT_WRITE;
+	return MBEDTLS_ERR_SSL_INTERNAL_ERROR;
+}
+
+static int tlsSocketRecv(void *context, unsigned char *buffer, size_t length)
+{
+	int socket = *(int *)context;
+	int result = recv(socket, buffer, length, 0);
+	if (result >= 0) return result;
+	if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR)
+		return MBEDTLS_ERR_SSL_WANT_READ;
+	return MBEDTLS_ERR_SSL_INTERNAL_ERROR;
+}
+
+static void tlsClose(void)
+{
+	if (!tls_client) return;
+	mbedtls_ssl_free(&tls_client->ssl);
+	mbedtls_ssl_config_free(&tls_client->config);
+	mbedtls_ctr_drbg_free(&tls_client->drbg);
+	mbedtls_entropy_free(&tls_client->entropy);
+	free(tls_client);
+	tls_client = NULL;
+}
+
+static bool tlsConnect(int socket, const char *hostname)
+{
+	static const unsigned char personalization[] = "KaRadio32 HTTPS client";
+	int result;
+	TickType_t started;
+	struct timeval timeout = {.tv_sec = 6, .tv_usec = 0};
+
+	tls_client = calloc(1, sizeof(*tls_client));
+	if (!tls_client) return false;
+	tls_client->socket = socket;
+	mbedtls_ssl_init(&tls_client->ssl);
+	mbedtls_ssl_config_init(&tls_client->config);
+	mbedtls_entropy_init(&tls_client->entropy);
+	mbedtls_ctr_drbg_init(&tls_client->drbg);
+
+	/* Bound blocking socket calls during handshake and streaming. */
+	setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+	setsockopt(socket, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+
+	result = mbedtls_ctr_drbg_seed(&tls_client->drbg, mbedtls_entropy_func,
+		&tls_client->entropy, personalization, sizeof(personalization) - 1);
+	if (result != 0) goto failed;
+	result = mbedtls_ssl_config_defaults(&tls_client->config,
+		MBEDTLS_SSL_IS_CLIENT, MBEDTLS_SSL_TRANSPORT_STREAM, MBEDTLS_SSL_PRESET_DEFAULT);
+	if (result != 0) goto failed;
+	/* Preserve the previous behavior: encrypted connection, no peer authentication. */
+	mbedtls_ssl_conf_authmode(&tls_client->config, MBEDTLS_SSL_VERIFY_NONE);
+	mbedtls_ssl_conf_rng(&tls_client->config, mbedtls_ctr_drbg_random, &tls_client->drbg);
+#if defined(MBEDTLS_DEBUG_C)
+	mbedtls_ssl_conf_dbg(&tls_client->config, tlsDebugCallback, NULL);
+#endif
+	result = mbedtls_ssl_setup(&tls_client->ssl, &tls_client->config);
+	if (result != 0) goto failed;
+	/* Send SNI even though certificate verification is disabled. */
+	result = mbedtls_ssl_set_hostname(&tls_client->ssl, hostname);
+	if (result != 0) goto failed;
+	mbedtls_ssl_set_bio(&tls_client->ssl, &tls_client->socket,
+		tlsSocketSend, tlsSocketRecv, NULL);
+
+	started = xTaskGetTickCount();
+	do {
+		result = mbedtls_ssl_handshake(&tls_client->ssl);
+		if (result == 0) return true;
+		if (result != MBEDTLS_ERR_SSL_WANT_READ &&
+		    result != MBEDTLS_ERR_SSL_WANT_WRITE) goto failed;
+		vTaskDelay(1);
+	} while ((TickType_t)(xTaskGetTickCount() - started) < pdMS_TO_TICKS(20000));
+	ESP_LOGE(TAG, "TLS handshake timed out");
+	tlsClose();
+	return false;
+failed:
+	tlsLogError("TLS handshake/setup", result);
+	tlsClose();
+	return false;
+}
+
+/* Return zero for retryable reads, as the existing stream loop expects. */
+static int tlsRead(void *buffer, size_t length)
+{
+	int result = mbedtls_ssl_read(&tls_client->ssl, buffer, length);
+	if (result == MBEDTLS_ERR_SSL_WANT_READ || result == MBEDTLS_ERR_SSL_WANT_WRITE)
+		return 0;
+	if (result == MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY)
+		return 0;
+	if (result < 0) tlsLogError("TLS read", result);
+	return result;
+}
+
+static bool tlsWriteAll(const void *buffer, size_t length)
+{
+	size_t written = 0;
+	TickType_t started = xTaskGetTickCount();
+	while (written < length) {
+		int result = mbedtls_ssl_write(&tls_client->ssl,
+			(const unsigned char *)buffer + written, length - written);
+		if (result > 0) {
+			written += result;
+			continue;
+		}
+		if (result != MBEDTLS_ERR_SSL_WANT_READ &&
+		    result != MBEDTLS_ERR_SSL_WANT_WRITE) {
+			if (result < 0) tlsLogError("TLS write", result);
+			return false;
+		}
+		if ((TickType_t)(xTaskGetTickCount() - started) >= pdMS_TO_TICKS(20000))
+			return false;
+		vTaskDelay(1);
+	}
+	return true;
+}
 
 static const struct hostent *serverInfo = NULL;
 static char* pseudoUtf8(char* str,int *len);
@@ -1091,7 +1250,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 								int ilen;
 								if (https)
 								{
-									ilen = wolfSSL_read(ssl, pdata+len, RECEIVE+8-len);
+									ilen = tlsRead(pdata+len, RECEIVE+8-len);
 									if (ilen >0) len += ilen;
 								}
 								else
@@ -1099,7 +1258,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 									ilen = recv(sockfd, pdata+len, RECEIVE+8-len, 0); 
 									if (ilen >0) len += ilen; 
 								}
-								if (ilen <0) {clientDisconnect("chunk2");break;}							
+								if (ilen <= 0) {clientDisconnect("chunk2");return;}
 							}
 							chunked = (uint32_t) strtol(t1, NULL, 16) +2;
 							if (strchr((t1),0x0A) != NULL)
@@ -1120,7 +1279,7 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 					vTaskDelay(1); //avoid watchdog is infernal loop
 					
 					if (https)
-						bread = wolfSSL_read(ssl, pdata+len, RECEIVE-len);
+						bread = tlsRead(pdata+len, RECEIVE-len);
 					else
 						bread = recvfrom(sockfd, pdata+len, RECEIVE-len, 0, NULL, NULL);					
 					if (bread <0) {clientDisconnect("header11");break;}
@@ -1166,15 +1325,15 @@ void clientReceiveCallback(int sockfd, char *pdata, int len)
 
 						while (lc != 0)
 						{
-							while (lc < cchunk+9)
+								while (lc < cchunk+9)
 							{
 								vTaskDelay(1);
 							
 								if (https)
-									bread = wolfSSL_read(ssl, pdata+len, 9);
+									bread = tlsRead(pdata+len, 9);
 								else
 									bread = recvfrom(sockfd, pdata+len, 9, 0, NULL, NULL);
-								if (bread <0) {clientDisconnect("chunk1");break;}
+									if (bread <= 0) {clientDisconnect("chunk1");return;}
 								if (bread >0) clen = bread;
 								else clen = 0;
 								lc+=clen;len+=clen;
@@ -1380,21 +1539,6 @@ ESP_LOGD(TAG,"mt2 len:%d, clen:%d, metad:%d, l:%d, inpdata:%x,  rest:%d",len,cle
 
 
 uint8_t bufrec[RECEIVE+20];
-    /* declare wolfSSL objects */
-    WOLFSSL_CTX *wctx;
-    WOLFSSL *ssl;
-
-void wolfSSL_log_function(const int logLevel, const char *const logMessage){
-//    ESP_LOGD(TAG,"WOLFSSL:%s\n",logMessage);
-if (logLevel <= wolfSSL_getLogState())
-	kprintf("WOLFSSL:%d %s\n",logLevel,logMessage);
-}
-
-uint8_t wolfSSL_getLogState()
-{
-	uint8_t level[4]= {0,1,3,4};
-	return (level[(g_device->options&T_WOLFSSL)>>S_WOLFSSL]);
-}
 	
 void clientTask(void *pvParams) {
 	portBASE_TYPE uxHighWaterMark;
@@ -1406,31 +1550,13 @@ void clientTask(void *pvParams) {
 	uint8_t cnterror;
 	char userAgent[40];
 	struct sockaddr_in dest;
-	int ret;
-
 	vTaskDelay(200);
 	spiRamFifoInit();	
 
 	if (strlen(g_device->ua) == 0) strcpy(g_device->ua,"Karadio32/2.0");
 	strcpy(userAgent, g_device->ua);
 //----------------------------------------------------------------------
-	/* Initialize wolfSSL */
-//	wolfSSL_getLogState()?wolfSSL_Debugging_ON():wolfSSL_Debugging_OFF();
-	wolfSSL_Debugging_ON();
-	if (wolfSSL_Init() != WOLFSSL_SUCCESS) {
-		ESP_LOGE(TAG,"Failed to init WOLFSSL");}
-	/* Create and initialize WOLFSSL_CTX */
-	if ((wctx = wolfSSL_CTX_new(wolfSSLv23_client_method())) == NULL) {
-		ESP_LOGE(TAG,"Failed to create WOLFSSL_CTX");
-	}
-    wolfSSL_SetLoggingCb(wolfSSL_log_function);	
-	/* Load client certificates into WOLFSSL_CTX */
-	if ((ret = wolfSSL_CTX_load_verify_buffer(wctx, client_cert_der_1024,
-		sizeof_client_cert_der_1024, WOLFSSL_FILETYPE_ASN1)) != SSL_SUCCESS) {
-		ESP_LOGE(TAG,"Failed to load %d, please check the file.",ret);
-	}
-	/* not peer check */
-	wolfSSL_CTX_set_verify(wctx, WOLFSSL_VERIFY_NONE, 0);
+	tlsDebugSetLevel((g_device->options&T_TLSLOG)>>S_TLSLOG);
 //----------------------------------------------------------------------
 					
 //	portBASE_TYPE uxHighWaterMark;
@@ -1458,30 +1584,17 @@ void clientTask(void *pvParams) {
 			ESP_LOGI(TAG,"IP: %x   ADDR:%s", dest.sin_addr.s_addr, inet_ntoa(*(struct in_addr*)(serverInfo-> h_addr_list[0])));
 			bytes_read = 0;
 			/*---Connect to server---*/
-			ssl = NULL;
+			tlsClose();
+			test_https();
 			if(connect(sockfd, (struct sockaddr*)&dest, sizeof(dest)) >= 0)
 			{
-				test_https();
 				if (https)
 				{
 					spiRamFifoDestroy();
 					setSPIRAMSIZE(128); // need heap for ssl connect
 					spiRamFifoInit();
 					vTaskDelay(1);
-//					wolfSSL_getLogState()?wolfSSL_Debugging_ON():wolfSSL_Debugging_OFF();
-					/* Create a WOLFSSL object */
-					if ((ssl = wolfSSL_new(wctx)) == NULL) {
-						ESP_LOGE(TAG,"Failed to create WOLFSSL ssl object");
-						goto NotConnected;
-					}
-					wolfSSL_set_using_nonblock(ssl, 1);    
-					/* Attach wolfSSL to the socket */
-					wolfSSL_set_fd(ssl, sockfd);
-				
-					/* Connect to wolfSSL on the server side */
-					if (wolfSSL_connect(ssl) != SSL_SUCCESS) {
-						int err=wolfSSL_get_error(ssl, 0);
-						ESP_LOGE(TAG,"WolfSSL_connect error: %d",err);
+					if (!tlsConnect(sockfd, cleanURL())) {
 						goto NotConnected;
 					}				
 				}
@@ -1511,8 +1624,8 @@ void clientTask(void *pvParams) {
 				xSemaphoreTake(sConnected, 0);
 				if (https)
 				{
-					if (wolfSSL_write(ssl, bufrec, strlen((char*)bufrec)) != strlen((char*)bufrec)) {
-						ESP_LOGE(TAG,"wolfSSL_write");
+					if (!tlsWriteAll(bufrec, strlen((char*)bufrec))) {
+						ESP_LOGE(TAG,"TLS write failed");
 						goto clearAll;
 					}
 				}
@@ -1535,25 +1648,8 @@ void clientTask(void *pvParams) {
 				ramSinit();
 				do
 				{
-					if (https)
-					{
-//						int incr = 0;
-//						bytes_read = 0;
-//						while (( bytes_read <= 0 )&& (incr++ <2))
-						{	
-							bytes_read = wolfSSL_read(ssl, bufrec, RECEIVE);							
-							if ( bytes_read < 0 )
-							{   					    
-								int err;
-								char buffer[80];
-								err = wolfSSL_get_error(ssl, 0);
-								wolfSSL_ERR_error_string(err, buffer);
-								ESP_LOGW(TAG,"wolfSSL_read: %d, read: %s",err, buffer);
-								if (wolfSSL_want_read(ssl) == 1) bytes_read = 0;
-								vTaskDelay(10);
-							}	
-						}						
-					}	
+				if (https)
+					bytes_read = tlsRead(bufrec, RECEIVE);
 					else
 					{
 						bytes_read = recvfrom(sockfd, bufrec,RECEIVE, 0, NULL, NULL);						
@@ -1575,7 +1671,7 @@ void clientTask(void *pvParams) {
 					{
 						ESP_LOGW(TAG,"No data in recv. Errno = %d, error count: %d",errno,++cnterror);
 						vTaskDelay(10);
-						if ((errno == 128)||(cnterror >= 10 )) break;
+						if (bytes_read < 0 || (errno == 128 && !https) || cnterror >= 10) break;
 					}
 					vTaskDelay(2); // >1 mandatory
 					// if a stop is asked
@@ -1592,10 +1688,7 @@ void clientTask(void *pvParams) {
 				shutdown(sockfd,SHUT_RDWR); // stop the socket
 				vTaskDelay(1);
 				clientDisconnect("Invalid");
-				if (https){
-					if (ssl) wolfSSL_free(ssl);     /* Free the wolfSSL object */
-					ESP_LOGI(TAG,"SSL Cleanup Socket: %d",sockfd);
-				}
+				tlsClose();
 				close(sockfd);
 				continue;
 			}
@@ -1649,10 +1742,7 @@ void clientTask(void *pvParams) {
 			
 			clearAll:
 			spiRamFifoReset();
-			if (https){
-				if (ssl) wolfSSL_free(ssl);    // Free the wolfSSL object 
-				ESP_LOGI(TAG,"SSL Cleanup 1 Socket: %d",sockfd);
-			}
+			tlsClose();
 			shutdown(sockfd,SHUT_RDWR); // stop the socket
 			vTaskDelay(10);
 			close(sockfd);

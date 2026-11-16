@@ -83,7 +83,7 @@ void wsVol(char* vol);
 void wsMonitor();
 void wsStationNext();
 void wsStationPrev();
-uint8_t wolfSSL_getLogState();
+void tlsDebugSetLevel(uint8_t level);
 
 
 #endif

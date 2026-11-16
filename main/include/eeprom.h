@@ -20,9 +20,9 @@
 #define NT_LEDPOL	0xF7
 #define T_LOGTEL	0x10
 #define NT_LOGTEL	0xEF
-#define T_WOLFSSL	0x60
-#define NT_WOLFSSL	0x9F
-#define S_WOLFSSL	0x5 //Shift right 
+#define T_TLSLOG	0x60
+#define NT_TLSLOG	0x9F
+#define S_TLSLOG	0x5 // Keep saved settings compatible
 //define for bit array options32
 #define T_DDMM		1
 #define NT_DDMM		0xFE
@@ -71,7 +71,7 @@ struct device_settings {
 	uint8_t i2sspeed; // 0 = 48kHz, 1 = 96kHz, 2 = 128kHz
 	uint32_t uartspeed; // serial baud
 	uint8_t options;  // bit0:0 theme ligth blue, 1 Dark brown, bit1: 0 patch load  1 no patch, bit2: O blink led  1 led on On play, bit3:led polarity 0 normal 1 reverse, bit 4: log syst on telnet, 
-	// bit 3&4: log wolfssl  OFF(0)  ERROR&INFO(1) ENTER&LEAVE(2)  OTHER_LOG(3)
+	// bits 5&6: Mbed TLS debug level 0..3
 	char ua[USERAGLEN]; // user agent
 	int8_t tzoffsetm; //timezone offset (minutes)
 	int8_t tzoffseth; //timezone offset	(hour)
