@@ -9,7 +9,7 @@ function openwebsocket(){
 //	autoplay(); //to force the server socket to accept and open the web server client.
 	websocket = new WebSocket("ws://"+window.location.host+"/");
 	console.log("url:"+"ws://"+window.location.host+"/");
-
+	setInterval(wsaskrssi, 2000); // start the rssi display
 
 	websocket.onmessage = function (event) {
 	try{	
@@ -29,7 +29,8 @@ function openwebsocket(){
 		if (arr["wssound"]) soundResp(arr["wssound"]); 
 		if (arr["monitor"]) playMonitor(arr["monitor"]); 
 		if (arr["wsstation"]) wsplayStation(arr["wsstation"]); 
-		if (arr["wsrssi"]) {document.getElementById('rssi').innerHTML = arr["wsrssi"]+' dBm';setTimeout(wsaskrssi,5000);}
+		if (arr["wsrssi"]) 
+			{document.getElementById('rssi').innerHTML = arr["wsrssi"]+' dBm';/*setTimeout(wsaskrssi,5000);*/}
 		if (arr["upgrade"]) {document.getElementById('updatefb').innerHTML = arr["upgrade"];}
 		if (arr["iurl"]) {document.getElementById('instant_url').value  = arr["iurl"];buildURL();}
 		if (arr["ipath"]) {document.getElementById('instant_path').value = arr["ipath"];buildURL();}
@@ -43,8 +44,8 @@ function openwebsocket(){
 			window.clearInterval(window.timerID);
 			window.timerID=0;
 		}
-		setTimeout(wsaskrssi, 5000); // start the rssi display
 		websocket.send("opencheck");
+		// setTimeout(wsaskrssi, 10000); // start the rssi display
 	}
 	websocket.onclose = function (event) {
 		console.log("onclose code: "+event.code);
