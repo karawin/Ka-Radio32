@@ -1,5 +1,5 @@
 ## STATE
-Release 2.5 R1 Stable  
+Release 2.5 R2 Stable  
 ESP-IDF v3.3.6  
 
 See also the version for ESP-IDF v4.4 at    
