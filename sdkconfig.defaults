@@ -1,5 +1,4 @@
 # Override defaults here
-CONFIG_MBEDTLS_DEBUG=y
 
 
 #
